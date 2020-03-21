@@ -10,5 +10,9 @@
   "license": "ISC",
   "devDependencies": {
     "@now/node": "^1.4.1"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3"
   }
 }
