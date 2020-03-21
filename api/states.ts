@@ -5,6 +5,8 @@ import State from '../model';
 
 export default async (req: NowRequest, res: NowResponse) => {
 
+    res.setHeader('Cache-Control', 's-maxage=3600');
+
     let states = [];
     
     const $ = await fetchData('https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html');
