@@ -1,5 +1,8 @@
 # Robert-Koch Institut API
 
+This is a JSON API to easily get the data from this website:
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
+
 ## Endpoint
 
 `https://rki-covid-api.now.sh/api/states`
