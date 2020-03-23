@@ -54,7 +54,7 @@ function getAbbreviation(name: string) {
         case "Bremen":
             return "HB";
         case "Hamburg":
-            return "HB";
+            return "HH";
         case "Hessen":
             return "HE";
         case "Mecklenburg-Vor­pommern":
