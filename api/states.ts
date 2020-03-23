@@ -32,6 +32,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 }
 
 function parseNumber(text: string) {
+    if (text == "") {
+        return 0;
+    }
     text = text.replace(".", "");
     return parseInt(text);
 }
