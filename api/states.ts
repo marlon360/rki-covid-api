@@ -16,7 +16,7 @@ export default async (req: NowRequest, res: NowResponse) => {
             let name = $(element).find("td").get(0);
             let count = $(element).find("td").get(1);
             let difference = $(element).find("td").get(2);
-            let deaths = $(element).find("td").get(3);
+            let deaths = $(element).find("td").get(4);
             
             let state = new State();
             state.name = $(name).text();
