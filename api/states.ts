@@ -17,14 +17,14 @@ export default async (req: NowRequest, res: NowResponse) => {
             let count = $(element).find("td").get(1);
             let difference = $(element).find("td").get(2);
             let deaths = $(element).find("td").get(4);
-            
+
             let state = new State();
             state.name = $(name).text();
             state.count = parseNumber($(count).text());
-            state.difference = parseInt($(difference).text());
+            state.difference = parseNumber($(difference).text());
             state.deaths = parseNumber($(deaths).text());
             state.code = getAbbreviation(state.name);
-            
+
             states.push(state);
         }
     });
@@ -35,7 +35,10 @@ function parseNumber(text: string) {
     if (text == "") {
         return 0;
     }
+
     text = text.replace(".", "");
+    text = text.replace("*", "");
+
     return parseInt(text);
 }
 
