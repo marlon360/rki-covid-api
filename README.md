@@ -9,7 +9,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
 ## Project Showcase
 
-[Add your project by openening an issue wirh your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
+[Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
 
 ## Data Structure
 
