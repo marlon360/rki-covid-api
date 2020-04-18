@@ -7,6 +7,10 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
 `https://rki-covid-api.now.sh/api/states`
 
+## Project Showcase
+
+[Add your project by openening an issue wirh your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
+
 ## Data Structure
 
 ```json
@@ -26,90 +30,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
       "deaths": 23,
       "code": "BY"
     },
-    {
-      "name": "Berlin",
-      "count": 866,
-      "difference": 135,
-      "deaths": 23,
-      "code": "BE"
-    },
-    {
-      "name": "Brandenburg",
-      "count": 254,
-      "difference": 62,
-      "deaths": 10,
-      "code": "BB"
-    },
-    {
-      "name": "Bremen",
-      "count": 142,
-      "difference": 21,
-      "deaths": 21,
-      "code": "HB"
-    },
-    {
-      "name": "Hamburg",
-      "count": 587,
-      "difference": 1,
-      "deaths": 32,
-      "code": "HB"
-    },
-    {
-      "name": "Hessen",
-      "count": 1080,
-      "difference": 267,
-      "deaths": 17,
-      "code": "HE"
-    },
-    {
-      "name": "Mecklenburg-Vor­pommern",
-      "count": 165,
-      "difference": 34,
-      "deaths": 10,
-      "code": "MV"
-    },
-    {
-      "name": "Niedersachsen",
-      "count": 1023,
-      "difference": 220,
-      "deaths": 13,
-      "code": "NI"
-    },
-    {
-      "name": "Nordrhein-West­falen",
-      "count": 3542,
-      "difference": 45,
-      "deaths": 20,
-      "code": "NW"
-    },
-    {
-      "name": "Rhein­land-Pfalz",
-      "count": 938,
-      "difference": 137,
-      "deaths": 23,
-      "code": "RP"
-    },
-    {
-      "name": "Saarland",
-      "count": 187,
-      "difference": 41,
-      "deaths": 19,
-      "code": "SL"
-    },
-    {
-      "name": "Sachsen",
-      "count": 567,
-      "difference": 173,
-      "deaths": 14,
-      "code": "SN"
-    },
-    {
-      "name": "Sachsen-Anhalt",
-      "count": 188,
-      "difference": 8,
-      "deaths": 9,
-      "code": "ST"
-    },
+    ...
     {
       "name": "Schles­wig-Holstein",
       "count": 308,
@@ -127,3 +48,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
   ]
 }
 ```
+
+## Donation
+
+[Buy me a coffee](https://ko-fi.com/marlon360)
