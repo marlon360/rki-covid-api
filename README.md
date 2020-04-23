@@ -1,5 +1,11 @@
 # Robert-Koch Institut API
 
+## 🚨Broken API
+
+Unfortunately the RKI removed the data from their website.
+At the moment the data is only available on their dashboard (https://corona.rki.de).
+This api needs to be rewritten to access the data from the dashboard.
+
 This is a JSON API to easily get the data from this website:
 https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
