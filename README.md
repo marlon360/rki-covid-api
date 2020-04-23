@@ -7,9 +7,11 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 `https://rki-covid-api.now.sh/api/states`
 
-## Project Showcase
+## Project Showcase (project using this API)
 
 [Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
+
+- https://coronafallzahlen.de
 
 ## Data Structure
 
