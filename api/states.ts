@@ -3,53 +3,43 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import State from '../model';
 
+interface APIData {
+    features: Feature[]
+}
+interface Feature {
+    attributes: {
+        Fallzahl: number,
+        Death: number,
+        LAN_ew_GEN: string
+    }
+}
+
 export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
 
-    let states = [];
+    const repsonse = await axios.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=Fallzahl,Aktualisierung,faelle_100000_EW,Death,LAN_ew_GEN&returnGeometry=false&outSR=4326&f=json");
+    const apidata: APIData = repsonse.data;
+
+    let states: State[] = [];
+
+    for (const feature of apidata.features) {
+        let state = new State();
+        state.name = feature.attributes.LAN_ew_GEN;
+        state.count = feature.attributes.Fallzahl;
+        state.difference = 0;
+        state.deaths = feature.attributes.Death;
+        state.code = getAbbreviation(state.name);
     
-    const $ = await fetchData('https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html');
-    $('table > tbody > tr').each((index, element) => {
-        if (index < 16) {
+        states.push(state);
+    }
 
-            let name = $(element).find("td").get(0);
-            let count = $(element).find("td").get(1);
-            let difference = $(element).find("td").get(2);
-            let deaths = $(element).find("td").get(4);
-
-            let state = new State();
-            state.name = $(name).text();
-            state.count = parseNumber($(count).text());
-            state.difference = parseNumber($(difference).text());
-            state.deaths = parseNumber($(deaths).text());
-            state.code = getAbbreviation(state.name);
-
-            states.push(state);
-        }
-    });
     res.json({ states: states })
 }
 
-function parseNumber(text: string) {
-    if (text == "") {
-        return 0;
-    }
-
-    text = text.replace(".", "");
-    text = text.replace("*", "");
-
-    return parseInt(text);
-}
-
-async function fetchData(url: string) {
-    const result = await axios.get(url);
-    return cheerio.load(result.data);
-};
-
 function getAbbreviation(name: string) {
     switch (name) {
-        case "Baden-Württem­berg":
+        case "Baden-Württemberg":
             return "BW";
         case "Bayern":
             return "BY";
@@ -63,13 +53,13 @@ function getAbbreviation(name: string) {
             return "HH";
         case "Hessen":
             return "HE";
-        case "Mecklenburg-Vor­pommern":
+        case "Mecklenburg-Vorpommern":
             return "MV";
         case "Niedersachsen":
             return "NI";
-        case "Nordrhein-West­falen":
+        case "Nordrhein-Westfalen":
             return "NW";
-        case "Rhein­land-Pfalz":
+        case "Rheinland-Pfalz":
             return "RP";
         case "Saarland":
             return "SL";
@@ -77,7 +67,7 @@ function getAbbreviation(name: string) {
             return "SN";
         case "Sachsen-Anhalt":
             return "ST";
-        case "Schles­wig-Holstein":
+        case "Schleswig-Holstein":
             return "SH";
         case "Thüringen":
             return "TH";
