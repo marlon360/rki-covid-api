@@ -1,7 +1,7 @@
 # Robert-Koch Institut API
 
-This is a JSON API to easily get the data from this API:
-https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0?geometry=-15.251%2C46.270%2C31.507%2C55.886
+This is a JSON API to easily get the data from this website:
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
 ## Endpoint
 
