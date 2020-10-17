@@ -17,6 +17,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
 ```json
 {
+  "lastUpdate": "17.10.2020, 00:00 Uhr (online aktualisiert um 11:20 Uhr)",
   "states": [
     {
       "name": "Baden-Württemberg",
