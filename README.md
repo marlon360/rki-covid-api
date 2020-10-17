@@ -17,34 +17,43 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
 ```json
 {
+  "lastUpdate": "17.10.2020, 00:00 Uhr (online aktualisiert um 11:20 Uhr)",
   "states": [
     {
-      "name": "Baden-Württem­berg",
-      "count": 3668,
-      "difference": 922,
-      "deaths": 33,
+      "name": "Baden-Württemberg",
+      "count": 58653,
+      "difference": 1198,
+      "weekDifference": 4683,
+      "weekIncidence": 42,
+      "deaths": 1927,
       "code": "BW"
     },
     {
       "name": "Bayern",
-      "count": 2960,
-      "difference": 559,
-      "deaths": 23,
+      "count": 77904,
+      "difference": 1224,
+      "weekDifference": 5131,
+      "weekIncidence": 39,
+      "deaths": 2714,
       "code": "BY"
     },
     ...
     {
-      "name": "Schles­wig-Holstein",
-      "count": 308,
-      "difference": 42,
-      "deaths": 11,
+      "name": "Schleswig-Holstein",
+      "count": 5600,
+      "difference": 90,
+      "weekDifference": 387,
+      "weekIncidence": 13,
+      "deaths": 163,
       "code": "SH"
     },
     {
       "name": "Thüringen",
-      "count": 187,
-      "difference": 38,
-      "deaths": 9,
+      "count": 4793,
+      "difference": 82,
+      "weekDifference": 398,
+      "weekIncidence": 18,
+      "deaths": 198,
       "code": "TH"
     }
   ]
