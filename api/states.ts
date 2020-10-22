@@ -11,7 +11,7 @@ interface Feature {
     attributes: {
         Fallzahl: number,
         Aktualisierung: number,
-        faelle_100000_E: number,
+        faelle_100000_EW: number,
         cases7_bl_per_100k: number,
         Death: number,
         LAN_ew_GEN: string
@@ -33,6 +33,7 @@ export default async (req: NowRequest, res: NowResponse) => {
         state.count = feature.attributes.Fallzahl;
         state.deaths = feature.attributes.Death;
         state.weekIncidence = feature.attributes.cases7_bl_per_100k;
+        state.casesPer100k = feature.attributes.faelle_100000_EW;
         state.code = getAbbreviation(state.name);
 
         states.push(state);

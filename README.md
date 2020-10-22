@@ -26,6 +26,7 @@ https://rki-covid-api.now.sh/api/states
       "name": "Baden-Württemberg",
       "count": 58653,
       "weekIncidence": 42,
+      "casesPer100k": 343.099136209832,
       "deaths": 1927,
       "code": "BW"
     },
@@ -33,6 +34,7 @@ https://rki-covid-api.now.sh/api/states
       "name": "Bayern",
       "count": 77904,
       "weekIncidence": 39,
+      "casesPer100k": 123.099136209832,
       "deaths": 2714,
       "code": "BY"
     },
@@ -41,6 +43,7 @@ https://rki-covid-api.now.sh/api/states
       "name": "Schleswig-Holstein",
       "count": 5600,
       "weekIncidence": 13,
+      "casesPer100k": 121.099136209832,
       "deaths": 163,
       "code": "SH"
     },
@@ -48,6 +51,7 @@ https://rki-covid-api.now.sh/api/states
       "name": "Thüringen",
       "count": 4793,
       "weekIncidence": 18,
+      "casesPer100k": 324.099136209832,
       "deaths": 198,
       "code": "TH"
     }
