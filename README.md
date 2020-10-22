@@ -4,10 +4,11 @@ This is a JSON API to easily get the data from this website:
 
 [~~https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html~~](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html)
 
-https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0/data
+https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_GEN,LAN_ew_EWZ,Fallzahl,Aktualisierung,faelle_100000_EW,Death,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json
+
 ## Endpoint
 
-`https://rki-covid-api.now.sh/api/states`
+https://rki-covid-api.now.sh/api/states
 
 ## Project Showcase (project using this API)
 
@@ -19,7 +20,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 ```json
 {
-  "lastUpdate": "17.10.2020, 00:00 Uhr (online aktualisiert um 11:20 Uhr)",
+  "lastUpdate": 1603317600000,
   "states": [
     {
       "name": "Baden-Württemberg",

@@ -8,7 +8,7 @@ interface APIData {
 }
 
 interface Feature {
-    properties: {
+    attributes: {
         Fallzahl: number,
         Aktualisierung: number,
         faelle_100000_E: number,
@@ -24,21 +24,21 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     let states = [];
     
-    const repsonse = await axios.get("https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.geojson");
+    const repsonse = await axios.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_GEN,LAN_ew_EWZ,Fallzahl,Aktualisierung,faelle_100000_EW,Death,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json");
     const apidata: APIData = repsonse.data;
 
     for (const feature of apidata.features) {
         let state = new State();
-        state.name = feature.properties.LAN_ew_GEN;
-        state.count = feature.properties.Fallzahl;
-        state.deaths = feature.properties.Death;
-        state.weekIncidence = feature.properties.cases7_bl_per_100k;
+        state.name = feature.attributes.LAN_ew_GEN;
+        state.count = feature.attributes.Fallzahl;
+        state.deaths = feature.attributes.Death;
+        state.weekIncidence = feature.attributes.cases7_bl_per_100k;
         state.code = getAbbreviation(state.name);
 
         states.push(state);
     }
 
-    res.json({ lastUpdate: apidata.features[0].properties.Aktualisierung, states: states })
+    res.json({ lastUpdate: apidata.features[0].attributes.Aktualisierung, states: states })
 }
 
 function parseNumber(text: string) {
