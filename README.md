@@ -1,8 +1,10 @@
 # Robert-Koch Institut API
 
 This is a JSON API to easily get the data from this website:
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
 
+[~~https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html~~](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html)
+
+https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0/data
 ## Endpoint
 
 `https://rki-covid-api.now.sh/api/states`
@@ -22,8 +24,6 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
     {
       "name": "Baden-Württemberg",
       "count": 58653,
-      "difference": 1198,
-      "weekDifference": 4683,
       "weekIncidence": 42,
       "deaths": 1927,
       "code": "BW"
@@ -31,8 +31,6 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
     {
       "name": "Bayern",
       "count": 77904,
-      "difference": 1224,
-      "weekDifference": 5131,
       "weekIncidence": 39,
       "deaths": 2714,
       "code": "BY"
@@ -41,8 +39,6 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
     {
       "name": "Schleswig-Holstein",
       "count": 5600,
-      "difference": 90,
-      "weekDifference": 387,
       "weekIncidence": 13,
       "deaths": 163,
       "code": "SH"
@@ -50,8 +46,6 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html
     {
       "name": "Thüringen",
       "count": 4793,
-      "difference": 82,
-      "weekDifference": 398,
       "weekIncidence": 18,
       "deaths": 198,
       "code": "TH"

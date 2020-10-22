@@ -3,39 +3,42 @@ import axios from 'axios';
 import cheerio from 'cheerio';
 import State from '../model';
 
+interface APIData {
+    features: Feature[]
+}
+
+interface Feature {
+    properties: {
+        Fallzahl: number,
+        Aktualisierung: number,
+        faelle_100000_E: number,
+        cases7_bl_per_100k: number,
+        Death: number,
+        LAN_ew_GEN: string
+    }
+}
+
 export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
 
     let states = [];
     
-    const $ = await fetchData('https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html');
+    const repsonse = await axios.get("https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.geojson");
+    const apidata: APIData = repsonse.data;
 
-    let lastUpdate = $('#main > .text > p').first().text().substr(7);
+    for (const feature of apidata.features) {
+        let state = new State();
+        state.name = feature.properties.LAN_ew_GEN;
+        state.count = feature.properties.Fallzahl;
+        state.deaths = feature.properties.Death;
+        state.weekIncidence = feature.properties.cases7_bl_per_100k;
+        state.code = getAbbreviation(state.name);
 
-    $('table > tbody > tr').each((index, element) => {
-        if (index < 16) {
+        states.push(state);
+    }
 
-            let name = $(element).find("td").get(0);
-            let count = $(element).find("td").get(1);
-            let difference = $(element).find("td").get(2);
-            let weekDifference = $(element).find("td").get(3);
-            let weekIncidence = $(element).find("td").get(4);
-            let deaths = $(element).find("td").get(5);
-
-            let state = new State();
-            state.name = cleanText($(name).text());
-            state.count = parseNumber($(count).text());
-            state.difference = parseNumber($(difference).text());
-            state.weekDifference = parseNumber($(weekDifference).text());
-            state.weekIncidence = parseNumber($(weekIncidence).text());
-            state.deaths = parseNumber($(deaths).text());
-            state.code = getAbbreviation(state.name);
-
-            states.push(state);
-        }
-    });
-    res.json({ lastUpdate: lastUpdate, states: states,  })
+    res.json({ lastUpdate: apidata.features[0].properties.Aktualisierung, states: states })
 }
 
 function parseNumber(text: string) {
