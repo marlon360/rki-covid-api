@@ -1,0 +1,7 @@
+{
+    "functions": {
+      "api/states-map.ts": {
+        "includeFiles": "*/**"
+      }
+    }
+  }
