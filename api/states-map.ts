@@ -39,6 +39,7 @@ export default async (req: NowRequest, res: NowResponse) => {
                     Jimp.read(buffer).then(image => {
                         Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then((font) => {
                             image.print(font, 10, 30, "COVID-19-Fälle/100.000 Einwohner");
+                            image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
                             image.print(font, 600, 1006, "Stand vom " + lastUpdate);
                             image.getBufferAsync(Jimp.MIME_PNG).then((buffer) => {
                                 res.setHeader('Content-Type', Jimp.MIME_PNG);
