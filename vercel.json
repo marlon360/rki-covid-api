@@ -1,0 +1,10 @@
+{
+    "functions": {
+      "api/states-map.ts": {
+        "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
+      },
+      "api/districts-map.ts": {
+        "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
+      }
+    }
+  }
