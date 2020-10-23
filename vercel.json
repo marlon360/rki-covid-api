@@ -1,7 +1,7 @@
 {
     "functions": {
       "api/states-map.ts": {
-        "includeFiles": "*/**"
+        "includeFiles": "node_modules/maki/renders/**"
       }
     }
   }
