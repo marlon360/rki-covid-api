@@ -6,17 +6,11 @@ This is a JSON API to easily get the data from this website:
 
 https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_GEN,LAN_ew_EWZ,Fallzahl,Aktualisierung,faelle_100000_EW,Death,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json
 
-## Endpoint
+## Endpoints
 
-https://rki-covid-api.now.sh/api/states
+### `https://rki-covid-api.now.sh/api/states`
 
-## Project Showcase (project using this API)
-
-[Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
-
-- https://coronafallzahlen.de
-
-## Data Structure
+#### Data Structure
 
 ```json
 {
@@ -58,6 +52,27 @@ https://rki-covid-api.now.sh/api/states
   ]
 }
 ```
+
+### `https://rki-covid-api.now.sh/api/states-map`
+
+You receive a PNG image:
+
+<img src="media/states-map.png" alt="states-map" width="300"/>
+
+### `https://rki-covid-api.now.sh/api/districts-map`
+
+You receive a PNG image:
+
+<img src="media/districts-map.png" alt="districts-map" width="300"/>
+
+
+## Project Showcase (project using this API)
+
+[Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
+
+- https://coronafallzahlen.de
+
+
 
 ## Donation
 
