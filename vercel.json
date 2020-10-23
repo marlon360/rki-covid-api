@@ -1,7 +1,7 @@
 {
     "functions": {
       "api/states-map.ts": {
-        "includeFiles": "node_modules/maki/renders/**"
+        "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
       }
     }
   }
