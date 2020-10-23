@@ -1,6 +1,5 @@
 import { NowRequest, NowResponse } from '@now/node'
 import axios from 'axios';
-import cheerio from 'cheerio';
 import State from '../model';
 
 interface APIData {
@@ -41,27 +40,6 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     res.json({ lastUpdate: apidata.features[0].attributes.Aktualisierung, states: states })
 }
-
-function parseNumber(text: string) {
-    if (text == "") {
-        return 0;
-    }
-
-    text = text.replace(".", "");
-    text = text.replace("*", "");
-
-    return parseInt(text);
-}
-
-function cleanText(text: string): string {
-    text = text.replace(/[^\w- ü]+/g, "");
-    return text
-}
-
-async function fetchData(url: string) {
-    const result = await axios.get(url);
-    return cheerio.load(result.data);
-};
 
 function getAbbreviation(name: string) {
     switch (name) {
