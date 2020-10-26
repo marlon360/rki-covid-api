@@ -1,6 +1,6 @@
 import { NowRequest, NowResponse } from '@now/node'
 import axios from 'axios';
-import State from '../model';
+import { State } from '../models';
 
 interface APIData {
     features: Feature[]
