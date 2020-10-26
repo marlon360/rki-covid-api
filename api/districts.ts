@@ -31,7 +31,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     for (const feature of apidata.features) {
         let district = new District();
         district.name = feature.attributes.GEN;
-        district.type = feature.attributes.county.substring(0,2);
+        district.county = feature.attributes.county;
         district.count = feature.attributes.cases;
         district.deaths = feature.attributes.deaths;
         district.weekIncidence = feature.attributes.cases7_per_100k;
