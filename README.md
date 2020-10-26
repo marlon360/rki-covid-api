@@ -72,6 +72,7 @@ You receive a PNG image:
   "districts": [
     {
       "name": "Flensburg",
+      "type": "SK",
       "count": 182,
       "deaths": 3,
       "weekIncidence": 34.3817931768777,
@@ -80,6 +81,7 @@ You receive a PNG image:
     },
     {
       "name": "Kiel",
+      "type": "SK",
       "count": 582,
       "deaths": 12,
       "weekIncidence": 27.5533440845401,
@@ -89,6 +91,7 @@ You receive a PNG image:
     ...
     {
       "name": "Berlin Friedrichshain-Kreuzberg",
+      "type": "SK",
       "count": 2622,
       "deaths": 11,
       "weekIncidence": 172.304376034801,
@@ -97,6 +100,7 @@ You receive a PNG image:
     },
     {
       "name": "Berlin Tempelhof-Schöneberg",
+      "type": "SK",
       "count": 2760,
       "deaths": 28,
       "weekIncidence": 164.729702842831,
