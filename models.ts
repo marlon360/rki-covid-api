@@ -14,6 +14,7 @@ export class State {
 export class District {
 
     public name: string;
+    public county: string;
     public count: number;
     public deaths: number;
     public weekIncidence: number;

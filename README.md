@@ -72,6 +72,7 @@ You receive a PNG image:
   "districts": [
     {
       "name": "Flensburg",
+      "county": "SK Flensburg",
       "count": 182,
       "deaths": 3,
       "weekIncidence": 34.3817931768777,
@@ -80,6 +81,7 @@ You receive a PNG image:
     },
     {
       "name": "Kiel",
+      "county": "SK Flensburg",
       "count": 582,
       "deaths": 12,
       "weekIncidence": 27.5533440845401,
@@ -89,6 +91,7 @@ You receive a PNG image:
     ...
     {
       "name": "Berlin Friedrichshain-Kreuzberg",
+      "county": "SK Berlin Friedrichshain-Kreuzberg",
       "count": 2622,
       "deaths": 11,
       "weekIncidence": 172.304376034801,
@@ -97,6 +100,7 @@ You receive a PNG image:
     },
     {
       "name": "Berlin Tempelhof-Schöneberg",
+      "county": "SK Berlin Tempelhof-Schöneberg",
       "count": 2760,
       "deaths": 28,
       "weekIncidence": 164.729702842831,
