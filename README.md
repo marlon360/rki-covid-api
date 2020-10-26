@@ -1,10 +1,13 @@
-# Robert-Koch Institut API
+# Robert-Koch Institut API (Data & Images)
 
-This is a JSON API to easily get the data from this website:
+With this JSON API you can get the data of corona cases for every state and every district in Germany.
+You have also access to the latest images of maps.
 
-[~~https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html~~](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html)
+Data Sources:
 
-https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_GEN,LAN_ew_EWZ,Fallzahl,Aktualisierung,faelle_100000_EW,Death,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json
+https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0?geometry=-21.159%2C46.211%2C43.177%2C55.839
+
+https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0?geometry=-24.040%2C46.270%2C40.296%2C55.886
 
 ## Endpoints
 
@@ -58,6 +61,51 @@ https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_
 You receive a PNG image:
 
 <img src="media/states-map.png" alt="states-map" width="300"/>
+
+### `https://rki-covid-api.now.sh/api/districts`
+
+#### Data Structure
+
+```json
+{
+  "lastUpdate": "26.10.2020, 00:00 Uhr",
+  "districts": [
+    {
+      "name": "Flensburg",
+      "count": 182,
+      "deaths": 3,
+      "weekIncidence": 34.3817931768777,
+      "casesPer100k": 201.854398651346,
+      "casesPerPopulation": 0.201854398651346
+    },
+    {
+      "name": "Kiel",
+      "count": 582,
+      "deaths": 12,
+      "weekIncidence": 27.5533440845401,
+      "casesPer100k": 235.824209664741,
+      "casesPerPopulation": 0.235824209664741
+    },
+    ...
+    {
+      "name": "Berlin Friedrichshain-Kreuzberg",
+      "count": 2622,
+      "deaths": 11,
+      "weekIncidence": 172.304376034801,
+      "casesPer100k": 929.592744780347,
+      "casesPerPopulation": 0.929592744780347
+    },
+    {
+      "name": "Berlin Tempelhof-Schöneberg",
+      "count": 2760,
+      "deaths": 28,
+      "weekIncidence": 164.729702842831,
+      "casesPer100k": 807.555914469295,
+      "casesPerPopulation": 0.807555914469295
+    }
+  ]
+}
+```
 
 ### `https://rki-covid-api.now.sh/api/districts-map`
 

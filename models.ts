@@ -1,4 +1,4 @@
-export default class State {
+export class State {
 
     public name: string;
     public code: string;
@@ -8,5 +8,16 @@ export default class State {
     public weekIncidence: number;
     public casesPer100k: number;
     public deaths: number;
+
+}
+
+export class District {
+
+    public name: string;
+    public count: number;
+    public deaths: number;
+    public weekIncidence: number;
+    public casesPer100k: number;
+    public casesPerPopulation: number;
 
 }
