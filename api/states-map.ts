@@ -4,6 +4,50 @@ import generateXML from '@mapbox/geojson-mapnikify';
 var mapnik = require('mapnik');
 var Jimp = require("jimp");
 
+const rangeSettings = {
+    ranges: [
+        {
+            min: 0,
+            max: 231,
+            color: "#CACDD8"
+        },
+        {
+            min: 231,
+            max: 326,
+            color: "#A8BACA"
+        },
+        {
+            min: 326,
+            max: 491,
+            color: "#88ACBE"
+        },
+        {
+            min: 491,
+            max: 652,
+            color: "#5C94B5"
+        },
+        {
+            min: 652,
+            max: 738,
+            color: "#2D70A0"
+        },
+        {
+            min: 738,
+            max: Infinity,
+            color: "#0D4785"
+        },
+    ]
+}
+
+function mapCasesToColor(cases: number): String {
+    for (const range of rangeSettings.ranges) {
+        if (cases >= range.min && cases < range.max) {
+            return range.color;
+        }
+    }
+    return "#FFFFFF"
+}
+
 export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
@@ -34,19 +78,20 @@ export default async (req: NowRequest, res: NowResponse) => {
             var im = new mapnik.Image(1024, 1024);
             map.render(im, function(err,im) {
                 if (err) throw err;
-                im.encode('png', function(err,buffer) {
+                im.encode('png', async (err, mapbuffer) => {
                     if (err) throw err;
-                    Jimp.read(buffer).then(image => {
-                        Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then((font) => {
-                            image.print(font, 10, 30, "COVID-19-Fälle/100.000 Einwohner");
-                            image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
-                            image.print(font, 600, 1006, "Stand vom " + lastUpdate);
-                            image.getBufferAsync(Jimp.MIME_PNG).then((buffer) => {
-                                res.setHeader('Content-Type', Jimp.MIME_PNG);
-                                res.send(buffer);
-                            })
-                        });
-                    })
+                    const image = await Jimp.read(mapbuffer);
+                    const font = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+
+                    drawLegend(image, font, 20, 80);
+
+                    image.print(font, 10, 30, "COVID-19-Fälle/100.000 Einwohner");
+                    image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
+                    image.print(font, 600, 1006, "Stand vom " + lastUpdate);
+                    const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+                    res.setHeader('Content-Type', Jimp.MIME_PNG);
+                    res.send(buffer);
+                    
                 });
 
             });
@@ -55,22 +100,30 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 }
 
-function mapCasesToColor(cases: number): String {
-    if (cases < 166) {
-        return "#CACDD8"
+function makeIteratorThatFillsWithColor(color) {
+    return function (x, y, offset) {
+      this.bitmap.data.writeUInt32BE(color, offset, true);
     }
-    if (cases < 296) {
-        return "#A8BACA"
+  };
+
+function drawLegend(image, font, startX, startY) {
+    for (const range of rangeSettings.ranges) {
+        image.scan(startX, startY, 30, 30, makeIteratorThatFillsWithColor(hexStringToHex(range.color)));
+        image.print(font, startX + 40, startY + 5, rangeToString(range));
+        startY = startY += 35;
     }
-    if (cases < 371) {
-        return "#88ACBE"
+}
+
+function hexStringToHex(hex: string): number {
+    return parseInt(hex.replace(/^#/, '') + "FF", 16)
+}
+
+function rangeToString(range) {
+    if (range.min == 0) {
+        return `bis unter ${range.max}`;
+    } else if (range.max == Infinity) {
+        return `${range.min} und mehr`;
+    } else {
+        return `${range.min} bis unter ${range.max}`;
     }
-    if (cases < 492) {
-        return "#5C94B5"
-    }
-    if (cases < 586) {
-        return "#2D70A0"
-    }
-    return "#0D4785";
-    
 }
