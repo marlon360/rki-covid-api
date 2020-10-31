@@ -4,6 +4,55 @@ import generateXML from '@mapbox/geojson-mapnikify';
 var mapnik = require('mapnik');
 var Jimp = require("jimp");
 
+const rangeSettings = {
+    ranges: [
+        {
+            min: 0,
+            max: 0,
+            color: "#D8D8D8"
+        },
+        {
+            min: 0,
+            max: 5,
+            color: "#D8D4AE"
+        },
+        {
+            min: 5,
+            max: 25,
+            color: "#D8D385"
+        },
+        {
+            min: 25,
+            max: 50,
+            color: "#D39805"
+        },
+        {
+            min: 50,
+            max: 100,
+            color: "#B32632"
+        },
+        {
+            min: 100,
+            max: 500,
+            color: "#900519"
+        },
+        {
+            min: 500,
+            max: Infinity,
+            color: "#58033C"
+        },
+    ]
+}
+
+function mapCasesToColor(cases: number): String {
+    for (const range of rangeSettings.ranges) {
+        if (cases >= range.min && cases < range.max) {
+            return range.color;
+        }
+    }
+    return "#FFFFFF"
+}
+
 export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
@@ -34,19 +83,19 @@ export default async (req: NowRequest, res: NowResponse) => {
             var im = new mapnik.Image(1024, 1024);
             map.render(im, function(err,im) {
                 if (err) throw err;
-                im.encode('png', function(err,buffer) {
+                im.encode('png', async function(err, mapbuffer) {
                     if (err) throw err;
-                    Jimp.read(buffer).then(image => {
-                        Jimp.loadFont(Jimp.FONT_SANS_16_BLACK).then((font) => {
-                            image.print(font, 10, 30, "Fälle der letzten 7 Tage/100.000 Einwohner");
-                            image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
-                            image.print(font, 600, 1006, "Stand vom " + lastUpdate);
-                            image.getBufferAsync(Jimp.MIME_PNG).then((buffer) => {
-                                res.setHeader('Content-Type', Jimp.MIME_PNG);
-                                res.send(buffer);
-                            })
-                        });
-                    })
+                    const image = await Jimp.read(mapbuffer);
+                    const font = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+
+                    drawLegend(image, font, 30, 80);
+
+                    image.print(font, 10, 30, "Fälle der letzten 7 Tage/100.000 Einwohner");
+                    image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
+                    image.print(font, 600, 1006, "Stand vom " + lastUpdate);
+                    const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
+                    res.setHeader('Content-Type', Jimp.MIME_PNG);
+                    res.send(buffer);
                 });
 
             });
@@ -55,22 +104,30 @@ export default async (req: NowRequest, res: NowResponse) => {
 
 }
 
-function mapCasesToColor(cases: number): String {
-    if (cases == 0) {
-        return "#D8D8D8"
+function makeIteratorThatFillsWithColor(color) {
+    return function (x, y, offset) {
+      this.bitmap.data.writeUInt32BE(color, offset, true);
     }
-    if (cases <= 5) {
-        return "#D8D4AE"
+  };
+
+function drawLegend(image, font, startX, startY) {
+    for (const range of rangeSettings.ranges) {
+        image.scan(startX, startY, 30, 30, makeIteratorThatFillsWithColor(hexStringToHex(range.color)));
+        image.print(font, startX + 40, startY + 5, rangeToString(range));
+        startY = startY += 35;
     }
-    if (cases <= 25) {
-        return "#D8D385"
+}
+
+function hexStringToHex(hex: string): number {
+    return parseInt(hex.replace(/^#/, '') + "FF", 16)
+}
+
+function rangeToString(range) {
+    if (range.min == range.max) {
+        return `${range.max}`;
+    } else if (range.max == Infinity) {
+        return `> ${range.min}`;
+    } else {
+        return `> ${range.min} <= ${range.max}`;
     }
-    if (cases <= 50) {
-        return "#D39805"
-    }
-    if (cases <= 100) {
-        return "#B32632"
-    }
-    return "#900519";
-    
 }
