@@ -87,12 +87,15 @@ export default async (req: NowRequest, res: NowResponse) => {
                     if (err) throw err;
                     const image = await Jimp.read(mapbuffer);
                     const font = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+                    const font12 = await Jimp.loadFont(Jimp.FONT_SANS_12_BLACK);
 
-                    drawLegend(image, font, 30, 80);
+                    drawLegend(image, font, 20, 100);
 
                     image.print(font, 10, 30, "Fälle der letzten 7 Tage/100.000 Einwohner");
-                    image.print(font, 10, 1006, "Basierend auf Daten vom RKI");
-                    image.print(font, 600, 1006, "Stand vom " + lastUpdate);
+                    image.print(font12, 10, 820, "Basierend auf Daten des Robert Koch-Instituts.");
+                    image.print(font12, 10, 840, "Grafik von Marlon Lueckert.");
+                    image.print(font12, 10, 860, "https://github.com/marlon360/rki-covid-api");
+                    image.print(font12, 10, 50, "Stand vom " + lastUpdate);
                     const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
                     res.setHeader('Content-Type', Jimp.MIME_PNG);
                     res.send(buffer);
