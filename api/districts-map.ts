@@ -8,21 +8,21 @@ const rangeSettings = {
     ranges: [
         {
             min: 0,
-            max: 0,
+            max: 5,
             color: "#D8D8D8"
         },
         {
-            min: 0,
-            max: 5,
+            min: 5,
+            max: 20,
             color: "#D8D4AE"
         },
         {
-            min: 5,
-            max: 25,
+            min: 20,
+            max: 35,
             color: "#D8D385"
         },
         {
-            min: 25,
+            min: 35,
             max: 50,
             color: "#D39805"
         },
@@ -33,11 +33,11 @@ const rangeSettings = {
         },
         {
             min: 100,
-            max: 500,
+            max: 200,
             color: "#900519"
         },
         {
-            min: 500,
+            min: 200,
             max: Infinity,
             color: "#58033C"
         },
@@ -62,8 +62,9 @@ export default async (req: NowRequest, res: NowResponse) => {
 
     for (const feature of geojson.features) {
         feature.properties.fill = mapCasesToColor(feature.properties.cases7_per_100k);
-        feature.properties["stroke-opacity"] = 0.8;
-        feature.properties["stroke-width"] = 0.5;
+        feature.properties["stroke"] = "#888";
+        feature.properties["stroke-opacity"] = 0.5;
+        feature.properties["stroke-width"] = 0.4;
         feature.properties["fill-opacity"] = 1;
     }
 
