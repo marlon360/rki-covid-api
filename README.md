@@ -123,6 +123,7 @@ You receive a PNG image:
 [Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
 
 - https://coronafallzahlen.de
+- https://twitter.com/CoronaBot_DEU
 
 
 
