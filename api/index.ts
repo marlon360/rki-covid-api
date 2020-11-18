@@ -1,3 +1,3 @@
-import statesAPI from "./states";
+import generalAPI from "./general";
 
-export default statesAPI;
+export default generalAPI;
