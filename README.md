@@ -11,6 +11,19 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 ## Endpoints
 
+### `https://rki-covid-api.now.sh/api/general`
+
+#### Data Structure
+
+```json
+{
+  "latestUpdate": "18.11.2020, 00:00 Uhr",
+  "recovered": 546503,
+  "cases": 833307,
+  "deaths": 13119
+}
+```
+
 ### `https://rki-covid-api.now.sh/api/states`
 
 #### Data Structure
