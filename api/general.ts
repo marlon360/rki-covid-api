@@ -39,10 +39,10 @@ export default async (req: NowRequest, res: NowResponse) => {
         cumulative.deaths += Math.max(0, feature.properties.AnzahlTodesfall);
     }
 
-    const latestUpdate = apidata.features[0].properties.Datenstand;
+    const lastUpdate = apidata.features[0].properties.Datenstand;
 
     res.json({
-        latestUpdate,
+        lastUpdate,
         ...cumulative,
     })
 }

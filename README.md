@@ -17,7 +17,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 ```json
 {
-  "latestUpdate": "18.11.2020, 00:00 Uhr",
+  "lastUpdate": "18.11.2020, 00:00 Uhr",
   "recovered": 546503,
   "cases": 833307,
   "deaths": 13119
