@@ -30,9 +30,9 @@ export default async (req: NowRequest, res: NowResponse) => {
     }
 
     for (const feature of apidata.features) {
-        cumulative.recovered += feature.properties.AnzahlGenesen;
-        cumulative.cases += feature.properties.AnzahlFall;
-        cumulative.deaths += feature.properties.AnzahlTodesfall;
+        cumulative.recovered += Math.max(0, feature.properties.AnzahlGenesen);
+        cumulative.cases += Math.max(0, feature.properties.AnzahlFall);
+        cumulative.deaths += Math.max(0, feature.properties.AnzahlTodesfall);
     }
 
     const latestUpdate = apidata.features[0].properties.Datenstand;
