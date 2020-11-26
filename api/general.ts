@@ -34,7 +34,7 @@ export default async (req: NowRequest, res: NowResponse) => {
         res.setHeader('Cache-Control', 's-maxage=3600');
 
         // connect to mongodb
-        const client = await MongoClient.connect(uri, {useNewUrlParser: true});
+        const client = await MongoClient.connect(uri, {useNewUrlParser: true, useUnifiedTopology: true});
         const db = client.db(dbname);
         let dCollection = db.collection("general");
 
