@@ -1,10 +1,14 @@
 {
-    "functions": {
-      "api/states-map.ts": {
-        "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
-      },
-      "api/districts-map.ts": {
-        "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
-      }
+  "redirects": [
+    { "source": "/api/general", "destination": "https://qjxdyrtqb3.execute-api.eu-central-1.amazonaws.com/dev/api/general" },
+    { "source": "/api", "destination": "https://qjxdyrtqb3.execute-api.eu-central-1.amazonaws.com/dev/api/general" }
+  ],
+  "functions": {
+    "api/states-map.ts": {
+      "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
+    },
+    "api/districts-map.ts": {
+      "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
     }
   }
+}

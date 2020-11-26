@@ -5,18 +5,21 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "npm rebuild",
+    "deploy-aws": "serverless deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@now/node": "^1.8.4"
+    "@now/node": "^1.8.4",
+    "serverless-plugin-include-dependencies": "^4.1.0"
   },
   "dependencies": {
     "@mapbox/geojson-mapnikify": "^3.0.2-dev",
     "axios": "^0.20.0",
     "jimp": "^0.16.1",
     "mapnik": "^4.5.4",
+    "serverless": "^2.13.0",
     "superagent": "^6.1.0",
     "superagent-jsonapify": "^1.4.5"
   }
