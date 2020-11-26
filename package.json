@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "npm rebuild",
+    "deploy-aws": "serverless deploy",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
