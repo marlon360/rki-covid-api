@@ -2,3 +2,4 @@ node_modules
 .now
 .vercel
 .env
+.serverless
