@@ -1,0 +1,25 @@
+service: rki-serverless
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  timeout: 14
+  region: eu-central-1
+
+plugins:
+  - serverless-plugin-include-dependencies
+
+package:
+  individually: false
+  exclude:
+    - media/**
+
+
+functions:
+  general:
+    handler: serverless/handler.general
+    events:
+      - http:
+          path: api/general
+          method: get
