@@ -17,6 +17,7 @@
     "axios": "^0.20.0",
     "jimp": "^0.16.1",
     "mapnik": "^4.5.4",
+    "mongodb": "^3.6.3",
     "superagent": "^6.1.0",
     "superagent-jsonapify": "^1.4.5"
   }
