@@ -33,6 +33,7 @@ module.exports.general = async event => {
     if (todayEntry) {
       latestData = todayEntry;
       delete latestData.date;
+      delete latestData._id;
 
       const yesterday = new Date();
       yesterday.setDate(yesterday.getDate()-1);
