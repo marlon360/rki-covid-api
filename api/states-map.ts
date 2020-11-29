@@ -8,31 +8,31 @@ const rangeSettings = {
     ranges: [
         {
             min: 0,
-            max: 231,
+            max: 544,
             color: "#CACDD8"
         },
         {
-            min: 231,
-            max: 326,
+            min: 544,
+            max: 886,
             color: "#A8BACA"
         },
         {
-            min: 326,
-            max: 491,
+            min: 886,
+            max: 1051,
             color: "#88ACBE"
         },
         {
-            min: 491,
-            max: 652,
+            min: 1051,
+            max: 1372,
             color: "#5C94B5"
         },
         {
-            min: 652,
-            max: 738,
+            min: 1372,
+            max: 1564,
             color: "#2D70A0"
         },
         {
-            min: 738,
+            min: 1564,
             max: Infinity,
             color: "#0D4785"
         },
