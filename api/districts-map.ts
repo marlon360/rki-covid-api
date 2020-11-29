@@ -38,8 +38,13 @@ const rangeSettings = {
         },
         {
             min: 200,
-            max: Infinity,
+            max: 500,
             color: "#58033C"
+        },
+        {
+            min: 500,
+            max: Infinity,
+            color: "#EE008F"
         },
     ]
 }
