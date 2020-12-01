@@ -113,6 +113,9 @@ module.exports.general = async event => {
         };
     }
 
+    // close database connection
+    client.close();
+
     return {
       statusCode: 200,
       body: JSON.stringify(
