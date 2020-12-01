@@ -70,16 +70,32 @@ module.exports.general = async event => {
 
         // test if latest data is from today
         if (lastUpdateDateString == todayString) {
-            const insert = await dCollection.insertOne({
-                date: lastUpdateDateString,
-                ...latestData
-            });
+          const insert = await dCollection.updateOne({
+            date: lastUpdateDateString
+          },
+          {
+            $set: {
+              date: lastUpdateDateString,
+              ...latestData
+            }  
+          },
+          {
+            upsert: true
+          });
         } else {
             const lastUpdateEntry = await dCollection.findOne({date: lastUpdateDateString});
             if (!lastUpdateEntry) {
-                const insert = await dCollection.insertOne({
+                const insert = await dCollection.updateOne({
+                  date: lastUpdateDateString
+                },
+                {
+                  $set: {
                     date: lastUpdateDateString,
                     ...latestData
+                  }  
+                },
+                {
+                  upsert: true
                 });
             }
         }
