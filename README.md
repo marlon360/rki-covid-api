@@ -136,13 +136,13 @@ You receive a PNG image:
 <img src="media/districts-map.png" alt="districts-map" width="300"/>
 
 
-## Project Showcase (project using this API)
+## Project Showcase (projects using this API)
 
 [Add your project by openening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
 
-- https://coronafallzahlen.de
-- https://twitter.com/CoronaBot_DEU
-
+- CoronaBot Deutschland (https://twitter.com/CoronaBot_DEU)
+- Fallzahlen Aktuell - Inzidenz & mehr aus DE
+(https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
 
 
 ## Donation
