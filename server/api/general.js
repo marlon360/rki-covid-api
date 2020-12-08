@@ -14,7 +14,7 @@ const dbname =  process.env['DATABASE_NAME'];
 // construct mongodb url
 const uri = `mongodb+srv://${dbuser}:${dbpassword}@cluster0.w244q.mongodb.net/${dbname}?retryWrites=true&w=majority`;
 
-module.exports.general = async event => {
+module.exports.general = async () => {
 
   try {
     // connect to mongodb

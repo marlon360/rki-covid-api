@@ -11,8 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@now/node": "^1.8.4",
-    "serverless-plugin-include-dependencies": "^4.1.0"
+    "@now/node": "^1.8.4"
   },
   "dependencies": {
     "@mapbox/geojson-mapnikify": "^3.0.2-dev",
@@ -20,7 +19,6 @@
     "jimp": "^0.16.1",
     "mapnik": "^4.5.4",
     "mongodb": "^3.6.3",
-    "serverless": "^2.13.0",
     "superagent": "^6.1.0",
     "superagent-jsonapify": "^1.4.5"
   }

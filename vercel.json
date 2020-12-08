@@ -1,7 +1,7 @@
 {
   "redirects": [
-    { "source": "/api/general", "destination": "https://qjxdyrtqb3.execute-api.eu-central-1.amazonaws.com/dev/api/general" },
-    { "source": "/api", "destination": "https://qjxdyrtqb3.execute-api.eu-central-1.amazonaws.com/dev/api/general" }
+    { "source": "/api/general", "destination": "http://h2915307.stratoserver.net/general" },
+    { "source": "/api", "destination": "http://h2915307.stratoserver.net/general" }
   ],
   "functions": {
     "api/states-map.ts": {
