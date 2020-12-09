@@ -51,6 +51,15 @@ function mapCasesToColor(cases: number): String {
 export default async (req: NowRequest, res: NowResponse) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
+
+    let {transparent, theme} = req.query;
+    let isTransparent = false;
+    if (transparent != null) {
+        isTransparent = true;
+    }
+    if (theme != "light" && theme != "dark") {
+        theme = "light";
+    }
     
     const repsonse = await axios.get("https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.geojson");
     const geojson = repsonse.data;
@@ -70,10 +79,16 @@ export default async (req: NowRequest, res: NowResponse) => {
         mapnik.register_default_fonts();
         mapnik.register_default_input_plugins();
 
-        var map = new mapnik.Map(1024, 1024);
+        var map = new mapnik.Map(1128, 1024);
         map.fromString(xml, function(err,map) {
             if (err) throw err;
-            map.background = new mapnik.Color('white');
+            if (!isTransparent) {
+                if (theme == "light") {
+                    map.background = new mapnik.Color('white');
+                } else {
+                    map.background = new mapnik.Color('black');
+                }
+            }
             map.zoomAll();
             var im = new mapnik.Image(1024, 1024);
             map.render(im, function(err,im) {
@@ -81,8 +96,14 @@ export default async (req: NowRequest, res: NowResponse) => {
                 im.encode('png', async (err, mapbuffer) => {
                     if (err) throw err;
                     const image = await Jimp.read(mapbuffer);
-                    const font = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
-                    const font12 = await Jimp.loadFont(Jimp.FONT_SANS_12_BLACK);
+                    let font, font12;
+                    if (theme == "dark") {                        
+                        font = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
+                        font12 = await Jimp.loadFont(Jimp.FONT_SANS_16_WHITE);
+                    } else {
+                        font = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK);
+                        font12 = await Jimp.loadFont(Jimp.FONT_SANS_12_BLACK);
+                    }
 
                     drawLegend(image, font, 20, 100);
 
