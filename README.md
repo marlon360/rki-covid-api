@@ -76,6 +76,11 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 ### `https://rki-covid-api.now.sh/api/states-map`
 
+#### Parameter
+
+- `transparent`: toggle transparency
+- `theme`: choose `dark` for a white font color, choose `light` for a black font color
+
 You receive a PNG image:
 
 <img src="media/states-map.png" alt="states-map" width="300"/>
@@ -130,6 +135,11 @@ You receive a PNG image:
 ```
 
 ### `https://rki-covid-api.now.sh/api/districts-map`
+
+#### Parameter
+
+- `transparent`: toggle transparency
+- `theme`: choose `dark` for a white font color, choose `light` for a black font color
 
 You receive a PNG image:
 
