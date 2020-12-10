@@ -16,7 +16,7 @@ jobs:
         IMAGE_NAME: 'rki-server'
         DOCKERFILE_PATH: 'server/Dockerfile'
         BUILD_CONTEXT: 'server/'
-        branch_tag: true
+        TAG: 'dev'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     # This second step is illustrative and shows how to reference the 
