@@ -19,5 +19,5 @@ app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`)
 })
 
-var job = new CronJob('0 */1 * * * *', updateDataset);
+var job = new CronJob('0 */10 * * * *', updateDataset);
 job.start();
