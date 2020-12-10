@@ -1,4 +1,6 @@
 const express = require('express')
+const { CronJob } = require('cron');
+const { updateDataset } = require('./cronjobs/updateDataset');
 const { general } = require('./api/general');
 const app = express()
 const port = 3000
@@ -16,3 +18,6 @@ app.get('/general', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`)
 })
+
+var job = new CronJob('0 */1 * * * *', updateDataset);
+job.start();
