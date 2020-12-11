@@ -29,6 +29,7 @@ module.exports.updateDataset = async () => {
     // we don't need to update if entry already exists
     if (todayEntry) {
       console.log("skipping update");
+      client.close();
       return;
     } else {
       // if no entry exists, get latest data from api
@@ -72,11 +73,11 @@ module.exports.updateDataset = async () => {
           {
             upsert: true
           });
+        console.log("updated database");
       }
     }
     // close database connection
     client.close();
-    console.log("updated database");
     return;
 
   } catch (e) {
