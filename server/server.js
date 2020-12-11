@@ -2,8 +2,11 @@ const express = require('express')
 const { CronJob } = require('cron');
 const { updateDataset } = require('./cronjobs/updateDataset');
 const { general } = require('./api/general');
+const cors = require('cors')
 const app = express()
 const port = 3000
+
+app.use(cors())
 
 app.get('/general', async (req, res) => {
   general().then((response) => {
