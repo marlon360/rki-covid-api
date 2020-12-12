@@ -2,6 +2,8 @@ const axios = require('axios');
 const generateXML = require('@mapbox/geojson-mapnikify');
 var mapnik = require('mapnik');
 var Jimp = require("jimp");
+const fs = require('fs');
+const path = require('path');
 
 const rangeSettings = {
     ranges: [
@@ -70,9 +72,9 @@ module.exports.districtsMap = async (req, res) => {
         theme = "light";
     }
     
-    const repsonse = await axios.get("https://opendata.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0.geojson");
-    const geojson = repsonse.data;
-
+    const rawdata = fs.readFileSync(path.resolve(__dirname, '../cache/districtsMap.json'));
+    const geojson = JSON.parse(rawdata);
+    
     for (const feature of geojson.features) {
         feature.properties.fill = mapCasesToColor(feature.properties.cases7_per_100k);
         if (theme == "light") {
