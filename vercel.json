@@ -1,16 +1,12 @@
 {
   "redirects": [
+    { "source": "/api", "destination": "https://rki.marlon-lueckert.de/general" },
     { "source": "/api/general", "destination": "https://rki.marlon-lueckert.de/general" },
-    { "source": "/api", "destination": "https://rki.marlon-lueckert.de/general" }
+    { "source": "/api/states", "destination": "https://rki.marlon-lueckert.de/states" },
+    { "source": "/api/states-map", "destination": "https://rki.marlon-lueckert.de/states-map" },
+    { "source": "/api/districts", "destination": "https://rki.marlon-lueckert.de/districts" },
+    { "source": "/api/districts-map", "destination": "https://rki.marlon-lueckert.de/districts-map" }
   ],
-  "functions": {
-    "api/states-map.ts": {
-      "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
-    },
-    "api/districts-map.ts": {
-      "includeFiles": "node_modules/{maki/renders,@jimp/plugin-print/fonts}/**"
-    }
-  },
   "headers": [
     {
       "source": "/api/(.*)",

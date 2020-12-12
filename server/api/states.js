@@ -1,30 +1,14 @@
-import { NowRequest, NowResponse } from '@now/node'
-import axios from 'axios';
-import { State } from '../models';
+const axios = require('axios');
+const { State } = require('../models');
 
-interface APIData {
-    features: Feature[]
-}
-
-interface Feature {
-    attributes: {
-        Fallzahl: number,
-        Aktualisierung: number,
-        faelle_100000_EW: number,
-        cases7_bl_per_100k: number,
-        Death: number,
-        LAN_ew_GEN: string
-    }
-}
-
-export default async (req: NowRequest, res: NowResponse) => {
+module.exports.states =  async (req, res) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
 
     let states = [];
     
     const repsonse = await axios.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_GEN,LAN_ew_EWZ,Fallzahl,Aktualisierung,faelle_100000_EW,Death,cases7_bl_per_100k&returnGeometry=false&outSR=4326&f=json");
-    const apidata: APIData = repsonse.data;
+    const apidata = repsonse.data;
 
     for (const feature of apidata.features) {
         let state = new State();
@@ -41,7 +25,7 @@ export default async (req: NowRequest, res: NowResponse) => {
     res.json({ lastUpdate: apidata.features[0].attributes.Aktualisierung, states: states })
 }
 
-function getAbbreviation(name: string) {
+function getAbbreviation(name) {
     switch (name) {
         case "Baden-Württemberg":
             return "BW";
