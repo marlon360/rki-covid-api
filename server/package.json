@@ -12,13 +12,14 @@
   "dependencies": {
     "@mapbox/geojson-mapnikify": "^3.0.2-dev",
     "axios": "^0.20.0",
-    "jimp": "^0.16.1",
-    "mapnik": "^4.5.4",
     "cors": "^2.8.5",
     "cron": "^1.8.2",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
+    "jimp": "^0.16.1",
+    "mapnik": "^4.5.4",
     "mongodb": "^3.6.3",
+    "pm2": "^4.5.0",
     "superagent": "^6.1.0",
     "superagent-jsonapify": "^1.4.5"
   }
