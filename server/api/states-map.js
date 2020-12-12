@@ -1,6 +1,5 @@
-import { NowRequest, NowResponse } from '@now/node'
-import axios from 'axios';
-import generateXML from '@mapbox/geojson-mapnikify';
+const axios = require('axios');
+const generateXML = require('@mapbox/geojson-mapnikify');
 var mapnik = require('mapnik');
 var Jimp = require("jimp");
 
@@ -8,48 +7,38 @@ const rangeSettings = {
     ranges: [
         {
             min: 0,
-            max: 5,
-            color: "#D8D8D8"
+            max: 544,
+            color: "#CACDD8"
         },
         {
-            min: 5,
-            max: 20,
-            color: "#D8D4AE"
+            min: 544,
+            max: 886,
+            color: "#A8BACA"
         },
         {
-            min: 20,
-            max: 35,
-            color: "#D8D385"
+            min: 886,
+            max: 1051,
+            color: "#88ACBE"
         },
         {
-            min: 35,
-            max: 50,
-            color: "#D39805"
+            min: 1051,
+            max: 1372,
+            color: "#5C94B5"
         },
         {
-            min: 50,
-            max: 100,
-            color: "#B32632"
+            min: 1372,
+            max: 1564,
+            color: "#2D70A0"
         },
         {
-            min: 100,
-            max: 200,
-            color: "#900519"
-        },
-        {
-            min: 200,
-            max: 500,
-            color: "#58033C"
-        },
-        {
-            min: 500,
+            min: 1564,
             max: Infinity,
-            color: "#EE008F"
+            color: "#0D4785"
         },
     ]
 }
 
-function mapCasesToColor(cases: number): String {
+function mapCasesToColor(cases) {
     for (const range of rangeSettings.ranges) {
         if (cases >= range.min && cases < range.max) {
             return range.color;
@@ -58,7 +47,7 @@ function mapCasesToColor(cases: number): String {
     return "#FFFFFF"
 }
 
-export default async (req: NowRequest, res: NowResponse) => {
+module.exports.statesMap =  async (req, res) => {
 
     res.setHeader('Cache-Control', 's-maxage=3600');
 
@@ -71,22 +60,17 @@ export default async (req: NowRequest, res: NowResponse) => {
         theme = "light";
     }
     
-    const repsonse = await axios.get("https://opendata.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0.geojson");
+    const repsonse = await axios.get("https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.geojson");
     const geojson = repsonse.data;
 
     for (const feature of geojson.features) {
-        feature.properties.fill = mapCasesToColor(feature.properties.cases7_per_100k);
-        if (theme == "light") {
-            feature.properties["stroke"] = "#888";
-        } else {
-            feature.properties["stroke"] = "#BBB";
-        }
-        feature.properties["stroke-opacity"] = 0.5;
-        feature.properties["stroke-width"] = 0.4;
+        feature.properties.fill = mapCasesToColor(feature.properties.faelle_100000_EW);
+        feature.properties["stroke-opacity"] = 0.8;
+        feature.properties["stroke-width"] = 1;
         feature.properties["fill-opacity"] = 1;
     }
 
-    const lastUpdate = geojson.features[0].properties.last_update;
+    const lastUpdate = geojson.features[0].properties.Aktualisierung;
 
     generateXML(geojson, true, (err, xml) => {
 
@@ -108,7 +92,7 @@ export default async (req: NowRequest, res: NowResponse) => {
             var im = new mapnik.Image(1024, 1024);
             map.render(im, function(err,im) {
                 if (err) throw err;
-                im.encode('png', async function(err, mapbuffer) {
+                im.encode('png', async (err, mapbuffer) => {
                     if (err) throw err;
                     const image = await Jimp.read(mapbuffer);
                     let font, font12;
@@ -122,7 +106,7 @@ export default async (req: NowRequest, res: NowResponse) => {
 
                     drawLegend(image, font, 20, 100);
 
-                    image.print(font, 10, 30, "Fälle der letzten 7 Tage/100.000 Einwohner");
+                    image.print(font, 10, 30, "COVID-19-Fälle/100.000 Einwohner");
                     image.print(font12, 10, 820, "Basierend auf Daten des Robert Koch-Instituts.");
                     image.print(font12, 10, 840, "Grafik von Marlon Lueckert.");
                     image.print(font12, 10, 860, "https://github.com/marlon360/rki-covid-api");
@@ -130,6 +114,7 @@ export default async (req: NowRequest, res: NowResponse) => {
                     const buffer = await image.getBufferAsync(Jimp.MIME_PNG);
                     res.setHeader('Content-Type', Jimp.MIME_PNG);
                     res.send(buffer);
+                    
                 });
 
             });
@@ -152,16 +137,16 @@ function drawLegend(image, font, startX, startY) {
     }
 }
 
-function hexStringToHex(hex: string): number {
+function hexStringToHex(hex) {
     return parseInt(hex.replace(/^#/, '') + "FF", 16)
 }
 
 function rangeToString(range) {
-    if (range.min == range.max) {
-        return `${range.max}`;
+    if (range.min == 0) {
+        return `bis unter ${range.max}`;
     } else if (range.max == Infinity) {
-        return `> ${range.min}`;
+        return `${range.min} und mehr`;
     } else {
-        return `> ${range.min} <= ${range.max}`;
+        return `${range.min} bis unter ${range.max}`;
     }
 }
