@@ -34,10 +34,6 @@ app.get('/states-map', statesMap)
 app.get('/districts', districts)
 app.get('/districts-map', districtsMap)
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`)
-})
-
 async function updateDataSources() {
   try {
     await updateGeneral();
@@ -50,7 +46,21 @@ async function updateDataSources() {
   }
 }
 
-updateDataSources();
+async function main() {
 
-var job = new CronJob('0 */15 * * * *', updateDataSources);
-job.start();
+  console.log("Starting..");
+
+  console.log("Updating data sources..");
+  await updateDataSources();
+
+  console.log("Starting cronjob..");
+  var job = new CronJob('0 */20 * * * *', updateDataSources);
+  job.start();
+
+  console.log("Starting server..");
+  app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`)
+  })
+}
+
+main();
