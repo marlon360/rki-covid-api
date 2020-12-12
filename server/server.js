@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require('express')
 const cors = require('cors');
 const { CronJob } = require('cron');
@@ -19,7 +20,15 @@ const port = 3000
 
 app.use(cors())
 
-app.get('/general', async (req, res) => {
+app.get('/', async (req, res) => {
+  res.sendFile(path.resolve(__dirname, 'static/index.html'));
+})
+
+app.get('/api', async (req, res) => {
+  res.redirect('/api/general');
+})
+
+app.get('/api/general', async (req, res) => {
   general().then((response) => {
     res.statusCode = response.statusCode;
     res.send(response.body);
@@ -29,10 +38,10 @@ app.get('/general', async (req, res) => {
   })
 })
 
-app.get('/states', states)
-app.get('/states-map', statesMap)
-app.get('/districts', districts)
-app.get('/districts-map', districtsMap)
+app.get('/api/states', states)
+app.get('/api/states-map', statesMap)
+app.get('/api/districts', districts)
+app.get('/api/districts-map', districtsMap)
 
 async function updateDataSources() {
   try {
