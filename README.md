@@ -1,4 +1,4 @@
-# Robert-Koch Institut API (Data & Images)
+# Robert Koch-Institut API (Data & Images)
 
 With this JSON API you can get the data of corona cases for every state and every district in Germany.
 You have also access to the latest images of maps.
@@ -11,7 +11,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 
 ## Endpoints
 
-### `https://rki-covid-api.now.sh/api/general`
+### `https://rki.marlon-lueckert.de/api/general`
 
 #### Data Structure
 
@@ -29,7 +29,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 }
 ```
 
-### `https://rki-covid-api.now.sh/api/states`
+### `https://rki.marlon-lueckert.de/api/states`
 
 #### Data Structure
 
@@ -74,7 +74,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
 }
 ```
 
-### `https://rki-covid-api.now.sh/api/states-map`
+### `https://rki.marlon-lueckert.de/api/states-map`
 
 #### Parameter
 
@@ -85,7 +85,7 @@ You receive a PNG image:
 
 <img src="media/states-map.png" alt="states-map" width="300"/>
 
-### `https://rki-covid-api.now.sh/api/districts`
+### `https://rki.marlon-lueckert.de/api/districts`
 
 #### Data Structure
 
@@ -134,7 +134,7 @@ You receive a PNG image:
 }
 ```
 
-### `https://rki-covid-api.now.sh/api/districts-map`
+### `https://rki.marlon-lueckert.de/api/districts-map`
 
 #### Parameter
 
