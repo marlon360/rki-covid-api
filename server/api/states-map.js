@@ -10,8 +10,7 @@ module.exports.statesMap =  async (req, res) => {
     if (theme != "light" && theme != "dark") {
         theme = "light";
     }
-    
-    const filename = `states_map_${theme}${transparent ? '_transparent': ''}.png`;
+    const filename = `states_map_${theme}${isTransparent ? '_transparent': ''}.png`;
     res.setHeader('Content-Type', 'image/png');
     res.sendFile(path.resolve(__dirname, `../cache/${filename}`));
 }
