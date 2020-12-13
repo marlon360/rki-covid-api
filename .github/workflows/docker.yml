@@ -1,4 +1,4 @@
-name: Publish Docker image
+name: Deploy
 on:
   push:
     branches:
@@ -29,3 +29,29 @@ jobs:
       env:
         VAR1: ${{ steps.docker.outputs.IMAGE_SHA_NAME }}
         VAR2: ${{ steps.docker.outputs.IMAGE_URL }}
+  deploy_dev:
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restart docker container on dev server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d
+  deploy_prod:
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restart docker container on production server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: cd /home/docker/rki && docker-compose pull && docker-compose up -d
