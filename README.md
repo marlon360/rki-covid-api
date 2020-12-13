@@ -153,6 +153,7 @@ You receive a PNG image:
 - CoronaBot Deutschland (https://twitter.com/CoronaBot_DEU)
 - Fallzahlen Aktuell - Inzidenz & mehr aus DE
 (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
+- Home Assistant Integration (https://github.com/thebino/rki_covid)
 
 
 ## Donation
