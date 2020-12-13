@@ -29,3 +29,11 @@ jobs:
       env:
         VAR1: ${{ steps.docker.outputs.IMAGE_SHA_NAME }}
         VAR2: ${{ steps.docker.outputs.IMAGE_URL }}
+    - name: Restart docker container on server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d
