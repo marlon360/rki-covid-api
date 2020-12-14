@@ -55,7 +55,7 @@ module.exports.general = async (req, res) => {
     }
 
     res.send(JSON.stringify({
-      result
+      ...result
     }))
 
   } catch (e) {
