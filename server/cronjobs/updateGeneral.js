@@ -1,24 +1,12 @@
 const superagent = require('superagent');
 const superagentJsonapify = require('superagent-jsonapify');
-const MongoClient = require('mongodb').MongoClient;
 
 superagentJsonapify(superagent);
 
-// get database credentials from environment
-const dbuser = process.env['DATABASE_USER'];
-const dbpassword = process.env['DATABASE_PASSWORD'];
-const dbname = process.env['DATABASE_NAME'];
-
-// construct mongodb url
-const uri = `mongodb+srv://${dbuser}:${dbpassword}@cluster0.w244q.mongodb.net/${dbname}?retryWrites=true&w=majority`;
-
-module.exports.updateGeneral = async () => {
+module.exports.updateGeneral = async (database) => {
 
   try {
-    // connect to mongodb
-    const client = await MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    const db = client.db(dbname);
-    let dCollection = db.collection("general");
+    let dCollection = database.collection("general");
 
     // get date string for today
     const todayString = (new Date()).toDateString();
@@ -29,7 +17,6 @@ module.exports.updateGeneral = async () => {
     // we don't need to update if entry already exists
     if (todayEntry) {
       console.log("skipping update");
-      client.close();
       return;
     } else {
       // if no entry exists, get latest data from api
@@ -76,13 +63,9 @@ module.exports.updateGeneral = async () => {
         console.log("updated database");
       }
     }
-    // close database connection
-    client.close();
-    return;
 
   } catch (e) {
     console.log(e);
-    return;
   }
 
 };

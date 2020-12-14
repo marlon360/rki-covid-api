@@ -14,6 +14,7 @@ const { updateDistricts } = require('./cronjobs/updateDistricts');
 const { updateStates } = require('./cronjobs/updateStates');
 const { updateDistrictsMap } = require('./cronjobs/updateDistrictsMap');
 const { updateStatesMap } = require('./cronjobs/updateStatesMap');
+const { connectToDatabase } = require('./utils/database');
 
 const app = express()
 const port = 3000
@@ -28,24 +29,16 @@ app.get('/api', async (req, res) => {
   res.redirect('/api/general');
 })
 
-app.get('/api/general', async (req, res) => {
-  general().then((response) => {
-    res.statusCode = response.statusCode;
-    res.send(response.body);
-  }).catch((error) => {
-    res.statusCode = error.statusCode;
-    res.send(error.body);
-  })
-})
+app.get('/api/general', general)
 
 app.get('/api/states', states)
 app.get('/api/states-map', statesMap)
 app.get('/api/districts', districts)
 app.get('/api/districts-map', districtsMap)
 
-async function updateDataSources() {
+async function updateDataSources(database) {
   try {
-    await updateGeneral();
+    await updateGeneral(database);
     await updateDistricts();
     await updateStates();
     await updateStatesMap();
@@ -59,14 +52,18 @@ async function main() {
 
   console.log("Starting..");
 
+  console.log("Connection to database..");
+  const database = await connectToDatabase();
+
   console.log("Updating data sources..");
-  await updateDataSources();
+  await updateDataSources(database);
 
   console.log("Starting cronjob..");
-  var job = new CronJob('0 */20 * * * *', updateDataSources);
+  var job = new CronJob('0 */20 * * * *', () => updateDataSources(database));
   job.start();
 
   console.log("Starting server..");
+  app.locals.database = database;
   app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`)
   })
