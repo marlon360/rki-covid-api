@@ -21,6 +21,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe631
   "recovered": 546503,
   "cases": 833307,
   "deaths": 13119,
+  "weekIncidence": 89.32123,
   "difference": {
     "recovered": 19628,
     "cases": 22268,
