@@ -29,7 +29,7 @@ module.exports.updateGeneral = async (database) => {
       const lastUpdateDateString = lastUpdateDate.toDateString();
 
       // get data of states to calculate week incidence
-      const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
+      const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung,Fallzahl&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
       const statesData = JSON.parse(statesResponse.text);
 
       const statesUpdateDate = new Date(statesData.features[0].attributes.Aktualisierung + (3600 * 1000));
@@ -54,17 +54,22 @@ module.exports.updateGeneral = async (database) => {
       // calculate week incidence
       let population = 0;
       let casesPerWeek = 0;
+      let cases = 0;
       for (const feature of statesData.features) {
         population += feature.attributes.LAN_ew_EWZ;
         casesPerWeek += feature.attributes.cases7_bl;
+        cases += feature.attributes.Fallzahl;
       }
 
       const weekIncidence = casesPerWeek / population * 100000;
+      const casesPer100k = cases / population * 100000;
 
       const latestData = {
         lastUpdate,
         ...cumulative,
-        weekIncidence
+        weekIncidence,
+        casesPerWeek,
+        casesPer100k
       }
 
       const insert = await dCollection.updateOne({
