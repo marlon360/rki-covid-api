@@ -23,6 +23,22 @@ module.exports.updateGeneral = async (database) => {
       const response = await superagent.get("https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.geojson").maxResponseSize(500 * 1024 * 1024);
       const apidata = response.body;
 
+      const lastUpdate = apidata.features[0].properties.Datenstand;
+
+      const lastUpdateDate = parseDate(lastUpdate);
+      const lastUpdateDateString = lastUpdateDate.toDateString();
+
+      // get data of states to calculate week incidence
+      const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
+      const statesData = JSON.parse(statesResponse.text);
+
+      const statesUpdateDate = new Date(statesData.features[0].attributes.Aktualisierung + (3600 * 1000));
+
+      if (lastUpdateDate.getTime() !== statesUpdateDate.getTime()) {
+        console.log("Skipping database update. Data from different dates.");
+        return;
+      }
+
       let cumulative = {
         recovered: 0,
         cases: 0,
@@ -35,14 +51,7 @@ module.exports.updateGeneral = async (database) => {
         cumulative.deaths += Math.max(0, feature.properties.AnzahlTodesfall);
       }
 
-      const lastUpdate = apidata.features[0].properties.Datenstand;
-
-      const lastUpdateDate = parseDate(lastUpdate);
-      const lastUpdateDateString = lastUpdateDate.toDateString();
-
-      const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
-      const statesData = JSON.parse(statesResponse.text);
-
+      // calculate week incidence
       let population = 0;
       let casesPerWeek = 0;
       for (const feature of statesData.features) {
@@ -72,6 +81,8 @@ module.exports.updateGeneral = async (database) => {
       });
       if (insert.modifiedCount > 0) {
         console.log("Updated database!");
+      } else {
+        console.log("Data already exists.");
       }
     }
 
