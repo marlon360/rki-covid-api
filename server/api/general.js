@@ -54,15 +54,13 @@ module.exports.general = async (req, res) => {
       }
     }
 
-    res.send(JSON.stringify({
-      ...result
-    }))
+    res.json({...result})
 
   } catch (e) {
     res.statusCode = 500;
-    res.send(JSON.stringify({
+    res.json({
       error: e
-    }))
+    })
   }
 
 };
