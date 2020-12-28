@@ -34,13 +34,19 @@ module.exports.general = async (req, res) => {
         difference = {
           recovered: todayData.recovered - yesterdayData.recovered,
           cases: todayData.cases - yesterdayData.cases,
-          deaths: todayData.deaths - yesterdayData.deaths
+          deaths: todayData.deaths - yesterdayData.deaths,
+          weekIncidence: todayData.weekIncidence - yesterdayData.weekIncidence,
+          casesPerWeek: todayData.casesPerWeek - yesterdayData.casesPerWeek,
+          casesPer100k: todayData.casesPer100k - yesterdayData.casesPer100k
         }
       } else {
         difference = {
           recovered: null,
           cases: null,
-          deaths: null
+          deaths: null,
+          weekIncidence: null,
+          casesPerWeek: null,
+          casesPer100k: null
         }
       }
 
