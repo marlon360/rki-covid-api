@@ -1,13 +1,26 @@
 {
-  "name": "rki-covid-api",
+  "name": "rki-server",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "postinstall": "npm rebuild",
-    "build": "echo \"no build\"",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@mapbox/geojson-mapnikify": "^3.0.2-dev",
+    "axios": "^0.20.0",
+    "cors": "^2.8.5",
+    "cron": "^1.8.2",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "jimp": "^0.16.1",
+    "mapnik": "^4.5.4",
+    "mongodb": "^3.6.3",
+    "pm2": "^4.5.0",
+    "superagent": "^6.1.0",
+    "superagent-jsonapify": "^1.4.5"
+  }
 }

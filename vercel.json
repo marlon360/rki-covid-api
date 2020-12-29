@@ -1,21 +1,5 @@
 {
-  "redirects": [
-    { "source": "/api", "destination": "https://rki.marlon-lueckert.de/api/general" },
-    { "source": "/api/general", "destination": "https://rki.marlon-lueckert.de/api/general" },
-    { "source": "/api/states", "destination": "https://rki.marlon-lueckert.de/api/states" },
-    { "source": "/api/states-map", "destination": "https://rki.marlon-lueckert.de/api/states-map" },
-    { "source": "/api/districts", "destination": "https://rki.marlon-lueckert.de/api/districts" },
-    { "source": "/api/districts-map", "destination": "https://rki.marlon-lueckert.de/api/districts-map" }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version" }
-      ]
-    }
-  ]
+  "github": {
+    "enabled": false
+  }
 }
