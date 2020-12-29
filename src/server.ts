@@ -17,7 +17,6 @@ import { updateStatesMap } from './cronjobs/updateStatesMap';
 
 import { StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyResponse } from './responses/germany';
-import { getLastCasesHistory, getRValue, getStatesData } from './requests';
 
 Date.prototype.toJSON = function() {
   return this.toLocaleString("de-DE")
@@ -53,13 +52,11 @@ app.get('/germany', async (req, res) => {
 
 app.get('/history/germany/cases/:days', async (req, res) => {
   const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.json(response)
 })
 
 app.get('/history/germany/cases', async (req, res) => {
   const response = await GermanyCasesHistoryResponse();
-  res.setHeader('Content-Type', 'application/json; charset=utf-8');
   res.json(response)
 })
 
@@ -100,29 +97,4 @@ async function updateDataSources(database) {
   })
 
 //main();
-getLastCasesHistory(7).then((now) => {
-  console.log(now.reduce((acc, value) => {
-    return {
-        cases: acc.cases + value.cases,
-        date: 0
-    }
-  }));
-})
 
-const statedNow = new Date();
-GermanyResponse().then((now) => {
-  console.log(new Date().getTime() - statedNow.getTime());
-  //console.log(now);
-})
-
-const statedStates = new Date();
-StatesResponse().then((states) => {
-  console.log(new Date().getTime() - statedStates.getTime());
-  //console.log(states);
-})
-const statedR = new Date();
-getRValue().then((val) => {
-  console.log(new Date().getTime() - statedR.getTime());
-  console.log(val);
-  
-})
