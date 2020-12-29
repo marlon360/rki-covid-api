@@ -38,7 +38,10 @@ app.get('/api', async (req, res) => {
 
 app.get('/api/general', general)
 
-app.get('/api/states', states)
+app.get('/states', async (req, res) => {
+  const response = await StatesResponse();
+  res.json(response)
+})
 app.get('/api/states-map', statesMap)
 app.get('/api/districts', districts)
 app.get('/api/districts-map', districtsMap)

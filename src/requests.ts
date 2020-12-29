@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-interface ResponseData<T> {
+export interface ResponseData<T> {
   data: T,
   lastUpdate: Date
 }
@@ -165,5 +165,35 @@ export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
   return {
     data: states,
     lastUpdate: new Date(data.features[0].attributes.Aktualisierung)
+  };
+}
+
+export async function getNewStateCases(): Promise<ResponseData<{id: number, cases: number}[]>> {
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdBundeland&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
+  const data = response.data;
+  const states = data.features.map((feature) => {
+    return {
+      id: feature.attributes.IdBundesland,
+      cases: feature.attributes.cases
+    }
+  })
+  return {
+    data: states,
+    lastUpdate: new Date(data.features[0].attributes.date)
+  };
+}
+
+export async function getNewStateDeaths(): Promise<ResponseData<{id: number, deaths: number}[]>> {
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdBundeland&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
+  const data = response.data;
+  const states = data.features.map((feature) => {
+    return {
+      id: feature.attributes.IdBundesland,
+      deaths: feature.attributes.deaths
+    }
+  })
+  return {
+    data: states,
+    lastUpdate: new Date(data.features[0].attributes.date)
   };
 }
