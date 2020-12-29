@@ -12,7 +12,7 @@ export class ResponseMeta {
 
     constructor(lastUpdate: Date) {
         this.source = "Robert Koch-Institut"
-        this.contact = "Marlon Lückert<m.lueckert@me.com>"
+        this.contact = "Marlon Lueckert (m.lueckert@me.com)"
         this.info = "https://github.com/marlon360/rki-covid-api"
         this.lastUpdate = lastUpdate
         this.lastCheckedForUpdate = new Date()

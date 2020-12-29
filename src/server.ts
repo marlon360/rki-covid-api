@@ -15,9 +15,14 @@ import { updateStates } from './cronjobs/updateStates';
 import { updateDistrictsMap } from './cronjobs/updateDistrictsMap';
 import { updateStatesMap } from './cronjobs/updateStatesMap';
 
-import { GenerateNow } from './data/now';
-import { GenerateStates } from './data/states';
+import { NowResponse } from './responses/now';
+import { StatesResponse } from './responses/states';
+import { GermanyCasesHistoryResponse } from './responses/germany';
 import { getLastCasesHistory, getStatesData } from './requests';
+
+Date.prototype.toJSON = function() {
+  return this.toLocaleString("de-DE")
+}
 
 const app = express()
 const port = 3000
@@ -40,19 +45,15 @@ app.get('/api/districts', districts)
 app.get('/api/districts-map', districtsMap)
 
 app.get('/history/germany/cases/:days', async (req, res) => {
-  const history = await getLastCasesHistory(parseInt(req.params.days));
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({
-    dates: history
-  }))
+  const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.json(response)
 })
 
 app.get('/history/germany/cases', async (req, res) => {
-  const history = await getLastCasesHistory();
-  res.setHeader('Content-Type', 'application/json');
-  res.end(JSON.stringify({
-    dates: history
-  }))
+  const response = await GermanyCasesHistoryResponse();
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.json(response)
 })
 
 async function updateDataSources(database) {
@@ -102,13 +103,13 @@ getLastCasesHistory(7).then((now) => {
 })
 
 const statedNow = new Date();
-GenerateNow().then((now) => {
+NowResponse().then((now) => {
   console.log(new Date().getTime() - statedNow.getTime());
   //console.log(now);
 })
 
 const statedStates = new Date();
-GenerateStates().then((states) => {
+StatesResponse().then((states) => {
   console.log(new Date().getTime() - statedStates.getTime());
   //console.log(states);
 })

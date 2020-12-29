@@ -15,7 +15,7 @@ interface NowData extends IResponseMeta {
     }
 }
 
-export async function GenerateNow(): Promise<NowData> {
+export async function NowResponse(): Promise<NowData> {
 
     const casesData = await getCases();
     const deathsData = await getDeaths();

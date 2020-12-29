@@ -10,7 +10,7 @@ interface StatesData extends IResponseMeta {
     states: StateData[]
 }
 
-export async function GenerateStates(): Promise<StatesData> {
+export async function StatesResponse(): Promise<StatesData> {
 
     const statesData = await getStatesData();
 
