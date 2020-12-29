@@ -18,6 +18,8 @@ import { updateStatesMap } from './cronjobs/updateStatesMap';
 import { StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyResponse } from './responses/germany';
 
+const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
+
 Date.prototype.toJSON = function() {
   return this.toLocaleString("de-DE")
 }
@@ -37,7 +39,7 @@ app.get('/api', async (req, res) => {
 
 app.get('/api/general', general)
 
-app.get('/states', async (req, res) => {
+app.get('/states', cache.route(), async (req, res) => {
   const response = await StatesResponse();
   res.json(response)
 })
@@ -45,7 +47,7 @@ app.get('/api/states-map', statesMap)
 app.get('/api/districts', districts)
 app.get('/api/districts-map', districtsMap)
 
-app.get('/germany', async (req, res) => {
+app.get('/germany', cache.route(), async (req, res) => {
   const response = await GermanyResponse();
   res.json(response)
 })
