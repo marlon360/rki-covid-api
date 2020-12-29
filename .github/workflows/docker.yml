@@ -16,8 +16,8 @@ jobs:
       id: docker
       with:
         IMAGE_NAME: 'rki-server'
-        DOCKERFILE_PATH: 'server/Dockerfile'
-        BUILD_CONTEXT: 'server/'
+        DOCKERFILE_PATH: 'Dockerfile'
+        BUILD_CONTEXT: '.'
         branch_tag: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
