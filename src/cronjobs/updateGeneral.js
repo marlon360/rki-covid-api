@@ -32,12 +32,6 @@ module.exports.updateGeneral = async (database) => {
       const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung,Fallzahl&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
       const statesData = JSON.parse(statesResponse.text);
 
-      const statesUpdateDate = new Date(statesData.features[0].attributes.Aktualisierung + (3600 * 1000));
-
-      if (lastUpdateDate.getTime() !== statesUpdateDate.getTime()) {
-        console.log("Skipping database update. Data from different dates.");
-        return;
-      }
 
       let cumulative = {
         recovered: 0,
@@ -71,24 +65,6 @@ module.exports.updateGeneral = async (database) => {
         casesPerWeek,
         casesPer100k
       }
-
-      const insert = await dCollection.updateOne({
-        date: lastUpdateDateString
-      },
-      {
-        $set: {
-          date: lastUpdateDateString,
-          ...latestData
-        }
-      },
-      {
-        upsert: true
-      });
-      if (insert.modifiedCount > 0) {
-        console.log("Updated database!");
-      } else {
-        console.log("Data already exists.");
-      }
     }
 
   } catch (e) {
@@ -96,9 +72,3 @@ module.exports.updateGeneral = async (database) => {
   }
 
 };
-
-function parseDate(input) {
-  var parts = input.match(/(\d+)/g);
-  // note parts[1]-1
-  return new Date(parts[2], parts[1] - 1, parts[0]);
-}

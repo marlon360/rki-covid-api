@@ -1,20 +1,20 @@
-const path = require('path');
-const express = require('express')
-const cors = require('cors');
-const { CronJob } = require('cron');
+import * as path from 'path';
+import express from 'express';
+import cors from 'cors';
+import { CronJob } from 'cron';
 
-const { general } = require('./api/general');
-const { states } = require('./api/states');
-const { statesMap } = require('./api/states-map');
-const { districts } = require('./api/districts');
-const { districtsMap } = require('./api/districts-map');
+import { general } from './api/general';
+import { states } from './api/states';
+import { statesMap } from './api/states-map';
+import { districts } from './api/districts';
+import { districtsMap } from './api/districts-map';
 
-const { updateGeneral } = require('./cronjobs/updateGeneral');
-const { updateDistricts } = require('./cronjobs/updateDistricts');
-const { updateStates } = require('./cronjobs/updateStates');
-const { updateDistrictsMap } = require('./cronjobs/updateDistrictsMap');
-const { updateStatesMap } = require('./cronjobs/updateStatesMap');
-const { connectToDatabase } = require('./utils/database');
+import { updateGeneral } from './cronjobs/updateGeneral';
+import { updateDistricts } from './cronjobs/updateDistricts';
+import { updateStates } from './cronjobs/updateStates';
+import { updateDistrictsMap } from './cronjobs/updateDistrictsMap';
+import { updateStatesMap } from './cronjobs/updateStatesMap';
+import { connectToDatabase } from './utils/database';
 
 const app = express()
 const port = 3000
@@ -22,7 +22,7 @@ const port = 3000
 app.use(cors())
 
 app.get('/', async (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'static/index.html'));
+  res.sendFile(path.resolve(path.dirname('static/index.html')));
 })
 
 app.get('/api', async (req, res) => {

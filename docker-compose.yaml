@@ -10,4 +10,4 @@ services:
       - DATABASE_PASSWORD
       - DATABASE_NAME
     volumes:
-      - ./cache:/usr/src/app/cache
+      - ./src/cache:/usr/src/app/dist/cache
