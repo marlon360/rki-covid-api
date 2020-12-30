@@ -1,5 +1,5 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastStateCasesHistory, getLastStateDeathsHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
+import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
 import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 
 interface StateData extends IStateData {
@@ -115,6 +115,40 @@ export async function StatesDeathsHistoryResponse(days?: number, abbreviation?: 
         }
         data[abbr].history.push({
             deaths: historyData.deaths,
+            date: new Date(historyData.date)
+        })
+    }
+    return {
+        data,
+        meta: new ResponseMeta(statesHistoryData.lastUpdate)
+    };
+}
+
+interface StatesRecoveredHistory {
+    [key: string]: StateHistory<{recovered: number, date: Date}>
+}
+export async function StatesRecoveredHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesRecoveredHistory>> {
+    
+    let id = null;
+    if (abbreviation != null) {
+        id = getStateIdByAbbreviation(abbreviation);
+    }
+
+    const statesHistoryData = await getLastStateRecoveredHistory(days, id);
+
+    const data: StatesRecoveredHistory = {}
+
+    for (const historyData of statesHistoryData.data) {
+        const abbr = getStateAbbreviationById(historyData.id);
+        if (data[abbr] == null) {
+            data[abbr] = {
+                id: historyData.id, 
+                name: historyData.name,
+                history: []
+            }
+        }
+        data[abbr].history.push({
+            recovered: historyData.recovered,
             date: new Date(historyData.date)
         })
     }

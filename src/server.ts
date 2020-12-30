@@ -15,7 +15,7 @@ import { updateStates } from './cronjobs/updateStates';
 import { updateDistrictsMap } from './cronjobs/updateDistrictsMap';
 import { updateStatesMap } from './cronjobs/updateStatesMap';
 
-import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesResponse } from './responses/states';
+import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyResponse } from './responses/germany';
 
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
@@ -98,13 +98,13 @@ app.get('/states/history/deaths/:days', cache.route(), async (req, res) => {
 })
 
 app.get('/states/history/recovered', cache.route(), async (req, res) => {
-  // const response = await StatesResponse();
-  // res.json(response)
+  const response = await StatesRecoveredHistoryResponse();
+  res.json(response)
 })
 
 app.get('/states/history/recovered/:days', cache.route(), async (req, res) => {
-  // const response = await StatesResponse();
-  // res.json(response)
+  const response = await StatesRecoveredHistoryResponse(parseInt(req.params.days));
+  res.json(response)
 })
 
 app.get('/states/:state', cache.route(), async (req, res) => {
@@ -133,13 +133,13 @@ app.get('/states/:state/history/deaths/:days', cache.route(), async (req, res) =
 })
 
 app.get('/states/:state/history/recovered', cache.route(), async (req, res) => {
-  // const response = await StatesResponse();
-  // res.json(response)
+  const response = await StatesRecoveredHistoryResponse(null, req.params.state);
+  res.json(response)
 })
 
 app.get('/states/:state/history/recovered/:days', cache.route(), async (req, res) => {
-  // const response = await StatesResponse();
-  // res.json(response)
+  const response = await StatesRecoveredHistoryResponse(parseInt(req.params.days), req.params.state);
+  res.json(response)
 })
 
 app.listen(port, () => {
