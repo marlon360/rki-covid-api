@@ -23,15 +23,25 @@ interface GermanyData extends IResponseMeta {
 
 export async function GermanyResponse(): Promise<GermanyData> {
 
-    const casesData = await getCases();
-    const deathsData = await getDeaths();
-    const recoveredData = await getRecovered();
-
-    const newCasesData = await getNewCases();
-    const newDeathsData = await getNewDeaths();
-    const newRecoveredData = await getNewRecovered();
-
-    const statesData = await getStatesData();
+    // make all requests
+    const [casesData,
+        deathsData,
+        recoveredData,
+        newCasesData,
+        newDeathsData,
+        newRecoveredData,
+        statesData,
+        rData
+    ] = await Promise.all([
+        getCases(),
+        getDeaths(),
+        getRecovered(),
+        getNewCases(),
+        getNewDeaths(),
+        getNewRecovered(),
+        getStatesData(),
+        getRValue()
+    ]);
 
     // calculate week incidence
     let population = 0;
@@ -43,8 +53,6 @@ export async function GermanyResponse(): Promise<GermanyData> {
 
     const weekIncidence = casesPerWeek / population * 100000;
     const casesPer100k = casesData.data / population * 100000;
-
-    const rData = await getRValue();
 
     return {
         cases: casesData.data,

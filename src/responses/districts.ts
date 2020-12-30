@@ -21,11 +21,19 @@ interface DistrictsData extends IResponseMeta {
 
 export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
 
-    const districtsData = await getDistrictsData();
-    const districtsRecoveredData = await getDistrictsRecoveredData();
-    const districtNewCasesData = await getNewDistrictCases();
-    const districtNewDeathsData = await getNewDistrictDeaths();
-    const districtNewRecoveredData = await getNewDistrictRecovered();
+    // make all requests
+    const [districtsData,
+        districtsRecoveredData,
+        districtNewCasesData,
+        districtNewDeathsData,
+        districtNewRecoveredData
+    ] = await Promise.all([
+        getDistrictsData(),
+        getDistrictsRecoveredData(),
+        getNewDistrictCases(),
+        getNewDistrictDeaths(),
+        getNewDistrictRecovered()
+    ]);
 
     function getDistrictByAgs (data: ResponseData<any[]>, ags: string): any | null {
         for (const district of data.data) {

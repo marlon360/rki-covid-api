@@ -22,11 +22,19 @@ interface StatesData extends IResponseMeta {
 
 export async function StatesResponse(abbreviation?: string): Promise<StatesData> {
 
-    const statesData = await getStatesData();
-    const statesRecoverdData = await getStatesRecoveredData();
-    const statesNewCasesData = await getNewStateCases();
-    const statesNewDeathsData = await getNewStateDeaths();
-    const statesNewRecoveredData = await getNewStateRecovered();
+    // make all requests
+    const [statesData,
+        statesRecoverdData,
+        statesNewCasesData,
+        statesNewDeathsData,
+        statesNewRecoveredData
+    ] = await Promise.all([
+        getStatesData(),
+        getStatesRecoveredData(),
+        getNewStateCases(),
+        getNewStateDeaths(),
+        getNewStateRecovered()
+    ]);
 
     function getStateById (data: ResponseData<any[]>, id: number): any | null {
         for (const state of data.data) {
