@@ -85,7 +85,7 @@ export async function getLastCasesHistory(days?: number): Promise<{cases: number
   return data.features.map((feature) => {
     return {
       cases: feature.attributes.cases,
-      date: feature.attributes.date
+      date: new Date(feature.attributes.date)
     }
   });
 }
