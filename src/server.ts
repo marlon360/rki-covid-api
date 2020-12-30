@@ -33,70 +33,117 @@ app.get('/', async (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static/index.html'));
 })
 
-app.get('/api', async (req, res) => {
-  res.redirect('/api/general');
-})
-
-app.get('/api/general', general)
-
-app.get('/states', cache.route(), async (req, res) => {
-  const response = await StatesResponse();
-  res.json(response)
-})
-app.get('/api/states-map', statesMap)
-app.get('/api/districts', districts)
-app.get('/api/districts-map', districtsMap)
-
 app.get('/germany', cache.route(), async (req, res) => {
   const response = await GermanyResponse();
   res.json(response)
 })
 
-app.get('/history/germany/cases/:days', async (req, res) => {
-  const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
-  res.json(response)
+app.get('/germany/history', cache.route(), async (req, res) => {
+  res.redirect('/germany/history/cases')
 })
 
-app.get('/history/germany/cases', async (req, res) => {
+app.get('/germany/history/cases', cache.route(), async (req, res) => {
   const response = await GermanyCasesHistoryResponse();
   res.json(response)
 })
 
-async function updateDataSources(database) {
-  try {
-    await updateGeneral(database);
-    await updateDistricts();
-    await updateStates();
-    await updateStatesMap();
-    await updateDistrictsMap();
-  } catch (error) {
-    console.log(error);
-  }
-}
+app.get('/germany/history/cases/:days',cache.route(), async (req, res) => {
+  const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
 
-// async function main() {
+app.get('/germany/history/deaths',cache.route(), async (req, res) => {
+  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  // res.json(response)
+})
 
-//   console.log("Starting..");
+app.get('/germany/history/deaths/:days',cache.route(), async (req, res) => {
+  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  // res.json(response)
+})
 
-//   console.log("Connection to database..");
+app.get('/germany/history/recovered',cache.route(), async (req, res) => {
+  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  // res.json(response)
+})
 
-//   console.log("Updating data sources..");
-//   await updateDataSources(database);
+app.get('/germany/history/recovered/:days',cache.route(), async (req, res) => {
+  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  // res.json(response)
+})
 
-//   console.log("Starting cronjob..");
-//   var job = new CronJob('0 */20 * * * *', () => updateDataSources(database));
-//   job.start();
+app.get('/states', cache.route(), async (req, res) => {
+  const response = await StatesResponse();
+  res.json(response)
+})
 
-//   console.log("Starting server..");
-//   app.locals.database = database;
-//   app.listen(port, () => {
-//     console.log(`Server running at http://localhost:${port}`)
-//   })
-// }
+app.get('/states/history/cases', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
 
-  app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`)
-  })
+app.get('/states/history/cases/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
 
-//main();
+app.get('/states/history/deaths', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/history/deaths/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/history/recovered', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/history/recovered/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/cases', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/cases/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/deaths', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/deaths/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/recovered', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.get('/states/:state/history/recovered/:days', cache.route(), async (req, res) => {
+  // const response = await StatesResponse();
+  // res.json(response)
+})
+
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`)
+})
+
 
