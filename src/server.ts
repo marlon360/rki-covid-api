@@ -222,7 +222,7 @@ app.get('/districts/:district/history/recovered/:days', cache.route(), async (re
   res.json(response)
 })
 
-app.get('/vaccination', cache.route(), async (req, res) => {
+app.get('/vaccinations', cache.route(), async (req, res) => {
   const response = await VaccinationResponse();
   res.json(response)
 })
