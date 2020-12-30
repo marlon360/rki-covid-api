@@ -4,6 +4,7 @@ import cors from 'cors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
+import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
 
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
 
@@ -126,6 +127,81 @@ app.get('/states/:state/history/recovered', cache.route(), async (req, res) => {
 
 app.get('/states/:state/history/recovered/:days', cache.route(), async (req, res) => {
   const response = await StatesRecoveredHistoryResponse(parseInt(req.params.days), req.params.state);
+  res.json(response)
+})
+
+app.get('/districts', cache.route(), async (req, res) => {
+  const response = await DistrictsResponse();
+  res.json(response)
+})
+
+app.get('/districts/:district', cache.route(), async (req, res) => {
+  const response = await DistrictsResponse(req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/history/cases', cache.route(), async (req, res) => {
+  const response = await DistrictsCasesHistoryResponse();
+  res.json(response)
+})
+
+app.get('/districts/history/cases/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsCasesHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
+app.get('/districts/history/deaths', cache.route(), async (req, res) => {
+  const response = await DistrictsDeathsHistoryResponse();
+  res.json(response)
+})
+
+app.get('/districts/history/deaths/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsDeathsHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
+app.get('/districts/history/recovered', cache.route(), async (req, res) => {
+  const response = await DistrictsRecoveredHistoryResponse();
+  res.json(response)
+})
+
+app.get('/districts/history/recovered/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsRecoveredHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
+app.get('/districts/:district', cache.route(), async (req, res) => {
+  const response = await DistrictsResponse(req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/cases', cache.route(), async (req, res) => {
+  const response = await DistrictsCasesHistoryResponse(null, req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/cases/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsCasesHistoryResponse(parseInt(req.params.days), req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/deaths', cache.route(), async (req, res) => {
+  const response = await DistrictsDeathsHistoryResponse(null, req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/deaths/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsDeathsHistoryResponse(parseInt(req.params.days), req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/recovered', cache.route(), async (req, res) => {
+  const response = await DistrictsRecoveredHistoryResponse(null, req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/recovered/:days', cache.route(), async (req, res) => {
+  const response = await DistrictsRecoveredHistoryResponse(parseInt(req.params.days), req.params.district);
   res.json(response)
 })
 
