@@ -1,5 +1,5 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastCasesHistory, getCases, getDeaths, getNewCases, getNewDeaths, getNewRecovered, getRecovered, getRValue, getStatesData, getLastDeathsHistory } from '../requests';
+import { getLastCasesHistory, getCases, getDeaths, getNewCases, getNewDeaths, getNewRecovered, getRecovered, getRValue, getStatesData, getLastDeathsHistory, getLastRecoveredHistory } from '../requests';
 
 interface GermanyData extends IResponseMeta {
     cases: number,
@@ -79,6 +79,14 @@ export async function GermanyCasesHistoryResponse(days?: number): Promise<German
 
 export async function GermanyDeathsHistoryResponse(days?: number): Promise<GermanyHistoryData<{deaths: number, date: Date}>> {
     const history = await getLastDeathsHistory(days);
+    return {
+        data: history,
+        meta: new ResponseMeta(new Date(history[history.length - 1].date))
+    }
+}
+
+export async function GermanyRecoveredHistoryResponse(days?: number): Promise<GermanyHistoryData<{recovered: number, date: Date}>> {
+    const history = await getLastRecoveredHistory(days);
     return {
         data: history,
         meta: new ResponseMeta(new Date(history[history.length - 1].date))
