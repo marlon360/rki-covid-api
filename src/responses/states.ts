@@ -16,7 +16,7 @@ interface StatesData extends IResponseMeta {
     states: StateData[]
 }
 
-export async function StatesResponse(): Promise<StatesData> {
+export async function StatesResponse(abbreviation?: string): Promise<StatesData> {
 
     const statesData = await getStatesData();
     const statesNewCasesData = await getNewStateCases();
@@ -29,7 +29,7 @@ export async function StatesResponse(): Promise<StatesData> {
         return null
     }    
 
-    const states = statesData.data.map((state) => {
+    let states = statesData.data.map((state) => {
         return {
             ...state,
             abbreviation: getStateAbbreviationById(state.id),
@@ -41,6 +41,15 @@ export async function StatesResponse(): Promise<StatesData> {
             }
         }
     })
+
+    if (abbreviation != null) {
+        const id = getStateIdByAbbreviation(abbreviation);
+        if (id != null) {
+            states = states.filter((state) => {
+                return state.id == id
+            })
+        }
+    }
 
     return {
         states,

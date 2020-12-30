@@ -190,11 +190,11 @@ export interface IStateData {
 }
 
 export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
-  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,OBJECTID,Fallzahl,Aktualisierung,Death,cases7_bl,death7_bl,LAN_ew_GEN&returnGeometry=false&outSR=4326&f=json`);
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronafälle_in_den_Bundesländern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,LAN_ew_AGS,Fallzahl,Aktualisierung,Death,cases7_bl,death7_bl,LAN_ew_GEN&returnGeometry=false&outSR=4326&f=json`);
   const data = response.data;
   const states = data.features.map((feature) => {
     return {
-      id: feature.attributes.OBJECTID,
+      id: parseInt(feature.attributes.LAN_ew_AGS),
       name: feature.attributes.LAN_ew_GEN,
       population: feature.attributes.LAN_ew_EWZ,
       cases: feature.attributes.Fallzahl,

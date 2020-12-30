@@ -108,8 +108,8 @@ app.get('/states/history/recovered/:days', cache.route(), async (req, res) => {
 })
 
 app.get('/states/:state', cache.route(), async (req, res) => {
-  // const response = await StatesResponse();
-  // res.json(response)
+  const response = await StatesResponse(req.params.state);
+  res.json(response)
 })
 
 app.get('/states/:state/history/cases', cache.route(), async (req, res) => {
