@@ -65,6 +65,10 @@ app.get('/states', cache.route(), async (req, res) => {
   res.json(response)
 })
 
+app.get('/states/history', cache.route(), async (req, res) => {
+  res.redirect('/states/history/cases')
+})
+
 app.get('/states/history/cases', cache.route(), async (req, res) => {
   const response = await StatesCasesHistoryResponse();
   res.json(response)
@@ -98,6 +102,10 @@ app.get('/states/history/recovered/:days', cache.route(), async (req, res) => {
 app.get('/states/:state', cache.route(), async (req, res) => {
   const response = await StatesResponse(req.params.state);
   res.json(response)
+})
+
+app.get('/states/:state/history', cache.route(), async (req, res) => {
+  res.redirect(`/states/${req.params.state}/history/cases`)
 })
 
 app.get('/states/:state/history/cases', cache.route(), async (req, res) => {
@@ -140,6 +148,10 @@ app.get('/districts/:district', cache.route(), async (req, res) => {
   res.json(response)
 })
 
+app.get('/districts/history', cache.route(), async (req, res) => {
+  res.redirect('/districts/history/cases')
+})
+
 app.get('/districts/history/cases', cache.route(), async (req, res) => {
   const response = await DistrictsCasesHistoryResponse();
   res.json(response)
@@ -173,6 +185,10 @@ app.get('/districts/history/recovered/:days', cache.route(), async (req, res) =>
 app.get('/districts/:district', cache.route(), async (req, res) => {
   const response = await DistrictsResponse(req.params.district);
   res.json(response)
+})
+
+app.get('/districts/:district/history', cache.route(), async (req, res) => {
+  res.redirect(`/districts/${req.params.district}/history/cases`)
 })
 
 app.get('/districts/:district/history/cases', cache.route(), async (req, res) => {
