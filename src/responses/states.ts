@@ -1,5 +1,5 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastStateCasesHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
+import { getLastStateCasesHistory, getLastStateDeathsHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
 import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 
 interface StateData extends IStateData {
@@ -52,14 +52,14 @@ interface StateHistory<T> {
     name: string,
     history: T[]
 }
-interface StatesHistoryData extends IResponseMeta {
-    data: StatesCasesHistory
+interface StatesHistoryData<T> extends IResponseMeta {
+    data: T
 }
 
 interface StatesCasesHistory {
     [key: string]: StateHistory<{cases: number, date: Date}>
 }
-export async function StatesHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData> {
+export async function StatesCasesHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesCasesHistory>> {
     
     let id = null;
     if (abbreviation != null) {
@@ -81,6 +81,40 @@ export async function StatesHistoryResponse(days?: number, abbreviation?: string
         }
         data[abbr].history.push({
             cases: historyData.cases,
+            date: new Date(historyData.date)
+        })
+    }
+    return {
+        data,
+        meta: new ResponseMeta(statesHistoryData.lastUpdate)
+    };
+}
+
+interface StatesDeathsHistory {
+    [key: string]: StateHistory<{deaths: number, date: Date}>
+}
+export async function StatesDeathsHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesDeathsHistory>> {
+    
+    let id = null;
+    if (abbreviation != null) {
+        id = getStateIdByAbbreviation(abbreviation);
+    }
+
+    const statesHistoryData = await getLastStateDeathsHistory(days, id);
+
+    const data: StatesDeathsHistory = {}
+
+    for (const historyData of statesHistoryData.data) {
+        const abbr = getStateAbbreviationById(historyData.id);
+        if (data[abbr] == null) {
+            data[abbr] = {
+                id: historyData.id, 
+                name: historyData.name,
+                history: []
+            }
+        }
+        data[abbr].history.push({
+            deaths: historyData.deaths,
             date: new Date(historyData.date)
         })
     }
