@@ -75,3 +75,9 @@ export function getStateIdByAbbreviation(abbreviation: string): number | null {
             return null;
     }
 }
+
+export function getDateBefore(days: number): string {
+    let offsetDate = new Date()
+    offsetDate.setDate(new Date().getDate() - days)
+    return offsetDate.toISOString().split('T').shift()
+}

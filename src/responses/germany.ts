@@ -1,5 +1,7 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastCasesHistory, getCases, getDeaths, getNewCases, getNewDeaths, getNewRecovered, getRecovered, getRValue, getStatesData, getLastDeathsHistory, getLastRecoveredHistory } from '../requests';
+import { getLastCasesHistory, getCases, getDeaths, getNewCases, getNewDeaths, getNewRecovered, getRecovered, getLastDeathsHistory, getLastRecoveredHistory } from '../data-requests/germany';
+import { getRValue } from '../data-requests/r-value'
+import { getStatesData } from '../data-requests/states';
 
 interface GermanyData extends IResponseMeta {
     cases: number,

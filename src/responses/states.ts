@@ -1,6 +1,7 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
+import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData } from '../data-requests/states';
 import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
+import { ResponseData } from '../data-requests/response-data';
 
 interface StateData extends IStateData {
     abbreviation: string,
