@@ -1,5 +1,5 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData } from '../data-requests/states';
+import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, getStatesRecoveredData, IStateData, getNewStateRecovered } from '../data-requests/states';
 import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 import { ResponseData } from '../data-requests/response-data';
 
@@ -9,7 +9,8 @@ interface StateData extends IStateData {
     casesPer100k: number,
     delta: {
         cases: number,
-        deaths: number
+        deaths: number,
+        recovered: number
     }
 }
 
@@ -22,8 +23,10 @@ interface StatesData extends IResponseMeta {
 export async function StatesResponse(abbreviation?: string): Promise<StatesData> {
 
     const statesData = await getStatesData();
+    const statesRecoverdData = await getStatesRecoveredData();
     const statesNewCasesData = await getNewStateCases();
     const statesNewDeathsData = await getNewStateDeaths();
+    const statesNewRecoveredData = await getNewStateRecovered();
 
     function getStateById (data: ResponseData<any[]>, id: number): any | null {
         for (const state of data.data) {
@@ -35,12 +38,14 @@ export async function StatesResponse(abbreviation?: string): Promise<StatesData>
     let states = statesData.data.map((state) => {
         return {
             ...state,
+            recovered: getStateById(statesRecoverdData, state.id).recovered,
             abbreviation: getStateAbbreviationById(state.id),
             weekIncidence: state.casesPerWeek / state.population * 100000,
             casesPer100k: state.cases / state.population * 100000,
             delta: {
                 cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
-                deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0
+                deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
+                recovered: getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0
             }
         }
     })
