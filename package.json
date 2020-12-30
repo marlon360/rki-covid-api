@@ -5,8 +5,9 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsc && node dist/server.js",
-    "build": "tsc"
+    "start": "npm run build && node dist/server.js",
+    "build": "tsc && npm run copy-static",
+    "copy-static": "cp -R src/static dist/static"
   },
   "author": "",
   "license": "ISC",

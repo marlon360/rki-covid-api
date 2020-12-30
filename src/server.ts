@@ -30,7 +30,7 @@ const port = 3000
 app.use(cors())
 
 app.get('/', async (req, res) => {
-  res.sendFile(path.resolve(path.dirname('static/index.html')));
+  res.sendFile(path.resolve(__dirname, 'static/index.html'));
 })
 
 app.get('/api', async (req, res) => {
