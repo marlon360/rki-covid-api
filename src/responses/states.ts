@@ -1,5 +1,6 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import { getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
+import { getLastStateCasesHistory, getNewStateCases, getNewStateDeaths, getStatesData, IStateData, ResponseData } from '../requests';
+import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 
 interface StateData extends IStateData {
     weekIncidence: number,
@@ -44,4 +45,47 @@ export async function StatesResponse(): Promise<StatesData> {
         meta: new ResponseMeta(statesData.lastUpdate)
     }
 
+}
+
+interface StateHistory<T> {
+    id: number,
+    name: string,
+    history: T[]
+}
+interface StatesHistoryData extends IResponseMeta {
+    data: StatesCasesHistory
+}
+
+interface StatesCasesHistory {
+    [key: string]: StateHistory<{cases: number, date: Date}>
+}
+export async function StatesHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData> {
+    
+    let id = null;
+    if (abbreviation != null) {
+        id = getStateIdByAbbreviation(abbreviation);
+    }
+
+    const statesHistoryData = await getLastStateCasesHistory(days, id);
+
+    const data: StatesCasesHistory = {}
+
+    for (const historyData of statesHistoryData.data) {
+        const abbr = getStateAbbreviationById(historyData.id);
+        if (data[abbr] == null) {
+            data[abbr] = {
+                id: historyData.id, 
+                name: historyData.name,
+                history: []
+            }
+        }
+        data[abbr].history.push({
+            cases: historyData.cases,
+            date: new Date(historyData.date)
+        })
+    }
+    return {
+        data,
+        meta: new ResponseMeta(statesHistoryData.lastUpdate)
+    };
 }

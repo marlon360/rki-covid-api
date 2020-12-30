@@ -197,3 +197,31 @@ export async function getNewStateDeaths(): Promise<ResponseData<{id: number, dea
     lastUpdate: new Date(data.features[0].attributes.date)
   };
 }
+
+export async function getLastStateCasesHistory(days?: number, id?: number): Promise<ResponseData<{id: number, name: string, cases: number, date: Date}[]>> {
+  const whereParams = [`NeuerFall IN(1,0)`];
+  if (days != null) {
+    const dateString = getDateBefore(days);
+    whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`)
+  }
+  if (id != null) {
+    whereParams.push(`IdBundesland = ${id}`)
+  }
+  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(" AND ")}&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,Bundesland,IdBundesland&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland,MeldeDatum&groupByFieldsForStatistics=IdBundesland,MeldeDatum,Bundesland&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`
+
+  const response = await axios.get(url);
+  const data = response.data;
+  const history: {id: number, name: string, cases: number, date: Date}[] = data.features.map((feature) => {
+    return {
+      id: feature.attributes.IdBundesland,
+      name: feature.attributes.Bundesland,
+      cases: feature.attributes.cases,
+      date: new Date(feature.attributes.MeldeDatum)
+    }
+  });
+
+  return {
+    data: history,
+    lastUpdate: history[history.length - 1].date
+  }
+}
