@@ -1,14 +1,15 @@
 import { IResponseMeta, ResponseMeta } from './meta'
-import {  } from '../data-requests/districts';
 import { ResponseData } from '../data-requests/response-data';
-import { getDistrictsData, getNewDistrictCases, getNewDistrictDeaths, IDistrictData, getLastDistrictCasesHistory, getLastDistrictDeathsHistory, getLastDistrictRecoveredHistory } from '../data-requests/districts';
+import { getDistrictsData, getNewDistrictCases, getNewDistrictDeaths, IDistrictData, getLastDistrictCasesHistory, getLastDistrictDeathsHistory, getLastDistrictRecoveredHistory, getDistrictsRecoveredData, getNewDistrictRecovered } from '../data-requests/districts';
 
 interface DistrictData extends IDistrictData {
     weekIncidence: number,
     casesPer100k: number,
+    recovered: number
     delta: {
         cases: number,
-        deaths: number
+        deaths: number,
+        recovered: number
     }
 }
 
@@ -21,8 +22,10 @@ interface DistrictsData extends IResponseMeta {
 export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
 
     const districtsData = await getDistrictsData();
+    const districtsRecoveredData = await getDistrictsRecoveredData();
     const districtNewCasesData = await getNewDistrictCases();
     const districtNewDeathsData = await getNewDistrictDeaths();
+    const districtNewRecoveredData = await getNewDistrictRecovered();
 
     function getDistrictByAgs (data: ResponseData<any[]>, ags: string): any | null {
         for (const district of data.data) {
@@ -34,11 +37,13 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     let districts = districtsData.data.map((district) => {
         return {
             ...district,
+            recovered: getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
             weekIncidence: district.casesPerWeek / district.population * 100000,
             casesPer100k: district.cases / district.population * 100000,
             delta: {
                 cases: getDistrictByAgs(districtNewCasesData, district.ags)?.cases ?? 0,
-                deaths: getDistrictByAgs(districtNewDeathsData, district.ags)?.deaths ?? 0
+                deaths: getDistrictByAgs(districtNewDeathsData, district.ags)?.deaths ?? 0,
+                recovered: getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ?? 0
             }
         }
     })

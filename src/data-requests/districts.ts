@@ -46,6 +46,21 @@ export async function getDistrictsData(): Promise<ResponseData<IDistrictData[]>>
   };
 }
 
+export async function getDistrictsRecoveredData(): Promise<ResponseData<{ags: string, recovered: number}[]>> {
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
+  const data = response.data;
+  const districts = data.features.map((feature) => {
+    return {
+      ags: feature.attributes.IdLandkreis,
+      recovered: feature.attributes.recovered
+    }
+  })
+  return {
+    data: districts,
+    lastUpdate: new Date(data.features[0].attributes.date)
+  };
+}
+
 export async function getNewDistrictCases(): Promise<ResponseData<{ags: string, cases: number}[]>> {
   const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
   const data = response.data;
@@ -68,6 +83,21 @@ export async function getNewDistrictDeaths(): Promise<ResponseData<{ags: string,
     return {
       ags: feature.attributes.IdLandkreis,
       deaths: feature.attributes.deaths
+    }
+  })
+  return {
+    data: districts,
+    lastUpdate: new Date(data.features[0].attributes.date)
+  };
+}
+
+export async function getNewDistrictRecovered(): Promise<ResponseData<{ags: string, recovered: number}[]>> {
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
+  const data = response.data;
+  const districts = data.features.map((feature) => {
+    return {
+      ags: feature.attributes.IdLandkreis,
+      recovered: feature.attributes.recovered
     }
   })
   return {
