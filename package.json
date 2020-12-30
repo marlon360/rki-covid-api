@@ -24,7 +24,8 @@
     "mongodb": "^3.6.3",
     "pm2": "^4.5.0",
     "superagent": "^6.1.0",
-    "superagent-jsonapify": "^1.4.5"
+    "superagent-jsonapify": "^1.4.5",
+    "xlsx": "^0.16.9"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",

@@ -76,6 +76,45 @@ export function getStateIdByAbbreviation(abbreviation: string): number | null {
     }
 }
 
+export function getStateAbbreviationByName(name: string): string | null {
+    switch (name) {
+        case "Baden-Württemberg":
+            return "BW";
+        case "Bayern":
+            return "BY";
+        case "Berlin":
+            return "BE";
+        case "Brandenburg":
+            return "BB";
+        case "Bremen":
+            return "HB";
+        case "Hamburg":
+            return "HH";
+        case "Hessen":
+            return "HE";
+        case "Mecklenburg-Vorpommern":
+            return "MV";
+        case "Niedersachsen":
+            return "NI";
+        case "Nordrhein-Westfalen":
+            return "NW";
+        case "Rheinland-Pfalz":
+            return "RP";
+        case "Saarland":
+            return "SL";
+        case "Sachsen":
+            return "SN";
+        case "Sachsen-Anhalt":
+            return "ST";
+        case "Schleswig-Holstein":
+            return "SH";
+        case "Thüringen":
+            return "TH";
+        default:
+            return null;
+    }
+}
+
 export function getDateBefore(days: number): string {
     let offsetDate = new Date()
     offsetDate.setDate(new Date().getDate() - days)

@@ -5,6 +5,7 @@ import cors from 'cors';
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
+import { VaccinationResponse } from './responses/vaccination'
 
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
 
@@ -218,6 +219,11 @@ app.get('/districts/:district/history/recovered', cache.route(), async (req, res
 
 app.get('/districts/:district/history/recovered/:days', cache.route(), async (req, res) => {
   const response = await DistrictsRecoveredHistoryResponse(parseInt(req.params.days), req.params.district);
+  res.json(response)
+})
+
+app.get('/vaccination', cache.route(), async (req, res) => {
+  const response = await VaccinationResponse();
   res.json(response)
 })
 
