@@ -3,6 +3,7 @@ import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecove
 import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 
 interface StateData extends IStateData {
+    abbreviation: string,
     weekIncidence: number,
     casesPer100k: number,
     delta: {
@@ -31,6 +32,7 @@ export async function StatesResponse(): Promise<StatesData> {
     const states = statesData.data.map((state) => {
         return {
             ...state,
+            abbreviation: getStateAbbreviationById(state.id),
             weekIncidence: state.casesPerWeek / state.population * 100000,
             casesPer100k: state.cases / state.population * 100000,
             delta: {
