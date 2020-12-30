@@ -21,7 +21,7 @@ import { GermanyCasesHistoryResponse, GermanyResponse } from './responses/german
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
 
 Date.prototype.toJSON = function() {
-  return this.toLocaleString("de-DE")
+  return this.toISOString()
 }
 
 const app = express()

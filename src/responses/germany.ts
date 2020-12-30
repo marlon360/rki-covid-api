@@ -60,7 +60,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
             value: rData.data,
             date: rData.lastUpdate
         },
-        meta: new ResponseMeta(casesData.lastUpdate)
+        meta: new ResponseMeta(statesData.lastUpdate)
     }
 }
 
