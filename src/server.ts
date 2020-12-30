@@ -16,7 +16,7 @@ import { updateDistrictsMap } from './cronjobs/updateDistrictsMap';
 import { updateStatesMap } from './cronjobs/updateStatesMap';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
-import { GermanyCasesHistoryResponse, GermanyResponse } from './responses/germany';
+import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyResponse } from './responses/germany';
 
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
 
@@ -53,13 +53,13 @@ app.get('/germany/history/cases/:days',cache.route(), async (req, res) => {
 })
 
 app.get('/germany/history/deaths',cache.route(), async (req, res) => {
-  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
-  // res.json(response)
+  const response = await GermanyDeathsHistoryResponse();
+  res.json(response)
 })
 
 app.get('/germany/history/deaths/:days',cache.route(), async (req, res) => {
-  // const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
-  // res.json(response)
+  const response = await GermanyDeathsHistoryResponse(parseInt(req.params.days));
+  res.json(response)
 })
 
 app.get('/germany/history/recovered',cache.route(), async (req, res) => {
