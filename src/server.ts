@@ -1,19 +1,6 @@
 import * as path from 'path';
 import express from 'express';
 import cors from 'cors';
-import { CronJob } from 'cron';
-
-import { general } from './api/general';
-import { states } from './api/states';
-import { statesMap } from './api/states-map';
-import { districts } from './api/districts';
-import { districtsMap } from './api/districts-map';
-
-import { updateGeneral } from './cronjobs/updateGeneral';
-import { updateDistricts } from './cronjobs/updateDistricts';
-import { updateStates } from './cronjobs/updateStates';
-import { updateDistrictsMap } from './cronjobs/updateDistrictsMap';
-import { updateStatesMap } from './cronjobs/updateStatesMap';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
