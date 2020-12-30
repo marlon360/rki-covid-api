@@ -13,7 +13,9 @@ interface StateData extends IStateData {
 }
 
 interface StatesData extends IResponseMeta {
-    states: StateData[]
+    data: {
+        [key: string]: StateData
+    }
 }
 
 export async function StatesResponse(abbreviation?: string): Promise<StatesData> {
@@ -51,8 +53,13 @@ export async function StatesResponse(abbreviation?: string): Promise<StatesData>
         }
     }
 
+    const statesKey = {}
+    for (const state of states) {
+        statesKey[state.abbreviation] = state
+    }
+
     return {
-        states,
+        data: statesKey,
         meta: new ResponseMeta(statesData.lastUpdate)
     }
 
