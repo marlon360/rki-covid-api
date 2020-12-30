@@ -38,7 +38,7 @@ export async function StatesResponse(abbreviation?: string): Promise<StatesData>
     let states = statesData.data.map((state) => {
         return {
             ...state,
-            recovered: getStateById(statesRecoverdData, state.id).recovered,
+            recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
             abbreviation: getStateAbbreviationById(state.id),
             weekIncidence: state.casesPerWeek / state.population * 100000,
             casesPer100k: state.cases / state.population * 100000,
