@@ -1,6 +1,7 @@
 import * as path from 'path';
 import express from 'express';
 import cors from 'cors';
+import compression from 'compression'
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
@@ -17,6 +18,7 @@ const app = express()
 const port = 3000
 
 app.use(cors())
+app.use(compression())
 
 app.get('/', async (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static/index.html'));
