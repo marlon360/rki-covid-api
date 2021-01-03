@@ -7,6 +7,7 @@ import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecovere
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
 import { VaccinationResponse } from './responses/vaccination'
+import { DistrictsMapResponse } from './responses/map';
 
 const cache = require('express-redis-cache')({ expire: 60, host: process.env.REDIS_URL });
 
@@ -229,8 +230,16 @@ app.get('/vaccinations', cache.route(), async (req, res) => {
   res.json(response)
 })
 
+app.get('/map', cache.route({ binary: true  }), async (req, res) => {
+  res.redirect('/map/districts')
+})
+
+app.get('/map/districts', cache.route({ binary: true  }), async (req, res) => {
+  res.setHeader('Content-Type', 'image/png');
+  const response = await DistrictsMapResponse();
+  res.send(response)
+})
+
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`)
 })
-
-
