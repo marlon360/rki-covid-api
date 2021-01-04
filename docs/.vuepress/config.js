@@ -26,6 +26,9 @@ module.exports = {
               },{
                   title: 'Districts',
                   path: '/endpoints/districts'
+              },{
+                title: 'Vaccinations 💉',
+                path: '/endpoints/vaccinations'
               }]
             }
         ],
