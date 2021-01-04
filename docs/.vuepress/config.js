@@ -18,8 +18,12 @@ module.exports = {
               title: 'Endpoints',
               children: [{
                   title: 'Germany 🇩🇪',
-                  path: '/endpoints/germany#germany'
-              }]
+                  path: '/endpoints/germany'
+              },
+              {
+                title: 'States',
+                path: '/endpoints/states'
+            }]
             }
         ],
         search: true,
