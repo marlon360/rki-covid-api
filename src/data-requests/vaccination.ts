@@ -37,6 +37,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         responseType: 'arraybuffer'
       });
     const data = response.data;
+    const lastModified = response.headers['last-modified'];
+    const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
 
     var workbook = XLSX.read(data, {type:'buffer'});
     
@@ -100,7 +102,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
 
     return {
         data: coverage,
-        lastUpdate: new Date()
+        lastUpdate: lastUpdate
     }
 
 }
