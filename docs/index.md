@@ -34,7 +34,11 @@ If you use this API, please consider supporting me:
 
 ## Endpoints
 
-[/germany](endpoints/germany.md#germany)
+- [Germany](endpoints/germany.md)
+- [States](endpoints/states.md)
+- [Districts](endpoints/districts.md)
+- [Vaccinations](endpoints/vaccinations.md)
+- [Maps](endpoints/maps.md)
 
 ## Data sources
 
