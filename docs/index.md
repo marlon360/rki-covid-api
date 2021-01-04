@@ -32,7 +32,7 @@ If you use this API, please consider supporting me:
 
 ## Endpoints
 
-[/germany](docs/endpoints/germany.md#germany)
+[/germany](endpoints/germany.md#germany)
 
 ## Data sources
 

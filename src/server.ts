@@ -19,12 +19,13 @@ Date.prototype.toJSON = function() {
 const app = express()
 const port = 3000
 
+app.use('/docs', express.static(path.join(__dirname, 'docs')))
 app.use(cors())
 app.use(compression())
 app.use(queue({ activeLimit: 2, queuedLimit: -1 }))
 
 app.get('/', async (req, res) => {
-  res.sendFile(path.resolve(__dirname, 'static/index.html'));
+  res.redirect('docs')
 })
 
 app.get('/germany', cache.route(), async (req, res) => {
