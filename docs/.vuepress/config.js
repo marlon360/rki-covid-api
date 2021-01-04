@@ -5,20 +5,27 @@ module.exports = {
     base: '/docs/',
     themeConfig: {
         sidebar: [
-            '/',
-            '/endpoints/germany'
-          ],
+            {
+              title: 'Start',   // required
+              path: '/',      // optional, link of the title, which should be an absolute path and must exist
+              collapsable: false, // optional, defaults to true
+              sidebarDepth: 1,    // optional, defaults to 1
+              children: [
+                '/'
+              ]
+            },
+            {
+              title: 'Endpoints',
+              children: [{
+                  title: 'Germany 🇩🇪',
+                  path: '/endpoints/germany#germany'
+              }]
+            }
+        ],
         search: true,
         nav: [{
             text: 'Home',
             link: '/'
-        },
-        {
-            text: 'Endpoints',
-            ariaLabel: 'Endpoints Menu',
-            items: [
-                { text: 'Germany', link: '/endpoints/germany.md' },
-            ]
         },
         {
             text: 'GitHub',
