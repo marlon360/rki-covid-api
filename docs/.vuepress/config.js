@@ -23,7 +23,10 @@ module.exports = {
               {
                 title: 'States',
                 path: '/endpoints/states'
-            }]
+              },{
+                  title: 'Districts',
+                  path: '/endpoints/districts'
+              }]
             }
         ],
         search: true,
