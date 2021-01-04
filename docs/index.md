@@ -70,6 +70,7 @@ If you use this API, please consider supporting me:
 - Fallzahlen Aktuell - Inzidenz & mehr aus DE
 (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
+- Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
 
 ## License
 
