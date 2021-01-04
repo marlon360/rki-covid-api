@@ -2,6 +2,8 @@
 
 A JSON Rest API to query all relevant corona data for Germany based on the figures of the Robert Koch-Institut.
 
+cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺
+
 ## Donation
 
 If you use this API, please consider supporting me:
