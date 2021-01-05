@@ -1,6 +1,7 @@
 const path = require('path');
 const express = require('express')
 const cors = require('cors');
+const queue = require('express-queue');
 const { CronJob } = require('cron');
 
 const { general } = require('./api/general');
@@ -20,6 +21,7 @@ const app = express()
 const port = 3000
 
 app.use(cors())
+app.use(queue({ activeLimit: 2, queuedLimit: -1 }));
 
 app.get('/', async (req, res) => {
   res.sendFile(path.resolve(__dirname, 'static/index.html'));
