@@ -21,6 +21,7 @@ const app = express()
 const port = 3000
 
 app.use(cors())
+// limit access to 2 users at a time
 app.use(queue({ activeLimit: 2, queuedLimit: -1 }));
 
 app.get('/', async (req, res) => {
