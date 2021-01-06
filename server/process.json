@@ -1,0 +1,11 @@
+{
+    "apps" : [{
+        "name"        : "cronjob",
+        "script"      : "./cronjobs.js"
+    },{
+        "name"       : "server",
+        "script"     : "./server.js",
+        "instances"  : 4,
+        "exec_mode"  : "cluster"
+    }]
+}

@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "pm2-runtime start process.json",
+    "stop": "pm2-runtime stop process.json"
   },
   "author": "",
   "license": "ISC",
