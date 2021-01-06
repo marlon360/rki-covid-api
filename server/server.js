@@ -1,7 +1,6 @@
 const path = require('path');
 const express = require('express')
 const cors = require('cors');
-const queue = require('express-queue');
 const compression = require('compression')
 
 const { general } = require('./api/general');
@@ -16,8 +15,6 @@ const app = express()
 const port = 3000
 
 app.use(cors())
-// limit access to 2 users at a time
-app.use(queue({ activeLimit: 2, queuedLimit: -1 }));
 // compress all responses
 app.use(compression())
 
