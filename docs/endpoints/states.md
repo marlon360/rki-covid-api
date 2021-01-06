@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/states`
+`GET https://api.corona-zahlen.org/states`
 [Open](/states)
 
 ### Response
@@ -84,7 +84,7 @@ Returns the data for a single `:state` state.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/states/HH`
+`GET https://api.corona-zahlen.org/states/HH`
 [Open](/states/HH)
 
 

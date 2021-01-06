@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/districts`
+`GET https://api.corona-zahlen.org/districts`
 [Open](/districts)
 
 ### Response
@@ -84,7 +84,7 @@ Returns the data for a single district identified by `:ags` AGS (Allgemeiner Gem
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/districts/02000`
+`GET https://api.corona-zahlen.org/districts/02000`
 [Open](/districts/02000)
 
 

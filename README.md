@@ -4,6 +4,8 @@ A JSON Rest API to query all relevant corona data for Germany based on the figur
 
 cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺
 
+[https://api.corona-zahlen.org](https://api.corona-zahlen.org)
+
 ## Donation
 
 If you use this API, please consider supporting me:
@@ -34,11 +36,11 @@ If you use this API, please consider supporting me:
 
 ## Endpoints
 
-- [Germany](docs/endpoints/germany.md)
-- [States](docs/endpoints/states.md)
-- [Districts](docs/endpoints/districts.md)
-- [Vaccinations](docs/endpoints/vaccinations.md)
-- [Maps](docs/endpoints/maps.md)
+- [Germany](https://api.corona-zahlen.org/docs/endpoints/germany.md)
+- [States](https://api.corona-zahlen.org/docs/endpoints/states.md)
+- [Districts](https://api.corona-zahlen.org/docs/endpoints/districts.md)
+- [Vaccinations](https://api.corona-zahlen.org/docs/endpoints/vaccinations.md)
+- [Maps](https://api.corona-zahlen.org/docs/endpoints/maps.md)
 
 ## Data sources
 

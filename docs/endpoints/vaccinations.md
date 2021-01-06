@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/vaccinations`
+`GET https://api.corona-zahlen.org/vaccinations`
 [Open](/vaccinations)
 
 ### Response

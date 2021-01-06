@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany`
+`GET https://api.corona-zahlen.org/germany`
 [Open](/germany)
 
 ### Response
@@ -46,7 +46,7 @@ Returns the total cases in germany for every day.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/cases`
+`GET https://api.corona-zahlen.org/germany/history/cases`
 [Open](/germany/history/cases)
 
 ### Response
@@ -84,7 +84,7 @@ Returns the total cases in germany for the last `:days` days.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/cases/7`
+`GET https://api.corona-zahlen.org/germany/history/cases/7`
 [Open](/germany/history/cases)
 
 **Parameters**
@@ -143,7 +143,7 @@ Returns the number of deaths in germany for every day.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/deaths`
+`GET https://api.corona-zahlen.org/germany/history/deaths`
 [Open](/germany/history/deaths)
 
 ### Response
@@ -181,7 +181,7 @@ Returns the number of deaths in germany for the last `:days` days.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/deaths/7`
+`GET https://api.corona-zahlen.org/germany/history/deaths/7`
 [Open](/germany/history/deaths/7)
 
 **Parameters**
@@ -240,7 +240,7 @@ Returns the number of recovered people in germany for every day.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/recovered`
+`GET https://api.corona-zahlen.org/germany/history/recovered`
 [Open](/germany/history/recovered)
 
 ### Response
@@ -278,7 +278,7 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 ### Request
 
-`GET https://v2.rki.marlon-lueckert.de/germany/history/recovered/7`
+`GET https://api.corona-zahlen.org/germany/history/recovered/7`
 [Open](/germany/history/recovered/7)
 
 **Parameters**
