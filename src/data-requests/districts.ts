@@ -108,12 +108,19 @@ export async function getNewDistrictRecovered(): Promise<ResponseData<{ags: stri
 
 export async function getLastDistrictCasesHistory(days?: number, ags?: string): Promise<ResponseData<{ags: string, name: string, cases: number, date: Date}[]>> {
   const whereParams = [`NeuerFall IN(1,0)`];
+  if (ags != null) {
+    whereParams.push(`IdLandkreis = '${ags}'`)
+  } else {
+    // if ags is not defined restrict days to 30
+    if (days != null) {
+      days = Math.min(days, 30);
+    } else {
+      days = 30;
+    }
+  }
   if (days != null) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`)
-  }
-  if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`)
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(" AND ")}&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`
 
@@ -130,18 +137,25 @@ export async function getLastDistrictCasesHistory(days?: number, ags?: string): 
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }
 
 export async function getLastDistrictDeathsHistory(days?: number, ags?: string): Promise<ResponseData<{ags: string, name: string, deaths: number, date: Date}[]>> {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
+  if (ags != null) {
+    whereParams.push(`IdLandkreis = '${ags}'`)
+  } else {
+    // if ags is not defined restrict days to 30
+    if (days != null) {
+      days = Math.min(days, 30);
+    } else {
+      days = 30;
+    }
+  }
   if (days != null) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`)
-  }
-  if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`)
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(" AND ")}&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`
 
@@ -164,12 +178,19 @@ export async function getLastDistrictDeathsHistory(days?: number, ags?: string):
 
 export async function getLastDistrictRecoveredHistory(days?: number, ags?: string): Promise<ResponseData<{ags: string, name: string, recovered: number, date: Date}[]>> {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
+  if (ags != null) {
+    whereParams.push(`IdLandkreis = '${ags}'`)
+  } else {
+    // if ags is not defined restrict days to 30
+    if (days != null) {
+      days = Math.min(days, 30);
+    } else {
+      days = 30;
+    }
+  }
   if (days != null) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`)
-  }
-  if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`)
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(" AND ")}&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`
 
