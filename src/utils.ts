@@ -117,6 +117,7 @@ export function getStateAbbreviationByName(name: string): string | null {
 
 export function getDateBefore(days: number): string {
     let offsetDate = new Date()
+    offsetDate.setHours(0, 0, 0, 0)
     offsetDate.setDate(new Date().getDate() - days)
     return offsetDate.toISOString().split('T').shift()
 }
