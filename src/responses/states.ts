@@ -1,6 +1,6 @@
 import { IResponseMeta, ResponseMeta } from './meta'
 import { getLastStateCasesHistory, getLastStateDeathsHistory, getLastStateRecoveredHistory, getNewStateCases, getNewStateDeaths, getStatesData, getStatesRecoveredData, IStateData, getNewStateRecovered } from '../data-requests/states';
-import { getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
+import { AddDaysToDate, getDayDifference, getStateAbbreviationById, getStateIdByAbbreviation } from '../utils'
 import { ResponseData } from '../data-requests/response-data';
 
 interface StateData extends IStateData {
@@ -111,6 +111,15 @@ export async function StatesCasesHistoryResponse(days?: number, abbreviation?: s
                 history: []
             }
         }
+        if (data[abbr].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[abbr].history[data[abbr].history.length - 1].date) > 1) {
+                data[abbr].history.push({
+                    cases: 0,
+                    date: AddDaysToDate(data[abbr].history[data[abbr].history.length - 1].date, 1)
+                })
+            }
+        }
         data[abbr].history.push({
             cases: historyData.cases,
             date: new Date(historyData.date)
@@ -145,6 +154,15 @@ export async function StatesDeathsHistoryResponse(days?: number, abbreviation?: 
                 history: []
             }
         }
+        if (data[abbr].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[abbr].history[data[abbr].history.length - 1].date) > 1) {
+                data[abbr].history.push({
+                    deaths: 0,
+                    date: AddDaysToDate(data[abbr].history[data[abbr].history.length - 1].date, 1)
+                })
+            }
+        }
         data[abbr].history.push({
             deaths: historyData.deaths,
             date: new Date(historyData.date)
@@ -177,6 +195,15 @@ export async function StatesRecoveredHistoryResponse(days?: number, abbreviation
                 id: historyData.id, 
                 name: historyData.name,
                 history: []
+            }
+        }
+        if (data[abbr].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[abbr].history[data[abbr].history.length - 1].date) > 1) {
+                data[abbr].history.push({
+                    recovered: 0,
+                    date: AddDaysToDate(data[abbr].history[data[abbr].history.length - 1].date, 1)
+                })
             }
         }
         data[abbr].history.push({

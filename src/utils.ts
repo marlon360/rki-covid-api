@@ -120,3 +120,12 @@ export function getDateBefore(days: number): string {
     offsetDate.setDate(new Date().getDate() - days)
     return offsetDate.toISOString().split('T').shift()
 }
+
+export function getDayDifference(date1: Date, date2: Date): number {
+    const diffTime = date1.getTime() - date2.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+}
+
+export function AddDaysToDate(date: Date, days: number): Date {
+    return new Date(date.getTime() + (1000 * 60 * 60 * 24))
+}

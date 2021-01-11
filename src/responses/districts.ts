@@ -1,6 +1,7 @@
 import { IResponseMeta, ResponseMeta } from './meta'
 import { ResponseData } from '../data-requests/response-data';
 import { getDistrictsData, getNewDistrictCases, getNewDistrictDeaths, IDistrictData, getLastDistrictCasesHistory, getLastDistrictDeathsHistory, getLastDistrictRecoveredHistory, getDistrictsRecoveredData, getNewDistrictRecovered } from '../data-requests/districts';
+import { AddDaysToDate, getDayDifference } from '../utils';
 
 interface DistrictData extends IDistrictData {
     weekIncidence: number,
@@ -100,6 +101,15 @@ export async function DistrictsCasesHistoryResponse(days?: number, ags?: string)
                 history: []
             }            
         }
+        if (data[historyData.ags].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[historyData.ags].history[data[historyData.ags].history.length - 1].date) > 1) {
+                data[historyData.ags].history.push({
+                    cases: 0,
+                    date: AddDaysToDate(data[historyData.ags].history[data[historyData.ags].history.length - 1].date, 1)
+                })
+            }
+        }
         data[historyData.ags].history.push({
             cases: historyData.cases,
             date: new Date(historyData.date)
@@ -128,6 +138,15 @@ export async function DistrictsDeathsHistoryResponse(days?: number, ags?: string
                 history: []
             }
         }
+        if (data[historyData.ags].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[historyData.ags].history[data[historyData.ags].history.length - 1].date) > 1) {
+                data[historyData.ags].history.push({
+                    deaths: 0,
+                    date: AddDaysToDate(data[historyData.ags].history[data[historyData.ags].history.length - 1].date, 1)
+                })
+            }
+        }
         data[historyData.ags].history.push({
             deaths: historyData.deaths,
             date: new Date(historyData.date)
@@ -154,6 +173,15 @@ export async function DistrictsRecoveredHistoryResponse(days?: number, ags?: str
                 ags: historyData.ags, 
                 name: historyData.name,
                 history: []
+            }
+        }
+        if (data[historyData.ags].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[historyData.ags].history[data[historyData.ags].history.length - 1].date) > 1) {
+                data[historyData.ags].history.push({
+                    recovered: 0,
+                    date: AddDaysToDate(data[historyData.ags].history[data[historyData.ags].history.length - 1].date, 1)
+                })
             }
         }
         data[historyData.ags].history.push({
