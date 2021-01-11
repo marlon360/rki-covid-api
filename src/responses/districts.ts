@@ -89,6 +89,9 @@ interface DistrictsCasesHistory {
 }
 export async function DistrictsCasesHistoryResponse(days?: number, ags?: string): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
     const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
 
     const data: DistrictsCasesHistory = {}
@@ -126,6 +129,9 @@ interface DistrictsDeathsHistory {
 }
 export async function DistrictsDeathsHistoryResponse(days?: number, ags?: string): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
     const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
 
     const data: DistrictsDeathsHistory = {}
@@ -163,6 +169,9 @@ interface DistrictsRecoveredHistory {
 }
 export async function DistrictsRecoveredHistoryResponse(days?: number, ags?: string): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
     const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
 
     const data: DistrictsRecoveredHistory = {}

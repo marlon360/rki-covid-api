@@ -1,8 +1,9 @@
 import * as path from 'path';
-import express from 'express';
+import express, { ErrorRequestHandler, Response } from 'express';
 import cors from 'cors';
 import compression from 'compression'
 import queue from 'express-queue'
+import 'express-async-errors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';

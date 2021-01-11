@@ -93,6 +93,10 @@ interface StatesCasesHistory {
 }
 export async function StatesCasesHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesCasesHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
+
     let id = null;
     if (abbreviation != null) {
         id = getStateIdByAbbreviation(abbreviation);
@@ -136,6 +140,10 @@ interface StatesDeathsHistory {
 }
 export async function StatesDeathsHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesDeathsHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
+
     let id = null;
     if (abbreviation != null) {
         id = getStateIdByAbbreviation(abbreviation);
@@ -179,6 +187,10 @@ interface StatesRecoveredHistory {
 }
 export async function StatesRecoveredHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesRecoveredHistory>> {
     
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
+
     let id = null;
     if (abbreviation != null) {
         id = getStateIdByAbbreviation(abbreviation);
