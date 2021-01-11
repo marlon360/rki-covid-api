@@ -117,7 +117,7 @@ export async function getLastStateCasesHistory(days?: number, id?: number): Prom
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }
 
@@ -145,7 +145,7 @@ export async function getLastStateDeathsHistory(days?: number, id?: number): Pro
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }
 
@@ -173,6 +173,6 @@ export async function getLastStateRecoveredHistory(days?: number, id?: number): 
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }

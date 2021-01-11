@@ -172,7 +172,7 @@ export async function getLastDistrictDeathsHistory(days?: number, ags?: string):
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }
 
@@ -207,6 +207,6 @@ export async function getLastDistrictRecoveredHistory(days?: number, ags?: strin
 
   return {
     data: history,
-    lastUpdate: history[history.length - 1].date
+    lastUpdate: history[history.length - 1] ? history[history.length - 1].date : new Date()
   }
 }
