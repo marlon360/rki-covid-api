@@ -17,6 +17,7 @@ export interface IDistrictData {
   ags: string,
   name: string,
   county: string,
+  state: string,
   population: number,
   cases: number,
   deaths: number,
@@ -26,13 +27,14 @@ export interface IDistrictData {
 }
 
 export async function getDistrictsData(): Promise<ResponseData<IDistrictData[]>> {
-  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,EWZ,cases,deaths,county,last_update,cases7_lk,death7_lk&returnGeometry=false&outSR=4326&f=json`);
+  const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,EWZ,cases,deaths,county,last_update,cases7_lk,death7_lk,BL&returnGeometry=false&outSR=4326&f=json`);
   const data = response.data;
   const districts = data.features.map((feature) => {
     return {
       ags: feature.attributes.RS,
       name: feature.attributes.GEN,
       county: feature.attributes.county,
+      state: feature.attributes.BL,
       population: feature.attributes.EWZ,
       cases: feature.attributes.cases,
       deaths: feature.attributes.deaths,

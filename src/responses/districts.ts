@@ -1,9 +1,10 @@
 import { IResponseMeta, ResponseMeta } from './meta'
 import { ResponseData } from '../data-requests/response-data';
 import { getDistrictsData, getNewDistrictCases, getNewDistrictDeaths, IDistrictData, getLastDistrictCasesHistory, getLastDistrictDeathsHistory, getLastDistrictRecoveredHistory, getDistrictsRecoveredData, getNewDistrictRecovered } from '../data-requests/districts';
-import { AddDaysToDate, getDayDifference } from '../utils';
+import { AddDaysToDate, getDayDifference, getStateAbbreviationByName } from '../utils';
 
 interface DistrictData extends IDistrictData {
+    stateAbbreviation: string,
     weekIncidence: number,
     casesPer100k: number,
     recovered: number
@@ -46,6 +47,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     let districts = districtsData.data.map((district) => {
         return {
             ...district,
+            stateAbbreviation: getStateAbbreviationByName(district.state),
             recovered: getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
             weekIncidence: district.casesPerWeek / district.population * 100000,
             casesPer100k: district.cases / district.population * 100000,
