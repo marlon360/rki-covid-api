@@ -8,7 +8,7 @@ import 'express-async-errors';
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
-import { VaccinationResponse } from './responses/vaccination'
+import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 
 const cache = require('express-redis-cache')({ expire: 600, host: process.env.REDIS_URL });
@@ -232,6 +232,11 @@ app.get('/districts/:district/history/recovered/:days', cache.route(), queueMidd
 
 app.get('/vaccinations', cache.route(), queueMiddleware(), async (req, res) => {
   const response = await VaccinationResponse();
+  res.json(response)
+})
+
+app.get('/vaccinations/history', cache.route(), queueMiddleware(), async (req, res) => {
+  const response = await VaccinationHistoryResponse();  
   res.json(response)
 })
 

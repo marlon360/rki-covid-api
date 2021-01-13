@@ -106,3 +106,44 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     }
 
 }
+
+export interface VaccinationHistoryEntry {
+    date: Date,
+    vaccinated: number
+}
+
+export async function getVaccinationHistory(): Promise<ResponseData<VaccinationHistoryEntry[]>> {
+    
+    const response = await axios.get(`https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile`, {
+        responseType: 'arraybuffer'
+      });
+    const data = response.data;
+    const lastModified = response.headers['last-modified'];
+    const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
+
+    var workbook = XLSX.read(data, {type:'buffer', cellDates: true});
+    
+    const sheet = workbook.Sheets[workbook.SheetNames[2]];
+
+    const json = XLSX.utils.sheet_to_json<{
+        Datum: Date,
+        'Gesamtzahl Impfungen': number
+    }>(sheet)
+    
+    const vaccinationHistory: VaccinationHistoryEntry[] = []
+
+    for (const entry of json) {
+        if ((entry.Datum as any) instanceof Date) {
+            vaccinationHistory.push({
+                date: entry.Datum,
+                vaccinated: entry['Gesamtzahl Impfungen']
+            })
+        }
+    }
+
+    return {
+        data: vaccinationHistory,
+        lastUpdate: lastUpdate
+    }
+
+}

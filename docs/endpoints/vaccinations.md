@@ -73,3 +73,53 @@
   }
 }
 ```
+
+## `/vaccinations/history`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/history`
+[Open](/vaccinations/history)
+
+### Response
+
+```json
+{
+  "data": {
+    "history": [
+      {
+        "date": "2020-12-27T00:00:00.000Z",
+        "vaccinated": 23672
+      },
+      {
+        "date": "2020-12-28T00:00:00.000Z",
+        "vaccinated": 19084
+      },
+      {
+        "date": "2020-12-29T00:00:00.000Z",
+        "vaccinated": 42268
+      },
+      // ...
+      {
+        "date": "2021-01-10T00:00:00.000Z",
+        "vaccinated": 32069
+      },
+      {
+        "date": "2021-01-11T00:00:00.000Z",
+        "vaccinated": 62871
+      },
+      {
+        "date": "2021-01-12T00:00:00.000Z",
+        "vaccinated": 69178
+      }
+    ]
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-01-13T14:44:14.000Z",
+    "lastCheckedForUpdate": "2021-01-13T15:43:03.880Z"
+  }
+}
+```
