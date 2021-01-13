@@ -11,7 +11,7 @@ Returns a Heatmap (PNG) of week incidences for districts.
 ### Request
 
 `GET https://api.corona-zahlen.org/map/districts`
-[Open](/map/district)
+[Open](/map/districts)
 
 ### Response
 
