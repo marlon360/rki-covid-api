@@ -66,6 +66,12 @@ export async function StatesMapResponse() {
     return sharp(svgBuffer).png({ quality: 1 }).toBuffer();
 }
 
+export function IncidenceColorsResponse() {
+    return {
+        incidentRanges: weekIncidenceColorRanges.ranges
+    };
+}
+
 function getColorForWeekIncidence(weekIncidence: number): string {
     for (const range of weekIncidenceColorRanges.ranges) {
         if (weekIncidence >= range.min && weekIncidence < range.max) {

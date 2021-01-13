@@ -9,7 +9,7 @@ import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecovere
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
 import { VaccinationResponse } from './responses/vaccination'
-import { DistrictsMapResponse, StatesMapResponse } from './responses/map';
+import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 
 const cache = require('express-redis-cache')({ expire: 600, host: process.env.REDIS_URL });
 
@@ -245,10 +245,18 @@ app.get('/map/districts', cache.route({ binary: true  }), queueMiddleware(), asy
   res.send(response)
 })
 
+app.get('/map/districts/legend', cache.route(), queueMiddleware(), async (req, res) => {
+  res.json(IncidenceColorsResponse());
+})
+
 app.get('/map/states', cache.route({ binary: true  }), queueMiddleware(), async (req, res) => {
   res.setHeader('Content-Type', 'image/png');
   const response = await StatesMapResponse();
   res.send(response)
+})
+
+app.get('/map/states/legend', cache.route(), queueMiddleware(), async (req, res) => {
+  res.json(IncidenceColorsResponse());
 })
 
 app.listen(port, () => {
