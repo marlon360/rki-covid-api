@@ -63,6 +63,46 @@ If you use this API, please consider supporting me:
 **R value**
 [https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen_csv.csv?__blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen_csv.csv?__blob=publicationFile)
 
+## Host it yourself
+
+### Requirements
+
+- Docker runtime
+- Docker compose
+
+### Start Server
+
+1. Setup docker-compose.yml:
+
+```yml
+version: "3.8"
+networks:
+  redis-net:
+services:
+  redis:
+    image: redis
+    container_name: cache
+    expose:
+      - 6379
+    networks:
+      - redis-net
+  rki-api:
+    image: docker.pkg.github.com/marlon360/rki-covid-api/rki-server:v2
+    ports:
+      - "8080:3000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis
+    networks:
+      - redis-net
+```
+
+2. Start Server:
+
+`docker-compose up`
+
+Now you can access the server at `http://localhost:8080`.
 
 ## Project Showcase (projects using this API)
 
