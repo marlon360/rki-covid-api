@@ -11,7 +11,7 @@ import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, District
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 
-const cache = require('express-redis-cache')({ expire: 600, host: process.env.REDIS_URL });
+const cache = require('express-redis-cache')({ expire: 1800, host: process.env.REDIS_URL });
 
 Date.prototype.toJSON = function() {
   return this.toISOString()
