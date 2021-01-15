@@ -6,7 +6,7 @@ export async function getCases(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerFall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -20,7 +20,7 @@ export async function getNewCases(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -42,7 +42,7 @@ export async function getLastCasesHistory(days?: number): Promise<{ cases: numbe
     const response = await axios.get(url, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -66,7 +66,7 @@ export async function getLastDeathsHistory(days?: number): Promise<{ deaths: num
     const response = await axios.get(url, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -90,7 +90,7 @@ export async function getLastRecoveredHistory(days?: number): Promise<{ recovere
     const response = await axios.get(url, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -106,7 +106,7 @@ export async function getDeaths(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerTodesfall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -120,7 +120,7 @@ export async function getNewDeaths(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -134,7 +134,7 @@ export async function getRecovered(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
@@ -148,7 +148,7 @@ export async function getNewRecovered(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;

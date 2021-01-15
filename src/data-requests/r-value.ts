@@ -50,7 +50,7 @@ export async function getRValue(): Promise<ResponseData<number>> {
     const response = await axios.get(`https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen_csv.csv?__blob=publicationFile`, {
         proxy: {
             host: 'iot.shinewelt.de',
-            port: 3128
+            port: 9999
         }
     });
     const data = response.data;
