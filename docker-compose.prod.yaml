@@ -10,7 +10,7 @@ services:
     networks:
       - redis-net
   rki-api:
-    image: docker.pkg.github.com/marlon360/rki-covid-api/rki-server:v2
+    image: marlon360/rki-covid-server:v2
     ports:
       - "8080:3000"
     depends_on:
