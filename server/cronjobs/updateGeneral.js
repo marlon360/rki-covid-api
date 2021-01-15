@@ -29,7 +29,7 @@ module.exports.updateGeneral = async (database) => {
       const lastUpdateDateString = lastUpdateDate.toDateString();
 
       // get data of states to calculate week incidence
-      const statesResponse = await superagent.get("https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung,Fallzahl&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
+      const statesResponse = await superagent.get("https://iot.shinewelt.de/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,cases7_bl,Aktualisierung,Fallzahl&returnGeometry=false&outSR=4326&f=json").maxResponseSize(500 * 1024 * 1024);
       const statesData = JSON.parse(statesResponse.text);
 
       const statesUpdateDate = new Date(statesData.features[0].attributes.Aktualisierung + (3600 * 1000));
