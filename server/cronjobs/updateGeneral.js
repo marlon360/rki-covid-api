@@ -20,7 +20,7 @@ module.exports.updateGeneral = async (database) => {
       return;
     } else {
       // if no entry exists, get latest data from api
-      const response = await superagent.get("https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.geojson").maxResponseSize(500 * 1024 * 1024);
+      const response = await superagent.get("https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.geojson").maxResponseSize(700 * 1024 * 1024);
       const apidata = response.body;
 
       const lastUpdate = apidata.features[0].properties.Datenstand;
