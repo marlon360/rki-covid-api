@@ -113,11 +113,11 @@ export async function getLastDistrictCasesHistory(days?: number, ags?: string): 
   if (ags != null) {
     whereParams.push(`IdLandkreis = '${ags}'`)
   } else {
-    // if ags is not defined restrict days to 30
+    // if ags is not defined restrict days to 36
     if (days != null) {
-      days = Math.min(days, 30);
+      days = Math.min(days, 36);
     } else {
-      days = 30;
+      days = 36;
     }
   }
   if (days != null) {
