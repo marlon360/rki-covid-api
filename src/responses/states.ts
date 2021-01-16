@@ -135,6 +135,92 @@ export async function StatesCasesHistoryResponse(days?: number, abbreviation?: s
     };
 }
 
+interface StatesWeekIncidenceHistory {
+    [key: string]: StateHistory<{weekIncidence: number, date: Date}>
+}
+export async function StatesWeekIncidenceHistoryResponse(days?: number, abbreviation?: string): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
+    
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
+
+    // add 6 days to calculate week incidence
+    if (days != null) {
+        days += 6;
+    }
+
+    let id = null;
+    if (abbreviation != null) {
+        id = getStateIdByAbbreviation(abbreviation);
+    }
+
+    const statesHistoryData = await getLastStateCasesHistory(days, id);
+    const statesData = await getStatesData();
+
+    function getStateById (data: ResponseData<IStateData[]>, id: number): IStateData | null {
+        for (const state of data.data) {
+            if (state.id == id) return state;
+        }
+        return null
+    }   
+
+    const data: StatesCasesHistory = {}
+
+    for (const historyData of statesHistoryData.data) {
+        const abbr = getStateAbbreviationById(historyData.id);
+        if (data[abbr] == null) {
+            data[abbr] = {
+                id: historyData.id, 
+                name: historyData.name,
+                history: []
+            }
+        }
+        if (data[abbr].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[abbr].history[data[abbr].history.length - 1].date) > 1) {
+                data[abbr].history.push({
+                    cases: 0,
+                    date: AddDaysToDate(data[abbr].history[data[abbr].history.length - 1].date, 1)
+                })
+            }
+        }
+        data[abbr].history.push({
+            cases: historyData.cases,
+            date: new Date(historyData.date)
+        })
+    }
+
+    const incidenceData: StatesWeekIncidenceHistory = {}
+
+    for (const abbr of Object.keys(data)) {
+        const stateHistory = data[abbr].history;
+        const state = getStateById(statesData, getStateIdByAbbreviation(abbr));
+        
+        incidenceData[abbr] = {
+            id: state.id, 
+            name: state.name,
+            history: []
+        }
+
+        for (let i = 6; i < stateHistory.length; i++) {
+            const date = stateHistory[i].date
+            let sum = 0;
+            for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
+                sum += stateHistory[dayOffset].cases;
+            }
+            incidenceData[abbr].history.push({
+                weekIncidence: sum / state.population * 100000,
+                date: date
+            })
+        }
+    }
+
+    return {
+        data: incidenceData,
+        meta: new ResponseMeta(statesHistoryData.lastUpdate)
+    };
+}
+
 interface StatesDeathsHistory {
     [key: string]: StateHistory<{deaths: number, date: Date}>
 }

@@ -5,9 +5,9 @@ import compression from 'compression'
 import queue from 'express-queue'
 import 'express-async-errors';
 
-import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse } from './responses/states';
+import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse, StatesWeekIncidenceHistoryResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
-import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse } from './responses/districts'
+import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts'
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 
@@ -123,6 +123,16 @@ app.get('/states/history/recovered/:days', queuedCache(), cache.route(), async (
   res.json(response)
 })
 
+app.get('/states/history/incidence', queuedCache(), cache.route(), async (req, res) => {
+  const response = await StatesWeekIncidenceHistoryResponse();
+  res.json(response)
+})
+
+app.get('/states/history/incidence/:days', queuedCache(), cache.route(), async (req, res) => {
+  const response = await StatesWeekIncidenceHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
 app.get('/states/:state', queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse(req.params.state);
   res.json(response)
@@ -139,6 +149,16 @@ app.get('/states/:state/history/cases', queuedCache(), cache.route(), async (req
 
 app.get('/states/:state/history/cases/:days', queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesCasesHistoryResponse(parseInt(req.params.days), req.params.state);
+  res.json(response)
+})
+
+app.get('/states/:state/history/incidence', queuedCache(), cache.route(), async (req, res) => {
+  const response = await StatesWeekIncidenceHistoryResponse(null, req.params.state);
+  res.json(response)
+})
+
+app.get('/states/:state/history/incidence/:days', queuedCache(), cache.route(), async (req, res) => {
+  const response = await StatesWeekIncidenceHistoryResponse(parseInt(req.params.days), req.params.state);
   res.json(response)
 })
 
@@ -186,6 +206,16 @@ app.get('/districts/history/cases/:days', queuedCache(), cache.route(), async (r
   res.json(response)
 })
 
+app.get('/districts/history/incidence', queuedCache(), cache.route(), async (req, res) => {
+  const response = await DistrictsWeekIncidenceHistoryResponse();
+  res.json(response)
+})
+
+app.get('/districts/history/incidence/:days', queuedCache(), cache.route(), async (req, res) => {
+  const response = await DistrictsWeekIncidenceHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
 app.get('/districts/history/deaths', queuedCache(), cache.route(), async (req, res) => {
   const response = await DistrictsDeathsHistoryResponse();
   res.json(response)
@@ -222,6 +252,16 @@ app.get('/districts/:district/history/cases', queuedCache(), cache.route(), asyn
 
 app.get('/districts/:district/history/cases/:days', queuedCache(), cache.route(), async (req, res) => {
   const response = await DistrictsCasesHistoryResponse(parseInt(req.params.days), req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/incidence', queuedCache(), cache.route(), async (req, res) => {
+  const response = await DistrictsWeekIncidenceHistoryResponse(null, req.params.district);
+  res.json(response)
+})
+
+app.get('/districts/:district/history/incidence/:days', queuedCache(), cache.route(), async (req, res) => {
+  const response = await DistrictsWeekIncidenceHistoryResponse(parseInt(req.params.days), req.params.district);
   res.json(response)
 })
 

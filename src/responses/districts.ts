@@ -126,6 +126,86 @@ export async function DistrictsCasesHistoryResponse(days?: number, ags?: string)
     };
 }
 
+interface DistrictsWeekIncidenceHistory {
+    [key: string]: DistrictHistory<{weekIncidence: number, date: Date}>
+}
+export async function DistrictsWeekIncidenceHistoryResponse(days?: number, ags?: string): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
+    
+    if (days != null && isNaN(days)) {
+        throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
+    }
+
+    // add 6 days to calculate week incidence
+    if (days != null) {
+        days += 6;
+    }
+
+    const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
+    const districtsData = await getDistrictsData();
+
+    function getDistrictByAGS (data: ResponseData<IDistrictData[]>, ags: string): IDistrictData | null {
+        for (const district of data.data) {
+            if (district.ags == ags) return district;
+        }
+        return null
+    }  
+
+    const data: DistrictsCasesHistory = {}
+
+    for (const historyData of statesHistoryData.data) {
+        if (data[historyData.ags] == null) {
+            data[historyData.ags] = {
+                ags: historyData.ags, 
+                name: historyData.name,
+                history: []
+            }            
+        }
+        if (data[historyData.ags].history.length > 0) {
+            const nextDate = new Date(historyData.date)
+            while (getDayDifference(nextDate, data[historyData.ags].history[data[historyData.ags].history.length - 1].date) > 1) {
+                data[historyData.ags].history.push({
+                    cases: 0,
+                    date: AddDaysToDate(data[historyData.ags].history[data[historyData.ags].history.length - 1].date, 1)
+                })
+            }
+        }
+        data[historyData.ags].history.push({
+            cases: historyData.cases,
+            date: new Date(historyData.date)
+        })
+    }
+
+    const incidenceData: DistrictsWeekIncidenceHistory = {}
+
+    for (const ags of Object.keys(data)) {
+        const districtHistory = data[ags].history;
+        const district = getDistrictByAGS(districtsData, ags);
+        
+        incidenceData[ags] = {
+            ags: district.ags, 
+            name: district.name,
+            history: []
+        }
+
+        for (let i = 6; i < districtHistory.length; i++) {
+            const date = districtHistory[i].date
+            let sum = 0;
+            for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
+                sum += districtHistory[dayOffset].cases;
+            }
+            incidenceData[ags].history.push({
+                weekIncidence: sum / district.population * 100000,
+                date: date
+            })
+        }
+    }
+
+    return {
+        data: incidenceData,
+        meta: new ResponseMeta(statesHistoryData.lastUpdate)
+    };
+}
+
 interface DistrictsDeathsHistory {
     [key: string]: DistrictHistory<{deaths: number, date: Date}>
 }
