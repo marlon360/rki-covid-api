@@ -56,16 +56,3 @@ jobs:
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: cd /home/docker/rki && docker-compose pull && docker-compose up -d
-  deploy_v2:
-    needs: build
-    if: github.ref == 'refs/heads/v2'
-    runs-on: ubuntu-latest
-    steps:
-    - name: Restart docker container on v2 server
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        key: ${{ secrets.KEY }}
-        passphrase: ${{ secrets.PASSPHRASE }}
-        script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d
