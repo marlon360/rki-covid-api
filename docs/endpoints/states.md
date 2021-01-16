@@ -134,6 +134,10 @@ Redirects to `/states/history/cases`
 
 ## `/states/history/cases/:days`
 
+## `/states/history/incidence`
+
+## `/states/history/incidence/:days`
+
 ## `/states/history/deaths`
 
 ## `/states/history/deaths/:days`
@@ -146,6 +150,10 @@ Redirects to `/states/history/cases`
 ## `/states/:state/history/cases`
 
 ## `/states/:state/history/cases/:days`
+
+## `/states/:state/history/incidence`
+
+## `/states/:state/history/incidence/:days`
 
 ## `/states/:state/history/deaths`
 

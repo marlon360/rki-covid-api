@@ -134,6 +134,10 @@ Redirects to `/districts/history/cases`
 
 ## `/districts/history/cases/:days`
 
+## `/districts/history/incidence`
+
+## `/districts/history/incidence/:days`
+
 ## `/districts/history/deaths`
 
 ## `/districts/history/deaths/:days`
@@ -146,6 +150,10 @@ Redirects to `/districts/history/cases`
 ## `/districts/:ags/history/cases`
 
 ## `/districts/:ags/history/cases/:days`
+
+## `/districts/:ags/history/incidence`
+
+## `/districts/:ags/history/incidence/:days`
 
 ## `/districts/:ags/history/deaths`
 
