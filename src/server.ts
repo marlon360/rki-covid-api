@@ -10,6 +10,7 @@ import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecov
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts'
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
+import { RKIError } from './utils';
 
 const cache = require('express-redis-cache')({ expire: 1800, host: process.env.REDIS_URL });
 
@@ -317,6 +318,27 @@ app.get('/map/states', queuedCache(), cache.route(), async (req, res) => {
 
 app.get('/map/states/legend', queuedCache(), cache.route(), async (req, res) => {
   res.json(IncidenceColorsResponse());
+})
+
+app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
+  if (error instanceof RKIError) {
+    res.json({
+      error: {
+        message: "There is a problem with the official RKI API.",
+        rkiError: error.rkiError,
+        url: error.url || ""
+      }
+    })
+  } else {
+    const baseError = error as Error;
+    res.json({
+      error: {
+        message: "An error occurred.",
+        details: baseError.message,
+        stack: baseError.stack
+      }
+    })
+  }
 })
 
 app.listen(port, () => {
