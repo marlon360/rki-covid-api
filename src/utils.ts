@@ -130,3 +130,22 @@ export function getDayDifference(date1: Date, date2: Date): number {
 export function AddDaysToDate(date: Date, days: number): Date {
     return new Date(date.getTime() + (1000 * 60 * 60 * 24))
 }
+
+export interface RKIErrorResponse {
+    code: number,
+    message: string,
+    details: string[]
+}
+
+export class RKIError extends Error {
+
+    public url?: string;
+    public rkiError: RKIErrorResponse;
+
+    constructor(error: RKIErrorResponse, url?: string) {
+        super(error.message);
+        this.name = "RKIError";
+        this.rkiError = error;
+        this.url = url
+    }
+}

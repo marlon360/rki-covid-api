@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getDateBefore } from '../utils';
+import { getDateBefore, RKIError } from '../utils';
 import { ResponseData } from './response-data'
 
 function parseDate(dateString: string): Date {
@@ -29,6 +29,9 @@ export interface IDistrictData {
 export async function getDistrictsData(): Promise<ResponseData<IDistrictData[]>> {
   const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_Landkreisdaten/FeatureServer/0/query?where=1%3D1&outFields=RS,GEN,EWZ,cases,deaths,county,last_update,cases7_lk,death7_lk,BL&returnGeometry=false&outSR=4326&f=json`);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const districts = data.features.map((feature) => {
     return {
       ags: feature.attributes.RS,
@@ -51,6 +54,9 @@ export async function getDistrictsData(): Promise<ResponseData<IDistrictData[]>>
 export async function getDistrictsRecoveredData(): Promise<ResponseData<{ags: string, recovered: number}[]>> {
   const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const districts = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
@@ -96,6 +102,9 @@ export async function getNewDistrictDeaths(): Promise<ResponseData<{ags: string,
 export async function getNewDistrictRecovered(): Promise<ResponseData<{ags: string, recovered: number}[]>> {
   const response = await axios.get(`https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=NeuGenesen IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=pjson&token=`);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const districts = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
@@ -128,6 +137,9 @@ export async function getLastDistrictCasesHistory(days?: number, ags?: string): 
 
   const response = await axios.get(url);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const history: {ags: string, name: string, cases: number, date: Date}[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
@@ -163,6 +175,9 @@ export async function getLastDistrictDeathsHistory(days?: number, ags?: string):
 
   const response = await axios.get(url);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const history: {ags: string, name: string, deaths: number, date: Date}[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
@@ -198,6 +213,9 @@ export async function getLastDistrictRecoveredHistory(days?: number, ags?: strin
 
   const response = await axios.get(url);
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   const history: {ags: string, name: string, recovered: number, date: Date}[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
