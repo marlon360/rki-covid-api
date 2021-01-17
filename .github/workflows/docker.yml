@@ -5,6 +5,7 @@ on:
       - "master"
       - "develop"
       - "v2"
+      - "v2-proxy"
 jobs:
   build:
     runs-on: ubuntu-latest 
@@ -56,3 +57,16 @@ jobs:
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
         script: cd /home/docker/rki && docker-compose pull && docker-compose up -d
+  deploy_v2-proxy:
+    needs: build
+    if: github.ref == 'refs/heads/v2-proxy'
+    runs-on: ubuntu-latest
+    steps:
+    - name: Restart docker container on v2 proxy server
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        passphrase: ${{ secrets.PASSPHRASE }}
+        script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d
