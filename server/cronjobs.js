@@ -9,7 +9,6 @@ const { connectToDatabase } = require('./utils/database');
 
 async function updateDataSources(database) {
     try {
-      await updateGeneral(database);
       await updateDistricts();
       await updateStates();
       await updateStatesMap();
