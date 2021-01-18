@@ -9,57 +9,122 @@
 
 ### Response
 
+`vaccinated` Number of people who got the first of two vaccinations.
+
+`vacciantion.biontech` Number of people who were vaccinated with BioNTech
+
+`vacciantion.moderna` Number of people who were vaccinated with Moderna
+
+`delta` New first vaccination compared to yesterday
+
+`secondVaccination.vaccinated` Number of people who got the second vaccination
+
+`secondVaccination.delta` New second vaccinations compared to yesterday
+
 ```json
 {
   "data": {
-    "vaccinated": 265986,
-    "delta": 22892,
-    "vaccinatedPer1k": 3.1982267520474625,
-    "quote": 0.0031982267520474623,
+    "vaccinated": 1139297,
+    "vaccination": {
+      "biontech": 1136573,
+      "moderna": 2724
+    },
+    "delta": 31152,
+    "quote": 0.013698954621398939,
+    "secondVaccination": {
+      "vaccinated": 6581,
+      "delta": 6464
+    },
     "indication": {
-      "age": 62805,
-      "job": 123103,
-      "medical": 7999,
-      "nursingHome": 114654
+      "age": 279063,
+      "job": 551369,
+      "medical": 39012,
+      "nursingHome": 394516,
+      "secondVaccination": {
+        "age": 2939,
+        "job": 2112,
+        "medical": 367,
+        "nursingHome": 4521
+      }
     },
     "states": {
       "BW": {
         "name": "Baden-Württemberg",
-        "vaccinated": 27454,
-        "delta": 3390,
-        "vaccinatedPer1k": 2.473245544257258,
-        "quote": 0.002473245544257258,
+        "vaccinated": 114954,
+        "vaccination": {
+          "biontech": 114954,
+          "moderna": 0
+        },
+        "secondVaccination": {
+          "vaccinated": 0,
+          "delta": 0
+        },
+        "delta": 5352,
+        "quote": 0.010355848630237809,
         "indication": {
-          "age": 12584,
-          "job": 8739,
-          "medical": 1469,
-          "nursingHome": 4932
-        }
-      },
-      "BY": {
-        "name": "Bayern",
-        "vaccinated": 66258,
-        "delta": 8425,
-        "vaccinatedPer1k": 5.048329730340502,
-        "quote": 0.0050483297303405015,
-        "indication": {
-          "age": 15480,
-          "job": 31755,
-          "medical": 1280,
-          "nursingHome": 23823
+          "age": 58770,
+          "job": 35662,
+          "medical": 3663,
+          "nursingHome": 23375,
+          "secondVaccination": {
+            "age": 0,
+            "job": 0,
+            "medical": 0,
+            "nursingHome": 0
+          }
         }
       },
       // ...
+      "SH": {
+        "name": "Schleswig-Holstein",
+        "vaccinated": 65849,
+        "vaccination": {
+          "biontech": 65849,
+          "moderna": 0
+        },
+        "secondVaccination": {
+          "vaccinated": 0,
+          "delta": 0
+        },
+        "delta": 3524,
+        "quote": 0.022677048102589286,
+        "indication": {
+          "age": 17562,
+          "job": 22557,
+          "medical": 5458,
+          "nursingHome": 18323,
+          "secondVaccination": {
+            "age": 0,
+            "job": 0,
+            "medical": 0,
+            "nursingHome": 0
+          }
+        }
+      },
       "TH": {
         "name": "Thüringen",
-        "vaccinated": 810,
-        "vaccinatedPer1k": 0.37967955045941226,
-        "quote": 0.00037967955045941227,
+        "vaccinated": 23413,
+        "vaccination": {
+          "biontech": 23413,
+          "moderna": 0
+        },
+        "secondVaccination": {
+          "vaccinated": 0,
+          "delta": 0
+        },
+        "delta": 195,
+        "quote": 0.010974613969020023,
         "indication": {
-          "age": 232,
-          "job": 297,
-          "medical": 0,
-          "nursingHome": 413
+          "age": 5024,
+          "job": 15020,
+          "medical": 475,
+          "nursingHome": 2892,
+          "secondVaccination": {
+            "age": 0,
+            "job": 0,
+            "medical": 0,
+            "nursingHome": 0
+          }
         }
       }
     }
@@ -68,8 +133,8 @@
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-04T14:32:08.399Z",
-    "lastCheckedForUpdate": "2021-01-04T14:32:08.400Z"
+    "lastUpdate": "2021-01-18T16:52:07.000Z",
+    "lastCheckedForUpdate": "2021-01-18T19:58:00.401Z"
   }
 }
 ```
@@ -89,28 +154,34 @@
     "history": [
       {
         "date": "2020-12-27T00:00:00.000Z",
-        "vaccinated": 23672
+        "vaccinated": 24080,
+        "firstVaccination": 24080,
+        "secondVaccination": 0
       },
       {
         "date": "2020-12-28T00:00:00.000Z",
-        "vaccinated": 19084
+        "vaccinated": 19501,
+        "firstVaccination": 19501,
+        "secondVaccination": 0
       },
       {
         "date": "2020-12-29T00:00:00.000Z",
-        "vaccinated": 42268
+        "vaccinated": 42692,
+        "firstVaccination": 42692,
+        "secondVaccination": 0
       },
       // ...
-      {
-        "date": "2021-01-10T00:00:00.000Z",
-        "vaccinated": 32069
+            {
+        "date": "2021-01-16T00:00:00.000Z",
+        "vaccinated": 52098,
+        "firstVaccination": 52098,
+        "secondVaccination": 62
       },
       {
-        "date": "2021-01-11T00:00:00.000Z",
-        "vaccinated": 62871
-      },
-      {
-        "date": "2021-01-12T00:00:00.000Z",
-        "vaccinated": 69178
+        "date": "2021-01-17T00:00:00.000Z",
+        "vaccinated": 31152,
+        "firstVaccination": 31152,
+        "secondVaccination": 6464
       }
     ]
   },
@@ -118,8 +189,8 @@
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-13T14:44:14.000Z",
-    "lastCheckedForUpdate": "2021-01-13T15:43:03.880Z"
+    "lastUpdate": "2021-01-18T16:52:07.000Z",
+    "lastCheckedForUpdate": "2021-01-18T19:59:48.164Z"
   }
 }
 ```

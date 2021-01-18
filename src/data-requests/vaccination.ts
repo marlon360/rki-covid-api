@@ -5,95 +5,176 @@ import { getStateAbbreviationByName } from '../utils';
 
 export interface VaccinationCoverage {
     vaccinated: number,
+    vaccination: {
+        biontech: number,
+        moderna: number
+    },
     delta: number,
-    vaccinatedPer1k: number,
     quote: number,
+    secondVaccination: {
+        vaccinated: number,
+        delta: number
+    }
     indication: {
         age: number,
         job: number,
         medical: number,
-        nursingHome: number
+        nursingHome: number,
+        secondVaccination: {
+            age: number,
+            job: number,
+            medical: number,
+            nursingHome: number
+        }
     },
     states: {
         [abbreviation: string]: {
             name: string,
             vaccinated: number,
+            vaccination: {
+                biontech: number,
+                moderna: number
+            },
+            secondVaccination: {
+                vaccinated: number,
+                delta: number
+            }
             delta: number,
-            vaccinatedPer1k: number,
             quote: number,
             indication: {
                 age: number,
                 job: number,
                 medical: number,
                 nursingHome: number
+                secondVaccination: {
+                    age: number,
+                    job: number,
+                    medical: number,
+                    nursingHome: number
+                }
             }
         }
-    } 
+    }
 }
 
 export async function getVaccinationCoverage(): Promise<ResponseData<VaccinationCoverage>> {
-    
+
     const response = await axios.get(`https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile`, {
         responseType: 'arraybuffer'
-      });
+    });
     const data = response.data;
     const lastModified = response.headers['last-modified'];
     const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
 
-    var workbook = XLSX.read(data, {type:'buffer'});
-    
-    const sheet = workbook.Sheets[workbook.SheetNames[1]];
+    var workbook = XLSX.read(data, { type: 'buffer' });
 
+    const sheet = workbook.Sheets[workbook.SheetNames[1]];
     const json = XLSX.utils.sheet_to_json<{
-        Bundesland: string,
-        'Impfungen kumulativ': number,
-        'Differenz zum Vortag': number,
-        'Indikation nach Alter*': number,
-        'Berufliche Indikation*': number,
-        'Medizinische Indikation*': number,
-        'Pflegeheim-bewohnerIn*': number
-    }>(sheet)
-    
+        ags: number,
+        state: string,
+        firstVaccinated: number,
+        biontech: number,
+        moderna: number,
+        firstDifference: number,
+        quote: number,
+        secondVaccinated: number,
+        secondDifference: number
+    }>(sheet, { header: ["ags", "state", "firstVaccinated", "biontech", "moderna", "firstDifference", "quote", "secondVaccinated", "secondDifference"], range: "A4:I20" })
+
+    const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
+    const indicationJson = XLSX.utils.sheet_to_json<{
+        ags: number,
+        state: string,
+        firstAge: number,
+        firstJob: number,
+        firstMedical: number,
+        firstNursingHome: number,
+        secondAge: number,
+        secondJob: number,
+        secondMedical: number,
+        secondNursingHome: number
+    }>(indicationSheet, { header: ["ags", "state", "firstAge", "firstJob", "firstMedical", "firstNursingHome", "secondAge", "secondJob", "secondMedical", "secondNursingHome"], range: "A3:J19" })        
+
     const coverage: VaccinationCoverage = {
         vaccinated: 0,
+        vaccination: {
+            biontech: 0,
+            moderna: 0
+        },
         delta: 0,
-        vaccinatedPer1k: 0,
         quote: 0,
+        secondVaccination: {
+            vaccinated: 0,
+            delta: 0
+        },
         indication: {
             age: 0,
             job: 0,
             medical: 0,
-            nursingHome: 0
+            nursingHome: 0,
+            secondVaccination: {
+                age: 0,
+                job: 0,
+                medical: 0,
+                nursingHome: 0
+            }
         },
         states: {}
     }
 
-    for (const entry of json) {
-        if (Object.keys(entry).length > 4) {
-            if (entry.Bundesland == "Gesamt") {
-                coverage.vaccinated = entry['Impfungen kumulativ']
-                coverage.delta = entry['Differenz zum Vortag'],
-                coverage.vaccinatedPer1k = entry['Impfungen pro 1.000 Einwohner'],
-                coverage.quote = coverage.vaccinated / (coverage.vaccinated / coverage.vaccinatedPer1k * 1000)
-                coverage.indication = {
-                    age: entry['Indikation nach Alter*'],
-                    job: entry['Berufliche Indikation*'],
-                    medical: entry['Medizinische Indikation*'],
-                    nursingHome: entry['Pflegeheim-bewohnerIn*']
+    for (let i = 0; i < 17; i++) {
+        const entry = json[i];
+        const indicationEntry = indicationJson[i];  
+        
+        if (entry.state == "Gesamt") {
+            coverage.vaccinated = entry.firstVaccinated;
+            coverage.delta = entry.firstDifference;
+            coverage.vaccination = {
+                biontech: entry.biontech,
+                moderna: entry.moderna
+            },
+            coverage.secondVaccination = {
+                vaccinated: entry.secondVaccinated,
+                delta: entry.secondDifference
+            }
+            coverage.quote = entry.quote / 100.0;
+            coverage.indication = {
+                age: indicationEntry.firstAge,
+                job: indicationEntry.firstJob,
+                medical: indicationEntry.firstMedical,
+                nursingHome: indicationEntry.firstNursingHome,
+                secondVaccination: {
+                    age: indicationEntry.secondAge,
+                    job: indicationEntry.secondJob,
+                    medical: indicationEntry.secondMedical,
+                    nursingHome: indicationEntry.secondNursingHome,
                 }
-            } else {
-                const abbreviation = getStateAbbreviationByName(entry.Bundesland)
-                coverage.states[abbreviation] = {
-                    name: entry.Bundesland,
-                    vaccinated: entry['Impfungen kumulativ'],
-                    delta: entry['Differenz zum Vortag'],
-                    vaccinatedPer1k: entry['Impfungen pro 1.000 Einwohner'],
-                    quote: entry['Impfungen kumulativ'] / (entry['Impfungen kumulativ'] / entry['Impfungen pro 1.000 Einwohner'] * 1000),
-                    indication: {
-                        age: entry['Indikation nach Alter*'],
-                        job: entry['Berufliche Indikation*'],
-                        medical: entry['Medizinische Indikation*'],
-                        nursingHome: entry['Pflegeheim-bewohnerIn*']
+            }
+        } else {
+            const abbreviation = getStateAbbreviationByName(entry.state)
+            coverage.states[abbreviation] = {
+                name: entry.state,
+                vaccinated: entry.firstVaccinated,
+                vaccination: {
+                    biontech: entry.biontech,
+                    moderna: entry.moderna
+                },
+                secondVaccination: {
+                    vaccinated: entry.secondVaccinated,
+                    delta: entry.secondDifference
+                },
+                delta: entry.firstDifference,
+                quote: entry.quote / 100.0,
+                indication: {
+                    age: indicationEntry.firstAge ?? 0,
+                    job: indicationEntry.firstJob ?? 0,
+                    medical: indicationEntry.firstMedical ?? 0,
+                    nursingHome: indicationEntry.firstNursingHome ?? 0,
+                    secondVaccination: {
+                        age: indicationEntry.secondAge ?? 0,
+                        job: indicationEntry.secondJob ?? 0,
+                        medical: indicationEntry.secondMedical ?? 0,
+                        nursingHome: indicationEntry.secondNursingHome ?? 0,
                     }
                 }
             }
@@ -109,34 +190,39 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
 
 export interface VaccinationHistoryEntry {
     date: Date,
-    vaccinated: number
+    vaccinated: number,
+    firstVaccination: number,
+    secondVaccination: number
 }
 
 export async function getVaccinationHistory(): Promise<ResponseData<VaccinationHistoryEntry[]>> {
-    
+
     const response = await axios.get(`https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile`, {
         responseType: 'arraybuffer'
-      });
+    });
     const data = response.data;
     const lastModified = response.headers['last-modified'];
     const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
 
-    var workbook = XLSX.read(data, {type:'buffer', cellDates: true});
-    
-    const sheet = workbook.Sheets[workbook.SheetNames[2]];
+    var workbook = XLSX.read(data, { type: 'buffer', cellDates: true });
+
+    const sheet = workbook.Sheets[workbook.SheetNames[3]];
 
     const json = XLSX.utils.sheet_to_json<{
         Datum: Date,
-        'Gesamtzahl Impfungen': number
+        'Erstimpfung': number,
+        'Zweitimpfung': number,
     }>(sheet)
-    
+
     const vaccinationHistory: VaccinationHistoryEntry[] = []
 
     for (const entry of json) {
         if ((entry.Datum as any) instanceof Date) {
             vaccinationHistory.push({
                 date: entry.Datum,
-                vaccinated: entry['Gesamtzahl Impfungen']
+                vaccinated: entry['Erstimpfung'] ?? 0,
+                firstVaccination: entry['Erstimpfung'] ?? 0,
+                secondVaccination: entry['Zweitimpfung'] ?? 0
             })
         }
     }
