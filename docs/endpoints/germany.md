@@ -137,6 +137,98 @@ Returns the total cases in germany for the last `:days` days.
 }
 ```
 
+## `/germany/history/incidence`
+
+Returns the history of week incidences in germany.
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/history/incidence`
+[Open](/germany/history/incidence)
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "weekIncidence": 162.7502138445754,
+      "date": "2021-01-13T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 155.7810792830319,
+      "date": "2021-01-14T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 148.2901013122907,
+      "date": "2021-01-15T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 144.20914156386442,
+      "date": "2021-01-16T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 141.81034524739113,
+      "date": "2021-01-17T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 131.50093190531484,
+      "date": "2021-01-18T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-01-18T00:00:00.000Z",
+    "lastCheckedForUpdate": "2021-01-19T10:58:20.854Z"
+  }
+}
+```
+
+## `/germany/history/incidence/:days`
+
+Returns the week incidence in germany for the last `:days` days.
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/history/incidence/3`
+[Open](/germany/history/incidence/3)
+
+**Parameters**
+
+| Parameter     | Description   | 
+| ------------- | ------------- |
+| :days         | Number of days in the past from today |
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "weekIncidence": 144.20914156386442,
+      "date": "2021-01-16T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 141.81034524739113,
+      "date": "2021-01-17T00:00:00.000Z"
+    },
+    {
+      "weekIncidence": 131.50093190531484,
+      "date": "2021-01-18T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-01-18T00:00:00.000Z",
+    "lastCheckedForUpdate": "2021-01-19T11:02:29.069Z"
+  }
+}
+```
+
 ## `/germany/history/deaths`
 
 Returns the number of deaths in germany for every day.
