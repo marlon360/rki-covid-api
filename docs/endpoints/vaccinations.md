@@ -9,6 +9,8 @@
 
 ### Response
 
+`administeredVaccinations` The total number of administered vaccine doses (sum of first and second vaccination)
+
 `vaccinated` Number of people who got the first of two vaccinations.
 
 `vacciantion.biontech` Number of people who were vaccinated with BioNTech
@@ -24,6 +26,7 @@
 ```json
 {
   "data": {
+    "administeredVaccinations": 1220170,
     "vaccinated": 1139297,
     "vaccination": {
       "biontech": 1136573,
@@ -50,6 +53,7 @@
     "states": {
       "BW": {
         "name": "Baden-Württemberg",
+        "administeredVaccinations": 1220170,
         "vaccinated": 114954,
         "vaccination": {
           "biontech": 114954,
@@ -77,6 +81,7 @@
       // ...
       "SH": {
         "name": "Schleswig-Holstein",
+        "administeredVaccinations": 1220170,
         "vaccinated": 65849,
         "vaccination": {
           "biontech": 65849,
@@ -103,6 +108,7 @@
       },
       "TH": {
         "name": "Thüringen",
+        "administeredVaccinations": 1220170,
         "vaccinated": 23413,
         "vaccination": {
           "biontech": 23413,
