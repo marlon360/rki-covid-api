@@ -87,6 +87,37 @@ export async function GermanyCasesHistoryResponse(days?: number): Promise<German
     }
 }
 
+export async function GermanyWeekIncidenceHistoryResponse(days?: number): Promise<GermanyHistoryData<{weekIncidence: number, date: Date}>> {
+    
+    if (days != null) {
+        days += 6
+    }
+    
+    const history = await getLastCasesHistory(days);
+    const statesData = await getStatesData();
+
+    const population = statesData.data.map((state) => state.population).reduce((cur, acc) => cur += acc);
+
+    const weekIncidenceHistory: {weekIncidence: number, date: Date}[] = [];
+
+    for (let i = 6; i < history.length; i++) {
+        const date = history[i].date
+        let sum = 0;
+        for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
+            sum += history[dayOffset].cases;
+        }
+        weekIncidenceHistory.push({
+            weekIncidence: sum / population * 100000,
+            date: date
+        })
+    }
+
+    return {
+        data: weekIncidenceHistory,
+        meta: new ResponseMeta(new Date(history[history.length - 1].date))
+    }
+}
+
 export async function GermanyDeathsHistoryResponse(days?: number): Promise<GermanyHistoryData<{deaths: number, date: Date}>> {
     const history = await getLastDeathsHistory(days);
     return {

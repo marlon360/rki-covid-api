@@ -6,7 +6,7 @@ import queue from 'express-queue'
 import 'express-async-errors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse, StatesWeekIncidenceHistoryResponse } from './responses/states';
-import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse } from './responses/germany';
+import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse, GermanyWeekIncidenceHistoryResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts'
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
@@ -62,6 +62,16 @@ app.get('/germany/history/cases', queuedCache(), cache.route(), async (req, res)
 
 app.get('/germany/history/cases/:days', queuedCache(), cache.route(), async (req, res) => {
   const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  res.json(response)
+})
+
+app.get('/germany/history/incidence', queuedCache(), cache.route(), async (req, res) => {
+  const response = await GermanyWeekIncidenceHistoryResponse();
+  res.json(response)
+})
+
+app.get('/germany/history/incidence/:days', queuedCache(), cache.route(), async (req, res) => {
+  const response = await GermanyWeekIncidenceHistoryResponse(parseInt(req.params.days));
   res.json(response)
 })
 
