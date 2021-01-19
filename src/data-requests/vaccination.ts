@@ -4,6 +4,7 @@ import XLSX from 'xlsx'
 import { getStateAbbreviationByName } from '../utils';
 
 export interface VaccinationCoverage {
+    administeredVaccinations: number,
     vaccinated: number,
     vaccination: {
         biontech: number,
@@ -30,6 +31,7 @@ export interface VaccinationCoverage {
     states: {
         [abbreviation: string]: {
             name: string,
+            administeredVaccinations: number,
             vaccinated: number,
             vaccination: {
                 biontech: number,
@@ -72,6 +74,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     const json = XLSX.utils.sheet_to_json<{
         ags: number,
         state: string,
+        administeredVaccinations: number,
         firstVaccinated: number,
         biontech: number,
         moderna: number,
@@ -79,7 +82,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         quote: number,
         secondVaccinated: number,
         secondDifference: number
-    }>(sheet, { header: ["ags", "state", "firstVaccinated", "biontech", "moderna", "firstDifference", "quote", "secondVaccinated", "secondDifference"], range: "A4:I20" })
+    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "biontech", "moderna", "firstDifference", "quote", "secondVaccinated", "secondDifference"], range: "A4:J20" })
 
     const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
     const indicationJson = XLSX.utils.sheet_to_json<{
@@ -96,6 +99,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     }>(indicationSheet, { header: ["ags", "state", "firstAge", "firstJob", "firstMedical", "firstNursingHome", "secondAge", "secondJob", "secondMedical", "secondNursingHome"], range: "A3:J19" })        
 
     const coverage: VaccinationCoverage = {
+        administeredVaccinations: 0,
         vaccinated: 0,
         vaccination: {
             biontech: 0,
@@ -128,6 +132,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         
         if (entry.state == "Gesamt") {
             coverage.vaccinated = entry.firstVaccinated;
+            coverage.administeredVaccinations = entry.administeredVaccinations;
             coverage.delta = entry.firstDifference;
             coverage.vaccination = {
                 biontech: entry.biontech,
@@ -154,6 +159,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             const abbreviation = getStateAbbreviationByName(entry.state)
             coverage.states[abbreviation] = {
                 name: entry.state,
+                administeredVaccinations: entry.administeredVaccinations,
                 vaccinated: entry.firstVaccinated,
                 vaccination: {
                     biontech: entry.biontech,
