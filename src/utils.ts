@@ -131,6 +131,11 @@ export function AddDaysToDate(date: Date, days: number): Date {
     return new Date(date.getTime() + (1000 * 60 * 60 * 24))
 }
 
+export function cleanupString(input: string): string {
+    // only keep latin characters, umlaute, ß, -
+    return input.replace(/[^a-zA-ZäöüÄÖÜß\-]/g,"")
+}
+
 export interface RKIErrorResponse {
     code: number,
     message: string,

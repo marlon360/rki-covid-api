@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { ResponseData } from './response-data'
 import XLSX from 'xlsx'
-import { getStateAbbreviationByName } from '../utils';
+import { cleanupString, getStateAbbreviationByName } from '../utils';
 
 export interface VaccinationCoverage {
     administeredVaccinations: number,
@@ -156,9 +156,10 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 }
             }
         } else {
-            const abbreviation = getStateAbbreviationByName(entry.state)
+            const cleanedStateName = cleanupString(entry.state)
+            const abbreviation = getStateAbbreviationByName(cleanedStateName)
             coverage.states[abbreviation] = {
-                name: entry.state,
+                name: cleanedStateName,
                 administeredVaccinations: entry.administeredVaccinations,
                 vaccinated: entry.firstVaccinated,
                 vaccination: {
