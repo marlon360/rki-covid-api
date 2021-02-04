@@ -3,57 +3,42 @@ export const weekIncidenceColorRanges = {
         {
             min: 0,
             max: 1,
-            color: "#2D81B8"
+            color: "rgb(173, 173, 173)"
         },
         {
             min: 1,
             max: 5,
-            color: "#7FD38D"
+            color: "rgb(255, 252, 205)"
         },
         {
-            min: 15,
+            min: 5,
             max: 25,
-            color: "#FEFFB1"
+            color: "rgb(255, 243, 128)"
         },
         {
             min: 25,
-            max: 35,
-            color: "#FECA81"
-        },
-        {
-            min: 35,
             max: 50,
-            color: "#F08A4B"
+            color: "rgb(255, 181, 52)"
         },
         {
             min: 50,
             max: 100,
-            color: "#EB1A1D"
+            color: "rgb(212, 54, 36)"
         },
         {
             min: 100,
-            max: 200,
-            color: "#AB1316"
+            max: 250,
+            color: "rgb(149, 18, 20)"
         },
         {
-            min: 200,
-            max: 350,
-            color: "#B374DD"
-        },
-        {
-            min: 350,
+            min: 250,
             max: 500,
-            color: "#5B189B"
+            color: "rgb(103, 18, 18)"
         },
         {
             min: 500,
-            max: 1000,
-            color: "#543D35"
-        },
-        {
-            min: 1000,
             max: Infinity,
-            color: "#020003"
+            color: "rgb(221, 0, 133)"
         }
     ]
 }
