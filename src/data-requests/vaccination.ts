@@ -14,8 +14,13 @@ export interface VaccinationCoverage {
     quote: number,
     secondVaccination: {
         vaccinated: number,
-        delta: number
-    }
+	vaccination: {
+	    biontech: number,
+	    moderna: number
+	},
+        delta: number,
+	quote: number
+    },
     indication: {
         age: number,
         job: number,
@@ -37,12 +42,17 @@ export interface VaccinationCoverage {
                 biontech: number,
                 moderna: number
             },
+	    delta: number,
+            quote: number,
             secondVaccination: {
                 vaccinated: number,
-                delta: number
-            }
-            delta: number,
-            quote: number,
+		vaccination: {
+		    biontech: number,
+		    moderna: number
+		},
+                delta: number,
+		quote: number
+            },
             indication: {
                 age: number,
                 job: number,
@@ -76,13 +86,16 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         state: string,
         administeredVaccinations: number,
         firstVaccinated: number,
-        biontech: number,
-        moderna: number,
+        firstbiontech: number,
+        firstmoderna: number,
         firstDifference: number,
-        quote: number,
+        firstquote: number,
         secondVaccinated: number,
-        secondDifference: number
-    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "biontech", "moderna", "firstDifference", "quote", "secondVaccinated", "secondDifference"], range: "A4:J20" })
+	secondbiontech: number,
+	secondmoderna: number,
+        secondDifference: number,
+	secondquote: number
+    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondDifference", "secondquote"], range: "A4:M20" })
 
     const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
     const indicationJson = XLSX.utils.sheet_to_json<{
@@ -109,7 +122,12 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         quote: 0,
         secondVaccination: {
             vaccinated: 0,
-            delta: 0
+	    vaccination: {
+		biontech: 0,
+		moderna: 0
+	    },
+            delta: 0,
+	    quote: 0
         },
         indication: {
             age: 0,
@@ -131,18 +149,23 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         const indicationEntry = indicationJson[i];  
         
         if (entry.state == "Gesamt") {
-            coverage.vaccinated = entry.firstVaccinated;
-            coverage.administeredVaccinations = entry.administeredVaccinations;
-            coverage.delta = entry.firstDifference;
+            coverage.administeredVaccinations = entry.administeredVaccinations,
+	    coverage.vaccinated = entry.firstVaccinated,
             coverage.vaccination = {
-                biontech: entry.biontech,
-                moderna: entry.moderna
+                biontech: entry.firstbiontech,
+                moderna: entry.firstmoderna
             },
+            coverage.delta = entry.firstDifference,
+            coverage.quote = entry.firstquote / 100.0,
             coverage.secondVaccination = {
                 vaccinated: entry.secondVaccinated,
-                delta: entry.secondDifference
+                vaccination: {
+		    biontech: entry.secondbiontech,
+		    moderna: entry.secondmoderna
+		},
+                delta: entry.secondDifference,
+                quote: entry.secondquote / 100.0
             }
-            coverage.quote = entry.quote / 100.0;
             coverage.indication = {
                 age: indicationEntry.firstAge,
                 job: indicationEntry.firstJob,
@@ -162,16 +185,21 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 name: cleanedStateName,
                 administeredVaccinations: entry.administeredVaccinations,
                 vaccinated: entry.firstVaccinated,
-                vaccination: {
-                    biontech: entry.biontech,
-                    moderna: entry.moderna
+		vaccination: {
+                    biontech: entry.firstbiontech,
+                    moderna: entry.firstmoderna
                 },
+		delta: entry.firstDifference,
+                quote: entry.firstquote / 100.0,
                 secondVaccination: {
                     vaccinated: entry.secondVaccinated,
-                    delta: entry.secondDifference
+                    vaccination: {
+			biontech: entry.secondbiontech,
+			moderna: entry.secondmoderna
+		    },
+                    delta: entry.secondDifference,
+                    quote: entry.secondquote / 100.0
                 },
-                delta: entry.firstDifference,
-                quote: entry.quote / 100.0,
                 indication: {
                     age: indicationEntry.firstAge ?? 0,
                     job: indicationEntry.firstJob ?? 0,
