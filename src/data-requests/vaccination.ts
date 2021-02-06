@@ -20,7 +20,7 @@ export interface VaccinationCoverage {
 	},
         delta: number,
 	quote: number
-    },
+    }
     indication: {
         age: number,
         job: number,
@@ -41,7 +41,7 @@ export interface VaccinationCoverage {
             vaccination: {
                 biontech: number,
                 moderna: number
-            },
+            }
 	    delta: number,
             quote: number,
             secondVaccination: {
@@ -52,7 +52,7 @@ export interface VaccinationCoverage {
 		},
                 delta: number,
 		quote: number
-            },
+            }
             indication: {
                 age: number,
                 job: number,
@@ -149,14 +149,14 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         const indicationEntry = indicationJson[i];  
         
         if (entry.state == "Gesamt") {
-            coverage.administeredVaccinations = entry.administeredVaccinations,
-	    coverage.vaccinated = entry.firstVaccinated,
+            coverage.administeredVaccinations = entry.administeredVaccinations;
+	    coverage.vaccinated = entry.firstVaccinated;
             coverage.vaccination = {
                 biontech: entry.firstbiontech,
                 moderna: entry.firstmoderna
             },
-            coverage.delta = entry.firstDifference,
-            coverage.quote = entry.firstquote / 100.0,
+            coverage.delta = entry.firstDifference;
+            coverage.quote = entry.firstquote / 100.0;
             coverage.secondVaccination = {
                 vaccinated: entry.secondVaccinated,
                 vaccination: {
