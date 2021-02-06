@@ -33,7 +33,7 @@ export async function DistrictsMapResponse() {
         stringify(mapData)
     );    
 
-    return sharp(svgBuffer).png({ quality: 50 }).toBuffer();
+    return sharp(svgBuffer).png({ quality: 1 }).toBuffer();
 }
 
 export async function StatesMapResponse() {
@@ -48,12 +48,12 @@ export async function StatesMapResponse() {
         return map;
     }, {});
 
-    // add fill color to every states
+    // add fill color to every districts
     for (const statePathElement of mapData.children) {
         const idAttribute = statePathElement.attributes.id;
         const id = idAttribute.split("-")[1];
-        const states = statesDataHashMap[id];
-        const weekIncidence = states.casesPerWeek / states.population * 100000;
+        const district = statesDataHashMap[id];
+        const weekIncidence = district.casesPerWeek / district.population * 100000;
         statePathElement.attributes["fill"] = getColorForWeekIncidence(weekIncidence);
         statePathElement.attributes["stroke"] = "#DBDBDB";
         statePathElement.attributes["stroke-width"] = "0.9";
@@ -63,7 +63,7 @@ export async function StatesMapResponse() {
         stringify(mapData)
     );    
 
-    return sharp(svgBuffer).png({ quality: 50 }).toBuffer();
+    return sharp(svgBuffer).png({ quality: 1 }).toBuffer();
 }
 
 export function IncidenceColorsResponse() {
