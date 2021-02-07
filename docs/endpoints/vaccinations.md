@@ -23,113 +23,105 @@
 
 `secondVaccination.delta` New second vaccinations compared to yesterday
 
+`secondVaccination.vacciantion.biontech` Number of people who received their second dose of BioNTech
+
+`secondVaccination.vacciantion.moderna` Number of people who received their second dose of Moderna
+
 ```json
 {
   "data": {
-    "administeredVaccinations": 1220170,
-    "vaccinated": 1139297,
+    "administeredVaccinations": 3116122,
+    "vaccinated": 2212851,
     "vaccination": {
-      "biontech": 1136573,
-      "moderna": 2724
+      "biontech": 2160072,
+      "moderna": 52779
     },
-    "delta": 31152,
-    "quote": 0.013698954621398939,
+    "delta": 49890,
+    "quote": 0.026607412670196853,
     "secondVaccination": {
-      "vaccinated": 6581,
-      "delta": 6464
+      "vaccinated": 903271,
+      "vaccination": {
+        "biontech": 903263,
+        "moderna": 8
+      },
+      "delta": 61132,
+      "quote": 0.010860968158281503
     },
     "indication": {
-      "age": 279063,
-      "job": 551369,
-      "medical": 39012,
-      "nursingHome": 394516,
+      "age": 774875,
+      "job": 1038877,
+      "medical": 79857,
+      "nursingHome": 636362,
       "secondVaccination": {
-        "age": 2939,
-        "job": 2112,
-        "medical": 367,
-        "nursingHome": 4521
+        "age": 300861,
+        "job": 436339,
+        "medical": 35389,
+        "nursingHome": 307312
       }
     },
     "states": {
       "BW": {
         "name": "Baden-Württemberg",
-        "administeredVaccinations": 1220170,
-        "vaccinated": 114954,
+        "administeredVaccinations": 365886,
+        "vaccinated": 269728,
         "vaccination": {
-          "biontech": 114954,
-          "moderna": 0
+          "biontech": 262064,
+          "moderna": 7664
         },
+        "delta": 9495,
+        "quote": 0.024298957316289855,
         "secondVaccination": {
-          "vaccinated": 0,
-          "delta": 0
+          "vaccinated": 96158,
+          "vaccination": {
+            "biontech": 96150,
+            "moderna": 8
+          },
+          "delta": 6537,
+          "quote": 0.008662575400476775
         },
-        "delta": 5352,
-        "quote": 0.010355848630237809,
         "indication": {
-          "age": 58770,
-          "job": 35662,
-          "medical": 3663,
-          "nursingHome": 23375,
+          "age": 154667,
+          "job": 92072,
+          "medical": 9113,
+          "nursingHome": 51870,
           "secondVaccination": {
-            "age": 0,
-            "job": 0,
-            "medical": 0,
-            "nursingHome": 0
+            "age": 57142,
+            "job": 31510,
+            "medical": 1583,
+            "nursingHome": 17543
           }
         }
       },
       // ...
-      "SH": {
-        "name": "Schleswig-Holstein",
-        "administeredVaccinations": 1220170,
-        "vaccinated": 65849,
-        "vaccination": {
-          "biontech": 65849,
-          "moderna": 0
-        },
-        "secondVaccination": {
-          "vaccinated": 0,
-          "delta": 0
-        },
-        "delta": 3524,
-        "quote": 0.022677048102589286,
-        "indication": {
-          "age": 17562,
-          "job": 22557,
-          "medical": 5458,
-          "nursingHome": 18323,
-          "secondVaccination": {
-            "age": 0,
-            "job": 0,
-            "medical": 0,
-            "nursingHome": 0
-          }
-        }
-      },
       "TH": {
         "name": "Thüringen",
-        "administeredVaccinations": 1220170,
-        "vaccinated": 23413,
+        "administeredVaccinations": 85878,
+        "vaccinated": 65341,
         "vaccination": {
-          "biontech": 23413,
-          "moderna": 0
+          "biontech": 63489,
+          "moderna": 1852
         },
+        "delta": 2798,
+        "quote": 0.030627952477245007,
         "secondVaccination": {
-          "vaccinated": 0,
-          "delta": 0
+          "vaccinated": 20537,
+          "vaccination": {
+            "biontech": 20537,
+            "moderna": 0
+          },
+          "delta": 2007,
+          "quote": 0.009626517194796234
         },
-        "delta": 195,
-        "quote": 0.010974613969020023,
         "indication": {
-          "age": 5024,
-          "job": 15020,
-          "medical": 475,
-          "nursingHome": 2892,
+          "age": 27465,
+          "job": 29894,
+          "medical": 2603,
+          "nursingHome": 7818,
           "secondVaccination": {
-            "age": 0,
-            "job": 0,
-            "medical": 0,
-            "nursingHome": 0
+            "age": 5801,
+            "job": 13396,
+            "medical": 500,
+            "nursingHome": 2485
           }
         }
       }
