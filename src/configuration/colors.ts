@@ -7,7 +7,7 @@ export const weekIncidenceColorRanges = {
         },
         {
             min: 1,
-            max: 5,
+            max: 15,
             color: "#7FD38D"
         },
         {
