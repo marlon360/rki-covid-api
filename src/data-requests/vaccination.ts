@@ -8,7 +8,8 @@ export interface VaccinationCoverage {
     vaccinated: number,
     vaccination: {
         biontech: number,
-        moderna: number
+        moderna: number,
+        astraZeneca: number
     },
     delta: number,
     quote: number,
@@ -40,7 +41,8 @@ export interface VaccinationCoverage {
             vaccinated: number,
             vaccination: {
                 biontech: number,
-                moderna: number
+                moderna: number,
+                astraZeneca: number
             }
             delta: number,
             quote: number,
@@ -88,6 +90,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         firstVaccinated: number,
         firstbiontech: number,
         firstmoderna: number,
+        firstAstraZeneca: number,
         firstDifference: number,
         firstquote: number,
         secondVaccinated: number,
@@ -95,7 +98,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         secondmoderna: number,
         secondDifference: number,
         secondquote: number
-    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondDifference", "secondquote"], range: "A4:M20" })
+    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondDifference", "secondquote"], range: "A4:N20" })
 
     const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
     const indicationJson = XLSX.utils.sheet_to_json<{
@@ -116,7 +119,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         vaccinated: 0,
         vaccination: {
             biontech: 0,
-            moderna: 0
+            moderna: 0,
+            astraZeneca: 0
         },
         delta: 0,
         quote: 0,
@@ -153,7 +157,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             coverage.vaccinated = entry.firstVaccinated;
             coverage.vaccination = {
                 biontech: entry.firstbiontech,
-                moderna: entry.firstmoderna
+                moderna: entry.firstmoderna,
+                astraZeneca: entry.firstAstraZeneca
             };
             coverage.delta = entry.firstDifference;
             coverage.quote = entry.firstquote / 100.0;
@@ -187,7 +192,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 vaccinated: entry.firstVaccinated,
                 vaccination: {
                     biontech: entry.firstbiontech,
-                    moderna: entry.firstmoderna
+                    moderna: entry.firstmoderna,
+                    astraZeneca: entry.firstAstraZeneca
                 },
                 delta: entry.firstDifference,
                 quote: entry.firstquote / 100.0,

@@ -17,6 +17,8 @@
 
 `vacciantion.moderna` Number of people who were vaccinated with Moderna
 
+`vacciantion.astraZeneca` Number of people who were vaccinated with AstraZeneca
+
 `delta` New first vaccination compared to yesterday
 
 `secondVaccination.vaccinated` Number of people who got the second vaccination
@@ -34,7 +36,8 @@
     "vaccinated": 2212851,
     "vaccination": {
       "biontech": 2160072,
-      "moderna": 52779
+      "moderna": 52779,
+      "astraZeneca": 15
     },
     "delta": 49890,
     "quote": 0.026607412670196853,
@@ -66,7 +69,8 @@
         "vaccinated": 269728,
         "vaccination": {
           "biontech": 262064,
-          "moderna": 7664
+          "moderna": 7664,
+          "astraZeneca": 15
         },
         "delta": 9495,
         "quote": 0.024298957316289855,
@@ -99,7 +103,8 @@
         "vaccinated": 65341,
         "vaccination": {
           "biontech": 63489,
-          "moderna": 1852
+          "moderna": 1852,
+          "astraZeneca": 15
         },
         "delta": 2798,
         "quote": 0.030627952477245007,
