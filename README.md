@@ -113,6 +113,7 @@ Now you can access the server at `http://localhost:8080`.
 (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
+- [Corona Update Germany Telegram Channel](https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
 
 ## License
 
