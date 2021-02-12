@@ -2,7 +2,7 @@ import * as path from 'path';
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import compression from 'compression'
-import queue from 'express-queue'
+import queue from '@marlon360/express-queue'
 import 'express-async-errors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse, StatesWeekIncidenceHistoryResponse } from './responses/states';
@@ -26,7 +26,7 @@ app.use(cors())
 app.use(compression())
 
 const queuedCache = () => {
-  const cacheQueue = queue({activeLimit: 2, queuedLimit: -1});
+  const cacheQueue = queue({concurrency: 2});
   return function(req: Request, res: Response, next: NextFunction) {
     const cacheName = req.originalUrl;
     cache.get(cacheName, function (error, entries) {
@@ -36,7 +36,7 @@ const queuedCache = () => {
       if (entries.length > 0) {
         return next()
       } else {
-        return cacheQueue(res, req, next);
+        return cacheQueue(req, res, next);
       }
     });
   }
