@@ -20,7 +20,7 @@
     "cron": "^1.8.2",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
-    "@marlon360/express-queue": "^1.0.1",
+    "@marlon360/express-queue": "^1.0.3",
     "express-redis-cache": "^1.1.3",
     "pm2": "^4.5.1",
     "sharp": "^0.27.0",

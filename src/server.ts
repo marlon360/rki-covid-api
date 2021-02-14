@@ -26,7 +26,7 @@ app.use(cors())
 app.use(compression())
 
 const queuedCache = () => {
-  const cacheQueue = queue({concurrency: 2});
+  const cacheQueue = queue({activeLimit: 2});
   return function(req: Request, res: Response, next: NextFunction) {
     const cacheName = req.originalUrl;
     cache.get(cacheName, function (error, entries) {
