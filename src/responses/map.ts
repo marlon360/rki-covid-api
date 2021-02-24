@@ -18,7 +18,7 @@ export async function DistrictsMapResponse() {
         return map;
     }, {});
 
-    // add fill color to every districts
+    // add fill color to every district
     for (const districtPathElement of mapData.children) {
         const idAttribute = districtPathElement.attributes.id;
         const id = idAttribute.split("-")[1];
@@ -48,12 +48,12 @@ export async function StatesMapResponse() {
         return map;
     }, {});
 
-    // add fill color to every districts
+    // add fill color to every state
     for (const statePathElement of mapData.children) {
         const idAttribute = statePathElement.attributes.id;
         const id = idAttribute.split("-")[1];
-        const district = statesDataHashMap[id];
-        const weekIncidence = district.casesPerWeek / district.population * 100000;
+        const state = statesDataHashMap[id];
+        const weekIncidence = state.casesPerWeek / state.population * 100000;
         statePathElement.attributes["fill"] = getColorForWeekIncidence(weekIncidence);
         statePathElement.attributes["stroke"] = "#DBDBDB";
         statePathElement.attributes["stroke-width"] = "0.9";
