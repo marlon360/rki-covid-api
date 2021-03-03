@@ -3,6 +3,8 @@ import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import compression from 'compression'
 import queue from '@marlon360/express-queue'
+import { RateLimiterRedis, RateLimiterRes }from 'rate-limiter-flexible';
+import redis from 'redis';
 import 'express-async-errors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse, StatesWeekIncidenceHistoryResponse } from './responses/states';
@@ -11,6 +13,39 @@ import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, District
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 import { RKIError } from './utils';
+
+const redisClient = redis.createClient({
+  host: process.env.REDIS_URL,
+  port: 6379,
+  enable_offline_queue: false,
+});
+
+const rateLimiter = new RateLimiterRedis({
+  storeClient: redisClient,
+  keyPrefix: 'middleware',
+  points: 15, // 15 requests
+  duration: 60, // per 60 seconds by IP,
+  inmemoryBlockOnConsumed: 15,
+});
+
+const rateLimiterMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  rateLimiter.consume(req.ip)
+    .then((rateLimiterRes) => {
+      res.setHeader("Retry-After", rateLimiterRes.msBeforeNext / 1000);
+      res.setHeader("X-RateLimit-Limit", 15);
+      res.setHeader("X-RateLimit-Remaining", rateLimiterRes.remainingPoints);
+      res.setHeader("X-RateLimit-Reset", new Date(Date.now() + rateLimiterRes.msBeforeNext).toString());
+      next();
+    })
+    .catch((rateLimiterRes: RateLimiterRes) => {
+      const retryIn = rateLimiterRes.msBeforeNext / 1000
+      res.status(429).json({
+        code: 429,
+        error: 'Too Many Requests',
+        message: `You are only allowed to make 15 requests every minute. Retry in ${retryIn} seconds. This is a free service and you should not abuse it. If you need more requests, you can host the server yourself (https://api.corona-zahlen.org/docs/#host-it-yourself).`
+      });
+    });
+};
 
 const cache = require('express-redis-cache')({ expire: 1800, host: process.env.REDIS_URL });
 
@@ -45,6 +80,8 @@ const queuedCache = () => {
 app.get('/', async (req, res) => {
   res.redirect('docs')
 })
+
+app.use(rateLimiterMiddleware)
 
 app.get('/germany', queuedCache(), cache.route(), async (req, res) => {
   const response = await GermanyResponse();
