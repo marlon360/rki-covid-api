@@ -56,6 +56,7 @@ Date.prototype.toJSON = function() {
 const app = express()
 const port = 3000
 
+app.set('trust proxy', true)
 app.use('/docs', express.static(path.join(__dirname, 'docs')))
 app.use(cors())
 app.use(compression())
