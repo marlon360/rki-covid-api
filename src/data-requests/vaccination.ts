@@ -98,7 +98,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         secondmoderna: number,
         secondDifference: number,
         secondquote: number
-    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondDifference", "secondquote"], range: "A4:N20" })
+    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondDifference", "secondquote"], range: "A4:N21" })
 
     const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
     const indicationJson = XLSX.utils.sheet_to_json<{
@@ -112,7 +112,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         secondJob: number,
         secondMedical: number,
         secondNursingHome: number
-    }>(indicationSheet, { header: ["ags", "state", "firstAge", "firstJob", "firstMedical", "firstNursingHome", "secondAge", "secondJob", "secondMedical", "secondNursingHome"], range: "A3:J19" })
+    }>(indicationSheet, { header: ["ags", "state", "firstAge", "firstJob", "firstMedical", "firstNursingHome", "secondAge", "secondJob", "secondMedical", "secondNursingHome"], range: "A3:J20" })
 
     const coverage: VaccinationCoverage = {
         administeredVaccinations: 0,
@@ -148,7 +148,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         states: {}
     }
 
-    for (let i = 0; i < 17; i++) {
+    for (let i = 0; i < 18; i++) {
         const entry = json[i];
         const indicationEntry = indicationJson[i];
 
@@ -184,8 +184,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 }
             }
         } else {
-            const cleanedStateName = cleanupString(entry.state)
-            const abbreviation = getStateAbbreviationByName(cleanedStateName)
+            const cleanedStateName = entry.state.includes("Bund") ? entry.state : cleanupString(entry.state)
+            const abbreviation = entry.state.includes("Bund") ? "Bund" : getStateAbbreviationByName(cleanedStateName)
             coverage.states[abbreviation] = {
                 name: cleanedStateName,
                 administeredVaccinations: entry.administeredVaccinations,
