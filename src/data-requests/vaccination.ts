@@ -3,6 +3,17 @@ import { ResponseData } from './response-data'
 import XLSX from 'xlsx'
 import { cleanupString, getStateAbbreviationByName } from '../utils';
 
+function clearEntry(entry: any) {
+    for (const key in entry) {
+        if (Object.prototype.hasOwnProperty.call(entry, key)) {
+            const element = entry[key];
+            if (element === "-") {
+                entry[key] = null
+            }
+        }
+    }
+}
+
 export interface VaccinationCoverage {
     administeredVaccinations: number,
     vaccinated: number,
@@ -154,7 +165,9 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
 
     for (let i = 0; i < 18; i++) {
         const entry = json[i];
+        clearEntry(entry);
         const indicationEntry = indicationJson[i];
+        clearEntry(indicationEntry);
 
         if (entry.state == "Gesamt") {
             coverage.administeredVaccinations = entry.administeredVaccinations;
