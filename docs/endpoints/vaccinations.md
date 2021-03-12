@@ -47,7 +47,7 @@
       "vaccinated": 903271,
       "vaccination": {
         "biontech": 903263,
-        "moderna": 8
+        "moderna": 8,
         "astraZeneca": 0
       },
       "delta": 61132,
@@ -81,7 +81,7 @@
           "vaccinated": 96158,
           "vaccination": {
             "biontech": 96150,
-            "moderna": 8
+            "moderna": 8,
             "astraZeneca": 0
           },
           "delta": 6537,
@@ -116,7 +116,7 @@
           "vaccinated": 20537,
           "vaccination": {
             "biontech": 20537,
-            "moderna": 0
+            "moderna": 0,
             "astraZeneca": 0
           },
           "delta": 2007,
