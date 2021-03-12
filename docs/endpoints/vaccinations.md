@@ -29,6 +29,8 @@
 
 `secondVaccination.vacciantion.moderna` Number of people who received their second dose of Moderna
 
+`secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
+
 ```json
 {
   "data": {
@@ -46,6 +48,7 @@
       "vaccination": {
         "biontech": 903263,
         "moderna": 8
+        "astraZeneca": 0
       },
       "delta": 61132,
       "quote": 0.010860968158281503
@@ -79,6 +82,7 @@
           "vaccination": {
             "biontech": 96150,
             "moderna": 8
+            "astraZeneca": 0
           },
           "delta": 6537,
           "quote": 0.008662575400476775
@@ -113,6 +117,7 @@
           "vaccination": {
             "biontech": 20537,
             "moderna": 0
+            "astraZeneca": 0
           },
           "delta": 2007,
           "quote": 0.009626517194796234
