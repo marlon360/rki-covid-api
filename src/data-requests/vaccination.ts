@@ -101,7 +101,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         secondAstraZeneca: number,
         secondDifference: number,
         secondquote: number
-    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondAstraZeneca", "secondDifference", "secondquote"], range: "A4:N21" })
+    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondAstraZeneca", "secondDifference", "secondquote"], range: "A4:O21" })
 
     const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
     const indicationJson = XLSX.utils.sheet_to_json<{
