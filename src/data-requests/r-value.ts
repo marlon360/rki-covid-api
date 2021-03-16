@@ -9,14 +9,17 @@ function parseRValue(data: ArrayBuffer): { r: number, date: Date } | null {
 
     const latestEntry = json[json.length - 1];
     const dateString = latestEntry["Datum des Erkrankungsbeginns"];
-    const rValue = latestEntry["Punktschätzer der 4-Tages R-Wert"];
+    let rValue = latestEntry["Punktschätzer der 4-Tage R-Wert"];
+
+    if (rValue instanceof String) {
+        rValue = parseFloat(rValue.replace(",", "."))
+    }
 
     const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
     const date = new Date(dateString.replace(pattern, '$3-$2-$1'));
 
-    const r = parseFloat(rValue.replace(",", "."));
     return {
-        r,
+        r: rValue,
         date
     }
 }
