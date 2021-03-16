@@ -43,7 +43,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d
+        script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d -V
   deploy_prod:
     needs: build
     if: github.ref == 'refs/heads/master'
@@ -56,7 +56,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        script: cd /home/docker/rki && docker-compose pull && docker-compose up -d
+        script: cd /home/docker/rki && docker-compose pull && docker-compose up -d -V
   deploy_v2-proxy:
     needs: build
     if: github.ref == 'refs/heads/v2-proxy'
@@ -69,4 +69,4 @@ jobs:
         username: ${{ secrets.USERNAME }}
         key: ${{ secrets.KEY }}
         passphrase: ${{ secrets.PASSPHRASE }}
-        script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d
+        script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d -V
