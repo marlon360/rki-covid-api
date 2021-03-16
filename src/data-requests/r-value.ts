@@ -14,7 +14,6 @@ function parseRValue(data: ArrayBuffer): { r: number, date: Date } | null {
     const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
     const date = new Date(dateString.replace(pattern, '$3-$2-$1'));
 
-    const r = parseFloat(rValue.replace(",", "."));
     return {
         r,
         date
