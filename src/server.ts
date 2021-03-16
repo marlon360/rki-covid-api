@@ -12,7 +12,7 @@ import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vac
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 import { RKIError } from './utils';
 
-const cache = require('express-redis-cache')({ expire: 180, host: process.env.REDIS_URL });
+const cache = require('express-redis-cache')({ expire: 1800, host: process.env.REDIS_URL });
 
 Date.prototype.toJSON = function() {
   return this.toISOString()
