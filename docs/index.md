@@ -118,6 +118,7 @@ Now you can access the server at `http://localhost:8080`.
 (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
+- Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)
 
 ## License
 
