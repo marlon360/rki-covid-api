@@ -36,11 +36,11 @@ If you use this API, please consider supporting me:
 
 ## Endpoints
 
-- [Germany](https://api.corona-zahlen.org/docs/endpoints/germany.md)
-- [States](https://api.corona-zahlen.org/docs/endpoints/states.md)
-- [Districts](https://api.corona-zahlen.org/docs/endpoints/districts.md)
-- [Vaccinations](https://api.corona-zahlen.org/docs/endpoints/vaccinations.md)
-- [Maps](https://api.corona-zahlen.org/docs/endpoints/maps.md)
+- [Germany](https://api.corona-zahlen.org/docs/endpoints/germany.html)
+- [States](https://api.corona-zahlen.org/docs/endpoints/states.html)
+- [Districts](https://api.corona-zahlen.org/docs/endpoints/districts.html)
+- [Vaccinations](https://api.corona-zahlen.org/docs/endpoints/vaccinations.html)
+- [Maps](https://api.corona-zahlen.org/docs/endpoints/maps.html)
 
 ## Data sources
 
