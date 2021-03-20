@@ -114,6 +114,10 @@ Now you can access the server at `http://localhost:8080`.
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
 - Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)
+- Twitter bot for vaccination numbers (https://twitter.com/impfstatus)
+- App Infektionsgeschehen (https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen)
+- App: corona-wiki (https://v-braun.github.io/corona-wiki)
+- small project to show some data (https://www.corona-zahlen.net/)
 
 ## License
 
