@@ -118,6 +118,9 @@ Now you can access the server at `http://localhost:8080`.
 - App Infektionsgeschehen (https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen)
 - App: corona-wiki (https://v-braun.github.io/corona-wiki)
 - small project to show some data (https://www.corona-zahlen.net/)
+- Corona Update Germany Telegram Channel (https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
+
+
 
 ## License
 
