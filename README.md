@@ -63,7 +63,7 @@ https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/917fc37a709542548cc3be077a
 https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html
 
 **R value**
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen_csv.csv?__blob=publicationFile
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile
 
 ## Host it yourself
 
@@ -116,6 +116,14 @@ Now you can access the server at `http://localhost:8080`.
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
 - Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)
+- Twitter bot for vaccination numbers (https://twitter.com/impfstatus)
+- App Infektionsgeschehen (https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen)
+- App: corona-wiki (https://v-braun.github.io/corona-wiki)
+- small project to show some data (https://www.corona-zahlen.net/)
+- Corona Update Germany Telegram Channel (https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
+- Die Corona Zahlen im Frankenjura (https://www.frankenjura.com/frankenjura/corona)
+
+
 
 ## License
 
