@@ -170,35 +170,35 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         clearEntry(indicationEntry);
 
         if (entry.state == "Gesamt") {
-            coverage.administeredVaccinations = entry.administeredVaccinations;
-            coverage.vaccinated = entry.firstVaccinated;
+            coverage.administeredVaccinations = Math.round(entry.administeredVaccinations);
+            coverage.vaccinated = Math.round(entry.firstVaccinated);
             coverage.vaccination = {
-                biontech: entry.firstbiontech,
-                moderna: entry.firstmoderna,
-                astraZeneca: entry.firstAstraZeneca
+                biontech: Math.round(entry.firstbiontech),
+                moderna: Math.round(ntry.firstmoderna),
+                astraZeneca: Math.round(entry.firstAstraZeneca)
             };
-            coverage.delta = entry.firstDifference;
+            coverage.delta = Math.round(entry.firstDifference);
             coverage.quote = entry.firstquote / 100.0;
             coverage.secondVaccination = {
-                vaccinated: entry.secondVaccinated,
+                vaccinated: Math.round(entry.secondVaccinated),
                 vaccination: {
-                    biontech: entry.secondbiontech,
-                    moderna: entry.secondmoderna,
-                    astraZeneca: entry.secondAstraZeneca
+                    biontech: Math.round(entry.secondbiontech),
+                    moderna: Math.round(entry.secondmoderna),
+                    astraZeneca: Math.round(entry.secondAstraZeneca)
                 },
-                delta: entry.secondDifference,
+                delta: Math.round(entry.secondDifference),
                 quote: entry.secondquote / 100.0
             }
             coverage.indication = {
-                age: indicationEntry.firstAge,
-                job: indicationEntry.firstJob,
-                medical: indicationEntry.firstMedical,
-                nursingHome: indicationEntry.firstNursingHome,
+                age: Math.round(indicationEntry.firstAge),
+                job: Math.round(indicationEntry.firstJob),
+                medical: Math.round(indicationEntry.firstMedical),
+                nursingHome: Math.round(indicationEntry.firstNursingHome),
                 secondVaccination: {
-                    age: indicationEntry.secondAge,
-                    job: indicationEntry.secondJob,
-                    medical: indicationEntry.secondMedical,
-                    nursingHome: indicationEntry.secondNursingHome,
+                    age: Math.round(indicationEntry.secondAge),
+                    job: Math.round(indicationEntry.secondJob),
+                    medical: Math.round(indicationEntry.secondMedical),
+                    nursingHome: Math.round(indicationEntry.secondNursingHome),
                 }
             }
         } else {
@@ -206,35 +206,35 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             const abbreviation = entry.state.includes("Bund") ? "Bund" : getStateAbbreviationByName(cleanedStateName)
             coverage.states[abbreviation] = {
                 name: cleanedStateName,
-                administeredVaccinations: entry.administeredVaccinations,
-                vaccinated: entry.firstVaccinated,
+                administeredVaccinations: Math.round(entry.administeredVaccinations),
+                vaccinated: Math.round(entry.firstVaccinated),
                 vaccination: {
-                    biontech: entry.firstbiontech,
-                    moderna: entry.firstmoderna,
-                    astraZeneca: entry.firstAstraZeneca
+                    biontech: Math.round(entry.firstbiontech),
+                    moderna: Math.round(entry.firstmoderna),
+                    astraZeneca: Math.round(entry.firstAstraZeneca)
                 },
-                delta: entry.firstDifference,
+                delta: Math.round(entry.firstDifference),
                 quote: entry.firstquote / 100.0,
                 secondVaccination: {
-                    vaccinated: entry.secondVaccinated,
+                    vaccinated: Math.round(entry.secondVaccinated),
                     vaccination: {
-                        biontech: entry.secondbiontech,
-                        moderna: entry.secondmoderna,
-                        astraZeneca: entry.secondAstraZeneca
+                        biontech: Math.round(entry.secondbiontech),
+                        moderna: Math.round(entry.secondmoderna),
+                        astraZeneca: Math.round(entry.secondAstraZeneca)
                     },
-                    delta: entry.secondDifference,
+                    delta: Math.round(entry.secondDifference),
                     quote: entry.secondquote / 100.0
                 },
                 indication: {
-                    age: indicationEntry.firstAge ?? 0,
-                    job: indicationEntry.firstJob ?? 0,
-                    medical: indicationEntry.firstMedical ?? 0,
-                    nursingHome: indicationEntry.firstNursingHome ?? 0,
+                    age: Math.round(indicationEntry.firstAge) ?? 0,
+                    job: Math.round(indicationEntry.firstJob) ?? 0,
+                    medical: Math.round(indicationEntry.firstMedical) ?? 0,
+                    nursingHome: Math.round(indicationEntry.firstNursingHome) ?? 0,
                     secondVaccination: {
-                        age: indicationEntry.secondAge ?? 0,
-                        job: indicationEntry.secondJob ?? 0,
-                        medical: indicationEntry.secondMedical ?? 0,
-                        nursingHome: indicationEntry.secondNursingHome ?? 0,
+                        age: Math.round(indicationEntry.secondAge) ?? 0,
+                        job: Math.round(indicationEntry.secondJob) ?? 0,
+                        medical: Math.round(indicationEntry.secondMedical) ?? 0,
+                        nursingHome: Math.round(indicationEntry.secondNursingHome) ?? 0,
                     }
                 }
             }
@@ -280,9 +280,9 @@ export async function getVaccinationHistory(): Promise<ResponseData<VaccinationH
         if ((entry.Datum as any) instanceof Date) {
             vaccinationHistory.push({
                 date: entry.Datum,
-                vaccinated: entry['Erstimpfung'] ?? 0,
-                firstVaccination: entry['Erstimpfung'] ?? 0,
-                secondVaccination: entry['Zweitimpfung'] ?? 0
+                vaccinated: Math.round(entry['Erstimpfung']) ?? 0,
+                firstVaccination: Math.round(entry['Erstimpfung']) ?? 0,
+                secondVaccination: Math.round(entry['Zweitimpfung']) ?? 0
             })
         }
     }
