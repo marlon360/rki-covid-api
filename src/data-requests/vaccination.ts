@@ -174,7 +174,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             coverage.vaccinated = Math.round(entry.firstVaccinated);
             coverage.vaccination = {
                 biontech: Math.round(entry.firstbiontech),
-                moderna: Math.round(ntry.firstmoderna),
+                moderna: Math.round(entry.firstmoderna),
                 astraZeneca: Math.round(entry.firstAstraZeneca)
             };
             coverage.delta = Math.round(entry.firstDifference);
