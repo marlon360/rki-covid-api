@@ -123,6 +123,7 @@ Now you can access the server at `http://localhost:8080`.
 - Die Corona Zahlen im Frankenjura (https://www.frankenjura.com/frankenjura/corona)
 - COVID-19 Impfdauer-Rechner (https://www.impfdauer.de)
 - Discord Corona Bot (https://github.com/markxoe/covid-bot)
+- COVID-19 Dashboard (https://covid.beyerleinf.de)
 
 ## License
 
