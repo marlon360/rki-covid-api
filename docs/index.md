@@ -122,6 +122,7 @@ Now you can access the server at `http://localhost:8080`.
 - Corona Update Germany Telegram Channel (https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
 - Die Corona Zahlen im Frankenjura (https://www.frankenjura.com/frankenjura/corona)
 - COVID-19 Impfdauer-Rechner (https://www.impfdauer.de)
+- Discord Corona Bot (https://github.com/markxoe/covid-bot)
 
 ## License
 
