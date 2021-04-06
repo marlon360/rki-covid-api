@@ -124,6 +124,7 @@ Now you can access the server at `http://localhost:8080`.
 - COVID-19 Impfdauer-Rechner (https://www.impfdauer.de)
 - Discord Corona Bot (https://github.com/markxoe/covid-bot)
 - COVID-19 Dashboard (https://covid.beyerleinf.de)
+- 7-Tage-Inzidenz Verlauf mit Vergleich beliebiger Städte/Länder (https://incidence-trend.web.app/)
 
 ## License
 
