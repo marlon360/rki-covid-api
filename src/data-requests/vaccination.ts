@@ -168,7 +168,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     }>(quoteSheet, { header: [
         "ags",
         "state",
-        "totvaccination",
+        "totalvaccination",
         "total1",
         "totalfull",
         "quote1",
