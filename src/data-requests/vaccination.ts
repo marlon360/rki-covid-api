@@ -35,15 +35,15 @@ export interface VaccinationCoverage {
         quote: number
     }
     indication: {
-        age: number,
-        job: number,
-        medical: number,
-        nursingHome: number,
+        age: string,
+        job: string,
+        medical: string,
+        nursingHome: string,
         secondVaccination: {
-            age: number,
-            job: number,
-            medical: number,
-            nursingHome: number
+            age: string,
+            job: string,
+            medical: string,
+            nursingHome: string
         }
     },
     states: {
@@ -69,15 +69,15 @@ export interface VaccinationCoverage {
                 quote: number
             }
             indication: {
-                age: number,
-                job: number,
-                medical: number,
-                nursingHome: number
+                age: string,
+                job: string,
+                medical: string,
+                nursingHome: string
                 secondVaccination: {
-                    age: number,
-                    job: number,
-                    medical: number,
-                    nursingHome: number
+                    age: string,
+                    job: string,
+                    medical: string,
+                    nursingHome: string
                 }
             }
         }
@@ -95,38 +95,98 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
 
     var workbook = XLSX.read(data, { type: 'buffer' });
 
-    const sheet = workbook.Sheets[workbook.SheetNames[1]];
+    const sheet = workbook.Sheets[workbook.SheetNames[2]];
     const json = XLSX.utils.sheet_to_json<{
         ags: number,
         state: string,
-        administeredVaccinations: number,
-        firstVaccinated: number,
-        firstbiontech: number,
-        firstmoderna: number,
-        firstAstraZeneca: number,
-        firstDifference: number,
-        firstquote: number,
-        secondVaccinated: number,
-        secondbiontech: number,
-        secondmoderna: number,
-        secondAstraZeneca: number,
-        secondDifference: number,
-        secondquote: number
-    }>(sheet, { header: ["ags", "state", "administeredVaccinations", "firstVaccinated", "firstbiontech", "firstmoderna", "firstAstraZeneca", "firstDifference", "firstquote", "secondVaccinated", "secondbiontech", "secondmoderna", "secondAstraZeneca", "secondDifference", "secondquote"], range: "A4:O21" })
+        VC1vaccination: number,
+        VC1biontech: number,
+        VC1moderna: number,
+        VC1AstraZeneca: number,
+        VC1Difference: number,
+        VCfullVaccinated: number,
+        VCfullbiontech: number,
+        VCfullmoderna: number,
+        VCfullAstraZeneca: number,
+        VCfullDifference: number,
+        GP1vaccination: number,
+        GP1biontech: number,
+        GP1moderna: number,
+        GP1AstraZeneca: number,
+        GP1Difference: number,
+        GPfullVaccinated: number,
+        GPfullbiontech: number,
+        GPfullmoderna: number,
+        GPfullAstraZeneca: number,
+        GPfullDifference: number
+    }>(sheet, { header: [
+        "ags",
+        "state",
+        "VC1vaccination",
+        "VC1biontech",
+        "VC1moderna",
+        "VC1AstraZeneca",
+        "VC1Difference",
+        "VCfullVaccinated",
+        "VCfullbiontech",
+        "VCfullmoderna",
+        "VCfullAstraZeneca",
+        "VCfullDifference",
+        "GP1vaccination",
+        "GP1biontech",
+        "GP1moderna",
+        "GP1AstraZeneca",
+        "GP1Difference",
+        "GPfullVaccinated",
+        "GPfullbiontech",
+        "GPfullmoderna",
+        "GPfullAstraZeneca",
+        "GPfullDifference"
+    ], range: "A5:V22" })
 
-    const indicationSheet = workbook.Sheets[workbook.SheetNames[2]];
-    const indicationJson = XLSX.utils.sheet_to_json<{
+    const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
+    const quoteJson = XLSX.utils.sheet_to_json<{
         ags: number,
         state: string,
-        firstAge: number,
-        firstJob: number,
-        firstMedical: number,
-        firstNursingHome: number,
-        secondAge: number,
-        secondJob: number,
-        secondMedical: number,
-        secondNursingHome: number
-    }>(indicationSheet, { header: ["ags", "state", "firstAge", "firstJob", "firstMedical", "firstNursingHome", "secondAge", "secondJob", "secondMedical", "secondNursingHome"], range: "A3:J20" })
+        totalvaccination: number,
+        total1: number,
+        totalfull: number,
+        quote1: number,
+        quote1ls60: number,
+        quote1gq60: number,
+        quotefull: number,
+        quotefullls60: number,
+        quotefullgq60: number,
+        VC1ls60: number,
+        VC1gq60: number,
+        VCfullls60: number,
+        VCfullgq60: number,
+        GP1ls60: number,
+        GP1gq60: number,
+        GPfullls60: number,
+        GPfullgq60: number
+    }>(quoteSheet, { header: [
+        "ags",
+        "state",
+        "totvaccination",
+        "total1",
+        "totalfull",
+        "quote1",
+        "quote1ls60",
+        "quote1gq60",
+        "quotefull",
+        "quotefullls60",
+        "quotefullgq60",
+        "VC1ls60",
+        "VC1gq60",
+        "VCfullls60",
+        "VCfullgq60",
+        "GP1ls60",
+        "GP1gq60",
+        "GPfullls60",
+        "GPfullgq60"
+    ], range: "A5:S22" })
+
 
     const coverage: VaccinationCoverage = {
         administeredVaccinations: 0,
@@ -149,15 +209,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             quote: 0
         },
         indication: {
-            age: 0,
-            job: 0,
-            medical: 0,
-            nursingHome: 0,
+            age: "droped by RKI!",
+            job: "droped by RKI!",
+            medical: "droped by RKI!",
+            nursingHome: "droped by RKI!",
             secondVaccination: {
-                age: 0,
-                job: 0,
-                medical: 0,
-                nursingHome: 0
+                age: "droped by RKI!",
+                job: "droped by RKI!",
+                medical: "droped by RKI!",
+                nursingHome: "droped by RKI!"
             }
         },
         states: {}
@@ -166,39 +226,39 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     for (let i = 0; i < 18; i++) {
         const entry = json[i];
         clearEntry(entry);
-        const indicationEntry = indicationJson[i];
-        clearEntry(indicationEntry);
+        const quoteEntry = quoteJson[i];
+        clearEntry(quoteEntry);
 
         if (entry.state == "Gesamt") {
-            coverage.administeredVaccinations = entry.administeredVaccinations;
-            coverage.vaccinated = entry.firstVaccinated;
+            coverage.administeredVaccinations = quoteEntry.totalvaccination;
+            coverage.vaccinated = quoteEntry.total1;
             coverage.vaccination = {
-                biontech: entry.firstbiontech,
-                moderna: entry.firstmoderna,
-                astraZeneca: entry.firstAstraZeneca
+                biontech: entry.VC1biontech + entry.GP1biontech,
+                moderna: entry.VC1moderna + entry.GP1moderna,
+                astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca
             };
-            coverage.delta = entry.firstDifference;
-            coverage.quote = entry.firstquote / 100.0;
+            coverage.delta = entry.VC1Difference + entry.GP1Difference;
+            coverage.quote = quoteEntry.quote1 / 100.0;
             coverage.secondVaccination = {
-                vaccinated: entry.secondVaccinated,
+                vaccinated: quoteEntry.totalfull,
                 vaccination: {
-                    biontech: entry.secondbiontech,
-                    moderna: entry.secondmoderna,
-                    astraZeneca: entry.secondAstraZeneca
+                    biontech: entry.VCfullbiontech + entry.GPfullbiontech,
+                    moderna: entry.VCfullmoderna + entry.GPfullmoderna,
+                    astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
                 },
-                delta: entry.secondDifference,
-                quote: entry.secondquote / 100.0
+                delta: entry.VCfullDifference + entry.GPfullDifference,
+                quote: quoteEntry.quotefull / 100.0
             }
             coverage.indication = {
-                age: indicationEntry.firstAge,
-                job: indicationEntry.firstJob,
-                medical: indicationEntry.firstMedical,
-                nursingHome: indicationEntry.firstNursingHome,
+                age: "droped by RKI!",
+                job: "droped by RKI!",
+                medical: "droped by RKI!",
+                nursingHome: "droped by RKI!",
                 secondVaccination: {
-                    age: indicationEntry.secondAge,
-                    job: indicationEntry.secondJob,
-                    medical: indicationEntry.secondMedical,
-                    nursingHome: indicationEntry.secondNursingHome,
+                    age: "droped by RKI!",
+                    job: "droped by RKI!",
+                    medical: "droped by RKI!",
+                    nursingHome: "droped by RKI!",
                 }
             }
         } else {
@@ -206,35 +266,35 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             const abbreviation = entry.state.includes("Bund") ? "Bund" : getStateAbbreviationByName(cleanedStateName)
             coverage.states[abbreviation] = {
                 name: cleanedStateName,
-                administeredVaccinations: entry.administeredVaccinations,
-                vaccinated: entry.firstVaccinated,
+                administeredVaccinations: quoteEntry.totalvaccination,
+                vaccinated: quoteEntry.total1,
                 vaccination: {
-                    biontech: entry.firstbiontech,
-                    moderna: entry.firstmoderna,
-                    astraZeneca: entry.firstAstraZeneca
+                    biontech: entry.VC1biontech + entry.GP1biontech,
+                    moderna: entry.VC1moderna + entry.GP1moderna,
+                    astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca
                 },
-                delta: entry.firstDifference,
-                quote: entry.firstquote / 100.0,
+                delta: entry.VC1Difference + entry.GP1Difference,
+                quote: quoteEntry.quote1 / 100.0,
                 secondVaccination: {
-                    vaccinated: entry.secondVaccinated,
+                    vaccinated: quoteEntry.totalfull,
                     vaccination: {
-                        biontech: entry.secondbiontech,
-                        moderna: entry.secondmoderna,
-                        astraZeneca: entry.secondAstraZeneca
+                        biontech: entry.VCfullbiontech + entry.GPfullbiontech,
+                        moderna: entry.VCfullmoderna + entry.GPfullmoderna,
+                        astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
                     },
-                    delta: entry.secondDifference,
-                    quote: entry.secondquote / 100.0
+                    delta: entry.VCfullDifference + entry.GPfullDifference,
+                    quote: quoteEntry.quotefull / 100.0
                 },
                 indication: {
-                    age: indicationEntry.firstAge ?? 0,
-                    job: indicationEntry.firstJob ?? 0,
-                    medical: indicationEntry.firstMedical ?? 0,
-                    nursingHome: indicationEntry.firstNursingHome ?? 0,
+                    age: "droped by RKI!",
+                    job: "droped by RKI!",
+                    medical: "droped by RKI!",
+                    nursingHome: "droped by RKI!",
                     secondVaccination: {
-                        age: indicationEntry.secondAge ?? 0,
-                        job: indicationEntry.secondJob ?? 0,
-                        medical: indicationEntry.secondMedical ?? 0,
-                        nursingHome: indicationEntry.secondNursingHome ?? 0,
+                        age: "droped by RKI!",
+                        job: "droped by RKI!",
+                        medical: "droped by RKI!",
+                        nursingHome: "droped by RKI!",
                     }
                 }
             }
