@@ -109,21 +109,20 @@ Now you can access the server at `http://localhost:8080`.
 
 [Add your project by opening an issue with your project details!](https://github.com/marlon360/rki-covid-api/issues/new)
 
-- CoronaBot Deutschland (https://twitter.com/CoronaBot_DEU)
-- Fallzahlen Aktuell - Inzidenz & mehr aus DE
-(https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
-- Home Assistant Integration (https://github.com/thebino/rki_covid)
-- Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
-- Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)
-- Twitter bot for vaccination numbers (https://twitter.com/impfstatus)
-- App Infektionsgeschehen (https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen)
-- App: corona-wiki (https://v-braun.github.io/corona-wiki)
-- small project to show some data (https://www.corona-zahlen.net/)
-- Corona Update Germany Telegram Channel (https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
-- Die Corona Zahlen im Frankenjura (https://www.frankenjura.com/frankenjura/corona)
-- COVID-19 Impfdauer-Rechner (https://www.impfdauer.de)
-- Discord Corona Bot (https://github.com/markxoe/covid-bot)
-- COVID-19 Dashboard (https://covid.beyerleinf.de)
+- CoronaBot Deutschland [https://twitter.com/CoronaBot_DEU](https://twitter.com/CoronaBot_DEU)
+- Fallzahlen Aktuell - Inzidenz & mehr aus DE [https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de](https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
+- Home Assistant Integration [https://github.com/thebino/rki_covid](https://github.com/thebino/rki_covid)
+- Corona Charts für Deutschland [https://corona.maximilianhaindl.de](https://corona.maximilianhaindl.de)
+- Corona Infos für das Berchtesgadener Land mit Zusatzinfos [https://covid.webreload.de/](https://covid.webreload.de/)
+- Twitter bot for vaccination numbers [https://twitter.com/impfstatus](https://twitter.com/impfstatus)
+- App Infektionsgeschehen [https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen](https://play.google.com/store/apps/details?id=de.geekbits.infektionsgeschehen)
+- App: corona-wiki [https://v-braun.github.io/corona-wiki](https://v-braun.github.io/corona-wiki)
+- small project to show some data [https://www.corona-zahlen.net/](https://www.corona-zahlen.net/)
+- Corona Update Germany Telegram Channel [https://t.me/corona_update_germany](https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
+- Die Corona Zahlen im Frankenjura [https://www.frankenjura.com/frankenjura/corona](https://www.frankenjura.com/frankenjura/corona)
+- COVID-19 Impfdauer-Rechner [https://www.impfdauer.de](https://www.impfdauer.de)
+- Discord Corona Bot [https://github.com/markxoe/covid-bot](https://github.com/markxoe/covid-bot)
+- COVID-19 Dashboard [https://covid.beyerleinf.de](https://covid.beyerleinf.de)
 
 ## License
 
