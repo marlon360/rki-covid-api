@@ -63,9 +63,10 @@ If you use this API, please consider supporting me:
 
 **Vaccination data**
 
-[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquoten-Tab.html)
+[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile)
 
 **R value**
+
 [https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile)
 
 ## Host it yourself
@@ -125,6 +126,9 @@ Now you can access the server at `http://localhost:8080`.
 - small project to show some data (https://www.corona-zahlen.net/)
 - Corona Update Germany Telegram Channel (https://t.me/corona_update_germany), Project can be found [here](https://github.com/Nlea/camunda-cloud-corona-update-process)
 - Die Corona Zahlen im Frankenjura (https://www.frankenjura.com/frankenjura/corona)
+- COVID-19 Impfdauer-Rechner (https://www.impfdauer.de)
+- Discord Corona Bot (https://github.com/markxoe/covid-bot)
+- COVID-19 Dashboard (https://covid.beyerleinf.de)
 
 ## License
 
