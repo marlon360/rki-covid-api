@@ -35,15 +35,15 @@ export interface VaccinationCoverage {
         quote: number
     }
     indication: {
-        age: string,
-        job: string,
-        medical: string,
-        nursingHome: string,
+        age: number,
+        job: number,
+        medical: number,
+        nursingHome: number,
         secondVaccination: {
-            age: string,
-            job: string,
-            medical: string,
-            nursingHome: string
+            age: number,
+            job: number,
+            medical: number,
+            nursingHome: number
         }
     },
     states: {
@@ -69,15 +69,15 @@ export interface VaccinationCoverage {
                 quote: number
             }
             indication: {
-                age: string,
-                job: string,
-                medical: string,
-                nursingHome: string
+                age: number,
+                job: number,
+                medical: number,
+                nursingHome: number
                 secondVaccination: {
-                    age: string,
-                    job: string,
-                    medical: string,
-                    nursingHome: string
+                    age: number,
+                    job: number,
+                    medical: number,
+                    nursingHome: number
                 }
             }
         }
@@ -209,15 +209,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             quote: 0
         },
         indication: {
-            age: "dropped by RKI!",
-            job: "dropped by RKI!",
-            medical: "dropped by RKI!",
-            nursingHome: "dropped by RKI!",
+            age: null,
+            job: null,
+            medical: null,
+            nursingHome: null,
             secondVaccination: {
-                age: "dropped by RKI!",
-                job: "dropped by RKI!",
-                medical: "dropped by RKI!",
-                nursingHome: "dropped by RKI!"
+                age: null,
+                job: null,
+                medical: null,
+                nursingHome: null
             }
         },
         states: {}
@@ -250,15 +250,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 quote: quoteEntry.quotefull / 100.0
             }
             coverage.indication = {
-                age: "dropped by RKI!",
-                job: "dropped by RKI!",
-                medical: "dropped by RKI!",
-                nursingHome: "dropped by RKI!",
+                age: null,
+                job: null,
+                medical: null,
+                nursingHome: null,
                 secondVaccination: {
-                    age: "dropped by RKI!",
-                    job: "dropped by RKI!",
-                    medical: "dropped by RKI!",
-                    nursingHome: "dropped by RKI!",
+                    age: null,
+                    job: null,
+                    medical: null,
+                    nursingHome: null,
                 }
             }
         } else {
@@ -286,15 +286,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                     quote: quoteEntry.quotefull / 100.0
                 },
                 indication: {
-                    age: "dropped by RKI!",
-                    job: "dropped by RKI!",
-                    medical: "dropped by RKI!",
-                    nursingHome: "dropped by RKI!",
+                    age: null,
+                    job: null,
+                    medical: null,
+                    nursingHome: null,
                     secondVaccination: {
-                        age: "dropped by RKI!",
-                        job: "dropped by RKI!",
-                        medical: "dropped by RKI!",
-                        nursingHome: "dropped by RKI!",
+                        age: null,
+                        job: null,
+                        medical: null,
+                        nursingHome: null,
                     }
                 }
             }
