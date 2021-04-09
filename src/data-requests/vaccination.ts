@@ -168,7 +168,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     }>(quoteSheet, { header: [
         "ags",
         "state",
-        "totvaccination",
+        "totalvaccination",
         "total1",
         "totalfull",
         "quote1",
@@ -209,15 +209,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             quote: 0
         },
         indication: {
-            age: "droped by RKI!",
-            job: "droped by RKI!",
-            medical: "droped by RKI!",
-            nursingHome: "droped by RKI!",
+            age: "dropped by RKI!",
+            job: "dropped by RKI!",
+            medical: "dropped by RKI!",
+            nursingHome: "dropped by RKI!",
             secondVaccination: {
-                age: "droped by RKI!",
-                job: "droped by RKI!",
-                medical: "droped by RKI!",
-                nursingHome: "droped by RKI!"
+                age: "dropped by RKI!",
+                job: "dropped by RKI!",
+                medical: "dropped by RKI!",
+                nursingHome: "dropped by RKI!"
             }
         },
         states: {}
@@ -250,15 +250,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 quote: quoteEntry.quotefull / 100.0
             }
             coverage.indication = {
-                age: "droped by RKI!",
-                job: "droped by RKI!",
-                medical: "droped by RKI!",
-                nursingHome: "droped by RKI!",
+                age: "dropped by RKI!",
+                job: "dropped by RKI!",
+                medical: "dropped by RKI!",
+                nursingHome: "dropped by RKI!",
                 secondVaccination: {
-                    age: "droped by RKI!",
-                    job: "droped by RKI!",
-                    medical: "droped by RKI!",
-                    nursingHome: "droped by RKI!",
+                    age: "dropped by RKI!",
+                    job: "dropped by RKI!",
+                    medical: "dropped by RKI!",
+                    nursingHome: "dropped by RKI!",
                 }
             }
         } else {
@@ -286,15 +286,15 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                     quote: quoteEntry.quotefull / 100.0
                 },
                 indication: {
-                    age: "droped by RKI!",
-                    job: "droped by RKI!",
-                    medical: "droped by RKI!",
-                    nursingHome: "droped by RKI!",
+                    age: "dropped by RKI!",
+                    job: "dropped by RKI!",
+                    medical: "dropped by RKI!",
+                    nursingHome: "dropped by RKI!",
                     secondVaccination: {
-                        age: "droped by RKI!",
-                        job: "droped by RKI!",
-                        medical: "droped by RKI!",
-                        nursingHome: "droped by RKI!",
+                        age: "dropped by RKI!",
+                        job: "dropped by RKI!",
+                        medical: "dropped by RKI!",
+                        nursingHome: "dropped by RKI!",
                     }
                 }
             }
