@@ -31,7 +31,11 @@
 
 `secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
 
+<<<<<<< HEAD
 since 08.04.2021 the RKI droped the indicationinformation 
+=======
+-ATTENTION- since 2021-04-08 the RKI droped the indication information!
+>>>>>>> a5d8151ca8dd29f9317af431ad980f34c8d4522c
 
 ```json
 {
