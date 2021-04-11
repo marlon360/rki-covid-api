@@ -238,7 +238,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca
             };
             coverage.delta = entry.VC1Difference + entry.GP1Difference;
-            coverage.quote = quoteEntry.quote1 / 100.0;
+            coverage.quote = quoteEntry.quote1 === null ? null: quoteEntry.quote1 / 100.0;
             coverage.secondVaccination = {
                 vaccinated: quoteEntry.totalfull,
                 vaccination: {
@@ -247,7 +247,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                     astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
                 },
                 delta: entry.VCfullDifference + entry.GPfullDifference,
-                quote: quoteEntry.quotefull / 100.0
+                quote: quoteEntry.quotefull === null ? null: quoteEntry.quotefull / 100.0
             }
             coverage.indication = {
                 age: null,
@@ -274,7 +274,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                     astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca
                 },
                 delta: entry.VC1Difference + entry.GP1Difference,
-                quote: quoteEntry.quote1 / 100.0,
+                quote: quoteEntry.quote1 === null ? null: quoteEntry.quote1 / 100.0,
                 secondVaccination: {
                     vaccinated: quoteEntry.totalfull,
                     vaccination: {
@@ -283,7 +283,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                         astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
                     },
                     delta: entry.VCfullDifference + entry.GPfullDifference,
-                    quote: quoteEntry.quotefull / 100.0
+                    quote: quoteEntry.quotefull === null ? null: quoteEntry.quotefull / 100.0
                 },
                 indication: {
                     age: null,
