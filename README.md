@@ -129,6 +129,7 @@ Now you can access the server at `http://localhost:8080`.
 - Corona statistics with diagrams (https://corona.jnebel.de/)
 - Twitter account with this API (https://twitter.com/GermanyCovid)
 - Corona, what's going on in your county or city (https://chrnoe.de/corona)
+- Wordpress Widget zur Anzeige der letzen 3 Inzidenzen für einen Landkreis (https://github.com/p-tenz/widget-7d-incidence)
 
 ## License
 
