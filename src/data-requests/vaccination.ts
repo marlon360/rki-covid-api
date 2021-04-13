@@ -330,8 +330,8 @@ export async function getVaccinationHistory(): Promise<ResponseData<VaccinationH
 
     const json = XLSX.utils.sheet_to_json<{
         Datum: Date,
-        'Erstimpfung': number,
-        'Zweitimpfung': number,
+        'Einmal geimpft': number,
+        'Vollständig geimpft': number,
     }>(sheet)
 
     const vaccinationHistory: VaccinationHistoryEntry[] = []
@@ -340,9 +340,9 @@ export async function getVaccinationHistory(): Promise<ResponseData<VaccinationH
         if ((entry.Datum as any) instanceof Date) {
             vaccinationHistory.push({
                 date: entry.Datum,
-                vaccinated: entry['Erstimpfung'] ?? 0,
-                firstVaccination: entry['Erstimpfung'] ?? 0,
-                secondVaccination: entry['Zweitimpfung'] ?? 0
+                vaccinated: entry['Einmal geimpft'] ?? 0,
+                firstVaccination: entry['Einmal geimpft'] ?? 0,
+                secondVaccination: entry['Vollständig geimpft'] ?? 0
             })
         }
     }
