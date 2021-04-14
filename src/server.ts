@@ -7,8 +7,9 @@ import 'express-async-errors';
 
 import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecoveredHistoryResponse, StatesResponse, StatesWeekIncidenceHistoryResponse } from './responses/states';
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse, GermanyWeekIncidenceHistoryResponse } from './responses/germany';
-import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts'
-import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
+import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts';
+import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination';
+import { TestingHistoryResponse} from './responses/testing';
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 import { RKIError } from './utils';
 
