@@ -19,19 +19,21 @@ module.exports = {
               children: [{
                   title: 'Germany 🇩🇪',
                   path: '/endpoints/germany'
-              },
-              {
-                title: 'States',
-                path: '/endpoints/states'
+              },{
+                  title: 'States',
+                  path: '/endpoints/states'
               },{
                   title: 'Districts',
                   path: '/endpoints/districts'
               },{
-                title: 'Vaccinations 💉',
-                path: '/endpoints/vaccinations'
+                  title: 'Vaccinations 💉',
+                  path: '/endpoints/vaccinations'
               },{
-                title: 'Maps 🗺',
-                path: '/endpoints/maps'
+                  title: 'Maps 🗺',
+                  path: '/endpoints/maps'
+              },{
+                  title: 'Testing',
+                  path: '/endpoints/testing'
               }]
             }
         ],
