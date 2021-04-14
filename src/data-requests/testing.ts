@@ -3,7 +3,7 @@ import XLSX from 'xlsx';
 import { ResponseData } from "./response-data";
 
 export interface testingHistoryEntry{
-    CalenderWeek: string,
+    CalendarWeek: string,
     CountTesting: number,
     PositivTesting: number,
     PositivQuote: number,
@@ -36,7 +36,7 @@ export async function getTestingHistory(): Promise<ResponseData<testingHistoryEn
     for (const entry of json) {
         if (entry.Kalenderwoche === "Bis einschließlich KW10, 2020") {
             testingHistory.push({
-                CalenderWeek: "until CW10, 2020",
+                CalendarWeek: "until CW10, 2020",
                 CountTesting: entry['Anzahl Testungen'],
                 PositivTesting: entry['Positiv getestet'],
                 PositivQuote: null,
@@ -47,7 +47,7 @@ export async function getTestingHistory(): Promise<ResponseData<testingHistoryEn
         }  
         else { 
             testingHistory.push({
-            CalenderWeek: entry.Kalenderwoche,
+            CalendarWeek: entry.Kalenderwoche,
             CountTesting: entry['Anzahl Testungen'],
             PositivTesting: entry['Positiv getestet'],
             PositivQuote: entry['Positivenanteil (%)'] / 100,
