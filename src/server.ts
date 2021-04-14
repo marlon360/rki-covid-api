@@ -12,7 +12,6 @@ import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vac
 import { TestingHistoryResponse} from './responses/testing' 
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 import { RKIError } from './utils';
-import { getTestingHistory } from './data-requests/testing';
 
 const cache = require('express-redis-cache')({ expire: 1800, host: process.env.REDIS_URL });
 
