@@ -330,6 +330,11 @@ app.get('/map/states/legend', queuedCache(), cache.route(), async (req, res) => 
   res.json(IncidenceColorsResponse());
 })
 
+app.get('/testing/history',queuedCache(), cache.route(), async (req, res) => {
+  const response = await TestingHistoryResponse();
+  res.json(response)
+})
+
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {
     res.json({
