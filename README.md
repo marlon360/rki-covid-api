@@ -22,6 +22,7 @@ If you use this API, please consider supporting me:
 - Werte für jedes Bundesland und jeden Landkreis
 - historische Daten für Deutschland, jedes Bundesland and jeden Landkreis
 - Karten mit Bundesländern und Landkreisen
+- Anzahl der wöchentlich durchgeführen PCR-Tests, Anzahl der positiven Tests sowie der Positiv Quote
 
 ## 🇺🇸 Overview
 
@@ -33,6 +34,7 @@ If you use this API, please consider supporting me:
 - data per state and district
 - time series for every state and district
 - maps for states and districts
+- Count of the weekly carried out PCR-Tests, Count of positiv tests and positiv quotes
 
 ## Endpoints
 
@@ -41,6 +43,7 @@ If you use this API, please consider supporting me:
 - [Districts](https://api.corona-zahlen.org/docs/endpoints/districts.html)
 - [Vaccinations](https://api.corona-zahlen.org/docs/endpoints/vaccinations.html)
 - [Maps](https://api.corona-zahlen.org/docs/endpoints/maps.html)
+- [Testing](https://api.corona-zahlen.org/docs/endpoints/testing.html) 
 
 ## Data sources
 
@@ -63,6 +66,11 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmon
 **R value**
 
 https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile
+
+**Testing data**
+
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Testzahlen-gesamt.xlsx?__blob=publicationFile
+
 
 ## Host it yourself
 
