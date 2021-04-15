@@ -6,6 +6,7 @@ COPY qemu-arm-static /usr/bin/
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
+ARG VIPS_VERSION=8.10.6
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -24,19 +25,19 @@ RUN apk update \
  && apk upgrade \
  && apk add --no-cache zlib libxml2 glib gobject-introspection libjpeg-turbo libexif lcms2 fftw giflib libpng \
      libwebp orc tiff poppler-glib librsvg libgsf openexr libheif libimagequant pango \
- && wget -O- https://github.com/libvips/libvips/releases/download/v8.10.5/vips-8.10.5.tar.gz | tar xzC /tmp \
+ && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz | tar xzC /tmp \
  && apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
      libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
  && ODIR=$(pwd) \
- && cd /tmp/vips-8.10.5 \
+ && cd /tmp/vips-${VIPS_VERSION} \
  && ./configure --prefix=/usr \
                 --disable-static \
                 --disable-dependency-tracking \
                 --enable-silent-rules \
  && make -s install-strip \
  && cd $ODIR \
- && rm -rf /tmp/vips-8.10.5 /var/cache/apk/* \
+ && rm -rf /tmp/vips-${VIPS_VERSION} /var/cache/apk/* \
  && npm install \
  && apk del .vips-deps
 # If you are building your code for production
