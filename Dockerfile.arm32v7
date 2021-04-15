@@ -6,7 +6,7 @@ COPY qemu-arm-static /usr/bin/
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
-ARG VIPS_VERSION=8.10.5
+ARG VIPS_VERSION=8.10.6
 
 # Create app directory
 WORKDIR /usr/src/app
