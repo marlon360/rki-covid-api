@@ -3,11 +3,11 @@ import XLSX from 'xlsx';
 import { ResponseData } from "./response-data";
 
 export interface testingHistoryEntry{
-    CalendarWeek: string,
-    CountTesting: number,
-    PositivTesting: number,
-    PositivQuote: number,
-    CountLaboratories: number
+    calendarWeek: string,
+    countTesting: number,
+    positiveTesting: number,
+    positiveQuote: number,
+    countLaboratories: number
 } 
 
 export async function getTestingHistory(): Promise<ResponseData<testingHistoryEntry[]>> {
@@ -36,22 +36,22 @@ export async function getTestingHistory(): Promise<ResponseData<testingHistoryEn
     for (const entry of json) {
         if (entry.Kalenderwoche === "Bis einschließlich KW10, 2020") {
             testingHistory.push({
-                CalendarWeek: "until CW10, 2020",
-                CountTesting: entry['Anzahl Testungen'],
-                PositivTesting: entry['Positiv getestet'],
-                PositivQuote: null,
-                CountLaboratories: null
+                calendarWeek: "until CW10, 2020",
+                countTesting: entry['Anzahl Testungen'],
+                positiveTesting: entry['Positiv getestet'],
+                positiveQuote: null,
+                countLaboratories: null
             })
         } else if (entry.Kalenderwoche === "Summe") {
         // do nothing, skip this entry
         }  
         else { 
             testingHistory.push({
-            CalendarWeek: entry.Kalenderwoche,
-            CountTesting: entry['Anzahl Testungen'],
-            PositivTesting: entry['Positiv getestet'],
-            PositivQuote: entry['Positivenanteil (%)'] / 100,
-            CountLaboratories: entry['Anzahl übermittelnder Labore']
+            calendarWeek: entry.Kalenderwoche,
+            countTesting: entry['Anzahl Testungen'],
+            positiveTesting: entry['Positiv getestet'],
+            positiveQuote: entry['Positivenanteil (%)'] / 100,
+            countLaboratories: entry['Anzahl übermittelnder Labore']
             })
         }  
     }
