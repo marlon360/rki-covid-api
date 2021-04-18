@@ -4,10 +4,10 @@ import { ResponseData } from "./response-data";
 
 export interface testingHistoryEntry{
     calendarWeek: string,
-    countTesting: number,
-    positiveTesting: number,
-    positiveQuote: number,
-    countLaboratories: number
+    performedTests: number,
+    positiveTests: number,
+    positivityRate: number,
+    laboratoryCount: number
 } 
 
 export async function getTestingHistory(): Promise<ResponseData<testingHistoryEntry[]>> {
@@ -37,21 +37,21 @@ export async function getTestingHistory(): Promise<ResponseData<testingHistoryEn
         if (entry.Kalenderwoche === "Bis einschließlich KW10, 2020") {
             testingHistory.push({
                 calendarWeek: "until CW10, 2020",
-                countTesting: entry['Anzahl Testungen'],
-                positiveTesting: entry['Positiv getestet'],
-                positiveQuote: null,
-                countLaboratories: null
+                performedTests: entry['Anzahl Testungen'],
+                positiveTests: entry['Positiv getestet'],
+                positivityRate: null,
+                laboratoryCount: null
             })
         } else if (entry.Kalenderwoche === "Summe") {
         // do nothing, skip this entry
         }  
         else { 
             testingHistory.push({
-            calendarWeek: entry.Kalenderwoche,
-            countTesting: entry['Anzahl Testungen'],
-            positiveTesting: entry['Positiv getestet'],
-            positiveQuote: entry['Positivenanteil (%)'] / 100,
-            countLaboratories: entry['Anzahl übermittelnder Labore']
+                calendarWeek: entry.Kalenderwoche,
+                performedTests: entry['Anzahl Testungen'],
+                positiveTests: entry['Positiv getestet'],
+                positivityRate: entry['Positivenanteil (%)'] / 100,
+                laboratoryCount: entry['Anzahl übermittelnder Labore']
             })
         }  
     }
