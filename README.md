@@ -34,7 +34,7 @@ If you use this API, please consider supporting me:
 - data per state and district
 - time series for every state and district
 - maps for states and districts
-- Count of the weekly carried out PCR-Tests, Count of positiv tests and positiv quotes
+- Number of performed PCR-test, number of positive tests and positivity rate
 
 ## Endpoints
 
