@@ -35,6 +35,7 @@ If you use this API, please consider supporting me:
 - time series for every state and district
 - maps for states and districts
 - Number of performed PCR-test, number of positive tests and positivity rate
+
 ## Endpoints
 
 - [Germany](endpoints/germany.md)
