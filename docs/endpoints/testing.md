@@ -5,11 +5,11 @@
 ### Request
 
 `GET https://api.corona-zahlen.org/testing/history`
-[Open](/testing/history)
+[Open](/testing)
 
 ### Response
 
-`calendarWeek` CalendarWeek
+`CalendarWeek` CalendarWeek
 
 `performedTests` Number PCR-tests executed.
 

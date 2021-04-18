@@ -1,4 +1,7 @@
-FROM node:12-alpine3.12
+FROM arm64v8/node:12-alpine3.12
+
+# Add QEMU
+COPY qemu-aarch64-static /usr/bin/
 
 # common build flags
 ENV CFLAGS=-O3
