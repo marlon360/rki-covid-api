@@ -11,60 +11,60 @@
 
 `calendarWeek` CalendarWeek
 
-`countTesting` Number PCR-tests executed.
+`performedTests` Number PCR-tests executed.
 
-`positiveTesting` Number PCR-tests witch are COVID-19 positiv
+`positiveTests` Number of positive PCR-tests
 
-`positiveQuote` Ouote of COVID-19 positive tests
+`positivityRate` The rate of positive PCR-tests
 
-`countLaboratories` Number Laboratories witch transmitted Data to RKI
+`laboratoryCount` Number of laboratories which transmitted data to the RKI
 
 ```json
 {
     "data":{
         "history":[
             {
-                "calendarWeek":"until CW10, 2020",
-                "countTesting":69184,
-                "positiveTesting":1722,
-                "positiveQuote":null,
-                "countLaboratories":null
+                "calendarWeek":     "until CW10, 2020",
+                "performedTests":   69184,
+                "positiveTests":    1722,
+                "positivityRate":   null,
+                "laboratoryCount":  null,
             },
             {
-                "calendarWeek":"11/2020",
-                "countTesting":128008,
-                "positiveTesting":7470,
-                "positiveQuote":0.05835572776701456,
-                "countLaboratories":118
+                "calendarWeek":     "11/2020",
+                "performedTests":   128008,
+                "positiveTests":    7470,
+                "positivityRate":   0.05835572776701456,
+                "laboratoryCount":  118
             },
             {
-                "calendarWeek":"12/2020",
-                "countTesting":374534,
-                "positiveTesting":25886,
-                "positiveQuote":0.06911522051402542,
-                "countLaboratories":154
+                "calendarWeek":     "12/2020",
+                "performedTests":   374534,
+                "positiveTests":    25886,
+                "positivityRate":   0.06911522051402542,
+                "laboratoryCount":  154
             },
             // ...
             {
-                "calendarWeek":"12/2021",
-                "countTesting":1415220,
-                "positiveTesting":131857,
-                "positiveQuote":0.09317067311089441,
-                "countLaboratories":206
+                "calendarWeek":     "12/2021",
+                "performedTests":   1415220,
+                "positiveTests":    131857,
+                "positivityRate":   0.09317067311089441,
+                "laboratoryCount":  206
             },
             {
-                "calendarWeek":"13/2021",
-                "countTesting":1167760,
-                "positiveTesting":128266,
-                "positiveQuote":0.10983935055148318,
-                "countLaboratories":204
+                "calendarWeek":     "13/2021",
+                "performedTests":   1167760,
+                "positiveTests":    128266,
+                "positivityRate":   0.10983935055148318,
+                "laboratoryCount":  204
             },
             {
-                "calendarWeek":"14/2021",
-                "countTesting":1152511,
-                "positiveTesting":138738,
-                "positiveQuote":0.12037889443137637,
-                "countLaboratories":201
+                "calendarWeek":     "14/2021",
+                "performedTests":   1152511,
+                "positiveTests":    138738,
+                "positivityRate":   0.12037889443137637,
+                "laboratoryCount":  201
             }
         ]
     },
