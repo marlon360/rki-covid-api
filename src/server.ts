@@ -9,6 +9,7 @@ import { StatesCasesHistoryResponse, StatesDeathsHistoryResponse, StatesRecovere
 import { GermanyCasesHistoryResponse, GermanyDeathsHistoryResponse, GermanyRecoveredHistoryResponse, GermanyResponse, GermanyWeekIncidenceHistoryResponse } from './responses/germany';
 import { DistrictsCasesHistoryResponse, DistrictsDeathsHistoryResponse, DistrictsRecoveredHistoryResponse, DistrictsResponse, DistrictsWeekIncidenceHistoryResponse } from './responses/districts'
 import { VaccinationResponse, VaccinationHistoryResponse } from './responses/vaccination'
+import { TestingHistoryResponse} from './responses/testing' 
 import { DistrictsMapResponse, IncidenceColorsResponse, StatesMapResponse } from './responses/map';
 import { RKIError } from './utils';
 
@@ -328,6 +329,11 @@ app.get('/map/states', queuedCache(), cache.route(), async (req, res) => {
 
 app.get('/map/states/legend', queuedCache(), cache.route(), async (req, res) => {
   res.json(IncidenceColorsResponse());
+})
+
+app.get('/testing/history',queuedCache(), cache.route(), async (req, res) => {
+  const response = await TestingHistoryResponse();
+  res.json(response)
 })
 
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
