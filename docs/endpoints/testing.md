@@ -5,7 +5,7 @@
 ### Request
 
 `GET https://api.corona-zahlen.org/testing/history`
-[Open](/testing)
+[Open](/testing/history)
 
 ### Response
 
