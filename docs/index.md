@@ -141,6 +141,7 @@ Now you can access the server at `http://localhost:8080`.
 - Twitter account with this API [https://twitter.com/GermanyCovid](https://twitter.com/GermanyCovid)
 - Corona, what's going on in your county or city [https://chrnoe.de/corona](https://chrnoe.de/corona)
 - Wordpress Widget zur Anzeige der letzen 3 Inzidenzen für einen Landkreis [https://github.com/p-tenz/widget-7d-incidence](https://github.com/p-tenz/widget-7d-incidence)
+- Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland [https://www.impfung.io/](https://www.impfung.io/)
 
 ## License
 
