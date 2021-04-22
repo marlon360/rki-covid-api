@@ -9,7 +9,7 @@ function parseRValue(data: ArrayBuffer): { r: number, date: Date } | null {
 
     const latestEntry = json[json.length - 1];
     const dateString = latestEntry["Datum des Erkrankungsbeginns"];
-    let rValue = latestEntry["Punktschätzer des 4-Tage R-Wertes"] || latestEntry["Punktschätzer der 4-Tage R-Wert"];
+    let rValue = latestEntry["Punktschätzer des 4-Tage-R-Wertes"] || latestEntry["Punktschätzer der 4-Tage R-Wert"];
 
     if (typeof rValue === 'string' || rValue instanceof String) {
         rValue = parseFloat(rValue.replace(",", "."))
