@@ -13,11 +13,11 @@
 
 `vaccinated` Number of people who got the first of two vaccinations.
 
-`vacciantion.biontech` Number of people who were vaccinated with BioNTech
+`vaccination.biontech` Number of people who were vaccinated with BioNTech
 
-`vacciantion.moderna` Number of people who were vaccinated with Moderna
+`vaccination.moderna` Number of people who were vaccinated with Moderna
 
-`vacciantion.astraZeneca` Number of people who were vaccinated with AstraZeneca
+`vaccination.astraZeneca` Number of people who were vaccinated with AstraZeneca
 
 `delta` New first vaccination compared to yesterday
 
