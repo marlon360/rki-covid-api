@@ -199,11 +199,6 @@ app.get('/districts', queuedCache(), cache.route(), async (req, res) => {
   res.json(response)
 })
 
-app.get('/districts/:district', queuedCache(), cache.route(), async (req, res) => {
-  const response = await DistrictsResponse(req.params.district);
-  res.json(response)
-})
-
 app.get('/districts/history', async (req, res) => {
   res.redirect('/districts/history/cases')
 })
