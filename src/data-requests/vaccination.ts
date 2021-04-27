@@ -29,7 +29,8 @@ export interface VaccinationCoverage {
         vaccination: {
             biontech: number,
             moderna: number,
-            astraZeneca: number
+            astraZeneca: number,
+            janssen: number    
         },
         delta: number,
         quote: number
@@ -63,7 +64,8 @@ export interface VaccinationCoverage {
                 vaccination: {
                     biontech: number,
                     moderna: number,
-                    astraZeneca: number
+                    astraZeneca: number,
+                    janssen: number
                 },
                 delta: number,
                 quote: number
@@ -96,6 +98,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
     var workbook = XLSX.read(data, { type: 'buffer' });
 
     const sheet = workbook.Sheets[workbook.SheetNames[2]];
+    // VC... = Vaccination Center, GP...= general practitioner (niedergelassene Aerzte)
     const json = XLSX.utils.sheet_to_json<{
         ags: number,
         state: string,
@@ -108,6 +111,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         VCfullbiontech: number,
         VCfullmoderna: number,
         VCfullAstraZeneca: number,
+        VCfullJanssen: number,
         VCfullDifference: number,
         GP1vaccination: number,
         GP1biontech: number,
@@ -118,6 +122,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         GPfullbiontech: number,
         GPfullmoderna: number,
         GPfullAstraZeneca: number,
+        // uncomment the following line if RKI add Janssen to GP and remove this line
+        // GPfullJanssen: number,
         GPfullDifference: number
     }>(sheet, { header: [
         "ags",
@@ -131,6 +137,7 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         "VCfullbiontech",
         "VCfullmoderna",
         "VCfullAstraZeneca",
+        "VCfullJanssen",
         "VCfullDifference",
         "GP1vaccination",
         "GP1biontech",
@@ -141,8 +148,10 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
         "GPfullbiontech",
         "GPfullmoderna",
         "GPfullAstraZeneca",
+        // uncomment the following line if RKI add Janssen to GP and remove this line
+        // "GPfullJanssen",
         "GPfullDifference"
-    ], range: "A5:V22" })
+    ], range: "A5:W22" }) //if RKI add Janssen to GP change W22 to X22 and delete this comment
 
     const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
     const quoteJson = XLSX.utils.sheet_to_json<{
@@ -203,7 +212,8 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
             vaccination: {
                 biontech: 0,
                 moderna: 0,
-                astraZeneca: 0
+                astraZeneca: 0,
+                janssen: 0
             },
             delta: 0,
             quote: 0
@@ -244,7 +254,9 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                 vaccination: {
                     biontech: entry.VCfullbiontech + entry.GPfullbiontech,
                     moderna: entry.VCfullmoderna + entry.GPfullmoderna,
-                    astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
+                    astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
+                    // uncommend the following comment if RKI add Janssen to GP and remove this line
+                    janssen: entry.VCfullJanssen //+ GPfullJanssen 
                 },
                 delta: entry.VCfullDifference + entry.GPfullDifference,
                 quote: quoteEntry.quotefull === null ? null: quoteEntry.quotefull / 100.0
@@ -280,7 +292,9 @@ export async function getVaccinationCoverage(): Promise<ResponseData<Vaccination
                     vaccination: {
                         biontech: entry.VCfullbiontech + entry.GPfullbiontech,
                         moderna: entry.VCfullmoderna + entry.GPfullmoderna,
-                        astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca
+                        astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
+                        // uncommend the following comment if RKI add Janssen to GP and remove this line
+                        janssen: entry.VCfullJanssen //+ entry.GPfullJanssen
                     },
                     delta: entry.VCfullDifference + entry.GPfullDifference,
                     quote: quoteEntry.quotefull === null ? null: quoteEntry.quotefull / 100.0
