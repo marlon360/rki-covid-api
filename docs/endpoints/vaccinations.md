@@ -31,6 +31,8 @@
 
 `secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
 
+`secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection!)
+
 -ATTENTION- since 2021-04-08 the RKI droped the indication information!
 
 ```json
@@ -51,20 +53,21 @@
         "biontech": 903263,
         "moderna": 8,
         "astraZeneca": 0
+        "janssen": 63
       },
       "delta": 61132,
       "quote": 0.010860968158281503
     },
     "indication": {
-      "age": 774875,
-      "job": 1038877,
-      "medical": 79857,
-      "nursingHome": 636362,
+      "age": 0,
+      "job": 0,
+      "medical": 0,
+      "nursingHome": 0,
       "secondVaccination": {
-        "age": 300861,
-        "job": 436339,
-        "medical": 35389,
-        "nursingHome": 307312
+        "age": 0,
+        "job": 0,
+        "medical": 0,
+        "nursingHome": 0
       }
     },
     "states": {
@@ -84,21 +87,22 @@
           "vaccination": {
             "biontech": 96150,
             "moderna": 8,
-            "astraZeneca": 0
+            "astraZeneca": 0,
+            "janssen": 0
           },
           "delta": 6537,
           "quote": 0.008662575400476775
         },
         "indication": {
-          "age": 154667,
-          "job": 92072,
-          "medical": 9113,
-          "nursingHome": 51870,
+          "age": 0,
+          "job": 0,
+          "medical": 0,
+          "nursingHome": 0,
           "secondVaccination": {
-            "age": 57142,
-            "job": 31510,
-            "medical": 1583,
-            "nursingHome": 17543
+            "age": 0,
+            "job": 0,
+            "medical": 0,
+            "nursingHome": 0
           }
         }
       },
@@ -119,21 +123,22 @@
           "vaccination": {
             "biontech": 20537,
             "moderna": 0,
-            "astraZeneca": 0
+            "astraZeneca": 0,
+            "janssen": 0
           },
           "delta": 2007,
           "quote": 0.009626517194796234
         },
         "indication": {
-          "age": 27465,
-          "job": 29894,
-          "medical": 2603,
-          "nursingHome": 7818,
+          "age": 0,
+          "job": 0,
+          "medical": 0,
+          "nursingHome": 0,
           "secondVaccination": {
-            "age": 5801,
-            "job": 13396,
-            "medical": 500,
-            "nursingHome": 2485
+            "age": 0,
+            "job": 0,
+            "medical": 0,
+            "nursingHome": 0
           }
         }
       }
@@ -143,8 +148,8 @@
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-18T16:52:07.000Z",
-    "lastCheckedForUpdate": "2021-01-18T19:58:00.401Z"
+    "lastUpdate": "2021-04-27T16:52:07.000Z",
+    "lastCheckedForUpdate": "2021-04-27T18:58:00.401Z"
   }
 }
 ```
