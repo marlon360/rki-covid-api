@@ -138,6 +138,7 @@ Now you can access the server at `http://localhost:8080`.
 - Corona, what's going on in your county or city (https://chrnoe.de/corona)
 - Wordpress Widget zur Anzeige der letzen 3 Inzidenzen für einen Landkreis (https://github.com/p-tenz/widget-7d-incidence)
 - Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland (https://www.impfung.io/)
+- Discordbot at (germanycovid.de/discord)
 
 ## License
 
