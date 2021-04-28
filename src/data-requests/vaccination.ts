@@ -354,8 +354,8 @@ export async function getVaccinationHistory(): Promise<ResponseData<VaccinationH
         if ((entry.Datum as any) instanceof Date) {
             vaccinationHistory.push({
                 date: entry.Datum,
-                vaccinated: entry['Einmal geimpft'] ?? 0,
-                firstVaccination: entry['Einmal geimpft'] ?? 0,
+                vaccinated: entry['Begonnene Impfserie'] ?? 0,
+                firstVaccination: entry['Begonnene Impfserie'] ?? 0,
                 secondVaccination: entry['Vollständig geimpft'] ?? 0
             })
         }
