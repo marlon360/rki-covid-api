@@ -45,7 +45,7 @@ If you use this API, please consider supporting me:
 - [Districts](https://api.corona-zahlen.org/docs/endpoints/districts.html)
 - [Vaccinations](https://api.corona-zahlen.org/docs/endpoints/vaccinations.html)
 - [Maps](https://api.corona-zahlen.org/docs/endpoints/maps.html)
-- [Testing](https://api.corona-zahlen.org/docs/endpoints/testing.html) 
+- [Testing](https://api.corona-zahlen.org/docs/endpoints/testing.html)
 
 ## Data sources
 
@@ -120,7 +120,7 @@ Now you can access the server at `http://localhost:8080`.
 
 - CoronaBot Deutschland (https://twitter.com/CoronaBot_DEU)
 - Fallzahlen Aktuell - Inzidenz & mehr aus DE
-(https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
+  (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
 - Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)

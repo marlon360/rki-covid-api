@@ -186,7 +186,7 @@
         "secondVaccination": 0
       },
       // ...
-            {
+      {
         "date": "2021-01-16T00:00:00.000Z",
         "vaccinated": 52098,
         "firstVaccination": 52098,
