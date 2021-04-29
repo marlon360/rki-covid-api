@@ -89,9 +89,9 @@ Returns the total cases in germany for the last `:days` days.
 
 **Parameters**
 
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :days         | Number of days in the past from today |
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
 
 ### Response
 
@@ -197,9 +197,9 @@ Returns the week incidence in germany for the last `:days` days.
 
 **Parameters**
 
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :days         | Number of days in the past from today |
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
 
 ### Response
 
@@ -278,9 +278,9 @@ Returns the number of deaths in germany for the last `:days` days.
 
 **Parameters**
 
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :days         | Number of days in the past from today |
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
 
 ### Response
 
@@ -375,9 +375,9 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 **Parameters**
 
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :days         | Number of days in the past from today |
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
 
 ### Response
 

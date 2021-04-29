@@ -87,10 +87,9 @@ Returns the data for a single `:state` state.
 `GET https://api.corona-zahlen.org/states/HH`
 [Open](/states/HH)
 
-
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :state        | State abbreviation |
+| Parameter | Description        |
+| --------- | ------------------ |
+| :state    | State abbreviation |
 
 ### Response
 
@@ -145,7 +144,6 @@ Redirects to `/states/history/cases`
 ## `/states/history/recovered`
 
 ## `/states/history/recovered/:days`
-
 
 ## `/states/:state/history/cases`
 
