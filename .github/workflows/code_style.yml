@@ -23,6 +23,6 @@ jobs:
       - name: Download and setup npm
         uses: actions/setup-node@v2
       - name: Install prettier
-        run: npm install -g prettier
+        run: npm install --only=dev
       - name: Check code style with prettier
-        run: npx prettier --check .
+        run: prettier --check .
