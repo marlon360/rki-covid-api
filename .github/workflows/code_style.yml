@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Download and setup npm
         uses: actions/setup-node@v2
-      - name: Install prettier
+      - name: Install devDependencies
         run: npm install --only=dev
       - name: Check code style with prettier
-        run: prettier --check .
+        run: npm run lint
