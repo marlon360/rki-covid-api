@@ -1,22 +1,22 @@
 import { IResponseMeta, ResponseMeta } from "./meta";
 import {
-    getTestingHistory,
-    testingHistoryEntry,
+  getTestingHistory,
+  testingHistoryEntry,
 } from "../data-requests/testing";
 
 interface TestingHistoryData extends IResponseMeta {
-    data: {
-        history: testingHistoryEntry[];
-    };
+  data: {
+    history: testingHistoryEntry[];
+  };
 }
 
 export async function TestingHistoryResponse(): Promise<TestingHistoryData> {
-    const TestingData = await getTestingHistory();
+  const TestingData = await getTestingHistory();
 
-    return {
-        data: {
-            history: TestingData.data,
-        },
-        meta: new ResponseMeta(TestingData.lastUpdate),
-    };
+  return {
+    data: {
+      history: TestingData.data,
+    },
+    meta: new ResponseMeta(TestingData.lastUpdate),
+  };
 }

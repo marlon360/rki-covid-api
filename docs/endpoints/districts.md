@@ -11,70 +11,70 @@
 
 ```json
 {
-    "data": {
-        "10041": {
-            "ags": "10041",
-            "name": "Regionalverband Saarbrücken",
-            "county": "LK Stadtverband Saarbrücken",
-            "population": 328714,
-            "cases": 7716,
-            "deaths": 240,
-            "casesPerWeek": 149,
-            "deathsPerWeek": 2,
-            "recovered": 6669,
-            "weekIncidence": 45.328157608133516,
-            "casesPer100k": 2347.329289290995,
-            "delta": {
-                "cases": 0,
-                "deaths": 0,
-                "recovered": 159
-            }
-        },
-        "10042": {
-            "ags": "10042",
-            "name": "Merzig-Wadern",
-            "county": "LK Merzig-Wadern",
-            "population": 103243,
-            "cases": 1850,
-            "deaths": 27,
-            "casesPerWeek": 118,
-            "deathsPerWeek": 0,
-            "recovered": 1603,
-            "weekIncidence": 114.29346299506987,
-            "casesPer100k": 1791.889038482028,
-            "delta": {
-                "cases": 4,
-                "deaths": 0,
-                "recovered": 6
-            }
-        },
-        // ...
-        "09780": {
-            "ags": "09780",
-            "name": "Oberallgäu",
-            "county": "LK Oberallgäu",
-            "population": 156008,
-            "cases": 2846,
-            "deaths": 30,
-            "casesPerWeek": 96,
-            "deathsPerWeek": 0,
-            "recovered": 2007,
-            "weekIncidence": 61.53530588174966,
-            "casesPer100k": 1824.2654222860367,
-            "delta": {
-                "cases": 0,
-                "deaths": 0,
-                "recovered": 14
-            }
-        }
+  "data": {
+    "10041": {
+      "ags": "10041",
+      "name": "Regionalverband Saarbrücken",
+      "county": "LK Stadtverband Saarbrücken",
+      "population": 328714,
+      "cases": 7716,
+      "deaths": 240,
+      "casesPerWeek": 149,
+      "deathsPerWeek": 2,
+      "recovered": 6669,
+      "weekIncidence": 45.328157608133516,
+      "casesPer100k": 2347.329289290995,
+      "delta": {
+        "cases": 0,
+        "deaths": 0,
+        "recovered": 159
+      }
     },
-    "meta": {
-        "source": "Robert Koch-Institut",
-        "contact": "Marlon Lueckert (m.lueckert@me.com)",
-        "info": "https://github.com/marlon360/rki-covid-api",
-        "lastUpdate": "2021-01-04T00:00:00.000Z",
-        "lastCheckedForUpdate": "2021-01-04T13:56:27.430Z"
+    "10042": {
+      "ags": "10042",
+      "name": "Merzig-Wadern",
+      "county": "LK Merzig-Wadern",
+      "population": 103243,
+      "cases": 1850,
+      "deaths": 27,
+      "casesPerWeek": 118,
+      "deathsPerWeek": 0,
+      "recovered": 1603,
+      "weekIncidence": 114.29346299506987,
+      "casesPer100k": 1791.889038482028,
+      "delta": {
+        "cases": 4,
+        "deaths": 0,
+        "recovered": 6
+      }
+    },
+    // ...
+    "09780": {
+      "ags": "09780",
+      "name": "Oberallgäu",
+      "county": "LK Oberallgäu",
+      "population": 156008,
+      "cases": 2846,
+      "deaths": 30,
+      "casesPerWeek": 96,
+      "deathsPerWeek": 0,
+      "recovered": 2007,
+      "weekIncidence": 61.53530588174966,
+      "casesPer100k": 1824.2654222860367,
+      "delta": {
+        "cases": 0,
+        "deaths": 0,
+        "recovered": 14
+      }
     }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-01-04T00:00:00.000Z",
+    "lastCheckedForUpdate": "2021-01-04T13:56:27.430Z"
+  }
 }
 ```
 
@@ -95,33 +95,33 @@ Returns the data for a single district identified by `:ags` AGS (Allgemeiner Gem
 
 ```json
 {
-    "data": {
-        "02000": {
-            "ags": "02000",
-            "name": "Hamburg",
-            "county": "SK Hamburg",
-            "population": 1847253,
-            "cases": 37535,
-            "deaths": 661,
-            "casesPerWeek": 2027,
-            "deathsPerWeek": 2,
-            "recovered": 27864,
-            "weekIncidence": 109.73050253538634,
-            "casesPer100k": 2031.9360693960166,
-            "delta": {
-                "cases": 0,
-                "deaths": 0,
-                "recovered": 350
-            }
-        }
-    },
-    "meta": {
-        "source": "Robert Koch-Institut",
-        "contact": "Marlon Lueckert (m.lueckert@me.com)",
-        "info": "https://github.com/marlon360/rki-covid-api",
-        "lastUpdate": "2021-01-04T00:00:00.000Z",
-        "lastCheckedForUpdate": "2021-01-04T13:59:49.832Z"
+  "data": {
+    "02000": {
+      "ags": "02000",
+      "name": "Hamburg",
+      "county": "SK Hamburg",
+      "population": 1847253,
+      "cases": 37535,
+      "deaths": 661,
+      "casesPerWeek": 2027,
+      "deathsPerWeek": 2,
+      "recovered": 27864,
+      "weekIncidence": 109.73050253538634,
+      "casesPer100k": 2031.9360693960166,
+      "delta": {
+        "cases": 0,
+        "deaths": 0,
+        "recovered": 350
+      }
     }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-01-04T00:00:00.000Z",
+    "lastCheckedForUpdate": "2021-01-04T13:59:49.832Z"
+  }
 }
 ```
 
