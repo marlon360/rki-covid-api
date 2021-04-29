@@ -8,7 +8,9 @@
     "start": "npm run build && node dist/server.js",
     "build": "tsc && npm run docs:build",
     "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs"
+    "docs:build": "vuepress build docs",
+    "lint": "prettier --check .",
+    "lint:fix": "prettier --write ."
   },
   "author": "",
   "license": "ISC",
