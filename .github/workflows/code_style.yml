@@ -1,0 +1,27 @@
+name: Code style
+on:
+  push:
+    branches:
+      - "master"
+      - "develop"
+      - "v2"
+      - "v2-proxy"
+  pull_request:
+    branches:
+      - "master"
+      - "develop"
+      - "v2"
+      - "v2-proxy"
+
+  jobs:
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo Files
+          uses: actions/checkout@v2
+        - name: Download and setup npm
+          uses: actions/setup-node@v2
+        - name: Install prettier
+          run: npm install -g prettier
+        - name: Chekc code style with prettier
+          run: npx prettier --check .
