@@ -1,114 +1,136 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>RKI API</title>
     <style>
-        body {
-            font-family: sans-serif;
-        }
-        main {
-            width: 96%;
-            max-width: 1000px;
-            margin: 50px auto;
-            background: #efefef;
-            padding: 30px;
-            border-radius: 20px;
-            box-sizing: border-box;
-        }
-        main pre {
-            display: inline-block
-        }
-        main li a {
-            margin-left: 1em;
-            text-decoration: none;
-            color: white;
-            background: rgb(57, 57, 57);
-            padding: 0.5em;
-            font-size: 12px;
-            border-radius: 3px;
-        }
+      body {
+        font-family: sans-serif;
+      }
+      main {
+        width: 96%;
+        max-width: 1000px;
+        margin: 50px auto;
+        background: #efefef;
+        padding: 30px;
+        border-radius: 20px;
+        box-sizing: border-box;
+      }
+      main pre {
+        display: inline-block;
+      }
+      main li a {
+        margin-left: 1em;
+        text-decoration: none;
+        color: white;
+        background: rgb(57, 57, 57);
+        padding: 0.5em;
+        font-size: 12px;
+        border-radius: 3px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <main>
-        <h1>Robert-Koch Institut API</h1>
-        <h3>Source Code: <a href="https://github.com/marlon360/rki-covid-api">https://github.com/marlon360/rki-covid-api</a></h3>
+      <h1>Robert-Koch Institut API</h1>
+      <h3>
+        Source Code:
+        <a href="https://github.com/marlon360/rki-covid-api"
+          >https://github.com/marlon360/rki-covid-api</a
+        >
+      </h3>
 
-        <ul>
-            <li>
-                <pre>/germany</pre><a href="/germany">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/cases</pre><a href="/germany/history/cases">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/cases/:days</pre><a href="/germany/history/cases/7">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/deaths</pre><a href="/germany/history/deaths">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/deaths/:days</pre><a href="/germany/history/deaths/7">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/recovered</pre><a href="/germany/history/recovered">Open</a>
-            </li>
-            <li>
-                <pre>/germany/history/recovered/:days</pre><a href="/germany/history/recovered/7">Open</a>
-            </li>
-        </ul>
+      <ul>
+        <li>
+          <pre>/germany</pre>
+          <a href="/germany">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/cases</pre>
+          <a href="/germany/history/cases">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/cases/:days</pre>
+          <a href="/germany/history/cases/7">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/deaths</pre>
+          <a href="/germany/history/deaths">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/deaths/:days</pre>
+          <a href="/germany/history/deaths/7">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/recovered</pre>
+          <a href="/germany/history/recovered">Open</a>
+        </li>
+        <li>
+          <pre>/germany/history/recovered/:days</pre>
+          <a href="/germany/history/recovered/7">Open</a>
+        </li>
+      </ul>
 
-        <ul>
-            <li>
-                <pre>/states</pre><a href="/states">Open</a>
-            </li>
-            <li>
-                <pre>/states/:abbreviation</pre><a href="/states/HH">Open</a>
-            </li>
-            <li>
-                <pre>/states/history/cases</pre><a href="/states/history/cases">Open</a>
-            </li>
-            <li>
-                <pre>/states/history/deaths</pre><a href="/states/history/deaths">Open</a>
-            </li>
-            <li>
-                <pre>/states/history/recovered</pre><a href="/states/history/recovered">Open</a>
-            </li>
-        </ul>
-        
-        <ul>
-            <li>
-                <pre>/districts</pre><a href="/districts">Open</a>
-            </li>
-            <li>
-                <pre>/districts/:ags</pre><a href="/districts/02000">Open</a>
-            </li>
-            <li>
-                <pre>/districts/history/cases</pre><a href="/districts/history/cases">Open</a>
-            </li>
-            <li>
-                <pre>/districts/history/deaths</pre><a href="/districts/history/deaths">Open</a>
-            </li>
-            <li>
-                <pre>/districts/history/recovered</pre><a href="/districts/history/recovered">Open</a>
-            </li>
-        </ul>
+      <ul>
+        <li>
+          <pre>/states</pre>
+          <a href="/states">Open</a>
+        </li>
+        <li>
+          <pre>/states/:abbreviation</pre>
+          <a href="/states/HH">Open</a>
+        </li>
+        <li>
+          <pre>/states/history/cases</pre>
+          <a href="/states/history/cases">Open</a>
+        </li>
+        <li>
+          <pre>/states/history/deaths</pre>
+          <a href="/states/history/deaths">Open</a>
+        </li>
+        <li>
+          <pre>/states/history/recovered</pre>
+          <a href="/states/history/recovered">Open</a>
+        </li>
+      </ul>
 
-        <ul>
-            <li>
-                <pre>/vaccinations</pre><a href="/vaccinations">Open</a>
-            </li>
-        </ul>
-        
-        <ul>
-            <li>
-                <pre>/map/districts</pre><a href="/map/districts">Open</a>
-            </li>
-        </ul>
+      <ul>
+        <li>
+          <pre>/districts</pre>
+          <a href="/districts">Open</a>
+        </li>
+        <li>
+          <pre>/districts/:ags</pre>
+          <a href="/districts/02000">Open</a>
+        </li>
+        <li>
+          <pre>/districts/history/cases</pre>
+          <a href="/districts/history/cases">Open</a>
+        </li>
+        <li>
+          <pre>/districts/history/deaths</pre>
+          <a href="/districts/history/deaths">Open</a>
+        </li>
+        <li>
+          <pre>/districts/history/recovered</pre>
+          <a href="/districts/history/recovered">Open</a>
+        </li>
+      </ul>
 
+      <ul>
+        <li>
+          <pre>/vaccinations</pre>
+          <a href="/vaccinations">Open</a>
+        </li>
+      </ul>
+
+      <ul>
+        <li>
+          <pre>/map/districts</pre>
+          <a href="/map/districts">Open</a>
+        </li>
+      </ul>
     </main>
-
-</body>
+  </body>
 </html>

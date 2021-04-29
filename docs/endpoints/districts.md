@@ -49,7 +49,7 @@
       }
     },
     // ...
-        "09780": {
+    "09780": {
       "ags": "09780",
       "name": "Oberallgäu",
       "county": "LK Oberallgäu",
@@ -87,10 +87,9 @@ Returns the data for a single district identified by `:ags` AGS (Allgemeiner Gem
 `GET https://api.corona-zahlen.org/districts/02000`
 [Open](/districts/02000)
 
-
-| Parameter     | Description   | 
-| ------------- | ------------- |
-| :ags          | Allgemeiner Gemeinde Schlüssel |
+| Parameter | Description                    |
+| --------- | ------------------------------ |
+| :ags      | Allgemeiner Gemeinde Schlüssel |
 
 ### Response
 
@@ -145,7 +144,6 @@ Redirects to `/districts/history/cases`
 ## `/districts/history/recovered`
 
 ## `/districts/history/recovered/:days`
-
 
 ## `/districts/:ags/history/cases`
 
