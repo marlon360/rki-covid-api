@@ -13,15 +13,16 @@ on:
       - "v2"
       - "v2-proxy"
 
-  jobs:
-    build:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout Repo Files
-          uses: actions/checkout@v2
-        - name: Download and setup npm
-          uses: actions/setup-node@v2
-        - name: Install prettier
-          run: npm install -g prettier
-        - name: Chekc code style with prettier
-          run: npx prettier --check .
+jobs:
+  code_style:
+    name: Check code style
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo Files
+        uses: actions/checkout@v2
+      - name: Download and setup npm
+        uses: actions/setup-node@v2
+      - name: Install prettier
+        run: npm install -g prettier
+      - name: Check code style with prettier
+        run: npx prettier --check .
