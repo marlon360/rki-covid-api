@@ -116,34 +116,33 @@ export function getStateAbbreviationByName(name: string): string | null {
 }
 
 export function getDateBefore(days: number): string {
-    let offsetDate = new Date()
-    offsetDate.setHours(0, 0, 0, 0)
-    offsetDate.setDate(new Date().getDate() - days)
-    return offsetDate.toISOString().split('T').shift()
+    let offsetDate = new Date();
+    offsetDate.setHours(0, 0, 0, 0);
+    offsetDate.setDate(new Date().getDate() - days);
+    return offsetDate.toISOString().split("T").shift();
 }
 
 export function getDayDifference(date1: Date, date2: Date): number {
     const diffTime = date1.getTime() - date2.getTime();
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 export function AddDaysToDate(date: Date, days: number): Date {
-    return new Date(date.getTime() + (1000 * 60 * 60 * 24))
+    return new Date(date.getTime() + 1000 * 60 * 60 * 24);
 }
 
 export function cleanupString(input: string): string {
     // only keep latin characters, umlaute, ß, -
-    return input.replace(/[^a-zA-ZäöüÄÖÜß\-]/g,"")
+    return input.replace(/[^a-zA-ZäöüÄÖÜß\-]/g, "");
 }
 
 export interface RKIErrorResponse {
-    code: number,
-    message: string,
-    details: string[]
+    code: number;
+    message: string;
+    details: string[];
 }
 
 export class RKIError extends Error {
-
     public url?: string;
     public rkiError: RKIErrorResponse;
 
@@ -151,6 +150,6 @@ export class RKIError extends Error {
         super(error.message);
         this.name = "RKIError";
         this.rkiError = error;
-        this.url = url
+        this.url = url;
     }
 }

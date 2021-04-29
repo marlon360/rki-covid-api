@@ -165,47 +165,47 @@
 
 ```json
 {
-  "data": {
-    "history": [
-      {
-        "date": "2020-12-27T00:00:00.000Z",
-        "vaccinated": 24080,
-        "firstVaccination": 24080,
-        "secondVaccination": 0
-      },
-      {
-        "date": "2020-12-28T00:00:00.000Z",
-        "vaccinated": 19501,
-        "firstVaccination": 19501,
-        "secondVaccination": 0
-      },
-      {
-        "date": "2020-12-29T00:00:00.000Z",
-        "vaccinated": 42692,
-        "firstVaccination": 42692,
-        "secondVaccination": 0
-      },
-      // ...
+    "data": {
+        "history": [
             {
-        "date": "2021-01-16T00:00:00.000Z",
-        "vaccinated": 52098,
-        "firstVaccination": 52098,
-        "secondVaccination": 62
-      },
-      {
-        "date": "2021-01-17T00:00:00.000Z",
-        "vaccinated": 31152,
-        "firstVaccination": 31152,
-        "secondVaccination": 6464
-      }
-    ]
-  },
-  "meta": {
-    "source": "Robert Koch-Institut",
-    "contact": "Marlon Lueckert (m.lueckert@me.com)",
-    "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-18T16:52:07.000Z",
-    "lastCheckedForUpdate": "2021-01-18T19:59:48.164Z"
-  }
+                "date": "2020-12-27T00:00:00.000Z",
+                "vaccinated": 24080,
+                "firstVaccination": 24080,
+                "secondVaccination": 0
+            },
+            {
+                "date": "2020-12-28T00:00:00.000Z",
+                "vaccinated": 19501,
+                "firstVaccination": 19501,
+                "secondVaccination": 0
+            },
+            {
+                "date": "2020-12-29T00:00:00.000Z",
+                "vaccinated": 42692,
+                "firstVaccination": 42692,
+                "secondVaccination": 0
+            },
+            // ...
+            {
+                "date": "2021-01-16T00:00:00.000Z",
+                "vaccinated": 52098,
+                "firstVaccination": 52098,
+                "secondVaccination": 62
+            },
+            {
+                "date": "2021-01-17T00:00:00.000Z",
+                "vaccinated": 31152,
+                "firstVaccination": 31152,
+                "secondVaccination": 6464
+            }
+        ]
+    },
+    "meta": {
+        "source": "Robert Koch-Institut",
+        "contact": "Marlon Lueckert (m.lueckert@me.com)",
+        "info": "https://github.com/marlon360/rki-covid-api",
+        "lastUpdate": "2021-01-18T16:52:07.000Z",
+        "lastCheckedForUpdate": "2021-01-18T19:59:48.164Z"
+    }
 }
 ```
