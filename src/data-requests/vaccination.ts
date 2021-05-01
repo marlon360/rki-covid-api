@@ -126,7 +126,7 @@ export async function getVaccinationCoverage(): Promise<
     GPfullbiontech: number;
     GPfullmoderna: number;
     GPfullAstraZeneca: number;
-    GPfullJanssen: number,
+    GPfullJanssen: number;
     GPfullDifference: number;
   }>(sheet, {
     header: [
