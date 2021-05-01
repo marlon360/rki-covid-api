@@ -126,8 +126,7 @@ export async function getVaccinationCoverage(): Promise<
     GPfullbiontech: number;
     GPfullmoderna: number;
     GPfullAstraZeneca: number;
-    // uncomment the following line if RKI add Janssen to GP and remove this line
-    // GPfullJanssen: number,
+    GPfullJanssen: number;
     GPfullDifference: number;
   }>(sheet, {
     header: [
@@ -153,12 +152,11 @@ export async function getVaccinationCoverage(): Promise<
       "GPfullbiontech",
       "GPfullmoderna",
       "GPfullAstraZeneca",
-      // uncomment the following line if RKI add Janssen to GP and remove this line
-      // "GPfullJanssen",
+      "GPfullJanssen",
       "GPfullDifference",
     ],
-    range: "A5:W22",
-  }); //if RKI add Janssen to GP change W22 to X22 and delete this comment
+    range: "A5:X22",
+  });
 
   const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
   const quoteJson = XLSX.utils.sheet_to_json<{
@@ -265,8 +263,7 @@ export async function getVaccinationCoverage(): Promise<
           biontech: entry.VCfullbiontech + entry.GPfullbiontech,
           moderna: entry.VCfullmoderna + entry.GPfullmoderna,
           astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
-          // uncommend the following comment if RKI add Janssen to GP and remove this line
-          janssen: entry.VCfullJanssen, //+ GPfullJanssen
+          janssen: entry.VCfullJanssen + entry.GPfullJanssen,
         },
         delta: entry.VCfullDifference + entry.GPfullDifference,
         quote:
@@ -308,8 +305,7 @@ export async function getVaccinationCoverage(): Promise<
             biontech: entry.VCfullbiontech + entry.GPfullbiontech,
             moderna: entry.VCfullmoderna + entry.GPfullmoderna,
             astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
-            // uncommend the following comment if RKI add Janssen to GP and remove this line
-            janssen: entry.VCfullJanssen, //+ entry.GPfullJanssen
+            janssen: entry.VCfullJanssen + entry.GPfullJanssen,
           },
           delta: entry.VCfullDifference + entry.GPfullDifference,
           quote:
