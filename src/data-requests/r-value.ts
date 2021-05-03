@@ -12,14 +12,13 @@ export interface RValueEntry {
 }
 
 function parseRValueRow(row: unknown): RValueEntry | null {
-  let latestEntry = row;
   const dateString =
-    latestEntry["Datum des Erkrankungsbeginns"] ||
-    latestEntry["Datum des Erkrankungs-beginns"];
+    row["Datum des Erkrankungsbeginns"] ||
+    row["Datum des Erkrankungs-beginns"];
   let rValue =
-    latestEntry["Punktschätzer des 4-Tage R-Wertes"] ||
-    latestEntry["Punktschätzer der 4-Tage R-Wert"] ||
-    latestEntry["Punktschätzer des 4-Tage-R-Wertes"];
+    row["Punktschätzer des 4-Tage R-Wertes"] ||
+    row["Punktschätzer der 4-Tage R-Wert"] ||
+    row["Punktschätzer des 4-Tage-R-Wertes"];
 
   if (typeof rValue === "string" || rValue instanceof String) {
     rValue = parseFloat(rValue.replace(",", "."));
