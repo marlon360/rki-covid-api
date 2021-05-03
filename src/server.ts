@@ -27,6 +27,7 @@ import {
   DistrictsRecoveredHistoryResponse,
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
+  FrozenIncidenceHistoryResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -464,6 +465,28 @@ app.get(
 );
 
 app.get(
+  "/districts/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/history/incidence/:days",
   queuedCache(),
   cache.route(),
@@ -578,6 +601,32 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsWeekIncidenceHistoryResponse(
+      parseInt(req.params.days),
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:district/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      null,
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:district/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
       parseInt(req.params.days),
       req.params.district
     );
