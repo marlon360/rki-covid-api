@@ -29,35 +29,29 @@ export async function getFrozenIncidenceHistory(
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets["LK_7-Tage-Inzidenz"];
-  const json = XLSX.utils.sheet_to_json(sheet);
-  const header = json.shift();
-  const dateString = Object.keys(json[0])[0].replace("Stand: ", "");
+  // table starts in row 5 (parameter is zero indexed)
+  const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
+
+  // date is in cell A2
+  const dateString = sheet["A2"].v.replace("Stand: ", "");
   const lastUpdate = new Date(dateString);
 
-  if (ags != null) {
-    // if ags is not defined restrict days to 36
-    if (days != null) {
-      days = Math.min(days, 36);
-    } else {
-      days = 36;
-    }
-  }
-
-  const districts = json.map((element) => {
-    // one district in each row
-
-    const keys = Object.keys(element); // columns
-    keys.shift(); // rowNumber
-    const name = element[keys.shift()];
-    const ags = element[keys.shift()].toString().padStart(5, "0");
+  const districts = json.map((district) => {
+    const name = district["LK"];
+    const ags = district["LKNR"].toString().padStart(5, "0");
 
     let history = [];
-    keys.forEach((key) => {
+
+    // get all date keys
+    const dateKeys = Object.keys(district);
+    // ignore the first three elements (rowNumber, LK, LKNR)
+    dateKeys.splice(0, 3);
+    dateKeys.forEach((dateKey) => {
       const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
       const date = new Date(
-        header[key].toString().replace(date_pattern, "$3-$2-$1")
+        dateKey.toString().replace(date_pattern, "$3-$2-$1")
       );
-      history.push({ weekIncidence: element[key], date });
+      history.push({ weekIncidence: district[dateKey], date });
     });
 
     if (days != null) {
