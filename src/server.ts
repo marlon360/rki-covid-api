@@ -606,6 +606,18 @@ app.get(
   }
 );
 
+app.get(
+  "/vaccinations/history/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await VaccinationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
 app.get("/map", async (req, res) => {
   res.redirect("/map/districts");
 });

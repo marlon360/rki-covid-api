@@ -1,7 +1,11 @@
 import axios from "axios";
 import { ResponseData } from "./response-data";
 import XLSX from "xlsx";
-import { cleanupString, getStateAbbreviationByName } from "../utils";
+import {
+  cleanupString,
+  getDateBefore,
+  getStateAbbreviationByName,
+} from "../utils";
 
 function clearEntry(entry: any) {
   for (const key in entry) {
@@ -340,9 +344,9 @@ export interface VaccinationHistoryEntry {
   secondVaccination: number;
 }
 
-export async function getVaccinationHistory(): Promise<
-  ResponseData<VaccinationHistoryEntry[]>
-> {
+export async function getVaccinationHistory(
+  days?: number
+): Promise<ResponseData<VaccinationHistoryEntry[]>> {
   const response = await axios.get(
     `https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile`,
     {
@@ -363,7 +367,7 @@ export async function getVaccinationHistory(): Promise<
     "Vollständig geimpft": number;
   }>(sheet);
 
-  const vaccinationHistory: VaccinationHistoryEntry[] = [];
+  let vaccinationHistory: VaccinationHistoryEntry[] = [];
 
   for (const entry of json) {
     if ((entry.Datum as any) instanceof Date) {
@@ -374,6 +378,13 @@ export async function getVaccinationHistory(): Promise<
         secondVaccination: entry["Vollständig geimpft"] ?? 0,
       });
     }
+  }
+
+  if (days != null) {
+    const reference_date = new Date(getDateBefore(days));
+    vaccinationHistory = vaccinationHistory.filter(
+      (element) => element.date > reference_date
+    );
   }
 
   return {
