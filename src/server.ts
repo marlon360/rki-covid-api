@@ -25,13 +25,13 @@ import {
   DistrictsRecoveredHistoryResponse,
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
+  FrozenIncidenceHistoryResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
   VaccinationHistoryResponse,
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
-import { FrozenIncidenceHistoryResponse } from "./responses/frozen-incidence";
 import {
   DistrictsMapResponse,
   IncidenceColorsResponse,
