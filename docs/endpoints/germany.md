@@ -422,3 +422,7 @@ Returns the number of recovered people in germany for the last `:days` days.
   }
 }
 ```
+
+## `/germany/history/rValue`
+
+Returns the R value of germany for every day.
