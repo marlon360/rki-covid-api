@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { RKIError } from "../utils";
+import { getDateBefore, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface FrozenIncidenceData {
@@ -12,9 +12,9 @@ export interface FrozenIncidenceData {
   }[];
 }
 
-export async function getFrozenIncidenceHistory(): Promise<
-  ResponseData<FrozenIncidenceData[]>
-> {
+export async function getFrozenIncidenceHistory(
+  days?: number
+): Promise<ResponseData<FrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
     {
@@ -50,11 +50,16 @@ export async function getFrozenIncidenceHistory(): Promise<
       history.push({ weekIncidence: element[key], date });
     });
 
-    return {
-      ags,
-      name,
-      history: history.slice(Math.max(history.length - 30, 0)),
-    };
+    if (days != null) {
+      days = Math.min(days, 36);
+    } else {
+      days = 36;
+    }
+
+    const reference_date = new Date(getDateBefore(days));
+    history = history.filter((element) => element.date > reference_date);
+
+    return { ags, name, history };
   });
 
   return {

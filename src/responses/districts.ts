@@ -383,8 +383,10 @@ interface FrozenIncidenceHistoryData extends IResponseMeta {
   };
 }
 
-export async function FrozenIncidenceHistoryResponse(): Promise<FrozenIncidenceHistoryData> {
-  const FrozenIncidenceData = await getFrozenIncidenceHistory();
+export async function FrozenIncidenceHistoryResponse(
+  days?: number
+): Promise<FrozenIncidenceHistoryData> {
+  const FrozenIncidenceData = await getFrozenIncidenceHistory(days);
 
   const data: {
     [key: string]: FrozenIncidenceData;

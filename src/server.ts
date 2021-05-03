@@ -429,6 +429,18 @@ app.get(
 );
 
 app.get(
+  "/districts/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/history/incidence/:days",
   queuedCache(),
   cache.route(),
