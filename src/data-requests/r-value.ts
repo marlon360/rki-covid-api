@@ -1,11 +1,17 @@
 import axios from "axios";
 import XLSX from "xlsx";
+import { RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 const rValueURL =
   "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile";
 
-function parseRValueRow(row: unknown): { r: number; date: Date } | null {
+export interface RValueEntry {
+  r: number;
+  date: Date;
+}
+
+function parseRValueRow(row: unknown): RValueEntry | null {
   let latestEntry = row;
   const dateString =
     latestEntry["Datum des Erkrankungsbeginns"] ||
@@ -33,12 +39,15 @@ export async function getRValue(): Promise<ResponseData<number>> {
     responseType: "arraybuffer",
   });
   const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[1]];
   const json = XLSX.utils.sheet_to_json(sheet);
   const latestEntry = json[json.length - 1];
-  const rData: { r: number; date: Date } = parseRValueRow(latestEntry);
+  const rData: RValueEntry = parseRValueRow(latestEntry);
 
   return {
     data: rData.r,
