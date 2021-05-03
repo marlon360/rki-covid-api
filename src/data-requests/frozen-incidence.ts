@@ -36,7 +36,7 @@ export async function getFrozenIncidenceHistory(
   const dateString = sheet["A2"].v.replace("Stand: ", "");
   const lastUpdate = new Date(dateString);
 
-  const districts = json.map((district) => {
+  let districts = json.map((district) => {
     const name = district["LK"];
     const ags = district["LKNR"].toString().padStart(5, "0");
 
@@ -61,6 +61,10 @@ export async function getFrozenIncidenceHistory(
 
     return { ags, name, history };
   });
+
+  if (ags != null) {
+    districts = districts.filter((district) => district.ags === ags);
+  }
 
   return {
     data: districts,

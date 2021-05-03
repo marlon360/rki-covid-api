@@ -387,20 +387,15 @@ export async function FrozenIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<FrozenIncidenceHistoryData> {
-  const FrozenIncidenceData = await getFrozenIncidenceHistory(days);
+  const frozenIncidenceHistoryData = await getFrozenIncidenceHistory(days, ags);
 
-  const data: {
-    [key: string]: FrozenIncidenceData;
-  } = {};
-
-  for (const element of FrozenIncidenceData.data) {
-    if (ags && element.ags != ags) continue;
-
-    data[element.ags] = element;
-  }
+  let data = {};
+  frozenIncidenceHistoryData.data.forEach((historyData) => {
+    data[historyData.ags] = historyData;
+  });
 
   return {
     data: data,
-    meta: new ResponseMeta(FrozenIncidenceData.lastUpdate),
+    meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
   };
 }
