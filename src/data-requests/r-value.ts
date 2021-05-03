@@ -40,6 +40,8 @@ export async function getRValue(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
+  const lastModified = response.headers["last-modified"];
+  const lastUpdate = lastModified ? new Date(lastModified) : new Date();
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[1]];
@@ -49,7 +51,7 @@ export async function getRValue(): Promise<ResponseData<number>> {
 
   return {
     data: rData.r,
-    lastUpdate: rData.date,
+    lastUpdate: lastUpdate,
   };
 }
 
