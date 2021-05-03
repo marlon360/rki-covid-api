@@ -168,6 +168,10 @@ Redirects to `/districts/history/cases`
 
 ## `/districts/:ags/history/incidence/:days`
 
+## `/districts/:ags/history/frozen-incidence`
+
+## `/districts/:ags/history/frozen-incidence/:days`
+
 ## `/districts/:ags/history/deaths`
 
 ## `/districts/:ags/history/deaths/:days`

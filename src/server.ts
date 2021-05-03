@@ -563,6 +563,32 @@ app.get(
 );
 
 app.get(
+  "/districts/:district/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      null,
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:district/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      parseInt(req.params.days),
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/:district/history/deaths",
   queuedCache(),
   cache.route(),

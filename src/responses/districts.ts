@@ -384,7 +384,8 @@ interface FrozenIncidenceHistoryData extends IResponseMeta {
 }
 
 export async function FrozenIncidenceHistoryResponse(
-  days?: number
+  days?: number,
+  ags?: string
 ): Promise<FrozenIncidenceHistoryData> {
   const FrozenIncidenceData = await getFrozenIncidenceHistory(days);
 
@@ -393,6 +394,8 @@ export async function FrozenIncidenceHistoryResponse(
   } = {};
 
   for (const element of FrozenIncidenceData.data) {
+    if (ags && element.ags != ags) continue;
+
     data[element.ags] = element;
   }
 
