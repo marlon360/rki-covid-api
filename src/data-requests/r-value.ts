@@ -13,8 +13,7 @@ export interface RValueEntry {
 
 function parseRValueRow(row: unknown): RValueEntry | null {
   const dateString =
-    row["Datum des Erkrankungsbeginns"] ||
-    row["Datum des Erkrankungs-beginns"];
+    row["Datum des Erkrankungsbeginns"] || row["Datum des Erkrankungs-beginns"];
   let rValue =
     row["Punktschätzer des 4-Tage R-Wertes"] ||
     row["Punktschätzer der 4-Tage R-Wert"] ||
