@@ -54,3 +54,23 @@ export async function getRValue(): Promise<ResponseData<number>> {
     lastUpdate: rData.date,
   };
 }
+
+export async function getRValueHistory(): Promise<ResponseData<RValueEntry[]>> {
+  const response = await axios.get(rValueURL, {
+    responseType: "arraybuffer",
+  });
+  const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
+
+  var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
+  const sheet = workbook.Sheets[workbook.SheetNames[1]];
+  const json = XLSX.utils.sheet_to_json(sheet);
+  const history: RValueEntry[] = json.map((row) => parseRValueRow(row));
+
+  return {
+    data: history,
+    lastUpdate: new Date(),
+  };
+}
