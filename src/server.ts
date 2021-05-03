@@ -657,6 +657,16 @@ app.get("/testing/history", queuedCache(), cache.route(), async (req, res) => {
   res.json(response);
 });
 
+app.get(
+  "/testing/history/:weeks",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await TestingHistoryResponse(parseInt(req.params.weeks));
+    res.json(response);
+  }
+);
+
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {
     res.json({
