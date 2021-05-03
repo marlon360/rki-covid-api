@@ -67,7 +67,10 @@ export async function getRValueHistory(): Promise<ResponseData<RValueEntry[]>> {
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[1]];
   const json = XLSX.utils.sheet_to_json(sheet);
-  const history: RValueEntry[] = json.map((row) => parseRValueRow(row));
+  let history: RValueEntry[] = json.map((row) => parseRValueRow(row));
+
+  // the first 4 entries are always null
+  history = history.slice(4);
 
   return {
     data: history,
