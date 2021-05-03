@@ -133,6 +133,8 @@ Redirects to `/districts/history/cases`
 
 ## `/districts/history/cases/:days`
 
+## `/districts/history/frozen-incidence`
+
 ## `/districts/history/incidence`
 
 ## `/districts/history/incidence/:days`

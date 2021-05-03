@@ -31,6 +31,7 @@ import {
   VaccinationHistoryResponse,
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
+import { FrozenIncidenceHistoryResponse } from "./responses/frozen-incidence";
 import {
   DistrictsMapResponse,
   IncidenceColorsResponse,
@@ -413,6 +414,16 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsWeekIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse();
     res.json(response);
   }
 );
