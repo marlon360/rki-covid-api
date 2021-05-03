@@ -183,6 +183,18 @@ app.get(
   }
 );
 
+app.get(
+  "/germany/history/rValue/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await RValueHistoryHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
 app.get("/states", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse();
   res.json(response);

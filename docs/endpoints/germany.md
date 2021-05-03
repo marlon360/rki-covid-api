@@ -426,3 +426,20 @@ Returns the number of recovered people in germany for the last `:days` days.
 ## `/germany/history/rValue`
 
 Returns the R value of germany for every day.
+
+## `/germany/history/rValue/:days`
+
+Returns the R value of germany for the last `:days` days.
+
+Note: The data is always 4 days behind.
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/history/rValue/10`
+[Open](/germany/history/rValue/10)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |

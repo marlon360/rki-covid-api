@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { RKIError } from "../utils";
+import { getDateBefore, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 const rValueURL =
@@ -55,7 +55,9 @@ export async function getRValue(): Promise<ResponseData<number>> {
   };
 }
 
-export async function getRValueHistory(): Promise<ResponseData<RValueEntry[]>> {
+export async function getRValueHistory(
+  days?: number
+): Promise<ResponseData<RValueEntry[]>> {
   const response = await axios.get(rValueURL, {
     responseType: "arraybuffer",
   });
@@ -73,6 +75,11 @@ export async function getRValueHistory(): Promise<ResponseData<RValueEntry[]>> {
 
   // the first 4 entries are always null
   history = history.slice(4);
+
+  if (days != null) {
+    const reference_date = new Date(getDateBefore(days));
+    history = history.filter((element) => element.date > reference_date);
+  }
 
   return {
     data: history,
