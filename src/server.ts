@@ -14,6 +14,7 @@ import {
   StatesAgeGroupsResponse,
 } from "./responses/states";
 import {
+  GermanyAgeGroupsResponse,
   GermanyCasesHistoryResponse,
   GermanyDeathsHistoryResponse,
   GermanyRecoveredHistoryResponse,
@@ -170,6 +171,16 @@ app.get(
     const response = await GermanyRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await GermanyAgeGroupsResponse();
     res.json(response);
   }
 );

@@ -422,3 +422,34 @@ Returns the number of recovered people in germany for the last `:days` days.
   }
 }
 ```
+
+## `/germany/age-groups`
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/age-groups`
+[Open](/germany/age-groups)
+
+### Response
+
+```json
+{
+  "data": {
+    "casesMale": 94628,
+    "casesFemale": 185126,
+    "deathsMale": 25492,
+    "deathsFemale": 30763,
+    "casesMalePer100k": 4373.1,
+    "casesFemalePer100k": 5263.4,
+    "deathsMalePer100k": 1178.1,
+    "deathsFemalePer100k": 874.6
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-05-04T01:09:15.000Z",
+    "lastCheckedForUpdate": "2021-05-04T20:34:41.427Z"
+  }
+}
+```
