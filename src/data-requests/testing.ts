@@ -10,9 +10,9 @@ export interface testingHistoryEntry {
   laboratoryCount: number;
 }
 
-export async function getTestingHistory(): Promise<
-  ResponseData<testingHistoryEntry[]>
-> {
+export async function getTestingHistory(
+  weeks?: number
+): Promise<ResponseData<testingHistoryEntry[]>> {
   const response = await axios.get(
     `https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Testzahlen-gesamt.xlsx?__blob=publicationFile`,
     {
@@ -35,7 +35,7 @@ export async function getTestingHistory(): Promise<
     "Anzahl übermittelnder Labore": number;
   }>(sheet);
 
-  const testingHistory: testingHistoryEntry[] = [];
+  let testingHistory: testingHistoryEntry[] = [];
 
   for (const entry of json) {
     if (entry.Kalenderwoche === "Bis einschließlich KW10, 2020") {
@@ -58,6 +58,11 @@ export async function getTestingHistory(): Promise<
       });
     }
   }
+
+  if (weeks != null) {
+    testingHistory = testingHistory.slice(-weeks);
+  }
+
   return {
     data: testingHistory,
     lastUpdate: lastUpdate,

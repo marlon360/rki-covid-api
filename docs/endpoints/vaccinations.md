@@ -209,3 +209,16 @@
   }
 }
 ```
+
+## `/vaccinations/history/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/history/7`
+[Open](/vaccinations/history/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |

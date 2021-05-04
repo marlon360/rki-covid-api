@@ -27,8 +27,10 @@ interface VaccinationHistoryData extends IResponseMeta {
   };
 }
 
-export async function VaccinationHistoryResponse(): Promise<VaccinationHistoryData> {
-  const vaccinationData = await getVaccinationHistory();
+export async function VaccinationHistoryResponse(
+  days?: number
+): Promise<VaccinationHistoryData> {
+  const vaccinationData = await getVaccinationHistory(days);
 
   return {
     data: {
