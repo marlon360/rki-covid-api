@@ -77,3 +77,16 @@
   }
 }
 ```
+
+## `/testing/history/:weeks`
+
+### Request
+
+`GET https://api.corona-zahlen.org/testing/history/7`
+[Open](/testing/history/7)
+
+**Parameters**
+
+| Parameter | Description                            |
+| --------- | -------------------------------------- |
+| :weeks    | Number of weeks in the past from today |
