@@ -28,4 +28,3 @@ jobs:
         env:
           VAR1: ${{ steps.docker.outputs.IMAGE_SHA_NAME }}
           VAR2: ${{ steps.docker.outputs.IMAGE_URL }}
-          
