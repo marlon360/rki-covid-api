@@ -1,4 +1,4 @@
-FROM arm64v8/rubber4duck/vips-node-alpine:latest
+FROM rubber4duck/vips-node-alpine:latest
 
 # Add QEMU
 COPY qemu-aarch64-static /usr/bin/
