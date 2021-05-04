@@ -2,16 +2,10 @@ name: Code style
 on:
   push:
     branches:
-      - "master"
-      - "develop"
-      - "v2"
-      - "v2-proxy"
+      - "mein-v2"
   pull_request:
     branches:
-      - "master"
-      - "develop"
-      - "v2"
-      - "v2-proxy"
+      - "mein-v2"
 
 jobs:
   code_style:
