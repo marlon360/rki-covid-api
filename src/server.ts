@@ -11,6 +11,7 @@ import {
   StatesRecoveredHistoryResponse,
   StatesResponse,
   StatesWeekIncidenceHistoryResponse,
+  StatesAgeGroupsResponse,
 } from "./responses/states";
 import {
   GermanyCasesHistoryResponse,
@@ -270,6 +271,16 @@ app.get(
   }
 );
 
+app.get(
+  "/states/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await StatesAgeGroupsResponse();
+    res.json(response);
+  }
+);
+
 app.get("/states/:state", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse(req.params.state);
   res.json(response);
@@ -373,6 +384,16 @@ app.get(
       parseInt(req.params.days),
       req.params.state
     );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await StatesAgeGroupsResponse(req.params.state);
     res.json(response);
   }
 );
