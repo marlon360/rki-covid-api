@@ -1,9 +1,8 @@
-FROM node:12-alpine3.12
+FROM rubber4duck/vips-node-alpine:latest
 
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
-ARG VIPS_VERSION=8.10.6
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -14,29 +13,17 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Inside "npm install" the build tools and dev packages are needed to compile "sharp"
-# To not install and deinstall the the build tools and dev packages twice the build process for libvips moved to here!
-# This will save some Dockerimage build time
-# Install the buildtools, dev packages of the required shared libs, compile, install libvips and cleanup
+# against globaly installed lib vips in newest version
+# Install the buildtools, dev packages of the required shared libs
 # execute "npm install" and remove the buildtools and dev packages afterwards
 RUN apk update \
  && apk upgrade \
- && apk add --no-cache zlib libxml2 glib gobject-introspection libjpeg-turbo libexif lcms2 fftw giflib libpng \
-     libwebp orc tiff poppler-glib librsvg libgsf openexr libheif libimagequant pango \
- && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz | tar xzC /tmp \
- && apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
+ && apk add --no-cache --virtual .vips-dev build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
      libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
- && ODIR=$(pwd) \
- && cd /tmp/vips-${VIPS_VERSION} \
- && ./configure --prefix=/usr \
-                --disable-static \
-                --disable-dependency-tracking \
-                --enable-silent-rules \
- && make -s install-strip \
- && cd $ODIR \
- && rm -rf /tmp/vips-${VIPS_VERSION} /var/cache/apk/* \
  && npm install \
- && apk del .vips-deps
+ && apk del .vips-dev \
+ && rm -rf /var/cache/apk/*
 # If you are building your code for production
 # RUN npm ci --only=production
 
