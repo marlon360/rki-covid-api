@@ -284,7 +284,7 @@ export async function getStatesAgeGroups(
   id?: number
 ): Promise<ResponseData<AgeGroupsData>> {
   const response = await axios.get(
-    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+    "https://iot.shinewelt.de/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
   );
   const data = response.data;
   if (data.error) {
