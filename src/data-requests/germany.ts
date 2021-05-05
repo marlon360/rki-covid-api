@@ -173,10 +173,10 @@ export interface AgeGroupData {
 }
 
 export async function getGermanyAgeGroups(): Promise<
-  ResponseData<AgeGroupData>
+  ResponseData<{ [ageGroup: string]: AgeGroupData }>
 > {
   const response = await axios.get(
-    "https://iot.shinewelt.de/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+    "https://iot.shinewelt.de/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=BundeslandId=0&outFields=*&outSR=4326&f=json"
   );
   const data = response.data;
   if (data.error) {
@@ -185,21 +185,21 @@ export async function getGermanyAgeGroups(): Promise<
   const lastModified = response.headers["last-modified"];
   const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
 
-  let germany_data: AgeGroupData = null;
+  let germany_data: { [ageGroup: string]: AgeGroupData } = {};
   data.features.forEach((feature) => {
     // germany has BundeslandId=0
-    // skip everything else
-    if (feature.attributes.BundeslandId != 0) return;
-    germany_data = {
-      casesMale: feature.attributes.AnzFallM,
-      casesFemale: feature.attributes.AnzFallW,
-      deathsMale: feature.attributes.AnzTodesfallM,
-      deathsFemale: feature.attributes.AnzTodesfallW,
-      casesMalePer100k: feature.attributes.AnzFall100kM,
-      casesFemalePer100k: feature.attributes.AnzFall100kW,
-      deathsMalePer100k: feature.attributes.AnzTodesfall100kM,
-      deathsFemalePer100k: feature.attributes.AnzTodesfall100kW,
-    };
+    if (feature.attributes.BundeslandId === 0) {
+      germany_data[feature.attributes.Altersgruppe] = {
+        casesMale: feature.attributes.AnzFallM,
+        casesFemale: feature.attributes.AnzFallW,
+        deathsMale: feature.attributes.AnzTodesfallM,
+        deathsFemale: feature.attributes.AnzTodesfallW,
+        casesMalePer100k: feature.attributes.AnzFall100kM,
+        casesFemalePer100k: feature.attributes.AnzFall100kW,
+        deathsMalePer100k: feature.attributes.AnzTodesfall100kM,
+        deathsFemalePer100k: feature.attributes.AnzTodesfall100kW,
+      };
+    }
   });
 
   return {

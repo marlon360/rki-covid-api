@@ -156,7 +156,7 @@ export async function GermanyRecoveredHistoryResponse(
 }
 
 export async function GermanyAgeGroupsResponse(): Promise<{
-  data: AgeGroupData;
+  data: { [ageGroup: string]: AgeGroupData };
   meta: ResponseMeta;
 }> {
   const AgeGroupsData = await getGermanyAgeGroups();
