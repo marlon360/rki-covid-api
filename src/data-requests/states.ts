@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getDateBefore, RKIError } from "../utils";
+import { getDateBefore, getStateAbbreviationById, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface IStateData {
@@ -260,5 +260,61 @@ export async function getLastStateRecoveredHistory(
     lastUpdate: history[history.length - 1]
       ? history[history.length - 1].date
       : new Date(),
+  };
+}
+
+export interface AgeGroupData {
+  casesMale: string;
+  casesFemale: string;
+  deathsMale: string;
+  deathsFemale: string;
+  casesMalePer100k: string;
+  casesFemalePer100k: string;
+  deathsMalePer100k: string;
+  deathsFemalePer100k: string;
+}
+
+export interface AgeGroupsData {
+  [key: string]: {
+    [key: string]: AgeGroupData;
+  };
+}
+
+export async function getStatesAgeGroups(
+  id?: number
+): Promise<ResponseData<AgeGroupsData>> {
+  const response = await axios.get(
+    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+  );
+  const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
+  const lastModified = response.headers["last-modified"];
+  const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
+
+  const states: AgeGroupsData = {};
+  data.features.forEach((feature) => {
+    if (!feature.attributes.BundeslandId) return;
+    if (id && feature.attributes.BundeslandId != id) return;
+    const abbreviation = getStateAbbreviationById(
+      feature.attributes.BundeslandId
+    );
+    if (!states[abbreviation]) states[abbreviation] = {};
+    states[abbreviation][feature.attributes.Altersgruppe] = {
+      casesMale: feature.attributes.AnzFallM,
+      casesFemale: feature.attributes.AnzFallW,
+      deathsMale: feature.attributes.AnzTodesfallM,
+      deathsFemale: feature.attributes.AnzTodesfallW,
+      casesMalePer100k: feature.attributes.AnzFall100kM,
+      casesFemalePer100k: feature.attributes.AnzFall100kW,
+      deathsMalePer100k: feature.attributes.AnzTodesfall100kM,
+      deathsFemalePer100k: feature.attributes.AnzTodesfall100kW,
+    };
+  });
+
+  return {
+    data: states,
+    lastUpdate,
   };
 }
