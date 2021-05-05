@@ -2,7 +2,7 @@
 
 A JSON Rest API to query all relevant corona data for Germany based on the figures of the Robert Koch-Institut.
 
-cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests
+cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests - age groups 👶👩‍🦳👴
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
@@ -28,6 +28,7 @@ If you use this API, please consider supporting me:
 - historische Daten für Deutschland, jedes Bundesland and jeden Landkreis
 - Karten mit Bundesländern und Landkreisen
 - Anzahl der wöchentlich durchgeführen PCR-Tests, Anzahl der positiven Tests sowie der Positiv Quote
+- Fallzahlen und Todesfälle pro Altersgruppe
 
 ## 🇺🇸 Overview
 
@@ -39,7 +40,8 @@ If you use this API, please consider supporting me:
 - data per state and district
 - time series for every state and district
 - maps for states and districts
-- Number of performed PCR-test, number of positive tests and positivity rate
+- number of performed PCR-test, number of positive tests and positivity rate
+- cases and deaths per age group
 
 ## Endpoints
 
@@ -79,6 +81,10 @@ If you use this API, please consider supporting me:
 **Frozen-Incidence data**
 
 [https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?\_\_blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile)
+
+**Age groups**
+
+[https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0)
 
 ## Host it yourself
 
