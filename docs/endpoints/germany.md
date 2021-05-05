@@ -422,3 +422,86 @@ Returns the number of recovered people in germany for the last `:days` days.
   }
 }
 ```
+
+## `/germany/age-groups`
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/age-groups`
+[Open](/germany/age-groups)
+
+### Response
+
+```json
+{
+  "data": {
+    "A00-A04": {
+      "casesMale": 43375,
+      "casesFemale": 40014,
+      "deathsMale": 2,
+      "deathsFemale": 6,
+      "casesMalePer100k": 2134.9,
+      "casesFemalePer100k": 2073.6,
+      "deathsMalePer100k": 0.1,
+      "deathsFemalePer100k": 0.3
+    },
+    "A05-A14": {
+      "casesMale": 123239,
+      "casesFemale": 112137,
+      "deathsMale": 3,
+      "deathsFemale": 3,
+      "casesMalePer100k": 3226.2,
+      "casesFemalePer100k": 3106.4,
+      "deathsMalePer100k": 0.1,
+      "deathsFemalePer100k": 0.1
+    },
+    "A15-A34": {
+      "casesMale": 503866,
+      "casesFemale": 499006,
+      "deathsMale": 90,
+      "deathsFemale": 51,
+      "casesMalePer100k": 5078.5,
+      "casesFemalePer100k": 5426.2,
+      "deathsMalePer100k": 0.9,
+      "deathsFemalePer100k": 0.6
+    },
+    "A35-A59": {
+      "casesMale": 635349,
+      "casesFemale": 677106,
+      "deathsMale": 2215,
+      "deathsFemale": 961,
+      "casesMalePer100k": 4364.5,
+      "casesFemalePer100k": 4714.6,
+      "deathsMalePer100k": 15.2,
+      "deathsFemalePer100k": 6.7
+    },
+    "A60-A79": {
+      "casesMale": 254426,
+      "casesFemale": 256076,
+      "deathsMale": 15719,
+      "deathsFemale": 8223,
+      "casesMalePer100k": 2978.1,
+      "casesFemalePer100k": 2691.6,
+      "deathsMalePer100k": 184,
+      "deathsFemalePer100k": 86.4
+    },
+    "A80+": {
+      "casesMale": 94793,
+      "casesFemale": 185428,
+      "deathsMale": 25543,
+      "deathsFemale": 30838,
+      "casesMalePer100k": 4380.7,
+      "casesFemalePer100k": 5271.9,
+      "deathsMalePer100k": 1180.4,
+      "deathsFemalePer100k": 876.8
+    }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-05-04T01:09:15.000Z",
+    "lastCheckedForUpdate": "2021-05-04T20:34:41.427Z"
+  }
+}
+```

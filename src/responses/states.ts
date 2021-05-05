@@ -9,6 +9,8 @@ import {
   getStatesRecoveredData,
   IStateData,
   getNewStateRecovered,
+  getStatesAgeGroups,
+  AgeGroupsData,
 } from "../data-requests/states";
 import {
   AddDaysToDate,
@@ -380,5 +382,22 @@ export async function StatesRecoveredHistoryResponse(
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
+  };
+}
+
+export async function StatesAgeGroupsResponse(
+  abbreviation?: string
+): Promise<{
+  data: AgeGroupsData;
+  meta: ResponseMeta;
+}> {
+  let id = null;
+  if (abbreviation != null) {
+    id = getStateIdByAbbreviation(abbreviation);
+  }
+  const AgeGroupsData = await getStatesAgeGroups(id);
+  return {
+    data: AgeGroupsData.data,
+    meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }
