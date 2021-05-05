@@ -9,6 +9,8 @@ import {
   getRecovered,
   getLastDeathsHistory,
   getLastRecoveredHistory,
+  getGermanyAgeGroups,
+  AgeGroupData,
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
@@ -150,5 +152,16 @@ export async function GermanyRecoveredHistoryResponse(
   return {
     data: history,
     meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+  };
+}
+
+export async function GermanyAgeGroupsResponse(): Promise<{
+  data: AgeGroupData;
+  meta: ResponseMeta;
+}> {
+  const AgeGroupsData = await getGermanyAgeGroups();
+  return {
+    data: AgeGroupsData.data,
+    meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }

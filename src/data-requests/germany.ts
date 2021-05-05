@@ -160,3 +160,50 @@ export async function getNewRecovered(): Promise<ResponseData<number>> {
     lastUpdate: new Date(data.features[0].attributes.date),
   };
 }
+
+export interface AgeGroupData {
+  casesMale: string;
+  casesFemale: string;
+  deathsMale: string;
+  deathsFemale: string;
+  casesMalePer100k: string;
+  casesFemalePer100k: string;
+  deathsMalePer100k: string;
+  deathsFemalePer100k: string;
+}
+
+export async function getGermanyAgeGroups(): Promise<
+  ResponseData<AgeGroupData>
+> {
+  const response = await axios.get(
+    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json"
+  );
+  const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
+  const lastModified = response.headers["last-modified"];
+  const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
+
+  let germany_data: AgeGroupData = null;
+  data.features.forEach((feature) => {
+    // germany has BundeslandId=0
+    // skip everything else
+    if (feature.attributes.BundeslandId != 0) return;
+    germany_data = {
+      casesMale: feature.attributes.AnzFallM,
+      casesFemale: feature.attributes.AnzFallW,
+      deathsMale: feature.attributes.AnzTodesfallM,
+      deathsFemale: feature.attributes.AnzTodesfallW,
+      casesMalePer100k: feature.attributes.AnzFall100kM,
+      casesFemalePer100k: feature.attributes.AnzFall100kW,
+      deathsMalePer100k: feature.attributes.AnzTodesfall100kM,
+      deathsFemalePer100k: feature.attributes.AnzTodesfall100kW,
+    };
+  });
+
+  return {
+    data: germany_data,
+    lastUpdate,
+  };
+}
