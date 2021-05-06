@@ -34,7 +34,9 @@ export async function getFrozenIncidenceHistory(
 
   // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const dateString = sheet["A2"].v.replace("Stand: ", "").replace(date_pattern, "$3-$2-$1");
+  const dateString = sheet["A2"].v
+    .replace("Stand: ", "")
+    .replace(date_pattern, "$3-$2-$1");
   const lastUpdate = new Date(dateString);
 
   let districts = json.map((district) => {
