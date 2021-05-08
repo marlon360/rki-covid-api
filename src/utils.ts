@@ -128,7 +128,7 @@ export function getDayDifference(date1: Date, date2: Date): number {
 }
 
 export function AddDaysToDate(date: Date, days: number): Date {
-  return new Date(date.getTime() + 1000 * 60 * 60 * 24);
+  return new Date(date.getTime() + days * 1000 * 60 * 60 * 24);
 }
 
 export function cleanupString(input: string): string {

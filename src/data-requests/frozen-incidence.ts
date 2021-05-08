@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, RKIError } from "../utils";
+import { RKIError, AddDaysToDate } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface FrozenIncidenceData {
@@ -31,9 +31,11 @@ export async function getFrozenIncidenceHistory(
   const sheet = workbook.Sheets["LK_7-Tage-Inzidenz"];
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
-
+  const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   // date is in cell A2
-  const dateString = sheet["A2"].v.replace("Stand: ", "");
+  const dateString = sheet["A2"].v
+    .replace("Stand: ", "")
+    .replace(date_pattern, "$3-$2-$1");
   const lastUpdate = new Date(dateString);
 
   let districts = json.map((district) => {
@@ -45,19 +47,13 @@ export async function getFrozenIncidenceHistory(
     // get all date keys
     const dateKeys = Object.keys(district);
     // ignore the first three elements (rowNumber, LK, LKNR)
-    dateKeys.splice(0, 3);
+    // and read only required dates if days: != null
+    dateKeys.splice(0, days != null ? dateKeys.length - days : 3);
     dateKeys.forEach((dateKey) => {
-      const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-      const date = new Date(
-        dateKey.toString().replace(date_pattern, "$3-$2-$1")
-      );
+      const dateString = dateKey.toString().replace(date_pattern, "$3-$2-$1");
+      const date = AddDaysToDate(new Date(dateString), -1);
       history.push({ weekIncidence: district[dateKey], date });
     });
-
-    if (days != null) {
-      const reference_date = new Date(getDateBefore(days));
-      history = history.filter((element) => element.date > reference_date);
-    }
 
     return { ags, name, history };
   });
