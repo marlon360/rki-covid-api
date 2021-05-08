@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, RKIError, AddDaysToDate } from "../utils";
+import { RKIError, AddDaysToDate } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface FrozenIncidenceData {
