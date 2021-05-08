@@ -51,9 +51,7 @@ export async function getFrozenIncidenceHistory(
     dateKeys.splice(0, days != null ? dateKeys.length - days : 3);
     dateKeys.forEach((dateKey) => {
       const dateString = dateKey.toString().replace(date_pattern, "$3-$2-$1");
-      const date = AddDaysToDate(
-        new Date(dateString), -1
-      );
+      const date = AddDaysToDate(new Date(dateString), -1);
       history.push({ weekIncidence: district[dateKey], date });
     });
 
