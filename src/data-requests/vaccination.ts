@@ -286,9 +286,8 @@ export async function getVaccinationCoverage(): Promise<
         },
       };
     } else {
-      const cleanedStateName = entry.state.includes("Bund")
-        ? entry.state
-        : cleanupString(entry.state);
+      const cleanedStateName =  cleanupString(entry.state);
+      // cleanedStateName should always be cleaned
       const abbreviation = entry.state.includes("Bund")
         ? "Bund"
         : getStateAbbreviationByName(cleanedStateName);
