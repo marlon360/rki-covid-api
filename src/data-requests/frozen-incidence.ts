@@ -33,7 +33,10 @@ export async function getFrozenIncidenceHistory(
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
 
   // date is in cell A2
-  const dateString = sheet["A2"].v.replace("Stand: ", "");
+  const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+  const dateString = sheet["A2"].v
+    .replace("Stand: ", "")
+    .replace(date_pattern, "$3-$2-$1");
   const lastUpdate = new Date(dateString);
 
   let districts = json.map((district) => {
@@ -47,7 +50,6 @@ export async function getFrozenIncidenceHistory(
     // ignore the first three elements (rowNumber, LK, LKNR)
     dateKeys.splice(0, 3);
     dateKeys.forEach((dateKey) => {
-      const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
       const date = new Date(
         dateKey.toString().replace(date_pattern, "$3-$2-$1")
       );
