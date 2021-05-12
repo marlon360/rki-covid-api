@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, RKIError } from "../utils";
+import { AddDaysToDate, getDateBefore, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface FrozenIncidenceData {
@@ -50,9 +50,11 @@ export async function getFrozenIncidenceHistory(
     // ignore the first three elements (rowNumber, LK, LKNR)
     dateKeys.splice(0, 3);
     dateKeys.forEach((dateKey) => {
-      const date = new Date(
-        dateKey.toString().replace(date_pattern, "$3-$2-$1")
+      const date = AddDaysToDate(
+        new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1")),
+        -1
       );
+
       history.push({ weekIncidence: district[dateKey], date });
     });
 
