@@ -11,8 +11,10 @@ import {
   StatesRecoveredHistoryResponse,
   StatesResponse,
   StatesWeekIncidenceHistoryResponse,
+  StatesAgeGroupsResponse,
 } from "./responses/states";
 import {
+  GermanyAgeGroupsResponse,
   GermanyCasesHistoryResponse,
   GermanyDeathsHistoryResponse,
   GermanyRecoveredHistoryResponse,
@@ -26,6 +28,7 @@ import {
   DistrictsRecoveredHistoryResponse,
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
+  FrozenIncidenceHistoryResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -195,6 +198,16 @@ app.get(
   }
 );
 
+app.get(
+  "/germany/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await GermanyAgeGroupsResponse();
+    res.json(response);
+  }
+);
+
 app.get("/states", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse();
   res.json(response);
@@ -288,6 +301,16 @@ app.get(
     const response = await StatesWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await StatesAgeGroupsResponse();
     res.json(response);
   }
 );
@@ -399,6 +422,16 @@ app.get(
   }
 );
 
+app.get(
+  "/states/:state/age-groups",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await StatesAgeGroupsResponse(req.params.state);
+    res.json(response);
+  }
+);
+
 app.get("/districts", queuedCache(), cache.route(), async (req, res) => {
   const response = await DistrictsResponse();
   res.json(response);
@@ -436,6 +469,28 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsWeekIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
     res.json(response);
   }
 );
@@ -563,6 +618,32 @@ app.get(
 );
 
 app.get(
+  "/districts/:district/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      null,
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:district/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await FrozenIncidenceHistoryResponse(
+      parseInt(req.params.days),
+      req.params.district
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/:district/history/deaths",
   queuedCache(),
   cache.route(),
@@ -629,6 +710,18 @@ app.get(
   }
 );
 
+app.get(
+  "/vaccinations/history/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await VaccinationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
 app.get("/map", async (req, res) => {
   res.redirect("/map/districts");
 });
@@ -667,6 +760,16 @@ app.get("/testing/history", queuedCache(), cache.route(), async (req, res) => {
   const response = await TestingHistoryResponse();
   res.json(response);
 });
+
+app.get(
+  "/testing/history/:weeks",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await TestingHistoryResponse(parseInt(req.params.weeks));
+    res.json(response);
+  }
+);
 
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {

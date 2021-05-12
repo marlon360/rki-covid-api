@@ -133,6 +133,21 @@ Redirects to `/districts/history/cases`
 
 ## `/districts/history/cases/:days`
 
+## `/districts/history/frozen-incidence`
+
+## `/districts/history/frozen-incidence/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/districts/history/frozen-incidence/7`
+[Open](/districts/history/frozen-incidence/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
+
 ## `/districts/history/incidence`
 
 ## `/districts/history/incidence/:days`
@@ -152,6 +167,10 @@ Redirects to `/districts/history/cases`
 ## `/districts/:ags/history/incidence`
 
 ## `/districts/:ags/history/incidence/:days`
+
+## `/districts/:ags/history/frozen-incidence`
+
+## `/districts/:ags/history/frozen-incidence/:days`
 
 ## `/districts/:ags/history/deaths`
 
