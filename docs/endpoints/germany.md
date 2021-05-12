@@ -444,7 +444,6 @@ Note: The data is always 4 days behind.
 | --------- | ------------------------------------- |
 | :days     | Number of days in the past from today |
 
-
 ## `/germany/age-groups`
 
 ### Request
