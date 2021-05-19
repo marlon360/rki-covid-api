@@ -29,6 +29,8 @@ const webhookMiddleware = (data: IResponseMeta, req: Request) => {
     setImmediate(async () => {
         try {
             const res = await setAsync ("webhook:" + route_name, last_update, "GET");
+            // Expire the last update in 2 days. Since in 2 days there is new data available for sure
+            client.expire("webhook:" + route_name, 60*60*24*2);
             // res now contains the last update which was processed by the hook
             if (res < last_update) {
                 // file got updated, let's call all the hooks
