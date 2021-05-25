@@ -7,8 +7,8 @@ export interface FrozenIncidenceData {
   ags: string;
   name: string;
   history: {
-    date: string;
-    value: number;
+    date: Date;
+    weekIncidence: number;
   }[];
 }
 
