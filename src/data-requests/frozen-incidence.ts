@@ -7,8 +7,8 @@ export interface FrozenIncidenceData {
   ags: string;
   name: string;
   history: {
-    date: string;
-    value: number;
+    date: Date;
+    weekIncidence: number;
   }[];
 }
 
@@ -28,7 +28,7 @@ export async function getFrozenIncidenceHistory(
   }
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
-  const sheet = workbook.Sheets["LK_7-Tage-Inzidenz"];
+  const sheet = workbook.Sheets["LK_7-Tage-Inzidenz (fixiert)"];
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
 
