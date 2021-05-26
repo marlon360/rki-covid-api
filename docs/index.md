@@ -17,7 +17,7 @@ If you use this API, please consider supporting me:
 - Anzahl der Infektionen, Todesfälle, Genesenen
 - 7-Tage-Inzidenz Wert
 - Neuinfektionen, neue Todesfälle, neue Genesene (Differenz zum Vortag)
-- R-Wert (Reproduktion)
+- R-Wert (Reproduktion, 4-Tage-R-Wert und 7-Tage-R-Wert)
 - Impfquote
 - Werte für jedes Bundesland und jeden Landkreis
 - historische Daten für Deutschland, jedes Bundesland and jeden Landkreis
@@ -30,7 +30,7 @@ If you use this API, please consider supporting me:
 - cases, deaths, recovered
 - week incidence
 - new cases, deaths, recovered (difference to yesterday)
-- R value (reproduction)
+- R value (reproduction, 4-day-R-value and 7-day-R-value)
 - vaccinations
 - data per state and district
 - time series for every state and district
