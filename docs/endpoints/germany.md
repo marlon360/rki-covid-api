@@ -11,30 +11,38 @@
 
 ```json
 {
-  "cases": 1765666,
-  "deaths": 34272,
-  "recovered": 1381937,
-  "weekIncidence": 139.59190955621654,
-  "casesPer100k": 2123.044158858224,
-  "casesPerWeek": 116094,
+  "cases": 3656177,
+  "deaths": 87726,
+  "recovered": 3438759,
+  "weekIncidence": 46.79997505251831,
+  "casesPer100k": 4396.202466152593,
+  "casesPerWeek": 38922,
   "delta": {
-    "cases": 10315,
-    "deaths": 312,
-    "recovered": 13802
+    "cases": 2626,
+    "deaths": 270,
+    "recovered": 15042
   },
   "r": {
-    "value": 0.91,
-    "date": "2020-12-29T00:00:00.000Z"
+    "value": 0.72,
+    "date": "2021-05-21T00:00:00.000Z"
+  },
+  "r7": {
+    "value": 0.78,
+    "date": "2021-05-20T00:00:00.000Z"
   },
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-03T00:00:00.000Z",
-    "lastCheckedForUpdate": "2021-01-03T22:55:41.850Z"
+    "lastUpdate": "2021-05-26T00:00:00.000Z",
+    "lastCheckedForUpdate": "2021-05-26T05:24:16.850Z"
   }
 }
 ```
+
+-Attention-
+The 4-day-r-value is published as "r" (as bevor!)
+the 7-day-r-value is published as "r7"
 
 ## `/germany/history`
 
