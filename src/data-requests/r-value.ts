@@ -12,7 +12,7 @@ function parseRValue(
   const latestEntryr4 = json[json.length - 1];
   const latestEntryr7 = json[json.length - 2];
   // The RKI is very creative in naming the columns!
-    const dateString_r4 =
+  const dateString_r4 =
     latestEntryr4["Datum des Erkrankungsbeginns"] ||
     latestEntryr4["Datum des Erkrankungs-beginns"];
   let r4Value =
