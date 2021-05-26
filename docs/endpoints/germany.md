@@ -41,7 +41,7 @@
 ```
 
 -Attention-
-The 4-day-r-value is published as "r" (as bevor!)
+The 4-day-r-value is published as "r" (as bevor!),
 the 7-day-r-value is published as "r7"
 
 ## `/germany/history`
