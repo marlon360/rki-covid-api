@@ -148,6 +148,7 @@ Now you can access the server at `http://localhost:8080`.
 - Wordpress Widget zur Anzeige der letzen 3 Inzidenzen für einen Landkreis [https://github.com/p-tenz/widget-7d-incidence](https://github.com/p-tenz/widget-7d-incidence)
 - Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland [https://www.impfung.io/](https://www.impfung.io/)
 - Discordbot at [https://germanycovid.de/discord](https://germanycovid.de/discord)
+- Web App for vaccination numbers which issues a Push Notification whenever the new vaccination numbers are available (https://vacstats.laurenzfg.com)
 
 ## License
 
