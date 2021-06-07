@@ -2,10 +2,7 @@ name: Deploy
 on:
   push:
     branches:
-      - "master"
-      - "develop"
-      - "v2"
-      - "v2-proxy"
+      - "mein-v2"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -31,42 +28,3 @@ jobs:
         env:
           VAR1: ${{ steps.docker.outputs.IMAGE_SHA_NAME }}
           VAR2: ${{ steps.docker.outputs.IMAGE_URL }}
-  deploy_dev:
-    needs: build
-    if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on dev server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d -V
-  deploy_prod:
-    needs: build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on production server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki && docker-compose pull && docker-compose up -d -V
-  deploy_v2-proxy:
-    needs: build
-    if: github.ref == 'refs/heads/v2-proxy'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on v2 proxy server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d -V
