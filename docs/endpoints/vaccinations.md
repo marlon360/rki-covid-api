@@ -19,8 +19,6 @@
 
 `vaccination.astraZeneca` Number of people who were vaccinated with AstraZeneca
 
-`vaccination.janssen` Number of people who were vaccinated with Janssen (only one dose of Janssen is needed for full protection! see remark!)
-
 `delta` New first vaccination compared to yesterday
 
 `secondVaccination.vaccinated` Number of people who got the second vaccination
@@ -33,11 +31,9 @@
 
 `secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
 
-`secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection! see remark!)
+`secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection!)
 
 -ATTENTION- since 2021-04-08 the RKI droped the indication information!
-
--ATTENTION- vaccinations with Janssen are counted both first and second vaccionation but are only counted once in administeredVaccinations!
 
 ```json
 {
@@ -48,7 +44,6 @@
       "biontech": 2160072,
       "moderna": 52779,
       "astraZeneca": 15
-      "janssen": XXXX
     },
     "delta": 49890,
     "quote": 0.026607412670196853,
@@ -84,7 +79,6 @@
           "biontech": 262064,
           "moderna": 7664,
           "astraZeneca": 15
-          "janssen": XXX
         },
         "delta": 9495,
         "quote": 0.024298957316289855,
@@ -121,7 +115,6 @@
           "biontech": 63489,
           "moderna": 1852,
           "astraZeneca": 15
-          "janssen": XXX
         },
         "delta": 2798,
         "quote": 0.030627952477245007,

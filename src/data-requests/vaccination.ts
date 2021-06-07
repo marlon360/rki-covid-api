@@ -25,7 +25,6 @@ export interface VaccinationCoverage {
     biontech: number;
     moderna: number;
     astraZeneca: number;
-    janssen: number;
   };
   delta: number;
   quote: number;
@@ -61,7 +60,6 @@ export interface VaccinationCoverage {
         biontech: number;
         moderna: number;
         astraZeneca: number;
-        janssen: number;
       };
       delta: number;
       quote: number;
@@ -108,39 +106,60 @@ export async function getVaccinationCoverage(): Promise<
   var workbook = XLSX.read(data, { type: "buffer" });
 
   const sheet = workbook.Sheets[workbook.SheetNames[2]];
+  // VC... = Vaccination Center, GP...= general practitioner (niedergelassene Aerzte)
   const json = XLSX.utils.sheet_to_json<{
     ags: number;
     state: string;
-    firstVaccination: number;
-    firstBiontech: number;
-    firstModerna: number;
-    firstAstraZeneca: number;
-    firstJanssen: number;
-    firstDifference: number;
-    fullVaccinated: number;
-    fullBiontech: number;
-    fullModerna: number;
-    fullAstraZeneca: number;
-    fullJanssen: number;
-    fullDifference: number;
+    VC1vaccination: number;
+    VC1biontech: number;
+    VC1moderna: number;
+    VC1AstraZeneca: number;
+    VC1Difference: number;
+    VCfullVaccinated: number;
+    VCfullbiontech: number;
+    VCfullmoderna: number;
+    VCfullAstraZeneca: number;
+    VCfullJanssen: number;
+    VCfullDifference: number;
+    GP1vaccination: number;
+    GP1biontech: number;
+    GP1moderna: number;
+    GP1AstraZeneca: number;
+    GP1Difference: number;
+    GPfullVaccinated: number;
+    GPfullbiontech: number;
+    GPfullmoderna: number;
+    GPfullAstraZeneca: number;
+    GPfullJanssen: number;
+    GPfullDifference: number;
   }>(sheet, {
     header: [
       "ags",
       "state",
-      "firstVaccination",
-      "firstBiontech",
-      "firstModerna",
-      "firstAstraZeneca",
-      "firstJanssen",
-      "firstDifference",
-      "fullVaccinated",
-      "fullBiontech",
-      "fullModerna",
-      "fullAstraZeneca",
-      "fullJanssen",
-      "fullDifference",
+      "VC1vaccination",
+      "VC1biontech",
+      "VC1moderna",
+      "VC1AstraZeneca",
+      "VC1Difference",
+      "VCfullVaccinated",
+      "VCfullbiontech",
+      "VCfullmoderna",
+      "VCfullAstraZeneca",
+      "VCfullJanssen",
+      "VCfullDifference",
+      "GP1vaccination",
+      "GP1biontech",
+      "GP1moderna",
+      "GP1AstraZeneca",
+      "GP1Difference",
+      "GPfullVaccinated",
+      "GPfullbiontech",
+      "GPfullmoderna",
+      "GPfullAstraZeneca",
+      "GPfullJanssen",
+      "GPfullDifference",
     ],
-    range: "A4:N21",
+    range: "A5:X22",
   });
 
   const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
@@ -151,13 +170,19 @@ export async function getVaccinationCoverage(): Promise<
     total1: number;
     totalfull: number;
     quote1: number;
-    quote1_ls18: number;
-    quote1_18to59: number;
-    quote1_gr60: number;
+    quote1ls60: number;
+    quote1gq60: number;
     quotefull: number;
-    quotefull_ls18: number;
-    quotefull_18to59: number;
-    quotefull_gr60: number;
+    quotefullls60: number;
+    quotefullgq60: number;
+    VC1ls60: number;
+    VC1gq60: number;
+    VCfullls60: number;
+    VCfullgq60: number;
+    GP1ls60: number;
+    GP1gq60: number;
+    GPfullls60: number;
+    GPfullgq60: number;
   }>(quoteSheet, {
     header: [
       "ags",
@@ -166,15 +191,21 @@ export async function getVaccinationCoverage(): Promise<
       "total1",
       "totalfull",
       "quote1",
-      "quote1_ls18",
-      "quote1_18to59",
-      "quote1_gr60",
+      "quote1ls60",
+      "quote1gq60",
       "quotefull",
-      "quotefull_ls18",
-      "quotefull_18to59",
-      "quotefull_gr60",
+      "quotefullls60",
+      "quotefullgq60",
+      "VC1ls60",
+      "VC1gq60",
+      "VCfullls60",
+      "VCfullgq60",
+      "GP1ls60",
+      "GP1gq60",
+      "GPfullls60",
+      "GPfullgq60",
     ],
-    range: "A4:M21",
+    range: "A5:S22",
   });
 
   const coverage: VaccinationCoverage = {
@@ -184,7 +215,6 @@ export async function getVaccinationCoverage(): Promise<
       biontech: 0,
       moderna: 0,
       astraZeneca: 0,
-      janssen: 0,
     },
     delta: 0,
     quote: 0,
@@ -224,23 +254,22 @@ export async function getVaccinationCoverage(): Promise<
       coverage.administeredVaccinations = quoteEntry.totalvaccination;
       coverage.vaccinated = quoteEntry.total1;
       coverage.vaccination = {
-        biontech: entry.firstBiontech,
-        moderna: entry.firstModerna,
-        astraZeneca: entry.firstAstraZeneca,
-        janssen: entry.firstJanssen,
+        biontech: entry.VC1biontech + entry.GP1biontech,
+        moderna: entry.VC1moderna + entry.GP1moderna,
+        astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca,
       };
-      coverage.delta = entry.firstDifference;
+      coverage.delta = entry.VC1Difference + entry.GP1Difference;
       coverage.quote =
         quoteEntry.quote1 === null ? null : quoteEntry.quote1 / 100.0;
       coverage.secondVaccination = {
         vaccinated: quoteEntry.totalfull,
         vaccination: {
-          biontech: entry.fullBiontech,
-          moderna: entry.fullModerna,
-          astraZeneca: entry.fullAstraZeneca,
-          janssen: entry.fullJanssen,
+          biontech: entry.VCfullbiontech + entry.GPfullbiontech,
+          moderna: entry.VCfullmoderna + entry.GPfullmoderna,
+          astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
+          janssen: entry.VCfullJanssen + entry.GPfullJanssen,
         },
-        delta: entry.fullDifference,
+        delta: entry.VCfullDifference + entry.GPfullDifference,
         quote:
           quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
       };
@@ -267,22 +296,21 @@ export async function getVaccinationCoverage(): Promise<
         administeredVaccinations: quoteEntry.totalvaccination,
         vaccinated: quoteEntry.total1,
         vaccination: {
-          biontech: entry.firstBiontech,
-          moderna: entry.firstModerna,
-          astraZeneca: entry.firstAstraZeneca,
-          janssen: entry.firstJanssen,
+          biontech: entry.VC1biontech + entry.GP1biontech,
+          moderna: entry.VC1moderna + entry.GP1moderna,
+          astraZeneca: entry.VC1AstraZeneca + entry.GP1AstraZeneca,
         },
-        delta: entry.firstDifference,
+        delta: entry.VC1Difference + entry.GP1Difference,
         quote: quoteEntry.quote1 === null ? null : quoteEntry.quote1 / 100.0,
         secondVaccination: {
           vaccinated: quoteEntry.totalfull,
           vaccination: {
-            biontech: entry.fullBiontech,
-            moderna: entry.fullModerna,
-            astraZeneca: entry.fullAstraZeneca,
-            janssen: entry.fullJanssen,
+            biontech: entry.VCfullbiontech + entry.GPfullbiontech,
+            moderna: entry.VCfullmoderna + entry.GPfullmoderna,
+            astraZeneca: entry.VCfullAstraZeneca + entry.GPfullAstraZeneca,
+            janssen: entry.VCfullJanssen + entry.GPfullJanssen,
           },
-          delta: entry.fullDifference,
+          delta: entry.VCfullDifference + entry.GPfullDifference,
           quote:
             quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
         },
@@ -339,14 +367,14 @@ export async function getVaccinationHistory(
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
-  // in the following "secondVaccination: entry["vollständig geimpt"] ?? 0," "geimpt" is NOT a ERROR today! maybe RKI will correct this tomorrow, than this will not work!
+
   for (const entry of json) {
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["mindestens einmal geimpft"] ?? 0,
-        firstVaccination: entry["mindestens einmal geimpft"] ?? 0,
-        secondVaccination: entry["vollständig geimpt"] ?? 0,
+        vaccinated: entry["Begonnene Impfserie"] ?? 0,
+        firstVaccination: entry["Begonnene Impfserie"] ?? 0,
+        secondVaccination: entry["Vollständig geimpft"] ?? 0,
       });
     }
   }
