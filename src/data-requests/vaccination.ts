@@ -334,8 +334,6 @@ export async function getVaccinationHistory(
 
   const json = XLSX.utils.sheet_to_json<{
     Datum: Date;
-    "Einmal geimpft": number;
-    "Vollständig geimpft": number;
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
@@ -352,7 +350,7 @@ export async function getVaccinationHistory(
   }
 
   if (days != null) {
-    const reference_date = new Date(getDateBefore(days));
+    const reference_date = new Date(getDateBefore(days + 1)); // We want to see the last x days, so add 1 to days
     vaccinationHistory = vaccinationHistory.filter(
       (element) => element.date > reference_date
     );
