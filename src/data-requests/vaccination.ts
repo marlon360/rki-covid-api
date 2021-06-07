@@ -342,7 +342,7 @@ export async function getVaccinationHistory(
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["mindestens einmal geimpft"] ?? 0,
+        vaccinated: entry["Gesamtzahl verabreichter Impfstoffdosen"] ?? 0, //because J&J is added to first AND second this is now the real vaccination doses!
         firstVaccination: entry["mindestens einmal geimpft"] ?? 0,
         secondVaccination: entry["vollständig geimpt"] ?? 0,
       });
