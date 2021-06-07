@@ -61,7 +61,7 @@ export interface VaccinationCoverage {
         biontech: number;
         moderna: number;
         astraZeneca: number;
-        jannsen: number;
+        janssen: number;
       };
       delta: number;
       quote: number;
@@ -131,6 +131,7 @@ export async function getVaccinationCoverage(): Promise<
       "firstBiontech",
       "firstModerna",
       "firstAstraZeneca",
+      "firstJanssen",
       "firstDifference",
       "fullVaccinated",
       "fullBiontech",
@@ -152,7 +153,7 @@ export async function getVaccinationCoverage(): Promise<
     quote1: number;
     quote1_ls18: number;
     quote1_18to59: number;
-    quote1_gr60:number;
+    quote1_gr60: number;
     quotefull: number;
     quotefull_ls18: number;
     quotefull_18to59: number;
@@ -339,7 +340,7 @@ export async function getVaccinationHistory(
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
-// in the following "secondVaccination: entry["vollständig geimpt"] ?? 0," "geimpt" is NOT a ERROR today! maybe RKI will correct this tomorrow, than this will not work!
+  // in the following "secondVaccination: entry["vollständig geimpt"] ?? 0," "geimpt" is NOT a ERROR today! maybe RKI will correct this tomorrow, than this will not work!
   for (const entry of json) {
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
