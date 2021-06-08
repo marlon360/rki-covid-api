@@ -35,9 +35,9 @@
 
 `secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection! see remark!)
 
-*ATTENTION* since 2021-04-08 the RKI dropped the indication information!
+_ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 
-*ATTENTION* vaccinations with Janssen are counted as both `firstVaccination` and `secondVaccination` but are only counted once in `administeredVaccinations`!
+_ATTENTION_ vaccinations with Janssen are counted as both `firstVaccination` and `secondVaccination` but are only counted once in `administeredVaccinations`!
 
 ```json
 {
