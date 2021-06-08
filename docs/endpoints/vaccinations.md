@@ -19,6 +19,8 @@
 
 `vaccination.astraZeneca` Number of people who were vaccinated with AstraZeneca
 
+`vaccination.janssen` Number of people who were vaccinated with Janssen (only one dose of Janssen is needed for full protection! see remark!)
+
 `delta` New first vaccination compared to yesterday
 
 `secondVaccination.vaccinated` Number of people who got the second vaccination
@@ -31,9 +33,11 @@
 
 `secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
 
-`secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection!)
+`secondVaccination.vacciantion.janssen` Number of people who received one dose of Janssen (only one dose of Janssen is needed for full protection! see remark!)
 
--ATTENTION- since 2021-04-08 the RKI droped the indication information!
+_ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
+
+_ATTENTION_ vaccinations with Janssen are counted as both `firstVaccination` and `secondVaccination` but are only counted once in `administeredVaccinations`!
 
 ```json
 {
@@ -43,7 +47,8 @@
     "vaccination": {
       "biontech": 2160072,
       "moderna": 52779,
-      "astraZeneca": 15
+      "astraZeneca": 15,
+      "janssen": 885722
     },
     "delta": 49890,
     "quote": 0.026607412670196853,
@@ -52,7 +57,7 @@
       "vaccination": {
         "biontech": 903263,
         "moderna": 8,
-        "astraZeneca": 0
+        "astraZeneca": 0,
         "janssen": 63
       },
       "delta": 61132,
@@ -78,7 +83,8 @@
         "vaccination": {
           "biontech": 262064,
           "moderna": 7664,
-          "astraZeneca": 15
+          "astraZeneca": 15,
+          "janssen": 6000
         },
         "delta": 9495,
         "quote": 0.024298957316289855,
@@ -114,7 +120,8 @@
         "vaccination": {
           "biontech": 63489,
           "moderna": 1852,
-          "astraZeneca": 15
+          "astraZeneca": 15,
+          "janssen": 2000
         },
         "delta": 2798,
         "quote": 0.030627952477245007,
