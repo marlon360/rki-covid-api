@@ -337,14 +337,13 @@ export async function getVaccinationHistory(
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
-  // in the following "secondVaccination: entry["vollständig geimpt"] ?? 0," "geimpt" is NOT a ERROR today! maybe RKI will correct this tomorrow, than this will not work!
   for (const entry of json) {
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["mindestens einmal geimpft"] ?? 0,
-        firstVaccination: entry["mindestens einmal geimpft"] ?? 0,
-        secondVaccination: entry["vollständig geimpt"] ?? 0,
+        vaccinated: entry["Erstimpfungen"] ?? 0, // legacy attribute
+        firstVaccination: entry["Erstimpfungen"] ?? 0,
+        secondVaccination: entry["Zweitimpfungen"] ?? 0,
       });
     }
   }
