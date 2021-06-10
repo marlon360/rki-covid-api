@@ -337,6 +337,7 @@ export async function getVaccinationHistory(
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
+  const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   for (const entry of json) {
     const firstVac =
       entry["Erstimpfung"] ||
