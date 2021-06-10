@@ -341,9 +341,9 @@ export async function getVaccinationHistory(
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["Erstimpfungen"] ?? 0, // legacy attribute
-        firstVaccination: entry["Erstimpfungen"] ?? 0,
-        secondVaccination: entry["Zweitimpfungen"] ?? 0,
+        vaccinated: entry["Erstimpfung"] ?? 0, // legacy attribute
+        firstVaccination: entry["Erstimpfung"] ?? 0,
+        secondVaccination: entry["Zweitimpfung"] ?? 0,
       });
     }
   }
