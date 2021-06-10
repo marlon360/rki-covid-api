@@ -344,15 +344,15 @@ export async function getVaccinationHistory(
     if ((entry.Datum as any) instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["mindestens einmal geimpft"] ?? 0,
-        firstVaccination: entry["mindestens einmal geimpft"] ?? 0,
-        secondVaccination: entry["vollständig geimpt"] ?? 0,
+        vaccinated: entry["Erstimpfung"] ?? 0, // legacy attribute
+        firstVaccination: entry["Erstimpfung"] ?? 0,
+        secondVaccination: entry["Zweitimpfung"] ?? 0,
       });
     }
   }
 
   if (days != null) {
-    const reference_date = new Date(getDateBefore(days));
+    const reference_date = new Date(getDateBefore(days + 1));
     vaccinationHistory = vaccinationHistory.filter(
       (element) => element.date > reference_date
     );
