@@ -347,7 +347,7 @@ export async function getVaccinationHistory(
       entry["Zweitimpfungen"] ||
       entry["vollständig geimpt"] ||
       entry["vollständig geimpft"];
-    if (typeof(entry.Datum) == "string") {
+    if (typeof entry.Datum == "string") {
       const dateString: string = entry.Datum;
       const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
       vaccinationHistory.push({
@@ -356,8 +356,7 @@ export async function getVaccinationHistory(
         firstVaccination: firstVac ?? 0,
         secondVaccination: secVac ?? 0,
       });
-    }
-    else if ((entry.Datum) instanceof Date) {
+    } else if (entry.Datum instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
         vaccinated: firstVac ?? 0, // legacy attribute
