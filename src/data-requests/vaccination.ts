@@ -327,6 +327,7 @@ export async function getVaccinationHistory(
   const data = response.data;
   const lastModified = response.headers["last-modified"];
   const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
+  const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
 
@@ -338,12 +339,23 @@ export async function getVaccinationHistory(
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
   for (const entry of json) {
-    if ((entry.Datum as any) instanceof Date) {
+    const firstVac = entry["Erstimpfung"] || entry["Erstimpfungen"];
+    const secVac = entry["Zweitimpfung"] || entry["Zweitimpfungen"];
+    if (typeof entry.Datum == "string") {
+      const dateString: string = entry.Datum;
+      const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
+      vaccinationHistory.push({
+        date: DateNew,
+        vaccinated: firstVac ?? 0, // legacy attribute
+        firstVaccination: firstVac ?? 0,
+        secondVaccination: secVac ?? 0,
+      });
+    } else if (entry.Datum instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["Erstimpfungen"] ?? 0, // legacy attribute
-        firstVaccination: entry["Erstimpfungen"] ?? 0,
-        secondVaccination: entry["Zweitimpfungen"] ?? 0,
+        vaccinated: firstVac ?? 0, // legacy attribute
+        firstVaccination: firstVac ?? 0,
+        secondVaccination: secVac ?? 0,
       });
     }
   }
