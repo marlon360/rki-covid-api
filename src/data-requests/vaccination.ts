@@ -372,7 +372,7 @@ export async function getVaccinationHistory(
   } //to filter out undefined dates
   const reference_date = new Date(getDateBefore(days + 1));
   vaccinationHistory = vaccinationHistory.filter(
-      (element) => element.date > reference_date
+    (element) => element.date > reference_date
   );
 
   return {
