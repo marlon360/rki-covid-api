@@ -337,23 +337,41 @@ export async function getVaccinationHistory(
   }>(sheet);
 
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
+  const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   for (const entry of json) {
-    if ((entry.Datum as any) instanceof Date) {
+    const firstVac =
+      entry["Erstimpfung"] ||
+      entry["Erstimpfungen"] ||
+      entry["mindestens einmal geimpft"];
+    const secVac =
+      entry["Zweitimpfung"] ||
+      entry["Zweitimpfungen"] ||
+      entry["vollständig geimpt"] ||
+      entry["vollständig geimpft"];
+    if (typeof entry.Datum == "string") {
+      const dateString: string = entry.Datum;
+      const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
+      vaccinationHistory.push({
+        date: DateNew,
+        vaccinated: firstVac ?? 0, // legacy attribute
+        firstVaccination: firstVac ?? 0,
+        secondVaccination: secVac ?? 0,
+      });
+    } else if (entry.Datum instanceof Date) {
       vaccinationHistory.push({
         date: entry.Datum,
-        vaccinated: entry["Erstimpfung"] ?? 0, // legacy attribute
-        firstVaccination: entry["Erstimpfung"] ?? 0,
-        secondVaccination: entry["Zweitimpfung"] ?? 0,
+        vaccinated: firstVac ?? 0, // legacy attribute
+        firstVaccination: firstVac ?? 0,
+        secondVaccination: secVac ?? 0,
       });
     }
   }
 
-  if (days != null) {
-    const reference_date = new Date(getDateBefore(days + 1)); // We want to see the last x days, so add 1 to days
-    vaccinationHistory = vaccinationHistory.filter(
-      (element) => element.date > reference_date
-    );
-  }
+  if (days == null) {
+    days = json.length;
+  } //to filter out undefined dates
+  const reference_date = new Date(getDateBefore(days + 1));
+  vaccinationHistory = vaccinationHistory.filter((element) => element.date > reference_date);
 
   return {
     data: vaccinationHistory,
