@@ -367,12 +367,13 @@ export async function getVaccinationHistory(
     }
   }
 
-  if (days != null) {
-    const reference_date = new Date(getDateBefore(days + 1));
-    vaccinationHistory = vaccinationHistory.filter(
+  if (days == null) {
+    days = json.length;
+  } //to filter out undefined dates
+  const reference_date = new Date(getDateBefore(days + 1));
+  vaccinationHistory = vaccinationHistory.filter(
       (element) => element.date > reference_date
-    );
-  }
+  );
 
   return {
     data: vaccinationHistory,
