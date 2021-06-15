@@ -311,7 +311,8 @@ export async function getVaccinationCoverage(): Promise<
 
   const historySheet = workbook.Sheets[workbook.SheetNames[3]];
   const vaccinationHistory = extractVaccinationHistory(historySheet);
-  coverage.latestDailyVaccinations = vaccinationHistory[vaccinationHistory.length-1];
+  coverage.latestDailyVaccinations =
+    vaccinationHistory[vaccinationHistory.length - 1];
 
   return {
     data: coverage,
@@ -326,8 +327,10 @@ export interface VaccinationHistoryEntry {
   secondVaccination: number;
 }
 
-function extractVaccinationHistory(sheet: any, days?: number): VaccinationHistoryEntry[] {
-  
+function extractVaccinationHistory(
+  sheet: any,
+  days?: number
+): VaccinationHistoryEntry[] {
   const json = XLSX.utils.sheet_to_json<{
     Datum: Date;
   }>(sheet);
@@ -367,7 +370,9 @@ function extractVaccinationHistory(sheet: any, days?: number): VaccinationHistor
     days = json.length;
   } //to filter out undefined dates
   const reference_date = new Date(getDateBefore(days + 1));
-  vaccinationHistory = vaccinationHistory.filter((element) => element.date > reference_date);
+  vaccinationHistory = vaccinationHistory.filter(
+    (element) => element.date > reference_date
+  );
 
   return vaccinationHistory;
 }
@@ -388,7 +393,7 @@ export async function getVaccinationHistory(
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
 
   const sheet = workbook.Sheets[workbook.SheetNames[3]];
-  const vaccinationHistory =  extractVaccinationHistory(sheet, days);
+  const vaccinationHistory = extractVaccinationHistory(sheet, days);
 
   return {
     data: vaccinationHistory,
