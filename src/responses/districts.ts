@@ -124,7 +124,8 @@ export async function DistrictsCasesHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  if ( days != null ) { //to prevent invalid date
+  if (days != null) {
+    //to prevent invalid date
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
   }
   const data: DistrictsCasesHistory = {};
@@ -223,7 +224,8 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   }
 
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  if ( days != null ) { //to prevent invalid date
+  if (days != null) {
+    //to prevent invalid date
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
   }
   const data: DistrictsCasesHistory = {};
@@ -330,7 +332,8 @@ export async function DistrictsDeathsHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  if ( days != null ) { //to prevent invalid date
+  if (days != null) {
+    //to prevent invalid date
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
   }
   const data: DistrictsDeathsHistory = {};
@@ -411,7 +414,8 @@ export async function DistrictsRecoveredHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  if ( days != null ) { //to prevent invalid date
+  if (days != null) {
+    //to prevent invalid date
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
   }
   const data: DistrictsRecoveredHistory = {};
