@@ -10,7 +10,7 @@ function parseDate(dateString: string): Date {
     parseInt(dateParts[2]),
     parseInt(dateParts[1]) - 1,
     parseInt(dateParts[0]),
-    parseInt(timeParts[0] + new Date().getTimezoneOffset() / -60, // Correct the Timezone if server not running GMT/UTC),
+    parseInt(timeParts[0]) + new Date().getTimezoneOffset() / -60, // Correct the Timezone if server not running GMT/UTC
     parseInt(timeParts[1])
   );
 }
@@ -297,7 +297,7 @@ export async function getLastDistrictRecoveredHistory(
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
     " AND "
   )}&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,Landkreis,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-  
+
   const response = await axios.get(url);
   const data = response.data;
   if (data.error) {
