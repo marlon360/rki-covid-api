@@ -18,9 +18,9 @@ COPY package*.json ./
 # execute "npm install" and remove the buildtools and dev packages afterwards
 RUN apk update \
  && apk upgrade \
- && apk add --no-cache --virtual .vips-dev build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
-     libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
-     poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
+ && apk add --no-cache --virtual .vips-dev build-base binutils \
+     libjpeg-turbo-dev libpng-dev tiff-dev \
+     librsvg-dev libgsf-dev libimagequant-dev py-gobject3-dev \
  && npm install \
  && apk del .vips-dev \
  && rm -rf /var/cache/apk/*
