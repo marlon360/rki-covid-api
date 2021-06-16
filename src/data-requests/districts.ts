@@ -10,7 +10,7 @@ function parseDate(dateString: string): Date {
     parseInt(dateParts[2]),
     parseInt(dateParts[1]) - 1,
     parseInt(dateParts[0]),
-    parseInt(timeParts[0]),
+    parseInt(timeParts[0] + new Date().getTimezoneOffset() / -60, // Correct the Timezone if server not running GMT/UTC),
     parseInt(timeParts[1])
   );
 }
@@ -143,7 +143,9 @@ export async function getLastDistrictCasesHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
+  ResponseData<
+    { ags: string; name: string; cases: number; date: Date; dataStatus: Date }[]
+  >
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
   if (ags != null) {
@@ -162,7 +164,7 @@ export async function getLastDistrictCasesHistory(
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
     " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+  )}&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,Landkreis,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
 
   const response = await axios.get(url);
   const data = response.data;
@@ -174,20 +176,26 @@ export async function getLastDistrictCasesHistory(
     name: string;
     cases: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
       name: feature.attributes.Landkreis,
       cases: feature.attributes.cases,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
-    lastUpdate: history[history.length - 1]
-      ? history[history.length - 1].date
-      : new Date(),
+    lastUpdate: history[history.length - 1] ? lowStatus : new Date(),
   };
 }
 
@@ -195,7 +203,15 @@ export async function getLastDistrictDeathsHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
+  ResponseData<
+    {
+      ags: string;
+      name: string;
+      deaths: number;
+      date: Date;
+      dataStatus: Date;
+    }[]
+  >
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
   if (ags != null) {
@@ -214,7 +230,7 @@ export async function getLastDistrictDeathsHistory(
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
     " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+  )}&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,Landkreis,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
 
   const response = await axios.get(url);
   const data = response.data;
@@ -226,20 +242,26 @@ export async function getLastDistrictDeathsHistory(
     name: string;
     deaths: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
       name: feature.attributes.Landkreis,
       deaths: feature.attributes.deaths,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
-    lastUpdate: history[history.length - 1]
-      ? history[history.length - 1].date
-      : new Date(),
+    lastUpdate: history[history.length - 1] ? lowStatus : new Date(),
   };
 }
 
@@ -247,7 +269,15 @@ export async function getLastDistrictRecoveredHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
+  ResponseData<
+    {
+      ags: string;
+      name: string;
+      recovered: number;
+      date: Date;
+      dataStatus: Date;
+    }[]
+  >
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
   if (ags != null) {
@@ -266,8 +296,8 @@ export async function getLastDistrictRecoveredHistory(
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
     " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,Landkreis,IdLandkreis&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-
+  )}&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,Landkreis,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis,MeldeDatum&groupByFieldsForStatistics=IdLandkreis,MeldeDatum,Landkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+  
   const response = await axios.get(url);
   const data = response.data;
   if (data.error) {
@@ -278,19 +308,25 @@ export async function getLastDistrictRecoveredHistory(
     name: string;
     recovered: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis,
       name: feature.attributes.Landkreis,
       recovered: feature.attributes.recovered,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
-    lastUpdate: history[history.length - 1]
-      ? history[history.length - 1].date
-      : new Date(),
+    lastUpdate: history[history.length - 1] ? lowStatus : new Date(),
   };
 }
