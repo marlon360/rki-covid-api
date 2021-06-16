@@ -124,7 +124,9 @@ export async function DistrictsCasesHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
+  if ( days != null ) { //to prevent invalid date
+    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
+  }
   const data: DistrictsCasesHistory = {};
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
@@ -134,8 +136,9 @@ export async function DistrictsCasesHistoryResponse(
         history: [],
       };
     }
-    // if history is empty and lowDate is missing insert lowDate
+    // if history is empty and lowDate is missing and lowDate is set insert lowDate
     if (
+      lowDate != null &&
       historyData.date > lowDate &&
       data[historyData.ags].history.length == 0
     ) {
@@ -220,7 +223,9 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   }
 
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
+  if ( days != null ) { //to prevent invalid date
+    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
+  }
   const data: DistrictsCasesHistory = {};
 
   for (const historyData of statesHistoryData.data) {
@@ -231,8 +236,9 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         history: [],
       };
     }
-    // if history is empty and lowDate is missing insert lowDate
+    // if history is empty and lowDate is missing and lowDate is set insert lowDate
     if (
+      lowDate != null &&
       historyData.date > lowDate &&
       data[historyData.ags].history.length == 0
     ) {
@@ -324,7 +330,9 @@ export async function DistrictsDeathsHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
+  if ( days != null ) { //to prevent invalid date
+    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
+  }
   const data: DistrictsDeathsHistory = {};
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
@@ -334,8 +342,9 @@ export async function DistrictsDeathsHistoryResponse(
         history: [],
       };
     }
-    // if history is empty and lowDate is missing insert lowDate
+    // if history is empty and lowDate is missing and lowDate is set insert lowDate
     if (
+      lowDate != null &&
       historyData.date > lowDate &&
       data[historyData.ags].history.length == 0
     ) {
@@ -402,7 +411,9 @@ export async function DistrictsRecoveredHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
+  if ( days != null ) { //to prevent invalid date
+    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date if days is set
+  }
   const data: DistrictsRecoveredHistory = {};
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
@@ -412,8 +423,9 @@ export async function DistrictsRecoveredHistoryResponse(
         history: [],
       };
     }
-    // if history is empty and lowDate is missing insert lowDate
+    // if history is empty and lowDate is missing and lowDate is set insert lowDate
     if (
+      lowDate != null &&
       historyData.date > lowDate &&
       data[historyData.ags].history.length == 0
     ) {
