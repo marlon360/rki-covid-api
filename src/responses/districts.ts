@@ -124,7 +124,7 @@ export async function DistrictsCasesHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if ( days != null ) {
+  if (days != null) {
     //to prevent invalid lowDate
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
   }
@@ -224,7 +224,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   }
 
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if ( days != null ) {
+  if (days != null) {
     //to prevent invalid lowDate
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
   }
@@ -332,7 +332,7 @@ export async function DistrictsDeathsHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if ( days != null) {
+  if (days != null) {
     // to prevent invalid lowDate
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
   }
@@ -414,7 +414,7 @@ export async function DistrictsRecoveredHistoryResponse(
   }
   const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
   const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if ( days != null ) {
+  if (days != null) {
     // to prevent invalid lowDate
     var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
   }
