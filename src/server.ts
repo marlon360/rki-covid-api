@@ -4,6 +4,7 @@ import cors from "cors";
 import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
+import webhookMiddleware from './webhook-middleware'
 
 import {
   StatesCasesHistoryResponse,
@@ -80,6 +81,7 @@ app.get("/", async (req, res) => {
 
 app.get("/germany", queuedCache(), cache.route(), async (req, res) => {
   const response = await GermanyResponse();
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -93,6 +95,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyCasesHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -105,6 +108,7 @@ app.get(
     const response = await GermanyCasesHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -115,6 +119,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyWeekIncidenceHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -127,6 +132,7 @@ app.get(
     const response = await GermanyWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -137,6 +143,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyDeathsHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -149,6 +156,7 @@ app.get(
     const response = await GermanyDeathsHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -159,6 +167,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyRecoveredHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -171,6 +180,7 @@ app.get(
     const response = await GermanyRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -181,12 +191,14 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyAgeGroupsResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
 
 app.get("/states", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse();
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -200,6 +212,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesCasesHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -212,6 +225,7 @@ app.get(
     const response = await StatesCasesHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -222,6 +236,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesDeathsHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -234,6 +249,7 @@ app.get(
     const response = await StatesDeathsHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -244,6 +260,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesRecoveredHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -256,6 +273,7 @@ app.get(
     const response = await StatesRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -266,6 +284,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesWeekIncidenceHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -278,6 +297,7 @@ app.get(
     const response = await StatesWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -288,12 +308,14 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesAgeGroupsResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
 
 app.get("/states/:state", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesResponse(req.params.state);
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -307,6 +329,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesCasesHistoryResponse(null, req.params.state);
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -320,6 +343,7 @@ app.get(
       parseInt(req.params.days),
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -333,6 +357,7 @@ app.get(
       null,
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -346,6 +371,7 @@ app.get(
       parseInt(req.params.days),
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -356,6 +382,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesDeathsHistoryResponse(null, req.params.state);
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -369,6 +396,7 @@ app.get(
       parseInt(req.params.days),
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -382,6 +410,7 @@ app.get(
       null,
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -395,6 +424,7 @@ app.get(
       parseInt(req.params.days),
       req.params.state
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -405,12 +435,14 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await StatesAgeGroupsResponse(req.params.state);
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
 
 app.get("/districts", queuedCache(), cache.route(), async (req, res) => {
   const response = await DistrictsResponse();
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -424,6 +456,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsCasesHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -436,6 +469,7 @@ app.get(
     const response = await DistrictsCasesHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -446,6 +480,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsWeekIncidenceHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -456,6 +491,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await FrozenIncidenceHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -468,6 +504,7 @@ app.get(
     const response = await FrozenIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -480,6 +517,7 @@ app.get(
     const response = await DistrictsWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -490,6 +528,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsDeathsHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -502,6 +541,7 @@ app.get(
     const response = await DistrictsDeathsHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -512,6 +552,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsRecoveredHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -524,6 +565,7 @@ app.get(
     const response = await DistrictsRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -534,6 +576,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await DistrictsResponse(req.params.district);
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -551,6 +594,7 @@ app.get(
       null,
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -564,6 +608,7 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -577,6 +622,7 @@ app.get(
       null,
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -590,6 +636,7 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -603,6 +650,7 @@ app.get(
       null,
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -616,6 +664,7 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -629,6 +678,7 @@ app.get(
       null,
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -642,6 +692,7 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -655,6 +706,7 @@ app.get(
       null,
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -668,12 +720,14 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
 
 app.get("/vaccinations", queuedCache(), cache.route(), async (req, res) => {
   const response = await VaccinationResponse();
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -683,6 +737,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await VaccinationHistoryResponse();
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -695,6 +750,7 @@ app.get(
     const response = await VaccinationHistoryResponse(
       parseInt(req.params.days)
     );
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
@@ -735,6 +791,7 @@ app.get(
 
 app.get("/testing/history", queuedCache(), cache.route(), async (req, res) => {
   const response = await TestingHistoryResponse();
+  webhookMiddleware(response,req);
   res.json(response);
 });
 
@@ -744,6 +801,7 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await TestingHistoryResponse(parseInt(req.params.weeks));
+    webhookMiddleware(response,req);
     res.json(response);
   }
 );
