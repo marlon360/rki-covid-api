@@ -21,6 +21,7 @@ import {
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
 } from "./responses/germany";
+import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import {
   DistrictsCasesHistoryResponse,
   DistrictsDeathsHistoryResponse,
@@ -169,6 +170,28 @@ app.get(
   cache.route(),
   async (req, res) => {
     const response = await GermanyRecoveredHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/rValue",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await RValueHistoryHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/rValue/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await RValueHistoryHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
