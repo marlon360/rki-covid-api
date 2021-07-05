@@ -117,7 +117,7 @@ export function getStateAbbreviationByName(name: string): string | null {
 
 export function getDateBefore(days: number): string {
   let offsetDate = new Date();
-  offsetDate.setHours(0, 0, 0, 0);
+  offsetDate.setHours(0 + offsetDate.getTimezoneOffset() / -60, 0, 0, 0); //corret the timezone if server not running in GMT/UTC e.g. debugging on Desktopcomputer
   offsetDate.setDate(new Date().getDate() - days);
   return offsetDate.toISOString().split("T").shift();
 }
