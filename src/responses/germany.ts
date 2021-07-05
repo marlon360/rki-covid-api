@@ -12,7 +12,7 @@ import {
   getGermanyAgeGroups,
   AgeGroupData,
 } from "../data-requests/germany";
-//import { getRValue } from "../data-requests/r-value";
+import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
 
 interface GermanyData extends IResponseMeta {
@@ -22,10 +22,18 @@ interface GermanyData extends IResponseMeta {
   weekIncidence: number;
   casesPerWeek: number;
   casesPer100k: number;
-  //r: {
-  //  value: number;
-  //  date: Date;
-  //};
+  r: {
+    value: number;
+    rValue4Days: {
+      value: number;
+      date: Date;
+    };
+    rValue7Days: {
+      value: number;
+      date: Date;
+    };
+    date: Date;
+  };
   delta: {
     cases: number;
     deaths: number;
@@ -43,7 +51,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     newDeathsData,
     newRecoveredData,
     statesData,
-    //rData,
+    rData,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -52,7 +60,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getNewDeaths(),
     getNewRecovered(),
     getStatesData(),
-    //getRValue(),
+    getRValue(),
   ]);
 
   // calculate week incidence
@@ -78,10 +86,12 @@ export async function GermanyResponse(): Promise<GermanyData> {
       deaths: newDeathsData.data,
       recovered: newRecoveredData.data,
     },
-    //r: {
-    //  value: rData.data,
-    //  date: rData.lastUpdate,
-    //},
+    r: {
+      value: rData.data.rValue4Days.value, // legacy
+      rValue4Days: rData.data.rValue4Days,
+      rValue7Days: rData.data.rValue7Days,
+      date: rData.lastUpdate,
+    },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
 }

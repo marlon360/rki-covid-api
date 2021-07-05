@@ -6,6 +6,8 @@ cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
+> :warning: **Rate Limiting**: Due to the high traffic on the server the requests are limited to 15 requests every minute. If you need more requests, you can host the server yourself.
+
 ## Donation
 
 If you use this API, please consider supporting me:
@@ -67,7 +69,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmon
 
 **R value**
 
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile
+https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv
 
 **Testing data**
 

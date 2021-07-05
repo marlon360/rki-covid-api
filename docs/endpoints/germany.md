@@ -11,27 +11,35 @@
 
 ```json
 {
-  "cases": 1765666,
-  "deaths": 34272,
-  "recovered": 1381937,
-  "weekIncidence": 139.59190955621654,
-  "casesPer100k": 2123.044158858224,
-  "casesPerWeek": 116094,
+  "cases": 3731124,
+  "deaths": 91031,
+  "recovered": 3629299,
+  "weekIncidence": 5.014025383305107,
+  "casesPer100k": 4486.319051381027,
+  "casesPerWeek": 4170,
   "delta": {
-    "cases": 10315,
-    "deaths": 312,
-    "recovered": 13802
+    "cases": 212,
+    "deaths": 1,
+    "recovered": 883
   },
   "r": {
-    "value": 0.91,
-    "date": "2020-12-29T00:00:00.000Z"
+    "value": 1.19,
+    "rValue4Days": {
+      "value": 1.19,
+      "date": "2021-07-01T00:00:00.000Z"
+    },
+    "rValue7Days": {
+      "value": 0.99,
+      "date": "2021-06-30T00:00:00.000Z"
+    },
+    "date": "2021-06-30T00:00:00.000Z"
   },
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-03T00:00:00.000Z",
-    "lastCheckedForUpdate": "2021-01-03T22:55:41.850Z"
+    "lastUpdate": "2021-07-04T23:00:00.000Z",
+    "lastCheckedForUpdate": "2021-07-05T09:59:34.267Z"
   }
 }
 ```
