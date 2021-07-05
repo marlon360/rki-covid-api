@@ -72,7 +72,7 @@ If you use this API, please consider supporting me:
 
 **R value**
 
-[https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv](https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv)
+[https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting*und*-R-Schaetzung/main/Nowcast_R_aktuell.csv](https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv)
 
 **Testing data**
 

@@ -1,17 +1,19 @@
 import axios from "axios";
 import XLSX from "xlsx";
 
-function parseRValue(data: ArrayBuffer): { 
-    rValue4Days: {
-        value: number,
-        date: Date
-    },
-    rValue7Days: {
-        value: number,
-        date: Date
-    }
- } | null {
-  var workbook = XLSX.read(data, { type: "buffer", cellDates: true });  
+function parseRValue(
+  data: ArrayBuffer
+): {
+  rValue4Days: {
+    value: number;
+    date: Date;
+  };
+  rValue7Days: {
+    value: number;
+    date: Date;
+  };
+} | null {
+  var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const json = XLSX.utils.sheet_to_json(sheet);
 
@@ -32,13 +34,13 @@ function parseRValue(data: ArrayBuffer): {
 
   return {
     rValue4Days: {
-        value: rValue4Days,
-        date: rValue4DaysDate
+      value: rValue4Days,
+      date: rValue4DaysDate,
     },
     rValue7Days: {
-        value: rValue7Days,
-        date: rValue7DaysDate
-    }
+      value: rValue7Days,
+      date: rValue7DaysDate,
+    },
   };
 }
 

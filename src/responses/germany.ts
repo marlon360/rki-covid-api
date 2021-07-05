@@ -25,13 +25,13 @@ interface GermanyData extends IResponseMeta {
   r: {
     value: number;
     rValue4Days: {
-      value: number,
-      date: Date
-    },
-    rValue7Days:{
-      value: number,
-      date: Date
-    },
+      value: number;
+      date: Date;
+    };
+    rValue7Days: {
+      value: number;
+      date: Date;
+    };
     date: Date;
   };
   delta: {
