@@ -7,6 +7,8 @@
 `GET https://api.corona-zahlen.org/germany`
 [Open](/germany)
 
+-ATTENTION- after 2021-07-17 the 4-day r-value is not provided by RKI anymore
+
 ### Response
 
 ```json
@@ -23,9 +25,9 @@
     "recovered": 883
   },
   "r": {
-    "value": 1.19,
+    "value": null,
     "rValue4Days": {
-      "value": 1.19,
+      "value": null,
       "date": "2021-07-01T00:00:00.000Z"
     },
     "rValue7Days": {
