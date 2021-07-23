@@ -87,8 +87,8 @@ export async function GermanyResponse(): Promise<GermanyData> {
       recovered: newRecoveredData.data,
     },
     r: {
-      value: rData.data.rValue4Days.value, // legacy
-      rValue4Days: rData.data.rValue4Days,
+      value: null // rData.data.rValue4Days.value, // legacy, since 2021-07-17 the value is not published by RKI
+      rValue4Days: null // rData.data.rValue4Days, see ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       rValue7Days: rData.data.rValue7Days,
       date: rData.lastUpdate,
     },
