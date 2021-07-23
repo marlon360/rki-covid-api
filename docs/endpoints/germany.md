@@ -7,7 +7,7 @@
 `GET https://api.corona-zahlen.org/germany`
 [Open](/germany)
 
--ATTENTION- after 2021-07-17 the 4-day r-value is not provided by RKI anymore
+-ATTENTION- The 4-day r-value is no longer provided since July 17, 2021 by RKI
 
 ### Response
 
