@@ -19,14 +19,13 @@ function parseRValue(
 
   const latestEntry = json[json.length - 1];
   const rValue4DaysDateString = latestEntry["Datum"];
-  let rValue4Days = latestEntry["OG_PI_4_Tage_R_Wert"] as number;
-
+  
   let rValue7DaysDateString = latestEntry["Datum"];
-  let rValue7Days = latestEntry["OG_PI_7_Tage_R_Wert"];
+  let rValue7Days = latestEntry["PS_7_Tage_R_Wert"];
   if (rValue7Days == null) {
     const entry = json[json.length - 2];
     rValue7DaysDateString = entry["Datum"];
-    rValue7Days = entry["OG_PI_7_Tage_R_Wert"];
+    rValue7Days = entry["PS_7_Tage_R_Wert"];
   }
 
   const rValue4DaysDate = new Date(rValue4DaysDateString);
