@@ -29,7 +29,7 @@ function parseRValue(
   for (let Offset = 5; Offset < 9; Offset++) {
     denominator += json[json.length - Offset]["PS_COVID_Faelle"];
   }
-  const rValue4Days = Math.round(numerator / denominator * 100) / 100;
+  const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
   let rValue7DaysDateString = latestEntry["Datum"];
   let rValue7Days = latestEntry["PS_7_Tage_R_Wert"];
