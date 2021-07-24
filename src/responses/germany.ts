@@ -87,7 +87,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
       recovered: newRecoveredData.data,
     },
     r: {
-      value: rData.data.rValue4Days.value, //legacy
+      value: rData.data.rValue4Days.value, // legacy
       rValue4Days: rData.data.rValue4Days,
       rValue7Days: rData.data.rValue7Days,
       date: rData.lastUpdate,
