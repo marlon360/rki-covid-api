@@ -20,7 +20,7 @@ function parseRValue(
   const latestEntry = json[json.length - 1];
   const rValue4DaysDateString = latestEntry["Datum"];
   // since 2021-07-17 the RKI no longer provide the 4-day-r-value
-  // so the value is to be caltuleted
+  // so that the value has to be calculated
   let numerator = 0 as number;
   for (let Offset = 1; Offset < 5; Offset++) {
     numerator += json[json.length - Offset]["PS_COVID_Faelle"];
