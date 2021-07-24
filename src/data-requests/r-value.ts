@@ -21,14 +21,22 @@ function parseRValue(
   const rValue4DaysDateString = latestEntry["Datum"];
   // since 2021-07-17 the RKI no longer provide the 4-day-r-value
   // so the value is to be caltuleted
-  let rValue4Days = latestEntry["OG_PI_4_Tage_R_Wert"] as number;
+  let numerator = 0 as number;
+  for (let Offset = 1; Offset < 5; Offset++) {
+    numerator += json[json.length - Offset]["PS_COVID_Faelle"];
+  }
+  let denominator = 0 as number;
+  for (let Offset = 5; Offset < 9; Offset++) {
+    denominator += json[json.length - Offset]["PS_COVID_Faelle"];
+  }
+  const rValue4Days = Math.round(numerator / denominator * 100) / 100;
 
   let rValue7DaysDateString = latestEntry["Datum"];
-  let rValue7Days = latestEntry["OG_PI_7_Tage_R_Wert"];
+  let rValue7Days = latestEntry["PS_7_Tage_R_Wert"];
   if (rValue7Days == null) {
     const entry = json[json.length - 2];
     rValue7DaysDateString = entry["Datum"];
-    rValue7Days = entry["OG_PI_7_Tage_R_Wert"];
+    rValue7Days = entry["PS_7_Tage_R_Wert"];
   }
 
   const rValue4DaysDate = new Date(rValue4DaysDateString);
