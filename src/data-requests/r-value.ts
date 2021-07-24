@@ -19,6 +19,7 @@ function parseRValue(
 
   const latestEntry = json[json.length - 1];
   const rValue4DaysDateString = latestEntry["Datum"];
+  const rValue4Days = null; //no longer provided by RKI
   
   let rValue7DaysDateString = latestEntry["Datum"];
   let rValue7Days = latestEntry["PS_7_Tage_R_Wert"];
