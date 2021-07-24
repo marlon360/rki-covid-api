@@ -19,6 +19,8 @@ function parseRValue(
 
   const latestEntry = json[json.length - 1];
   const rValue4DaysDateString = latestEntry["Datum"];
+  // since 2021-07-17 the RKI no longer provide the 4-day-r-value
+  // so the value is to be caltuleted
   let rValue4Days = latestEntry["OG_PI_4_Tage_R_Wert"] as number;
 
   let rValue7DaysDateString = latestEntry["Datum"];
