@@ -1,5 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
+import { AddDaysToDate } from "../utils";
 
 function parseRValue(
   data: ArrayBuffer
@@ -19,15 +20,22 @@ function parseRValue(
 
   const latestEntry = json[json.length - 1];
   const rValue4DaysDateString = latestEntry["Datum"];
-  let rValue4Days = latestEntry["OG_PI_4_Tage_R_Wert"] as number;
-
-  let rValue7DaysDateString = latestEntry["Datum"];
-  let rValue7Days = latestEntry["OG_PI_7_Tage_R_Wert"];
-  if (rValue7Days == null) {
-    const entry = json[json.length - 2];
-    rValue7DaysDateString = entry["Datum"];
-    rValue7Days = entry["OG_PI_7_Tage_R_Wert"];
+  // since 2021-07-17 the RKI no longer provide the 4-day-r-value
+  // so that the value has to be calculated
+  let numerator = 0 as number;
+  for (let Offset = 1; Offset < 5; Offset++) {
+    numerator += json[json.length - Offset]["PS_COVID_Faelle"];
   }
+  let denominator = 0 as number;
+  for (let Offset = 5; Offset < 9; Offset++) {
+    denominator += json[json.length - Offset]["PS_COVID_Faelle"];
+  }
+  const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
+
+  // the 7-day r-value is always one day bevor the 4-day r-value!
+  const entry = json[json.length - 2];
+  const rValue7DaysDateString = entry["Datum"];
+  const rValue7Days = entry["PS_7_Tage_R_Wert"];
 
   const rValue4DaysDate = new Date(rValue4DaysDateString);
   const rValue7DaysDate = new Date(rValue7DaysDateString);
@@ -55,6 +63,6 @@ export async function getRValue() {
   const rData = parseRValue(data);
   return {
     data: rData,
-    lastUpdate: rData.rValue7Days.date,
+    lastUpdate: AddDaysToDate(rData.rValue4Days.date, 4), // the lastUpdate Date is rValue4Days.date + 4 Days
   };
 }
