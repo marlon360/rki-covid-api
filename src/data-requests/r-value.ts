@@ -1,5 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
+import { AddDaysToDate } from "../utils";
 
 function parseRValue(
   data: ArrayBuffer
@@ -31,13 +32,10 @@ function parseRValue(
   }
   const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
-  let rValue7DaysDateString = latestEntry["Datum"];
-  let rValue7Days = latestEntry["PS_7_Tage_R_Wert"];
-  if (rValue7Days == null) {
-    const entry = json[json.length - 2];
-    rValue7DaysDateString = entry["Datum"];
-    rValue7Days = entry["PS_7_Tage_R_Wert"];
-  }
+  // the 7-day r-value is always one day bevor the 4-day r-value!
+  const entry = json[json.length - 2];
+  const rValue7DaysDateString = entry["Datum"];
+  const rValue7Days = entry["PS_7_Tage_R_Wert"];
 
   const rValue4DaysDate = new Date(rValue4DaysDateString);
   const rValue7DaysDate = new Date(rValue7DaysDateString);
@@ -65,6 +63,6 @@ export async function getRValue() {
   const rData = parseRValue(data);
   return {
     data: rData,
-    lastUpdate: rData.rValue7Days.date,
+    lastUpdate: AddDaysToDate(rData.rValue4Days.date, 4), // the lastUpdate Date is rValue4Days.date + 4 Days
   };
 }
