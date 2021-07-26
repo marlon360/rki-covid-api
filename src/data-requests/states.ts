@@ -34,14 +34,7 @@ export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
   });
   return {
     data: states,
-    lastUpdate: new Date(
-      data.features[0].attributes.Aktualisierung +
-        new Date(
-          data.features[0].attributes.Aktualisierung
-        ).getTimezoneOffset() *
-          -60 *
-          1000
-    ),
+    lastUpdate: new Date(data.features[0].attributes.Aktualisierung),
   };
 }
 
