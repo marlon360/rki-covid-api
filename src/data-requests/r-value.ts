@@ -61,8 +61,11 @@ export async function getRValue() {
   );
   const data = response.data;
   const rData = parseRValue(data);
+  const meta = await axios.get(
+    `https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/.zenodo.json`
+  );
   return {
     data: rData,
-    lastUpdate: AddDaysToDate(rData.rValue4Days.date, 4), // the lastUpdate Date is rValue4Days.date + 4 Days
+    lastUpdate: new Date(meta.data.publication_date),
   };
 }
