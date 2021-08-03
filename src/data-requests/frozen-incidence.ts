@@ -31,7 +31,7 @@ export async function getFrozenIncidenceHistory(
   const sheet = workbook.Sheets["LK_7-Tage-Inzidenz (fixiert)"];
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
-  
+
   // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   const dateString = sheet["A2"].v
