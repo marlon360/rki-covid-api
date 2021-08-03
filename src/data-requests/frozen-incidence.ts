@@ -31,32 +31,37 @@ export async function getFrozenIncidenceHistory(
   const sheet = workbook.Sheets["LK_7-Tage-Inzidenz (fixiert)"];
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
-  const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+  
   // date is in cell A2
+  const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   const dateString = sheet["A2"].v
     .replace("Stand: ", "")
     .replace(date_pattern, "$3-$2-$1");
   const lastUpdate = new Date(dateString);
 
-  let districts = json.map((district) => {
-    const name = district["LK"];
-    const ags = district["LKNR"].toString().padStart(5, "0");
+  let districts = json
+    .filter((district) => !!district["NR"])
+    .map((district) => {
+      const name = district["LK"];
+      const ags = district["LKNR"].toString().padStart(5, "0");
 
-    let history = [];
+      let history = [];
 
-    // get all date keys
-    const dateKeys = Object.keys(district);
-    // ignore the first three elements (rowNumber, LK, LKNR)
-    // and read only required dates if days: != null
-    dateKeys.splice(0, days != null ? dateKeys.length - days : 3);
-    dateKeys.forEach((dateKey) => {
-      const dateString = dateKey.toString().replace(date_pattern, "$3-$2-$1");
-      const date = AddDaysToDate(new Date(dateString), -1);
-      history.push({ weekIncidence: district[dateKey], date });
+      // get all date keys
+      const dateKeys = Object.keys(district);
+      // ignore the first three elements (rowNumber, LK, LKNR)
+      // and read only required dates if days: != null
+      dateKeys.splice(0, days != null ? dateKeys.length - days : 3);
+      dateKeys.forEach((dateKey) => {
+        const date = AddDaysToDate(
+          new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1")),
+          -1
+        );
+        history.push({ weekIncidence: district[dateKey], date });
+      });
+
+      return { ags, name, history };
     });
-
-    return { ags, name, history };
-  });
 
   if (ags != null) {
     districts = districts.filter((district) => district.ags === ags);
