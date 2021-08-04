@@ -42,7 +42,6 @@ export async function getFrozenIncidenceHistory(
   let districts = json
     .filter((district) => !!district["NR"])
     .map((district) => {
-      console.log(district);
       const name = district["LK"];
       const ags = district["LKNR"].toString().padStart(5, "0");
 
@@ -53,9 +52,8 @@ export async function getFrozenIncidenceHistory(
       // ignore the first three elements (rowNumber, LK, LKNR)
       dateKeys.splice(0, 3);
       dateKeys.forEach((dateKey) => {
-        const date = AddDaysToDate(
-          new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1")),
-          -1
+        const date = new Date(
+          dateKey.toString().replace(date_pattern, "$3-$2-$1")
         );
         history.push({ weekIncidence: district[dateKey], date });
       });
