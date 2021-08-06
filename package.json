@@ -30,7 +30,7 @@
     "redis": "^3.0.2",
     "sharp": "^0.27.0",
     "svgson": "^4.1.0",
-    "xlsx": "^0.16.9"
+    "xlsx": "^0.17.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.9",
