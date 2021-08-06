@@ -21,17 +21,21 @@ function parseRValue(
   const rValue4DaysDateString = latestEntry["Datum"];
   // since 2021-07-17 the RKI no longer provide the 4-day-r-value
   // so that the value has to be calculated
-  let numerator = 0 as number;
-  for (let Offset = 1; Offset < 5; Offset++) {
-    numerator += json[json.length - Offset]["PS_COVID_Faelle"];
+
+  // sum of the daily cases in the last 4 days
+  let numerator = 0;
+  for (let offset = 1; offset < 5; offset++) {
+    numerator += json[json.length - offset]["PS_COVID_Faelle"];
   }
-  let denominator = 0 as number;
-  for (let Offset = 5; Offset < 9; Offset++) {
-    denominator += json[json.length - Offset]["PS_COVID_Faelle"];
+
+  // sum of four daily cases 4 days ago
+  let denominator = 0;
+  for (let offset = 5; offset < 9; offset++) {
+    denominator += json[json.length - offset]["PS_COVID_Faelle"];
   }
   const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
-  // the 7-day r-value is always one day bevor the 4-day r-value!
+  // the 7-day r-value is always one day before the 4-day r-value!
   const entry = json[json.length - 2];
   const rValue7DaysDateString = entry["Datum"];
   const rValue7Days = entry["PS_7_Tage_R_Wert"];
