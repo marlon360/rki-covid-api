@@ -32,7 +32,7 @@ interface GermanyData extends IResponseMeta {
       value: number;
       date: Date;
     };
-    date: Date;
+    lastUpdate: Date;
   };
   delta: {
     cases: number;
@@ -90,7 +90,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
       value: rData.data.rValue4Days.value, // legacy
       rValue4Days: rData.data.rValue4Days,
       rValue7Days: rData.data.rValue7Days,
-      date: rData.lastUpdate,
+      lastUpdate: rData.lastUpdate,
     },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
