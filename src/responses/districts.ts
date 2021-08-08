@@ -74,7 +74,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
         getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
       weekIncidence: fixDigit(
         (district.casesPerWeek / district.population) * 100000,
-        8
+        2
       ),
       casesPer100k: fixDigit(
         (district.cases / district.population) * 100000,
@@ -313,7 +313,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         sum += districtHistory[dayOffset].cases;
       }
       incidenceData[ags].history.push({
-        weekIncidence: fixDigit((sum / district.population) * 100000, 8),
+        weekIncidence: fixDigit((sum / district.population) * 100000, 2),
         date: date,
       });
     }

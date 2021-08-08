@@ -70,7 +70,7 @@ export async function StatesResponse(
       abbreviation: getStateAbbreviationById(state.id),
       weekIncidence: fixDigit(
         (state.casesPerWeek / state.population) * 100000,
-        8
+        2
       ),
       casesPer100k: fixDigit((state.cases / state.population) * 100000, 0),
       delta: {
@@ -259,7 +259,7 @@ export async function StatesWeekIncidenceHistoryResponse(
         sum += stateHistory[dayOffset].cases;
       }
       incidenceData[abbr].history.push({
-        weekIncidence: fixDigit((sum / state.population) * 100000, 8),
+        weekIncidence: fixDigit((sum / state.population) * 100000, 2),
         date: date,
       });
     }

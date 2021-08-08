@@ -66,7 +66,7 @@ export async function getFrozenIncidenceHistory(
           -1
         );
         history.push({
-          weekIncidence: fixDigit(district[dateKey], 8),
+          weekIncidence: fixDigit(district[dateKey], 2),
           date,
         });
       });

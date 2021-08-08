@@ -72,7 +72,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     casesPerWeek += state.casesPerWeek;
   }
 
-  const weekIncidence = fixDigit((casesPerWeek / population) * 100000, 8);
+  const weekIncidence = fixDigit((casesPerWeek / population) * 100000, 2);
   const casesPer100k = fixDigit((casesData.data / population) * 100000, 0);
 
   return {
@@ -135,7 +135,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
       sum += history[dayOffset].cases;
     }
     weekIncidenceHistory.push({
-      weekIncidence: (sum / population) * 100000,
+      weekIncidence: fixDigit((sum / population) * 100000, 2),
       date: date,
     });
   }
