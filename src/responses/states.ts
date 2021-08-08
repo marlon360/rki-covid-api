@@ -14,6 +14,7 @@ import {
 } from "../data-requests/states";
 import {
   AddDaysToDate,
+  fixDigit,
   getDayDifference,
   getStateAbbreviationById,
   getStateIdByAbbreviation,
@@ -67,11 +68,11 @@ export async function StatesResponse(
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
       abbreviation: getStateAbbreviationById(state.id),
-      weekIncidence:
-        Math.round(
-          (state.casesPerWeek / state.population) * 100000 * 10000000000
-        ) / 10000000000,
-      casesPer100k: Math.round((state.cases / state.population) * 100000),
+      weekIncidence: fixDigit(
+        (state.casesPerWeek / state.population) * 100000,
+        8
+      ),
+      casesPer100k: fixDigit((state.cases / state.population) * 100000, 0),
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
@@ -258,7 +259,7 @@ export async function StatesWeekIncidenceHistoryResponse(
         sum += stateHistory[dayOffset].cases;
       }
       incidenceData[abbr].history.push({
-        weekIncidence: (sum / state.population) * 100000,
+        weekIncidence: fixDigit((sum / state.population) * 100000, 8),
         date: date,
       });
     }

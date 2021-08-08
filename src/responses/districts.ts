@@ -13,6 +13,7 @@ import {
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
+  fixDigit,
   getDayDifference,
   getStateAbbreviationByName,
 } from "../utils";
@@ -71,11 +72,14 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       stateAbbreviation: getStateAbbreviationByName(district.state),
       recovered:
         getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
-      weekIncidence:
-        Math.round(
-          (district.casesPerWeek / district.population) * 100000 * 10000000000
-        ) / 10000000000,
-      casesPer100k: Math.round((district.cases / district.population) * 100000),
+      weekIncidence: fixDigit(
+        (district.casesPerWeek / district.population) * 100000,
+        8
+      ),
+      casesPer100k: fixDigit(
+        (district.cases / district.population) * 100000,
+        0
+      ),
       delta: {
         cases: getDistrictByAgs(districtNewCasesData, district.ags)?.cases ?? 0,
         deaths:
@@ -309,9 +313,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         sum += districtHistory[dayOffset].cases;
       }
       incidenceData[ags].history.push({
-        weekIncidence:
-          Math.round((sum / district.population) * 100000 * 10000000000) /
-          10000000000,
+        weekIncidence: fixDigit((sum / district.population) * 100000, 8),
         date: date,
       });
     }

@@ -14,6 +14,7 @@ import {
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
+import { fixDigit } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -71,10 +72,8 @@ export async function GermanyResponse(): Promise<GermanyData> {
     casesPerWeek += state.casesPerWeek;
   }
 
-  const weekIncidence =
-    Math.round((casesPerWeek / population) * 100000 * 10000000000) /
-    10000000000;
-  const casesPer100k = Math.round((casesData.data / population) * 100000);
+  const weekIncidence = fixDigit((casesPerWeek / population) * 100000, 8);
+  const casesPer100k = fixDigit((casesData.data / population) * 100000, 0);
 
   return {
     cases: casesData.data,

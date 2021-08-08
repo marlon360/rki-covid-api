@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { RKIError, AddDaysToDate } from "../utils";
+import { RKIError, AddDaysToDate, fixDigit } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface FrozenIncidenceData {
@@ -66,8 +66,7 @@ export async function getFrozenIncidenceHistory(
           -1
         );
         history.push({
-          weekIncidence:
-            Math.round(district[dateKey] * 10000000000) / 10000000000,
+          weekIncidence: fixDigit(district[dateKey], 8),
           date,
         });
       });
