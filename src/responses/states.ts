@@ -71,7 +71,7 @@ export async function StatesResponse(
         Math.round(
           (state.casesPerWeek / state.population) * 100000 * 10000000000
         ) / 10000000000,
-      casesPer100k: (state.cases / state.population) * 100000,
+      casesPer100k: Math.round((state.cases / state.population) * 100000),
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,

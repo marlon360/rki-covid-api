@@ -71,8 +71,11 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       stateAbbreviation: getStateAbbreviationByName(district.state),
       recovered:
         getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
-      weekIncidence: (district.casesPerWeek / district.population) * 100000,
-      casesPer100k: (district.cases / district.population) * 100000,
+      weekIncidence:
+        Math.round(
+          (district.casesPerWeek / district.population) * 100000 * 10000000000
+        ) / 10000000000,
+      casesPer100k: Math.round((district.cases / district.population) * 100000),
       delta: {
         cases: getDistrictByAgs(districtNewCasesData, district.ags)?.cases ?? 0,
         deaths:
