@@ -306,7 +306,9 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         sum += districtHistory[dayOffset].cases;
       }
       incidenceData[ags].history.push({
-        weekIncidence: (sum / district.population) * 100000,
+        weekIncidence:
+          Math.round((sum / district.population) * 100000 * 10000000000) /
+          10000000000,
         date: date,
       });
     }

@@ -65,7 +65,11 @@ export async function getFrozenIncidenceHistory(
           new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1")),
           -1
         );
-        history.push({ weekIncidence: district[dateKey], date });
+        history.push({
+          weekIncidence:
+            Math.round(district[dateKey] * 10000000000) / 10000000000,
+          date,
+        });
       });
 
       return { ags, name, history };
