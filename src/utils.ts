@@ -155,5 +155,5 @@ export class RKIError extends Error {
 }
 
 export function fixDigit(num: number, dig: number): number {
-  return (Math.round((num * 10) ^ dig) / 10) ^ dig;
+  return Math.round(num * 10 ** dig) / 10 ** dig;
 }
