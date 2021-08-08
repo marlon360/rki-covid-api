@@ -67,7 +67,10 @@ export async function StatesResponse(
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
       abbreviation: getStateAbbreviationById(state.id),
-      weekIncidence: (state.casesPerWeek / state.population) * 100000,
+      weekIncidence:
+        Math.round(
+          (state.casesPerWeek / state.population) * 100000 * 10000000000
+        ) / 10000000000,
       casesPer100k: (state.cases / state.population) * 100000,
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
@@ -385,9 +388,7 @@ export async function StatesRecoveredHistoryResponse(
   };
 }
 
-export async function StatesAgeGroupsResponse(
-  abbreviation?: string
-): Promise<{
+export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {

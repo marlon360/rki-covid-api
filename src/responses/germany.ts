@@ -71,7 +71,9 @@ export async function GermanyResponse(): Promise<GermanyData> {
     casesPerWeek += state.casesPerWeek;
   }
 
-  const weekIncidence = (casesPerWeek / population) * 100000;
+  const weekIncidence =
+    Math.round((casesPerWeek / population) * 100000 * 10000000000) /
+    10000000000;
   const casesPer100k = (casesData.data / population) * 100000;
 
   return {
