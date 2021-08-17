@@ -78,6 +78,17 @@ export async function getFrozenIncidenceHistory(
     districts = districts.filter((district) => district.ags === ags);
   }
 
+  districts.sort(function (a, b) {
+    if (a.ags < b.ags) {
+      return -1;
+    }
+    if (a.ags > b.ags) {
+      return 1;
+    }
+    // Namen müssen gleich sein
+    return 0;
+  });
+
   return {
     data: districts,
     lastUpdate: lastUpdate,

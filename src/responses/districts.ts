@@ -503,7 +503,7 @@ export async function FrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    data[historyData.ags] = historyData;
+    data[(+historyData.ags).toString()] = historyData;
   });
 
   return {
