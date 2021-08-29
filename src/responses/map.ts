@@ -32,7 +32,7 @@ export async function DistrictsMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 50 }).toBuffer();
+  return sharp(svgBuffer).png({ quality: 100 }).toBuffer();
 }
 
 export async function StatesMapResponse() {
@@ -61,7 +61,7 @@ export async function StatesMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 50 }).toBuffer();
+  return sharp(svgBuffer).png({ quality: 100 }).toBuffer();
 }
 
 export function IncidenceColorsResponse() {
