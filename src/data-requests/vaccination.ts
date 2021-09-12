@@ -35,7 +35,6 @@ export interface VaccinationCoverage {
       biontech: number;
       moderna: number;
       astraZeneca: number;
-      janssen: number;
     };
     delta: number;
     quote: number;
@@ -81,7 +80,6 @@ export interface VaccinationCoverage {
           biontech: number;
           moderna: number;
           astraZeneca: number;
-          janssen: number;
         };
         delta: number;
         quote: number;
@@ -140,7 +138,6 @@ export async function getVaccinationCoverage(): Promise<
     fullBiontech: number;
     fullModerna: number;
     fullAstraZeneca: number;
-    fullJanssen: number;
     fullDifference: number;
     boosterVacciantion: number;
     boosterBiontech: number;
@@ -161,7 +158,6 @@ export async function getVaccinationCoverage(): Promise<
       "fullBiontech",
       "fullModerna",
       "fullAstraZeneca",
-      "fullJanssen",
       "fullDifference",
       "boosterVacciantion",
       "boosterBiontech",
@@ -209,7 +205,7 @@ export async function getVaccinationCoverage(): Promise<
       "quotefull_18to59",
       "quotefull_gr60",
     ],
-    range: "A4:M21",
+    range: "A4:P21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -229,7 +225,6 @@ export async function getVaccinationCoverage(): Promise<
         biontech: 0,
         moderna: 0,
         astraZeneca: 0,
-        janssen: 0,
       },
       delta: 0,
       quote: 0,
@@ -247,6 +242,7 @@ export async function getVaccinationCoverage(): Promise<
       date: null,
       firstVaccination: 0,
       secondVaccination: 0,
+      boosterVaccination: 0,
       vaccinated: 0,
     },
     indication: {
@@ -288,13 +284,12 @@ export async function getVaccinationCoverage(): Promise<
           biontech: entry.fullBiontech,
           moderna: entry.fullModerna,
           astraZeneca: entry.fullAstraZeneca,
-          janssen: entry.fullJanssen,
         },
         delta: entry.fullDifference,
         quote:
           quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
       };
-      coverage.boosterVaccination = {
+      (coverage.boosterVaccination = {
         vaccianted: entry.boosterVacciantion,
         vaccination: {
           biontech: entry.boosterBiontech,
@@ -302,19 +297,19 @@ export async function getVaccinationCoverage(): Promise<
           janssen: entry.boosterJanssen,
         },
         delta: entry.boosterDifference,
-      },
-      coverage.indication = {
-        age: null,
-        job: null,
-        medical: null,
-        nursingHome: null,
-        secondVaccination: {
+      }),
+        (coverage.indication = {
           age: null,
           job: null,
           medical: null,
           nursingHome: null,
-        },
-      };
+          secondVaccination: {
+            age: null,
+            job: null,
+            medical: null,
+            nursingHome: null,
+          },
+        });
     } else {
       const cleanedStateName = cleanupString(entry.state);
       // cleanedStateName should always be cleaned
@@ -339,13 +334,12 @@ export async function getVaccinationCoverage(): Promise<
             biontech: entry.fullBiontech,
             moderna: entry.fullModerna,
             astraZeneca: entry.fullAstraZeneca,
-            janssen: entry.fullJanssen,
           },
           delta: entry.fullDifference,
           quote:
             quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
         },
-        coverage.boosterVaccination = {
+        boosterVaccination: {
           vaccianted: entry.boosterVacciantion,
           vaccination: {
             biontech: entry.boosterBiontech,
@@ -409,8 +403,7 @@ function extractVaccinationHistory(
       entry["Zweitimpfungen"] ||
       entry["vollständig geimpt"] ||
       entry["vollständig geimpft"];
-    const boostVac =
-      entry["Auffrischungsimpfung"];
+    const boostVac = entry["Auffrischungsimpfung"];
     if (typeof entry.Datum == "string") {
       const dateString: string = entry.Datum;
       const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
