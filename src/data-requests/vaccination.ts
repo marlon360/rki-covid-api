@@ -35,10 +35,18 @@ export interface VaccinationCoverage {
       biontech: number;
       moderna: number;
       astraZeneca: number;
-      janssen: number;
     };
     delta: number;
     quote: number;
+  };
+  boosterVaccination: {
+    vaccianted: number;
+    vaccination: {
+      biontech: number;
+      moderna: number;
+      janssen: number;
+    };
+    delta: number;
   };
   indication: {
     age: number;
@@ -72,10 +80,18 @@ export interface VaccinationCoverage {
           biontech: number;
           moderna: number;
           astraZeneca: number;
-          janssen: number;
         };
         delta: number;
         quote: number;
+      };
+      boosterVaccination: {
+        vaccianted: number;
+        vaccination: {
+          biontech: number;
+          moderna: number;
+          janssen: number;
+        };
+        delta: number;
       };
       indication: {
         age: number;
@@ -122,8 +138,12 @@ export async function getVaccinationCoverage(): Promise<
     fullBiontech: number;
     fullModerna: number;
     fullAstraZeneca: number;
-    fullJanssen: number;
     fullDifference: number;
+    boosterVacciantion: number;
+    boosterBiontech: number;
+    boosterModerna: number;
+    boosterJanssen: number;
+    boosterDifference: number;
   }>(sheet, {
     header: [
       "ags",
@@ -138,10 +158,14 @@ export async function getVaccinationCoverage(): Promise<
       "fullBiontech",
       "fullModerna",
       "fullAstraZeneca",
-      "fullJanssen",
       "fullDifference",
+      "boosterVacciantion",
+      "boosterBiontech",
+      "boosterModerna",
+      "boosterJanssen",
+      "boosterDifference",
     ],
-    range: "A4:N21",
+    range: "A4:R21",
   });
 
   const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
@@ -151,12 +175,15 @@ export async function getVaccinationCoverage(): Promise<
     totalvaccination: number;
     total1: number;
     totalfull: number;
+    totalbooster: number;
     quote1: number;
     quote1_ls18: number;
+    quote1_18plus_total: number;
     quote1_18to59: number;
     quote1_gr60: number;
     quotefull: number;
     quotefull_ls18: number;
+    quotefull_18plus_total: number;
     quotefull_18to59: number;
     quotefull_gr60: number;
   }>(quoteSheet, {
@@ -166,16 +193,19 @@ export async function getVaccinationCoverage(): Promise<
       "totalvaccination",
       "total1",
       "totalfull",
+      "totalbooster",
       "quote1",
       "quote1_ls18",
+      "quote1_18plus_total",
       "quote1_18to59",
       "quote1_gr60",
       "quotefull",
       "quotefull_ls18",
+      "quotefull_18plus_total",
       "quotefull_18to59",
       "quotefull_gr60",
     ],
-    range: "A4:M21",
+    range: "A4:P21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -195,15 +225,24 @@ export async function getVaccinationCoverage(): Promise<
         biontech: 0,
         moderna: 0,
         astraZeneca: 0,
-        janssen: 0,
       },
       delta: 0,
       quote: 0,
+    },
+    boosterVaccination: {
+      vaccianted: 0,
+      vaccination: {
+        biontech: 0,
+        moderna: 0,
+        janssen: 0,
+      },
+      delta: 0,
     },
     latestDailyVaccinations: {
       date: null,
       firstVaccination: 0,
       secondVaccination: 0,
+      boosterVaccination: 0,
       vaccinated: 0,
     },
     indication: {
@@ -245,24 +284,32 @@ export async function getVaccinationCoverage(): Promise<
           biontech: entry.fullBiontech,
           moderna: entry.fullModerna,
           astraZeneca: entry.fullAstraZeneca,
-          janssen: entry.fullJanssen,
         },
         delta: entry.fullDifference,
         quote:
           quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
       };
-      coverage.indication = {
-        age: null,
-        job: null,
-        medical: null,
-        nursingHome: null,
-        secondVaccination: {
+      (coverage.boosterVaccination = {
+        vaccianted: entry.boosterVacciantion,
+        vaccination: {
+          biontech: entry.boosterBiontech,
+          moderna: entry.boosterModerna,
+          janssen: entry.boosterJanssen,
+        },
+        delta: entry.boosterDifference,
+      }),
+        (coverage.indication = {
           age: null,
           job: null,
           medical: null,
           nursingHome: null,
-        },
-      };
+          secondVaccination: {
+            age: null,
+            job: null,
+            medical: null,
+            nursingHome: null,
+          },
+        });
     } else {
       const cleanedStateName = cleanupString(entry.state);
       // cleanedStateName should always be cleaned
@@ -287,11 +334,19 @@ export async function getVaccinationCoverage(): Promise<
             biontech: entry.fullBiontech,
             moderna: entry.fullModerna,
             astraZeneca: entry.fullAstraZeneca,
-            janssen: entry.fullJanssen,
           },
           delta: entry.fullDifference,
           quote:
             quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
+        },
+        boosterVaccination: {
+          vaccianted: entry.boosterVacciantion,
+          vaccination: {
+            biontech: entry.boosterBiontech,
+            moderna: entry.boosterModerna,
+            janssen: entry.boosterJanssen,
+          },
+          delta: entry.boosterDifference,
         },
         indication: {
           age: null,
@@ -325,6 +380,7 @@ export interface VaccinationHistoryEntry {
   vaccinated: number;
   firstVaccination: number;
   secondVaccination: number;
+  boosterVaccination: number;
 }
 
 function extractVaccinationHistory(
@@ -347,6 +403,7 @@ function extractVaccinationHistory(
       entry["Zweitimpfungen"] ||
       entry["vollständig geimpt"] ||
       entry["vollständig geimpft"];
+    const boostVac = entry["Auffrischungsimpfung"];
     if (typeof entry.Datum == "string") {
       const dateString: string = entry.Datum;
       const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
@@ -355,6 +412,7 @@ function extractVaccinationHistory(
         vaccinated: firstVac ?? 0, // legacy attribute
         firstVaccination: firstVac ?? 0,
         secondVaccination: secVac ?? 0,
+        boosterVaccination: boostVac ?? 0,
       });
     } else if (entry.Datum instanceof Date) {
       vaccinationHistory.push({
@@ -362,6 +420,7 @@ function extractVaccinationHistory(
         vaccinated: firstVac ?? 0, // legacy attribute
         firstVaccination: firstVac ?? 0,
         secondVaccination: secVac ?? 0,
+        boosterVaccination: boostVac ?? 0,
       });
     }
   }
