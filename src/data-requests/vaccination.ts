@@ -40,7 +40,7 @@ export interface VaccinationCoverage {
     quote: number;
   };
   boosterVaccination: {
-    vaccianted: number;
+    vaccinated: number;
     vaccination: {
       biontech: number;
       moderna: number;
@@ -85,7 +85,7 @@ export interface VaccinationCoverage {
         quote: number;
       };
       boosterVaccination: {
-        vaccianted: number;
+        vaccinated: number;
         vaccination: {
           biontech: number;
           moderna: number;
@@ -139,7 +139,7 @@ export async function getVaccinationCoverage(): Promise<
     fullModerna: number;
     fullAstraZeneca: number;
     fullDifference: number;
-    boosterVacciantion: number;
+    boosterVaccination: number;
     boosterBiontech: number;
     boosterModerna: number;
     boosterJanssen: number;
@@ -159,7 +159,7 @@ export async function getVaccinationCoverage(): Promise<
       "fullModerna",
       "fullAstraZeneca",
       "fullDifference",
-      "boosterVacciantion",
+      "boosterVaccination",
       "boosterBiontech",
       "boosterModerna",
       "boosterJanssen",
@@ -230,7 +230,7 @@ export async function getVaccinationCoverage(): Promise<
       quote: 0,
     },
     boosterVaccination: {
-      vaccianted: 0,
+      vaccinated: 0,
       vaccination: {
         biontech: 0,
         moderna: 0,
@@ -290,7 +290,7 @@ export async function getVaccinationCoverage(): Promise<
           quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
       };
       (coverage.boosterVaccination = {
-        vaccianted: entry.boosterVacciantion,
+        vaccinated: entry.boosterVaccination,
         vaccination: {
           biontech: entry.boosterBiontech,
           moderna: entry.boosterModerna,
@@ -340,7 +340,7 @@ export async function getVaccinationCoverage(): Promise<
             quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
         },
         boosterVaccination: {
-          vaccianted: entry.boosterVacciantion,
+          vaccinated: entry.boosterVaccination,
           vaccination: {
             biontech: entry.boosterBiontech,
             moderna: entry.boosterModerna,

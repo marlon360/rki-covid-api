@@ -34,17 +34,17 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `secondVaccination.quote` Quote of full vaccinated people
 
-`secondVaccination.vacciantion.biontech` Number of people who received their second dose of BioNTech
+`secondVaccination.vaccination.biontech` Number of people who received their second dose of BioNTech
 
-`secondVaccination.vacciantion.moderna` Number of people who received their second dose of Moderna
+`secondVaccination.vaccination.moderna` Number of people who received their second dose of Moderna
 
-`secondVaccination.vacciantion.astraZeneca` Number of people who received their second dose of AstraZeneca
+`secondVaccination.vaccination.astraZeneca` Number of people who received their second dose of AstraZeneca
 
-`boosterVaccination.vacciantion.biontech` Number of people who received their booster dose of BioNTech
+`boosterVaccination.vaccination.biontech` Number of people who received their booster dose of BioNTech
 
-`boosterVaccination.vacciantion.moderna` Number of people who received their booster dose of Moderna
+`boosterVaccination.vaccination.moderna` Number of people who received their booster dose of Moderna
 
-`boosterVaccination.vacciantion.janssen` Number of people who received their booster dose of Janssen
+`boosterVaccination.vaccination.janssen` Number of people who received their booster dose of Janssen
 
 `boosterVaccination.delta` New booster vaccinations compared to yesterday
 
@@ -73,7 +73,7 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
       "delta":118952,
       "quote":0.619},
       "boosterVaccination": {
-        "vaccianted":162467,
+        "vaccinated":162467,
         "vaccination": {
           "biontech":152383,
           "moderna":9534,
@@ -124,7 +124,7 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
             "quote":0.607
           },
           "boosterVaccination": {
-            "vaccianted":32000,
+            "vaccinated":32000,
             "vaccination": {
               "biontech":30952,
               "moderna":1047,
@@ -169,7 +169,7 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
             "quote":null
           },
           "boosterVaccination": {
-            "vaccianted":33,
+            "vaccinated":33,
             "vaccination": {
               "biontech":23,
               "moderna":10,
