@@ -14,7 +14,7 @@ import {
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
-import { getActualHospitalization } from "../data-requests/hospitalization"
+import { getActualHospitalization } from "../data-requests/hospitalization";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -86,14 +86,28 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getRValue(),
     getActualHospitalization(),
   ]);
-  
-  const germany = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "00+");
-  const age0to4 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "00-04");
-  const age5to14 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "05-14");
-  const age15to34 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "15-34");
-  const age35to59 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "35-59");
-  const age60to79 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "60-79");
-  const age80plus = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "80+");
+
+  const germany = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "00+"
+  );
+  const age0to4 = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "00-04"
+  );
+  const age5to14 = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "05-14"
+  );
+  const age15to34 = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "15-34"
+  );
+  const age35to59 = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "35-59"
+  );
+  const age60to79 = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "60-79"
+  );
+  const age80plus = actualHospitalizationData.data.filter(
+    (element) => element.id === 0 && element.ageGroup === "80+"
+  );
 
   // calculate week incidence
   let population = 0;

@@ -11,55 +11,56 @@
 
 ```json
 {
-  "cases":4260187,
-  "deaths":93883,
-  "recovered":4043384,
-  "weekIncidence":63.612507101344235,
-  "casesPer100k":5123.186112455421,
-  "casesPerWeek":52897,
-  "delta":{
-    "cases":4799,
-    "deaths":90,
-    "recovered":10995},
-  "r":{
-    "value":0.83,
-    "rValue4Days":{
-      "value":0.83,
-      "date":"2021-10-01T00:00:00.000Z"
-    },
-    "rValue7Days":{
-      "value":0.92,
-      "date":"2021-09-30T00:00:00.000Z"
-    },
-    "lastUpdate":"2021-10-04T23:47:13.000Z"
+  "cases": 4260187,
+  "deaths": 93883,
+  "recovered": 4043384,
+  "weekIncidence": 63.612507101344235,
+  "casesPer100k": 5123.186112455421,
+  "casesPerWeek": 52897,
+  "delta": {
+    "cases": 4799,
+    "deaths": 90,
+    "recovered": 10995
   },
-  "hospitalization":{
-    "cases7D":1398,
-    "cases7DbyAge":{
-      "age0to4":50,
-      "age5to14":32,
-      "age15to34":227,
-      "age35to59":377,
-      "age60to79":365,
-      "age80plus":347
+  "r": {
+    "value": 0.83,
+    "rValue4Days": {
+      "value": 0.83,
+      "date": "2021-10-01T00:00:00.000Z"
     },
-    "incidence7D":1.68,
-    "incidence7DbyAge":{
-      "age0to4":1.26,
-      "age5to14":0.43,
-      "age15to34":1.2,
-      "age35to59":1.32,
-      "age60to79":2.01,
-      "age80plus":5.85
+    "rValue7Days": {
+      "value": 0.92,
+      "date": "2021-09-30T00:00:00.000Z"
     },
-    "lastUpdate":"2021-10-05T06:28:25.000Z"
+    "lastUpdate": "2021-10-04T23:47:13.000Z"
   },
-  "meta":{
-    "source":"Robert Koch-Institut",
-    "contact":"Marlon Lueckert (m.lueckert@me.com)",
-    "info":"https://github.com/marlon360/rki-covid-api",
-    "lastUpdate":"2021-10-04T23:00:00.000Z",
-    "lastCheckedForUpdate":"2021-10-05T20:34:10.593Z"
+  "hospitalization": {
+    "cases7D": 1398,
+    "cases7DbyAge": {
+      "age0to4": 50,
+      "age5to14": 32,
+      "age15to34": 227,
+      "age35to59": 377,
+      "age60to79": 365,
+      "age80plus": 347
+    },
+    "incidence7D": 1.68,
+    "incidence7DbyAge": {
+      "age0to4": 1.26,
+      "age5to14": 0.43,
+      "age15to34": 1.2,
+      "age35to59": 1.32,
+      "age60to79": 2.01,
+      "age80plus": 5.85
+    },
+    "lastUpdate": "2021-10-05T06:28:25.000Z"
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-10-04T23:00:00.000Z",
+    "lastCheckedForUpdate": "2021-10-05T20:34:10.593Z"
   }
 }
 ```
