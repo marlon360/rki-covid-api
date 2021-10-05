@@ -11,69 +11,132 @@
 
 ```json
 {
-  "data": {
-    "SH": {
-      "id": 1,
-      "name": "Schleswig-Holstein",
-      "population": 2903773,
-      "cases": 25751,
-      "deaths": 446,
-      "casesPerWeek": 2272,
-      "deathsPerWeek": 9,
-      "recovered": 19434,
-      "abbreviation": "SH",
-      "weekIncidence": 78.24303070522386,
-      "casesPer100k": 886.8117445819628,
-      "delta": {
-        "cases": 211,
-        "deaths": 3,
-        "recovered": 258
+  "data":{
+    "SH":{
+      "id":1,
+      "name":"Schleswig-Holstein",
+      "population":2910875,
+      "cases":76683,
+      "deaths":1690,
+      "casesPerWeek":841,
+      "deathsPerWeek":1,
+      "recovered":73523,
+      "abbreviation":"SH",
+      "weekIncidence":28.89165628891656,
+      "casesPer100k":2634.3625198608665,
+      "delta":{
+        "cases":102,
+        "deaths":3,
+        "recovered":145
+      },
+      "hospitalization":{
+        "cases7D":38,
+        "cases7DbyAge":{
+          "age0to4":1,
+          "age5to14":2,
+          "age15to34":5,
+          "age35to59":11,
+          "age60to79":10,
+          "age80plus":9
+        },
+        "incidence7D":1.31,
+        "incidence7DbyAge":{
+          "age0to4":0.77,
+          "age5to14":0.77,
+          "age15to34":0.79,
+          "age35to59":1.09,
+          "age60to79":1.51,
+          "age80plus":4.08
+        },
+        "lastUpdate":"2021-10-05T06:28:25.000Z"
       }
     },
-    "HH": {
-      "id": 2,
-      "name": "Hamburg",
-      "population": 1847253,
-      "cases": 37535,
-      "deaths": 661,
-      "casesPerWeek": 2027,
-      "deathsPerWeek": 2,
-      "recovered": 27864,
-      "abbreviation": "HH",
-      "weekIncidence": 109.73050253538634,
-      "casesPer100k": 2031.9360693960166,
-      "delta": {
-        "cases": 0,
-        "deaths": 0,
-        "recovered": 350
+    "HH":{
+      "id":2,
+      "name":"Hamburg",
+      "population":1852478,
+      "cases":92396,
+      "deaths":1741,
+      "casesPerWeek":1262,
+      "deathsPerWeek":3,
+      "recovered":86712,
+      "abbreviation":"HH",
+      "weekIncidence":68.12496558663585,
+      "casesPer100k":4987.697559701114,
+      "delta":{
+        "cases":227,
+        "deaths":0,
+        "recovered":250
+      },
+      "hospitalization":{
+        "cases7D":13,
+        "cases7DbyAge":{
+          "age0to4":0,
+          "age5to14":0,
+          "age15to34":1,
+          "age35to59":2,
+          "age60to79":6,
+          "age80plus":4
+        },
+        "incidence7D":0.7,
+        "incidence7DbyAge":{
+          "age0to4":0,
+          "age5to14":0,
+          "age15to34":0.2,
+          "age35to59":0.31,
+          "age60to79":1.84,
+          "age80plus":3.55
+        },
+        "lastUpdate":"2021-10-05T06:28:25.000Z"
       }
     },
     // ...
-    "TH": {
-      "id": 16,
-      "name": "Thüringen",
-      "population": 2133378,
-      "cases": 44696,
-      "deaths": 1054,
-      "casesPerWeek": 5364,
-      "deathsPerWeek": 42,
-      "recovered": 32643,
-      "abbreviation": "TH",
-      "weekIncidence": 251.43223563756632,
-      "casesPer100k": 2095.081134238752,
-      "delta": {
-        "cases": 330,
-        "deaths": 24,
-        "recovered": 811
+    "TH":{
+      "id":16,
+      "name":"Thüringen",
+      "population":2120237,
+      "cases":136370,
+      "deaths":4416,
+      "casesPerWeek":1615,
+      "deathsPerWeek":2,
+      "recovered":129211,
+      "abbreviation":"TH",
+      "weekIncidence":76.17072997028161,
+      "casesPer100k":6431.8281399673715,
+      "delta":{
+        "cases":177,
+        "deaths":1,
+        "recovered":186
+      },
+      "hospitalization":{
+        "cases7D":59,
+        "cases7DbyAge":{
+          "age0to4":1,
+          "age5to14":1,
+          "age15to34":5,
+          "age35to59":14,
+          "age60to79":17,
+          "age80plus":21
+        },
+        "incidence7D":2.78,
+        "incidence7DbyAge":{
+          "age0to4":1.14,
+          "age5to14":0.54,
+          "age15to34":1.29,
+          "age35to59":1.94,
+          "age60to79":3.04,
+          "age80plus":11.72
+        },
+        "lastUpdate":"2021-10-05T06:28:25.000Z"
       }
     }
   },
-  "meta": {
-    "source": "Robert Koch-Institut",
-    "contact": "Marlon Lueckert (m.lueckert@me.com)",
-    "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-04T00:00:00.000Z",
-    "lastCheckedForUpdate": "2021-01-04T13:44:55.187Z"
+  "meta":{
+    "source":"Robert Koch-Institut",
+    "contact":"Marlon Lueckert (m.lueckert@me.com)",
+    "info":"https://github.com/marlon360/rki-covid-api",
+    "lastUpdate":"2021-10-04T23:00:00.000Z",
+    "lastCheckedForUpdate":"2021-10-05T20:42:00.029Z"
   }
 }
 ```

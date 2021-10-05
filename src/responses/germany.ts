@@ -14,6 +14,7 @@ import {
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
+import { getActualHospitalization } from "../data-requests/hospitalization"
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -39,6 +40,27 @@ interface GermanyData extends IResponseMeta {
     deaths: number;
     recovered: number;
   };
+  hospitalization: {
+    cases7D: number;
+    cases7DbyAge: {
+      age0to4: number;
+      age5to14: number;
+      age15to34: number;
+      age35to59: number;
+      age60to79: number;
+      age80plus: number;
+    };
+    incidence7D: number;
+    incidence7DbyAge: {
+      age0to4: number;
+      age5to14: number;
+      age15to34: number;
+      age35to59: number;
+      age60to79: number;
+      age80plus: number;
+    };
+    lastUpdate: Date;
+  };
 }
 
 export async function GermanyResponse(): Promise<GermanyData> {
@@ -52,6 +74,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     newRecoveredData,
     statesData,
     rData,
+    actualHospitalizationData,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -61,7 +84,16 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getNewRecovered(),
     getStatesData(),
     getRValue(),
+    getActualHospitalization(),
   ]);
+  
+  const germany = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "00+");
+  const age0to4 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "00-04");
+  const age5to14 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "05-14");
+  const age15to34 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "15-34");
+  const age35to59 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "35-59");
+  const age60to79 = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "60-79");
+  const age80plus = actualHospitalizationData.data.filter((element) => element.id === 0 && element.ageGroup === "80+");
 
   // calculate week incidence
   let population = 0;
@@ -91,6 +123,27 @@ export async function GermanyResponse(): Promise<GermanyData> {
       rValue4Days: rData.data.rValue4Days,
       rValue7Days: rData.data.rValue7Days,
       lastUpdate: rData.lastUpdate,
+    },
+    hospitalization: {
+      cases7D: germany[0].cases7days,
+      cases7DbyAge: {
+        age0to4: age0to4[0].cases7days,
+        age5to14: age5to14[0].cases7days,
+        age15to34: age15to34[0].cases7days,
+        age35to59: age35to59[0].cases7days,
+        age60to79: age60to79[0].cases7days,
+        age80plus: age80plus[0].cases7days,
+      },
+      incidence7D: germany[0].incidence7days,
+      incidence7DbyAge: {
+        age0to4: age0to4[0].incidence7days,
+        age5to14: age5to14[0].incidence7days,
+        age15to34: age15to34[0].incidence7days,
+        age35to59: age35to59[0].incidence7days,
+        age60to79: age60to79[0].incidence7days,
+        age80plus: age80plus[0].incidence7days,
+      },
+      lastUpdate: actualHospitalizationData.lastUpdate,
     },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
