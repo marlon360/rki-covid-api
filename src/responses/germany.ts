@@ -15,6 +15,7 @@ import {
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
 import { fixDigit } from "../utils";
+import { getActualHospitalization } from "../data-requests/hospitalization";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -40,6 +41,27 @@ interface GermanyData extends IResponseMeta {
     deaths: number;
     recovered: number;
   };
+  hospitalization: {
+    cases7D: number;
+    cases7DbyAge: {
+      age0to4: number;
+      age5to14: number;
+      age15to34: number;
+      age35to59: number;
+      age60to79: number;
+      age80plus: number;
+    };
+    incidence7D: number;
+    incidence7DbyAge: {
+      age0to4: number;
+      age5to14: number;
+      age15to34: number;
+      age35to59: number;
+      age60to79: number;
+      age80plus: number;
+    };
+    lastUpdate: Date;
+  };
 }
 
 export async function GermanyResponse(): Promise<GermanyData> {
@@ -53,6 +75,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     newRecoveredData,
     statesData,
     rData,
+    actualHospitalizationData,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -62,7 +85,30 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getNewRecovered(),
     getStatesData(),
     getRValue(),
+    getActualHospitalization(),
   ]);
+
+  const germanyIndex = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "00+"
+  );
+  const age0to4Index = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "00-04"
+  );
+  const age5to14Index = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "05-14"
+  );
+  const age15to34Index = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "15-34"
+  );
+  const age35to59Index = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "35-59"
+  );
+  const age60to79Index = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "60-79"
+  );
+  const age80plusIndex = actualHospitalizationData.data.findIndex(
+    (element) => element.id === 0 && element.ageGroup === "80+"
+  );
 
   // calculate week incidence
   let population = 0;
@@ -92,6 +138,31 @@ export async function GermanyResponse(): Promise<GermanyData> {
       rValue4Days: rData.data.rValue4Days,
       rValue7Days: rData.data.rValue7Days,
       lastUpdate: rData.lastUpdate,
+    },
+    hospitalization: {
+      cases7D: actualHospitalizationData.data[germanyIndex].cases7days,
+      cases7DbyAge: {
+        age0to4: actualHospitalizationData.data[age0to4Index].cases7days,
+        age5to14: actualHospitalizationData.data[age5to14Index].cases7days,
+        age15to34: actualHospitalizationData.data[age15to34Index].cases7days,
+        age35to59: actualHospitalizationData.data[age35to59Index].cases7days,
+        age60to79: actualHospitalizationData.data[age60to79Index].cases7days,
+        age80plus: actualHospitalizationData.data[age80plusIndex].cases7days,
+      },
+      incidence7D: actualHospitalizationData.data[germanyIndex].incidence7days,
+      incidence7DbyAge: {
+        age0to4: actualHospitalizationData.data[age0to4Index].incidence7days,
+        age5to14: actualHospitalizationData.data[age5to14Index].incidence7days,
+        age15to34:
+          actualHospitalizationData.data[age15to34Index].incidence7days,
+        age35to59:
+          actualHospitalizationData.data[age35to59Index].incidence7days,
+        age60to79:
+          actualHospitalizationData.data[age60to79Index].incidence7days,
+        age80plus:
+          actualHospitalizationData.data[age80plusIndex].incidence7days,
+      },
+      lastUpdate: actualHospitalizationData.lastUpdate,
     },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
