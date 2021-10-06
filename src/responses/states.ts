@@ -457,9 +457,7 @@ export async function StatesRecoveredHistoryResponse(
   };
 }
 
-export async function StatesAgeGroupsResponse(
-  abbreviation?: string
-): Promise<{
+export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {
