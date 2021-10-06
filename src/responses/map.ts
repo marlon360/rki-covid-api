@@ -24,8 +24,9 @@ export async function DistrictsMapResponse() {
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence
+    );
     districtPathElement.attributes["stroke"] = "#DBDBDB";
     districtPathElement.attributes["stroke-width"] = "0.9";
   }
@@ -53,8 +54,9 @@ export async function StatesMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }

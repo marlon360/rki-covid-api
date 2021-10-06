@@ -2,7 +2,9 @@ import axios from "axios";
 import XLSX from "xlsx";
 import { fixDigit } from "../utils";
 
-function parseRValue(data: ArrayBuffer): {
+function parseRValue(
+  data: ArrayBuffer
+): {
   rValue4Days: {
     value: number;
     date: Date;
