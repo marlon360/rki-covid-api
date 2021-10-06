@@ -113,8 +113,11 @@ export async function StatesResponse(
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
       abbreviation: getStateAbbreviationById(state.id),
-      weekIncidence: (state.casesPerWeek / state.population) * 100000,
-      casesPer100k: (state.cases / state.population) * 100000,
+      weekIncidence: fixDigit(
+        (state.casesPerWeek / state.population) * 100000,
+        2
+      ),
+      casesPer100k: fixDigit((state.cases / state.population) * 100000, 0),
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
