@@ -87,6 +87,27 @@ export async function StatesResponse(
   }
 
   let states = statesData.data.map((state) => {
+    const stateIndex = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "00+"
+    );
+    const age0to4Index = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "00-04"
+    );
+    const age5to14Index = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "05-14"
+    );
+    const age15to34Index = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "15-34"
+    );
+    const age35to59Index = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "35-59"
+    );
+    const age60to79Index = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "60-79"
+    );
+    const age80plusIndex = actualHospitalizationData.data.findIndex(
+      (element) => element.id === state.id && element.ageGroup === "80+"
+    );
     return {
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
@@ -100,51 +121,28 @@ export async function StatesResponse(
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
       },
       hospitalization: {
-        cases7D: actualHospitalizationData.data.filter(
-          (element) => element.id === state.id && element.ageGroup === "00+"
-        )[0].cases7days,
+        cases7D: actualHospitalizationData.data[stateIndex].cases7days,
         cases7DbyAge: {
-          age0to4: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "00-04"
-          )[0].cases7days,
-          age5to14: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "05-14"
-          )[0].cases7days,
-          age15to34: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "15-34"
-          )[0].cases7days,
-          age35to59: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "35-59"
-          )[0].cases7days,
-          age60to79: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "60-79"
-          )[0].cases7days,
-          age80plus: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "80+"
-          )[0].cases7days,
+          age0to4: actualHospitalizationData.data[age0to4Index].cases7days,
+          age5to14: actualHospitalizationData.data[age5to14Index].cases7days,
+          age15to34: actualHospitalizationData.data[age15to34Index].cases7days,
+          age35to59: actualHospitalizationData.data[age35to59Index].cases7days,
+          age60to79: actualHospitalizationData.data[age60to79Index].cases7days,
+          age80plus: actualHospitalizationData.data[age80plusIndex].cases7days,
         },
-        incidence7D: actualHospitalizationData.data.filter(
-          (element) => element.id === state.id && element.ageGroup === "00+"
-        )[0].incidence7days,
+        incidence7D: actualHospitalizationData.data[stateIndex].incidence7days,
         incidence7DbyAge: {
-          age0to4: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "00-04"
-          )[0].incidence7days,
-          age5to14: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "05-14"
-          )[0].incidence7days,
-          age15to34: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "15-34"
-          )[0].incidence7days,
-          age35to59: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "35-59"
-          )[0].incidence7days,
-          age60to79: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "60-79"
-          )[0].incidence7days,
-          age80plus: actualHospitalizationData.data.filter(
-            (element) => element.id === state.id && element.ageGroup === "80+"
-          )[0].incidence7days,
+          age0to4: actualHospitalizationData.data[age0to4Index].incidence7days,
+          age5to14:
+            actualHospitalizationData.data[age5to14Index].incidence7days,
+          age15to34:
+            actualHospitalizationData.data[age15to34Index].incidence7days,
+          age35to59:
+            actualHospitalizationData.data[age35to59Index].incidence7days,
+          age60to79:
+            actualHospitalizationData.data[age60to79Index].incidence7days,
+          age80plus:
+            actualHospitalizationData.data[age80plusIndex].incidence7days,
         },
         lastUpdate: actualHospitalizationData.lastUpdate,
       },
@@ -458,7 +456,9 @@ export async function StatesRecoveredHistoryResponse(
   };
 }
 
-export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
+export async function StatesAgeGroupsResponse(
+  abbreviation?: string
+): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {

@@ -87,25 +87,25 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getActualHospitalization(),
   ]);
 
-  const germany = actualHospitalizationData.data.filter(
+  const germanyIndex = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "00+"
   );
-  const age0to4 = actualHospitalizationData.data.filter(
+  const age0to4Index = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "00-04"
   );
-  const age5to14 = actualHospitalizationData.data.filter(
+  const age5to14Index = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "05-14"
   );
-  const age15to34 = actualHospitalizationData.data.filter(
+  const age15to34Index = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "15-34"
   );
-  const age35to59 = actualHospitalizationData.data.filter(
+  const age35to59Index = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "35-59"
   );
-  const age60to79 = actualHospitalizationData.data.filter(
+  const age60to79Index = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "60-79"
   );
-  const age80plus = actualHospitalizationData.data.filter(
+  const age80plusIndex = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "80+"
   );
 
@@ -139,23 +139,27 @@ export async function GermanyResponse(): Promise<GermanyData> {
       lastUpdate: rData.lastUpdate,
     },
     hospitalization: {
-      cases7D: germany[0].cases7days,
+      cases7D: actualHospitalizationData.data[germanyIndex].cases7days,
       cases7DbyAge: {
-        age0to4: age0to4[0].cases7days,
-        age5to14: age5to14[0].cases7days,
-        age15to34: age15to34[0].cases7days,
-        age35to59: age35to59[0].cases7days,
-        age60to79: age60to79[0].cases7days,
-        age80plus: age80plus[0].cases7days,
+        age0to4: actualHospitalizationData.data[age0to4Index].cases7days,
+        age5to14: actualHospitalizationData.data[age5to14Index].cases7days,
+        age15to34: actualHospitalizationData.data[age15to34Index].cases7days,
+        age35to59: actualHospitalizationData.data[age35to59Index].cases7days,
+        age60to79: actualHospitalizationData.data[age60to79Index].cases7days,
+        age80plus: actualHospitalizationData.data[age80plusIndex].cases7days,
       },
-      incidence7D: germany[0].incidence7days,
+      incidence7D: actualHospitalizationData.data[germanyIndex].incidence7days,
       incidence7DbyAge: {
-        age0to4: age0to4[0].incidence7days,
-        age5to14: age5to14[0].incidence7days,
-        age15to34: age15to34[0].incidence7days,
-        age35to59: age35to59[0].incidence7days,
-        age60to79: age60to79[0].incidence7days,
-        age80plus: age80plus[0].incidence7days,
+        age0to4: actualHospitalizationData.data[age0to4Index].incidence7days,
+        age5to14: actualHospitalizationData.data[age5to14Index].incidence7days,
+        age15to34:
+          actualHospitalizationData.data[age15to34Index].incidence7days,
+        age35to59:
+          actualHospitalizationData.data[age35to59Index].incidence7days,
+        age60to79:
+          actualHospitalizationData.data[age60to79Index].incidence7days,
+        age80plus:
+          actualHospitalizationData.data[age80plusIndex].incidence7days,
       },
       lastUpdate: actualHospitalizationData.lastUpdate,
     },
