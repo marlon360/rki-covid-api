@@ -1,15 +1,5 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { AddDaysToDate } from "../utils";
-
-interface actualHospitalizationData {
-  date: Date;
-  state: string;
-  id: number;
-  ageGroup: string;
-  cases7days: number;
-  incidence7days: number;
-}
 
 export async function getActualHospitalization() {
   const response = await axios.get(
@@ -26,12 +16,12 @@ export async function getActualHospitalization() {
   });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const json = XLSX.utils.sheet_to_json<{
-    date: Date;
+    date: string;
     state: string;
-    id: number;
+    id: string;
     ageGroup: string;
-    cases7days: number;
-    incidence7days: number;
+    cases7days: string;
+    incidence7days: string;
   }>(sheet, {
     header: ["date", "state", "id", "ageGroup", "cases7days", "incidence7days"],
     range: 1,
@@ -43,18 +33,14 @@ export async function getActualHospitalization() {
   const tempDate = lastUpdate.split("T");
   const todayData = json.filter((element) => element.date === tempDate[0]);
   let actualHospitalizationData = [];
-  // get all date keys
+  // get all keys
   const actualData = Object.keys(todayData);
   actualData.forEach((key) => {
-    const date = AddDaysToDate(new Date(todayData[key].date.toString()), -1);
-    const state = todayData[key].state;
     const id = +todayData[key].id;
     const ageGroup = todayData[key].ageGroup;
     const cases7days = +todayData[key].cases7days;
     const incidence7days = +todayData[key].incidence7days;
     actualHospitalizationData.push({
-      date,
-      state,
       id,
       ageGroup,
       cases7days,
