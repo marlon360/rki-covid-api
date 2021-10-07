@@ -85,7 +85,7 @@ export async function StatesResponse(
     }
     return null;
   }
-
+  // find the indexes for hospitalization data
   let states = statesData.data.map((state) => {
     const stateIndex = actualHospitalizationData.data.findIndex(
       (element) => element.id === state.id && element.ageGroup === "00+"

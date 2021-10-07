@@ -1,15 +1,5 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { AddDaysToDate } from "../utils";
-
-interface actualHospitalizationData {
-  date: Date;
-  state: string;
-  id: number;
-  ageGroup: string;
-  cases7days: number;
-  incidence7days: number;
-}
 
 export async function getActualHospitalization() {
   const response = await axios.get(
@@ -21,17 +11,18 @@ export async function getActualHospitalization() {
   const data = response.data;
   const workbook = XLSX.read(data, {
     type: "buffer",
-    codepage: 65001,
-    raw: true,
+    codepage: 65001, // Codepage 65001 = UTF8
+    raw: true, // because some fields are interpreted as dates raed the data "raw"
   });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  // rawread all fields are strings!
   const json = XLSX.utils.sheet_to_json<{
-    date: Date;
+    date: string;
     state: string;
-    id: number;
+    id: string;
     ageGroup: string;
-    cases7days: number;
-    incidence7days: number;
+    cases7days: string;
+    incidence7days: string;
   }>(sheet, {
     header: ["date", "state", "id", "ageGroup", "cases7days", "incidence7days"],
     range: 1,
@@ -39,22 +30,19 @@ export async function getActualHospitalization() {
   const meta = await axios.get(
     `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/.zenodo.json`
   );
-  const lastUpdate = meta.data.publication_date;
-  const tempDate = lastUpdate.split("T");
-  const todayData = json.filter((element) => element.date === tempDate[0]);
+  const lastUpdate = meta.data.publication_date; // get the last date in Data
+  const tempDate = lastUpdate.split("T"); //split out the date only
+  const todayData = json.filter((element) => element.date === tempDate[0]); //filter out old data
   let actualHospitalizationData = [];
-  // get all date keys
+  // get all keys
   const actualData = Object.keys(todayData);
   actualData.forEach((key) => {
-    const date = AddDaysToDate(new Date(todayData[key].date.toString()), -1);
-    const state = todayData[key].state;
+    // only needed data to array
     const id = +todayData[key].id;
     const ageGroup = todayData[key].ageGroup;
     const cases7days = +todayData[key].cases7days;
     const incidence7days = +todayData[key].incidence7days;
     actualHospitalizationData.push({
-      date,
-      state,
       id,
       ageGroup,
       cases7days,

@@ -86,7 +86,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getRValue(),
     getActualHospitalization(),
   ]);
-
+  // find the indexes for hospitalization data
   const germanyIndex = actualHospitalizationData.data.findIndex(
     (element) => element.id === 0 && element.ageGroup === "00+"
   );
