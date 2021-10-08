@@ -32,21 +32,21 @@
       "hospitalization": {
         "cases7D": 38,
         "cases7DbyAge": {
-          "age0to4": 1,
-          "age5to14": 2,
-          "age15to34": 5,
-          "age35to59": 11,
-          "age60to79": 10,
-          "age80plus": 9
+          "A00-A04": 1,
+          "A05-A14": 2,
+          "A15-A34": 5,
+          "A35-A59": 11,
+          "A60-A79": 10,
+          "A80+": 9
         },
         "incidence7D": 1.31,
         "incidence7DbyAge": {
-          "age0to4": 0.77,
-          "age5to14": 0.77,
-          "age15to34": 0.79,
-          "age35to59": 1.09,
-          "age60to79": 1.51,
-          "age80plus": 4.08
+          "A00-A04": 0.77,
+          "A05-A14": 0.77,
+          "A15-A34": 0.79,
+          "A35-A59": 1.09,
+          "A60-A79": 1.51,
+          "A80+": 4.08
         },
         "lastUpdate": "2021-10-05T06:28:25.000Z"
       }
@@ -71,21 +71,21 @@
       "hospitalization": {
         "cases7D": 13,
         "cases7DbyAge": {
-          "age0to4": 0,
-          "age5to14": 0,
-          "age15to34": 1,
-          "age35to59": 2,
-          "age60to79": 6,
-          "age80plus": 4
+          "A00-A04": 0,
+          "A05-A14": 0,
+          "A15-A34": 1,
+          "A35-A59": 2,
+          "A60-A79": 6,
+          "A80+": 4
         },
         "incidence7D": 0.7,
         "incidence7DbyAge": {
-          "age0to4": 0,
-          "age5to14": 0,
-          "age15to34": 0.2,
-          "age35to59": 0.31,
-          "age60to79": 1.84,
-          "age80plus": 3.55
+          "A00-A04": 0,
+          "A05-A14": 0,
+          "A15-A34": 0.2,
+          "A35-A59": 0.31,
+          "A60-A79": 1.84,
+          "A80+": 3.55
         },
         "lastUpdate": "2021-10-05T06:28:25.000Z"
       }
@@ -111,21 +111,21 @@
       "hospitalization": {
         "cases7D": 59,
         "cases7DbyAge": {
-          "age0to4": 1,
-          "age5to14": 1,
-          "age15to34": 5,
-          "age35to59": 14,
-          "age60to79": 17,
-          "age80plus": 21
+          "A00-A04": 1,
+          "A05-A14": 1,
+          "A15-A34": 5,
+          "A35-A59": 14,
+          "A60-A79": 17,
+          "A80+": 21
         },
         "incidence7D": 2.78,
         "incidence7DbyAge": {
-          "age0to4": 1.14,
-          "age5to14": 0.54,
-          "age15to34": 1.29,
-          "age35to59": 1.94,
-          "age60to79": 3.04,
-          "age80plus": 11.72
+          "A00-A04": 1.14,
+          "A05-A14": 0.54,
+          "A15-A34": 1.29,
+          "A35-A59": 1.94,
+          "A60-A79": 3.04,
+          "A80+": 11.72
         },
         "lastUpdate": "2021-10-05T06:28:25.000Z"
       }
