@@ -44,21 +44,21 @@ interface GermanyData extends IResponseMeta {
   hospitalization: {
     cases7D: number;
     cases7DbyAge: {
-      age0to4: number;
-      age5to14: number;
-      age15to34: number;
-      age35to59: number;
-      age60to79: number;
-      age80plus: number;
+      "A00-A04": number;
+      "A05-A14": number;
+      "A15-A34": number;
+      "A35-A59": number;
+      "A60-A79": number;
+      "A80+": number;
     };
     incidence7D: number;
     incidence7DbyAge: {
-      age0to4: number;
-      age5to14: number;
-      age15to34: number;
-      age35to59: number;
-      age60to79: number;
-      age80plus: number;
+      "A00-A04": number;
+      "A05-A14": number;
+      "A15-A34": number;
+      "A35-A59": number;
+      "A60-A79": number;
+      "A80+": number;
     };
     lastUpdate: Date;
   };
@@ -142,24 +142,24 @@ export async function GermanyResponse(): Promise<GermanyData> {
     hospitalization: {
       cases7D: actualHospitalizationData.data[germanyIndex].cases7days,
       cases7DbyAge: {
-        age0to4: actualHospitalizationData.data[age0to4Index].cases7days,
-        age5to14: actualHospitalizationData.data[age5to14Index].cases7days,
-        age15to34: actualHospitalizationData.data[age15to34Index].cases7days,
-        age35to59: actualHospitalizationData.data[age35to59Index].cases7days,
-        age60to79: actualHospitalizationData.data[age60to79Index].cases7days,
-        age80plus: actualHospitalizationData.data[age80plusIndex].cases7days,
+        "A00-A04": actualHospitalizationData.data[age0to4Index].cases7days,
+        "A05-A14": actualHospitalizationData.data[age5to14Index].cases7days,
+        "A15-A34": actualHospitalizationData.data[age15to34Index].cases7days,
+        "A35-A59": actualHospitalizationData.data[age35to59Index].cases7days,
+        "A60-A79": actualHospitalizationData.data[age60to79Index].cases7days,
+        "A80+": actualHospitalizationData.data[age80plusIndex].cases7days,
       },
       incidence7D: actualHospitalizationData.data[germanyIndex].incidence7days,
       incidence7DbyAge: {
-        age0to4: actualHospitalizationData.data[age0to4Index].incidence7days,
-        age5to14: actualHospitalizationData.data[age5to14Index].incidence7days,
-        age15to34:
+        "A00-A04": actualHospitalizationData.data[age0to4Index].incidence7days,
+        "A05-A14": actualHospitalizationData.data[age5to14Index].incidence7days,
+        "A15-A34":
           actualHospitalizationData.data[age15to34Index].incidence7days,
-        age35to59:
+        "A35-A59":
           actualHospitalizationData.data[age35to59Index].incidence7days,
-        age60to79:
+        "A60-A79":
           actualHospitalizationData.data[age60to79Index].incidence7days,
-        age80plus:
+        "A80+":
           actualHospitalizationData.data[age80plusIndex].incidence7days,
       },
       lastUpdate: actualHospitalizationData.lastUpdate,
