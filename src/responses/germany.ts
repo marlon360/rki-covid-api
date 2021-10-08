@@ -16,6 +16,7 @@ import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
 import { fixDigit } from "../utils";
 import { getActualHospitalization } from "../data-requests/hospitalization";
+import { ageGroups } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -43,23 +44,9 @@ interface GermanyData extends IResponseMeta {
   };
   hospitalization: {
     cases7D: number;
-    cases7DbyAge: {
-      "A00-A04": number;
-      "A05-A14": number;
-      "A15-A34": number;
-      "A35-A59": number;
-      "A60-A79": number;
-      "A80+": number;
-    };
+    cases7DbyAge: ageGroups;
     incidence7D: number;
-    incidence7DbyAge: {
-      "A00-A04": number;
-      "A05-A14": number;
-      "A15-A34": number;
-      "A35-A59": number;
-      "A60-A79": number;
-      "A80+": number;
-    };
+    incidence7DbyAge: ageGroups;
     lastUpdate: Date;
   };
 }
@@ -159,8 +146,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
           actualHospitalizationData.data[age35to59Index].incidence7days,
         "A60-A79":
           actualHospitalizationData.data[age60to79Index].incidence7days,
-        "A80+":
-          actualHospitalizationData.data[age80plusIndex].incidence7days,
+        "A80+": actualHospitalizationData.data[age80plusIndex].incidence7days,
       },
       lastUpdate: actualHospitalizationData.lastUpdate,
     },

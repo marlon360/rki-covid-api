@@ -21,6 +21,7 @@ import {
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import { getActualHospitalization } from "../data-requests/hospitalization";
+import { ageGroups } from "../utils";
 
 interface StateData extends IStateData {
   abbreviation: string;
@@ -33,23 +34,9 @@ interface StateData extends IStateData {
   };
   hospitalization: {
     cases7D: number;
-    cases7DbyAge: {
-      "A00-A04": number;
-      "A05-A14": number;
-      "A15-A34": number;
-      "A35-A59": number;
-      "A60-A79": number;
-      "A80+": number;
-    };
+    cases7DbyAge: ageGroups;
     incidence7D: number;
-    incidence7DbyAge: {
-      "A00-A04": number;
-      "A05-A14": number;
-      "A15-A34": number;
-      "A35-A59": number;
-      "A60-A79": number;
-      "A80+": number;
-    };
+    incidence7DbyAge: ageGroups;
     lastUpdate: Date;
   };
 }
@@ -136,7 +123,8 @@ export async function StatesResponse(
         },
         incidence7D: actualHospitalizationData.data[stateIndex].incidence7days,
         incidence7DbyAge: {
-          "A00-A04": actualHospitalizationData.data[age0to4Index].incidence7days,
+          "A00-A04":
+            actualHospitalizationData.data[age0to4Index].incidence7days,
           "A05-A14":
             actualHospitalizationData.data[age5to14Index].incidence7days,
           "A15-A34":
@@ -145,8 +133,7 @@ export async function StatesResponse(
             actualHospitalizationData.data[age35to59Index].incidence7days,
           "A60-A79":
             actualHospitalizationData.data[age60to79Index].incidence7days,
-          "A80+":
-            actualHospitalizationData.data[age80plusIndex].incidence7days,
+          "A80+": actualHospitalizationData.data[age80plusIndex].incidence7days,
         },
         lastUpdate: actualHospitalizationData.lastUpdate,
       },

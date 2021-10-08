@@ -154,6 +154,15 @@ export class RKIError extends Error {
   }
 }
 
+export interface ageGroups {
+  "A00-A04": number;
+  "A05-A14": number;
+  "A15-A34": number;
+  "A35-A59": number;
+  "A60-A79": number;
+  "A80+": number;
+}
+
 export function fixDigit(num: number, dig: number): number {
   return Math.round(num * 10 ** dig) / 10 ** dig;
 }
