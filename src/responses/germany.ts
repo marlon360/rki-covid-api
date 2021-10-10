@@ -17,6 +17,7 @@ import { getStatesData } from "../data-requests/states";
 import { fixDigit } from "../utils";
 import { getActualHospitalization } from "../data-requests/hospitalization";
 import { ageGroups } from "../utils";
+import { ResponseData } from "../data-requests/response-data";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -75,27 +76,15 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getActualHospitalization(),
   ]);
 
-  const germanyIndex = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "00+"
-  );
-  const age0to4Index = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "00-04"
-  );
-  const age5to14Index = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "05-14"
-  );
-  const age15to34Index = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "15-34"
-  );
-  const age35to59Index = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "35-59"
-  );
-  const age60to79Index = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "60-79"
-  );
-  const age80plusIndex = actualHospitalizationData.data.findIndex(
-    (element) => element.id === 0 && element.ageGroup === "80+"
-  );
+  function getGermanHospitalisation(
+    data: ResponseData<any[]>,
+    ageGroup: string
+  ): any | null {
+    for (const germany of data.data) {
+      if (germany.id == 0 && germany.ageGroup == ageGroup) return germany;
+    }
+    return null;
+  }
 
   // calculate week incidence
   let population = 0;
@@ -127,26 +116,37 @@ export async function GermanyResponse(): Promise<GermanyData> {
       lastUpdate: rData.lastUpdate,
     },
     hospitalization: {
-      cases7D: actualHospitalizationData.data[germanyIndex].cases7days,
+      cases7D: getGermanHospitalisation(actualHospitalizationData, "00+")
+        .cases7days,
       cases7DbyAge: {
-        "A00-A04": actualHospitalizationData.data[age0to4Index].cases7days,
-        "A05-A14": actualHospitalizationData.data[age5to14Index].cases7days,
-        "A15-A34": actualHospitalizationData.data[age15to34Index].cases7days,
-        "A35-A59": actualHospitalizationData.data[age35to59Index].cases7days,
-        "A60-A79": actualHospitalizationData.data[age60to79Index].cases7days,
-        "A80+": actualHospitalizationData.data[age80plusIndex].cases7days,
+        "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
+          .cases7days,
+        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "04-14")
+          .cases7days,
+        "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
+          .cases7days,
+        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "34-59")
+          .cases7days,
+        "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
+          .cases7days,
+        "A80+": getGermanHospitalisation(actualHospitalizationData, "80+")
+          .cases7days,
       },
-      incidence7D: actualHospitalizationData.data[germanyIndex].incidence7days,
+      incidence7D: getGermanHospitalisation(actualHospitalizationData, "00+")
+        .incidence7days,
       incidence7DbyAge: {
-        "A00-A04": actualHospitalizationData.data[age0to4Index].incidence7days,
-        "A05-A14": actualHospitalizationData.data[age5to14Index].incidence7days,
-        "A15-A34":
-          actualHospitalizationData.data[age15to34Index].incidence7days,
-        "A35-A59":
-          actualHospitalizationData.data[age35to59Index].incidence7days,
-        "A60-A79":
-          actualHospitalizationData.data[age60to79Index].incidence7days,
-        "A80+": actualHospitalizationData.data[age80plusIndex].incidence7days,
+        "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
+          .incidence7days,
+        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "04-14")
+          .incidence7days,
+        "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
+          .incidence7days,
+        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "34-59")
+          .incidence7days,
+        "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
+          .incidence7days,
+        "A80+": getGermanHospitalisation(actualHospitalizationData, "80+")
+          .incidence7days,
       },
       lastUpdate: actualHospitalizationData.lastUpdate,
     },
