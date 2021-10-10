@@ -121,11 +121,11 @@ export async function GermanyResponse(): Promise<GermanyData> {
       cases7DbyAge: {
         "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
           .cases7days,
-        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "04-14")
+        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "05-14")
           .cases7days,
         "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
           .cases7days,
-        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "34-59")
+        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "35-59")
           .cases7days,
         "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
           .cases7days,
@@ -137,11 +137,11 @@ export async function GermanyResponse(): Promise<GermanyData> {
       incidence7DbyAge: {
         "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
           .incidence7days,
-        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "04-14")
+        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "05-14")
           .incidence7days,
         "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
           .incidence7days,
-        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "34-59")
+        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "35-59")
           .incidence7days,
         "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
           .incidence7days,
