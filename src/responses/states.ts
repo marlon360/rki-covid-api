@@ -66,35 +66,22 @@ export async function StatesResponse(
     getActualHospitalization(),
   ]);
 
-  function getStateById(data: ResponseData<any[]>, id: number): any | null {
+  function getStateById(
+    data: ResponseData<any[]>,
+    id: number,
+    ageGroup?: string
+  ): any | null {
     for (const state of data.data) {
-      if (state.id == id) return state;
+      if (ageGroup === undefined) {
+        if (state.id == id) return state;
+      } else {
+        if (state.id == id && state.ageGroup == ageGroup) return state;
+      }
     }
     return null;
   }
-  // find the indexes for hospitalization data
+
   let states = statesData.data.map((state) => {
-    const stateIndex = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "00+"
-    );
-    const age0to4Index = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "00-04"
-    );
-    const age5to14Index = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "05-14"
-    );
-    const age15to34Index = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "15-34"
-    );
-    const age35to59Index = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "35-59"
-    );
-    const age60to79Index = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "60-79"
-    );
-    const age80plusIndex = actualHospitalizationData.data.findIndex(
-      (element) => element.id === state.id && element.ageGroup === "80+"
-    );
     return {
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
@@ -108,28 +95,51 @@ export async function StatesResponse(
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
       },
       hospitalization: {
-        cases7D: actualHospitalizationData.data[stateIndex].cases7days,
+        cases7D:
+          getStateById(actualHospitalizationData, state.id, "00+")
+            ?.cases7days ?? 0,
         cases7DbyAge: {
-          "A00-A04": actualHospitalizationData.data[age0to4Index].cases7days,
-          "A05-A14": actualHospitalizationData.data[age5to14Index].cases7days,
-          "A15-A34": actualHospitalizationData.data[age15to34Index].cases7days,
-          "A35-A59": actualHospitalizationData.data[age35to59Index].cases7days,
-          "A60-A79": actualHospitalizationData.data[age60to79Index].cases7days,
-          "A80+": actualHospitalizationData.data[age80plusIndex].cases7days,
+          "A00-A04":
+            getStateById(actualHospitalizationData, state.id, "00-04")
+              ?.cases7days ?? 0,
+          "A05-A14":
+            getStateById(actualHospitalizationData, state.id, "05-14")
+              ?.cases7days ?? 0,
+          "A15-A34":
+            getStateById(actualHospitalizationData, state.id, "15-34")
+              ?.cases7days ?? 0,
+          "A35-A59":
+            getStateById(actualHospitalizationData, state.id, "35-59")
+              ?.cases7days ?? 0,
+          "A60-A79":
+            getStateById(actualHospitalizationData, state.id, "60-79")
+              ?.cases7days ?? 0,
+          "A80+":
+            getStateById(actualHospitalizationData, state.id, "80+")
+              ?.cases7days ?? 0,
         },
-        incidence7D: actualHospitalizationData.data[stateIndex].incidence7days,
+        incidence7D:
+          getStateById(actualHospitalizationData, state.id, "00+")
+            ?.incidence7days ?? 0,
         incidence7DbyAge: {
           "A00-A04":
-            actualHospitalizationData.data[age0to4Index].incidence7days,
+            getStateById(actualHospitalizationData, state.id, "00-04")
+              ?.incidence7days ?? 0,
           "A05-A14":
-            actualHospitalizationData.data[age5to14Index].incidence7days,
+            getStateById(actualHospitalizationData, state.id, "05-14")
+              ?.incidence7days ?? 0,
           "A15-A34":
-            actualHospitalizationData.data[age15to34Index].incidence7days,
+            getStateById(actualHospitalizationData, state.id, "15-34")
+              ?.incidence7days ?? 0,
           "A35-A59":
-            actualHospitalizationData.data[age35to59Index].incidence7days,
+            getStateById(actualHospitalizationData, state.id, "35-59")
+              ?.incidence7days ?? 0,
           "A60-A79":
-            actualHospitalizationData.data[age60to79Index].incidence7days,
-          "A80+": actualHospitalizationData.data[age80plusIndex].incidence7days,
+            getStateById(actualHospitalizationData, state.id, "60-79")
+              ?.incidence7days ?? 0,
+          "A80+":
+            getStateById(actualHospitalizationData, state.id, "80+")
+              ?.incidence7days ?? 0,
         },
         lastUpdate: actualHospitalizationData.lastUpdate,
       },
