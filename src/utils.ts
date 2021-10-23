@@ -115,7 +115,9 @@ export function getStateAbbreviationByName(name: string): string | null {
   }
 }
 
-export function getStateNameByAbbreviation(abbreviation: string): string | null {
+export function getStateNameByAbbreviation(
+  abbreviation: string
+): string | null {
   switch (abbreviation) {
     case "BW":
       return "Baden-Württemberg";
@@ -192,4 +194,3 @@ export class RKIError extends Error {
     this.url = url;
   }
 }
-

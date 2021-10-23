@@ -19,8 +19,11 @@ import {
   getStateIdByAbbreviation,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
-import { AgeGroups, getHospitalizationData, getLatestHospitalizationDataKey } from "../data-requests/hospitalization";
-import { ageGroups } from "../utils";
+import {
+  AgeGroups,
+  getHospitalizationData,
+  getLatestHospitalizationDataKey,
+} from "../data-requests/hospitalization";
 
 interface StateData extends IStateData {
   abbreviation: string;
@@ -35,7 +38,7 @@ interface StateData extends IStateData {
     cases7Days: number;
     incidence7Days: number;
     ageGroups: AgeGroups;
-    date: Date,
+    date: Date;
     lastUpdate: Date;
   };
 }
@@ -81,7 +84,9 @@ export async function StatesResponse(
     return null;
   }
 
-  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(hospitalizationData.data)
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
+    hospitalizationData.data
+  );
 
   let states = statesData.data.map((state) => {
     return {
@@ -97,9 +102,18 @@ export async function StatesResponse(
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
       },
       hospitalization: {
-        cases7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].cases7Days,
-        incidence7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].incidence7Days,
-        ageGroups: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].ageGroups,
+        cases7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].states[
+            state.name
+          ].cases7Days,
+        incidence7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].states[
+            state.name
+          ].incidence7Days,
+        ageGroups:
+          hospitalizationData.data[latestHospitalizationDataKey].states[
+            state.name
+          ].ageGroups,
         date: new Date(latestHospitalizationDataKey),
         lastUpdate: hospitalizationData.lastUpdate,
       },

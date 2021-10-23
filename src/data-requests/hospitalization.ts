@@ -31,7 +31,9 @@ export interface HospitalizationData {
   };
 }
 
-export async function getHospitalizationData(): Promise<ResponseData<HospitalizationData>> {
+export async function getHospitalizationData(): Promise<
+  ResponseData<HospitalizationData>
+> {
   const response = await axios.get(
     `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_COVID-19-Hospitalisierungen.csv`,
     {
@@ -85,10 +87,13 @@ export async function getHospitalizationData(): Promise<ResponseData<Hospitaliza
     // if "Bundesgebiet" write data to the root of the date entry, else add to "states" property
     if (element.state === "Bundesgebiet") {
       // get the current data for "Bundesgebiet"
-      hospitalizationDataEntry = { ...hospitalizationDataEntry, ...dateEntry}
+      hospitalizationDataEntry = { ...hospitalizationDataEntry, ...dateEntry };
     } else {
       // get the current data of the state
-      hospitalizationDataEntry = { ...hospitalizationDataEntry, ...dateEntry.states[element.state] }
+      hospitalizationDataEntry = {
+        ...hospitalizationDataEntry,
+        ...dateEntry.states[element.state],
+      };
     }
 
     // write to root if "00+" (all age groups combined) or if it is a specific age group to the "ageGroups" property
@@ -162,11 +167,12 @@ export async function getHospitalizationData(): Promise<ResponseData<Hospitaliza
   };
 }
 
-
-export function getLatestHospitalizationDataKey (hospitalizationData: HospitalizationData) {  
+export function getLatestHospitalizationDataKey(
+  hospitalizationData: HospitalizationData
+) {
   return Object.keys(hospitalizationData).sort((a, b) => {
     const dateA = new Date(a);
     const dateB = new Date(b);
     return dateB.getTime() - dateA.getTime();
-  })[0]
+  })[0];
 }

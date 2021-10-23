@@ -203,10 +203,10 @@ export async function GermanyAgeGroupsResponse(): Promise<{
 }> {
   const AgeGroupsData = await getGermanyAgeGroups();
   const hospitalizationData = await getHospitalizationData();
-  
+
   const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
     hospitalizationData.data
-  );  
+  );
 
   const data = {};
   Object.keys(AgeGroupsData.data).forEach((key) => {
