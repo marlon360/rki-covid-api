@@ -19,7 +19,7 @@ import {
   getStateIdByAbbreviation,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
-import { getActualHospitalization } from "../data-requests/hospitalization";
+import { AgeGroups, getHospitalizationData, getLatestHospitalizationDataKey } from "../data-requests/hospitalization";
 import { ageGroups } from "../utils";
 
 interface StateData extends IStateData {
@@ -32,10 +32,10 @@ interface StateData extends IStateData {
     recovered: number;
   };
   hospitalization: {
-    cases7D: number;
-    cases7DbyAge: ageGroups;
-    incidence7D: number;
-    incidence7DbyAge: ageGroups;
+    cases7Days: number;
+    incidence7Days: number;
+    ageGroups: AgeGroups;
+    date: Date,
     lastUpdate: Date;
   };
 }
@@ -56,14 +56,14 @@ export async function StatesResponse(
     statesNewCasesData,
     statesNewDeathsData,
     statesNewRecoveredData,
-    actualHospitalizationData,
+    hospitalizationData,
   ] = await Promise.all([
     getStatesData(),
     getStatesRecoveredData(),
     getNewStateCases(),
     getNewStateDeaths(),
     getNewStateRecovered(),
-    getActualHospitalization(),
+    getHospitalizationData(),
   ]);
 
   function getStateById(
@@ -81,6 +81,8 @@ export async function StatesResponse(
     return null;
   }
 
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(hospitalizationData.data)
+
   let states = statesData.data.map((state) => {
     return {
       ...state,
@@ -95,53 +97,11 @@ export async function StatesResponse(
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
       },
       hospitalization: {
-        cases7D:
-          getStateById(actualHospitalizationData, state.id, "00+")
-            ?.cases7days ?? 0,
-        cases7DbyAge: {
-          "A00-A04":
-            getStateById(actualHospitalizationData, state.id, "00-04")
-              ?.cases7days ?? 0,
-          "A05-A14":
-            getStateById(actualHospitalizationData, state.id, "05-14")
-              ?.cases7days ?? 0,
-          "A15-A34":
-            getStateById(actualHospitalizationData, state.id, "15-34")
-              ?.cases7days ?? 0,
-          "A35-A59":
-            getStateById(actualHospitalizationData, state.id, "35-59")
-              ?.cases7days ?? 0,
-          "A60-A79":
-            getStateById(actualHospitalizationData, state.id, "60-79")
-              ?.cases7days ?? 0,
-          "A80+":
-            getStateById(actualHospitalizationData, state.id, "80+")
-              ?.cases7days ?? 0,
-        },
-        incidence7D:
-          getStateById(actualHospitalizationData, state.id, "00+")
-            ?.incidence7days ?? 0,
-        incidence7DbyAge: {
-          "A00-A04":
-            getStateById(actualHospitalizationData, state.id, "00-04")
-              ?.incidence7days ?? 0,
-          "A05-A14":
-            getStateById(actualHospitalizationData, state.id, "05-14")
-              ?.incidence7days ?? 0,
-          "A15-A34":
-            getStateById(actualHospitalizationData, state.id, "15-34")
-              ?.incidence7days ?? 0,
-          "A35-A59":
-            getStateById(actualHospitalizationData, state.id, "35-59")
-              ?.incidence7days ?? 0,
-          "A60-A79":
-            getStateById(actualHospitalizationData, state.id, "60-79")
-              ?.incidence7days ?? 0,
-          "A80+":
-            getStateById(actualHospitalizationData, state.id, "80+")
-              ?.incidence7days ?? 0,
-        },
-        lastUpdate: actualHospitalizationData.lastUpdate,
+        cases7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].cases7Days,
+        incidence7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].incidence7Days,
+        ageGroups: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].ageGroups,
+        date: new Date(latestHospitalizationDataKey),
+        lastUpdate: hospitalizationData.lastUpdate,
       },
     };
   });

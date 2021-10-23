@@ -14,9 +14,10 @@ import {
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
-import { getActualHospitalization } from "../data-requests/hospitalization";
-import { ageGroups } from "../utils";
-import { ResponseData } from "../data-requests/response-data";
+import {
+  getHospitalizationData,
+  getLatestHospitalizationDataKey,
+} from "../data-requests/hospitalization";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -43,10 +44,9 @@ interface GermanyData extends IResponseMeta {
     recovered: number;
   };
   hospitalization: {
-    cases7D: number;
-    cases7DbyAge: ageGroups;
-    incidence7D: number;
-    incidence7DbyAge: ageGroups;
+    date: Date;
+    cases7Days: number;
+    incidence7Days: number;
     lastUpdate: Date;
   };
 }
@@ -62,7 +62,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     newRecoveredData,
     statesData,
     rData,
-    actualHospitalizationData,
+    hospitalizationData,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -72,18 +72,8 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getNewRecovered(),
     getStatesData(),
     getRValue(),
-    getActualHospitalization(),
+    getHospitalizationData(),
   ]);
-
-  function getGermanHospitalisation(
-    data: ResponseData<any[]>,
-    ageGroup: string
-  ): any | null {
-    for (const germany of data.data) {
-      if (germany.id == 0 && germany.ageGroup == ageGroup) return germany;
-    }
-    return null;
-  }
 
   // calculate week incidence
   let population = 0;
@@ -115,39 +105,16 @@ export async function GermanyResponse(): Promise<GermanyData> {
       lastUpdate: rData.lastUpdate,
     },
     hospitalization: {
-      cases7D: getGermanHospitalisation(actualHospitalizationData, "00+")
-        .cases7days,
-      cases7DbyAge: {
-        "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
-          .cases7days,
-        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "05-14")
-          .cases7days,
-        "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
-          .cases7days,
-        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "35-59")
-          .cases7days,
-        "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
-          .cases7days,
-        "A80+": getGermanHospitalisation(actualHospitalizationData, "80+")
-          .cases7days,
-      },
-      incidence7D: getGermanHospitalisation(actualHospitalizationData, "00+")
-        .incidence7days,
-      incidence7DbyAge: {
-        "A00-A04": getGermanHospitalisation(actualHospitalizationData, "00-04")
-          .incidence7days,
-        "A05-A14": getGermanHospitalisation(actualHospitalizationData, "05-14")
-          .incidence7days,
-        "A15-A34": getGermanHospitalisation(actualHospitalizationData, "15-34")
-          .incidence7days,
-        "A35-A59": getGermanHospitalisation(actualHospitalizationData, "35-59")
-          .incidence7days,
-        "A60-A79": getGermanHospitalisation(actualHospitalizationData, "60-79")
-          .incidence7days,
-        "A80+": getGermanHospitalisation(actualHospitalizationData, "80+")
-          .incidence7days,
-      },
-      lastUpdate: actualHospitalizationData.lastUpdate,
+      cases7Days:
+        hospitalizationData.data[
+          getLatestHospitalizationDataKey(hospitalizationData.data)
+        ].cases7Days,
+      incidence7Days:
+        hospitalizationData.data[
+          getLatestHospitalizationDataKey(hospitalizationData.data)
+        ].incidence7Days,
+      date: new Date(getLatestHospitalizationDataKey(hospitalizationData.data)),
+      lastUpdate: hospitalizationData.lastUpdate,
     },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
@@ -223,12 +190,42 @@ export async function GermanyRecoveredHistoryResponse(
 }
 
 export async function GermanyAgeGroupsResponse(): Promise<{
-  data: { [ageGroup: string]: AgeGroupData };
+  data: {
+    [ageGroup: string]: AgeGroupData & {
+      hospitalization: {
+        cases7Days: number;
+        incidence7Days: number;
+        date: Date;
+      };
+    };
+  };
   meta: ResponseMeta;
 }> {
   const AgeGroupsData = await getGermanyAgeGroups();
+  const hospitalizationData = await getHospitalizationData();
+  
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
+    hospitalizationData.data
+  );  
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((key) => {
+    data[key] = {
+      ...AgeGroupsData.data[key],
+      hospitalization: {
+        cases7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].ageGroups[key]
+            .cases7Days,
+        incidence7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].ageGroups[key]
+            .cases7Days,
+        date: new Date(latestHospitalizationDataKey),
+      },
+    };
+  });
+
   return {
-    data: AgeGroupsData.data,
+    data: data,
     meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }
