@@ -115,6 +115,45 @@ export function getStateAbbreviationByName(name: string): string | null {
   }
 }
 
+export function getStateNameByAbbreviation(abbreviation: string): string | null {
+  switch (abbreviation) {
+    case "BW":
+      return "Baden-Württemberg";
+    case "BY":
+      return "Bayern";
+    case "BE":
+      return "Berlin";
+    case "BB":
+      return "Brandenburg";
+    case "HB":
+      return "Bremen";
+    case "HH":
+      return "Hamburg";
+    case "HE":
+      return "Hessen";
+    case "MV":
+      return "Mecklenburg-Vorpommern";
+    case "NI":
+      return "Niedersachsen";
+    case "NW":
+      return "Nordrhein-Westfalen";
+    case "RP":
+      return "Rheinland-Pfalz";
+    case "SL":
+      return "Saarland";
+    case "SN":
+      return "Sachsen";
+    case "ST":
+      return "Sachsen-Anhalt";
+    case "SH":
+      return "Schleswig-Holstein";
+    case "TH":
+      return "Thüringen";
+    default:
+      return null;
+  }
+}
+
 export function getDateBefore(days: number): string {
   let offsetDate = new Date();
   offsetDate.setHours(0, 0, 0, 0);
@@ -154,11 +193,3 @@ export class RKIError extends Error {
   }
 }
 
-export interface ageGroups {
-  "A00-A04": number;
-  "A05-A14": number;
-  "A15-A34": number;
-  "A35-A59": number;
-  "A60-A79": number;
-  "A80+": number;
-}
