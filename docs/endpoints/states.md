@@ -15,56 +15,74 @@
     "SH": {
       "id": 1,
       "name": "Schleswig-Holstein",
-      "population": 2903773,
-      "cases": 25751,
-      "deaths": 446,
-      "casesPerWeek": 2272,
-      "deathsPerWeek": 9,
-      "recovered": 19434,
+      "population": 2910875,
+      "cases": 79941,
+      "deaths": 1712,
+      "casesPerWeek": 1678,
+      "deathsPerWeek": 1,
+      "recovered": 76035,
       "abbreviation": "SH",
-      "weekIncidence": 78.24303070522386,
-      "casesPer100k": 886.8117445819628,
+      "weekIncidence": 57.64589685232104,
+      "casesPer100k": 2746.287628290462,
       "delta": {
-        "cases": 211,
-        "deaths": 3,
-        "recovered": 258
+        "cases": 74,
+        "deaths": 0,
+        "recovered": 136
+      },
+      "hospitalization": {
+        "cases7Days": 51,
+        "incidence7Days": 1.75,
+        "date": "2021-10-25T00:00:00.000Z",
+        "lastUpdate": "2021-10-25T02:01:53.000Z"
       }
     },
     "HH": {
       "id": 2,
       "name": "Hamburg",
-      "population": 1847253,
-      "cases": 37535,
-      "deaths": 661,
-      "casesPerWeek": 2027,
-      "deathsPerWeek": 2,
-      "recovered": 27864,
+      "population": 1852478,
+      "cases": 96556,
+      "deaths": 1793,
+      "casesPerWeek": 1862,
+      "deathsPerWeek": 1,
+      "recovered": 90301,
       "abbreviation": "HH",
-      "weekIncidence": 109.73050253538634,
-      "casesPer100k": 2031.9360693960166,
+      "weekIncidence": 100.51401420151818,
+      "casesPer100k": 5212.2616300976315,
       "delta": {
-        "cases": 0,
-        "deaths": 0,
-        "recovered": 350
+        "cases": 280,
+        "deaths": 6,
+        "recovered": 174
+      },
+      "hospitalization": {
+        "cases7Days": 29,
+        "incidence7Days": 1.57,
+        "date": "2021-10-25T00:00:00.000Z",
+        "lastUpdate": "2021-10-25T02:01:53.000Z"
       }
     },
     // ...
     "TH": {
       "id": 16,
       "name": "Thüringen",
-      "population": 2133378,
-      "cases": 44696,
-      "deaths": 1054,
-      "casesPerWeek": 5364,
-      "deathsPerWeek": 42,
-      "recovered": 32643,
+      "population": 2120237,
+      "cases": 146156,
+      "deaths": 4462,
+      "casesPerWeek": 4755,
+      "deathsPerWeek": 5,
+      "recovered": 134169,
       "abbreviation": "TH",
-      "weekIncidence": 251.43223563756632,
-      "casesPer100k": 2095.081134238752,
+      "weekIncidence": 224.26738142952888,
+      "casesPer100k": 6893.380315502464,
       "delta": {
-        "cases": 330,
-        "deaths": 24,
-        "recovered": 811
+        "cases": 252,
+        "deaths": 1,
+        "recovered": 368
+      },
+      "hospitalization": {
+        "cases7Days": 164,
+        "incidence7Days": 7.73,
+        "date": "2021-10-25T00:00:00.000Z",
+        "lastUpdate": "2021-10-25T02:01:53.000Z"
       }
     }
   },
@@ -72,8 +90,8 @@
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-04T00:00:00.000Z",
-    "lastCheckedForUpdate": "2021-01-04T13:44:55.187Z"
+    "lastUpdate": "2021-10-24T23:00:00.000Z",
+    "lastCheckedForUpdate": "2021-10-25T11:09:21.355Z"
   }
 }
 ```
@@ -159,24 +177,34 @@ Redirects to `/states/history/cases`
   "data": {
     "SH": {
       "A00-A04": {
-        "casesMale": 71,
-        "casesFemale": 72,
+        "casesMale": 1368,
+        "casesFemale": 1305,
         "deathsMale": 0,
         "deathsFemale": 1,
-        "casesMalePer100k": 1225.2,
-        "casesFemalePer100k": 1321.6,
+        "casesMalePer100k": 2061.7,
+        "casesFemalePer100k": 2064,
         "deathsMalePer100k": 0,
-        "deathsFemalePer100k": 18.4
+        "deathsFemalePer100k": 1.6,
+        "hospitalization": {
+          "cases7Days": 1,
+          "incidence7Days": 1,
+          "date": "2021-10-25T00:00:00.000Z"
+        }
       },
       "A05-A14": {
-        "casesMale": 202,
-        "casesFemale": 169,
+        "casesMale": 4448,
+        "casesFemale": 4148,
         "deathsMale": 0,
         "deathsFemale": 0,
-        "casesMalePer100k": 1663.4,
-        "casesFemalePer100k": 1462.7,
+        "casesMalePer100k": 3321.9,
+        "casesFemalePer100k": 3267.1,
         "deathsMalePer100k": 0,
-        "deathsFemalePer100k": 0
+        "deathsFemalePer100k": 0,
+        "hospitalization": {
+          "cases7Days": 5,
+          "incidence7Days": 5,
+          "date": "2021-10-25T00:00:00.000Z"
+        }
       },
       "A15-A34": {
         // ...
@@ -194,14 +222,19 @@ Redirects to `/states/history/cases`
     // ...
     "TH": {
       "A00-A04": {
-        "casesMale": 1228,
-        "casesFemale": 1191,
+        "casesMale": 1680,
+        "casesFemale": 1625,
         "deathsMale": 0,
         "deathsFemale": 0,
-        "casesMalePer100k": 2656.9,
-        "casesFemalePer100k": 2699.5,
+        "casesMalePer100k": 3752.2,
+        "casesFemalePer100k": 3788.4,
         "deathsMalePer100k": 0,
-        "deathsFemalePer100k": 0
+        "deathsFemalePer100k": 0,
+        "hospitalization": {
+          "cases7Days": 2,
+          "incidence7Days": 2,
+          "date": "2021-10-25T00:00:00.000Z"
+        }
       },
       // ...
     },
@@ -247,24 +280,34 @@ Redirects to `/states/history/cases`
   "data": {
     "HH": {
       "A00-A04": {
-        "casesMale": 1095,
-        "casesFemale": 863,
+        "casesMale": 1603,
+        "casesFemale": 1316,
         "deathsMale": 0,
         "deathsFemale": 0,
-        "casesMalePer100k": 2139.3,
-        "casesFemalePer100k": 1769.8,
+        "casesMalePer100k": 3146.5,
+        "casesFemalePer100k": 2719.9,
         "deathsMalePer100k": 0,
-        "deathsFemalePer100k": 0
+        "deathsFemalePer100k": 0,
+        "hospitalization": {
+          "cases7Days": 1,
+          "incidence7Days": 1,
+          "date": "2021-10-25T00:00:00.000Z"
+        }
       },
       "A05-A14": {
-        "casesMale": 2775,
-        "casesFemale": 2510,
+        "casesMale": 4985,
+        "casesFemale": 4594,
         "deathsMale": 0,
         "deathsFemale": 0,
-        "casesMalePer100k": 3267.4,
-        "casesFemalePer100k": 3147,
+        "casesMalePer100k": 5786.6,
+        "casesFemalePer100k": 5663.1,
         "deathsMalePer100k": 0,
-        "deathsFemalePer100k": 0
+        "deathsFemalePer100k": 0,
+        "hospitalization": {
+          "cases7Days": 2,
+          "incidence7Days": 2,
+          "date": "2021-10-25T00:00:00.000Z"
+        }
       },
       "A15-A34": {
         // ...
