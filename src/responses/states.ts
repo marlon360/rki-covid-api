@@ -17,6 +17,7 @@ import {
   getDayDifference,
   getStateAbbreviationById,
   getStateIdByAbbreviation,
+  getStateNameByAbbreviation,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -438,8 +439,37 @@ export async function StatesAgeGroupsResponse(
     id = getStateIdByAbbreviation(abbreviation);
   }
   const AgeGroupsData = await getStatesAgeGroups(id);
+  const hospitalizationData = await getHospitalizationData();
+
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
+    hospitalizationData.data
+  );
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((stateAbbreviation) => {
+    data[stateAbbreviation] = {
+      ...AgeGroupsData.data[stateAbbreviation],
+    };
+    Object.keys(AgeGroupsData.data[stateAbbreviation]).forEach((ageGroup) => {
+      data[stateAbbreviation][ageGroup] = {
+        ...AgeGroupsData.data[stateAbbreviation][ageGroup],
+        hospitalization: {
+          cases7Days:
+            hospitalizationData.data[latestHospitalizationDataKey].states[
+              getStateNameByAbbreviation(stateAbbreviation)
+            ].ageGroups[ageGroup].cases7Days,
+          incidence7Days:
+            hospitalizationData.data[latestHospitalizationDataKey].states[
+              getStateNameByAbbreviation(stateAbbreviation)
+            ].ageGroups[ageGroup].cases7Days,
+          date: new Date(latestHospitalizationDataKey),
+        },
+      };
+    });
+  });
+
   return {
-    data: AgeGroupsData.data,
+    data: data,
     meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }
