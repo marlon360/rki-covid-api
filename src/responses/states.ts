@@ -111,10 +111,6 @@ export async function StatesResponse(
           hospitalizationData.data[latestHospitalizationDataKey].states[
             state.name
           ].incidence7Days,
-        ageGroups:
-          hospitalizationData.data[latestHospitalizationDataKey].states[
-            state.name
-          ].ageGroups,
         date: new Date(latestHospitalizationDataKey),
         lastUpdate: hospitalizationData.lastUpdate,
       },
