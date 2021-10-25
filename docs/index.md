@@ -158,7 +158,6 @@ Now you can access the server at `http://localhost:8080`.
 - Pandemie jetzt [https://pandemie.jetzt/](https://pandemie.jetzt/)
 - Corona Zahlen in Deutschland (Wordpress Plugin) [https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/](https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/)
 
-
 ## License
 
 <p xmlns:dct="http://purl.org/dc/terms/" xmlns:cc="http://creativecommons.org/ns#" class="license-text"><a rel="cc:attributionURL" property="dct:title" href="https://rki.marlon-lueckert.de">rki-covid-api</a> by <a rel="cc:attributionURL dct:creator" property="cc:attributionName" href="https://marlon-lueckert.de">Marlon Lückert</a> is licensed under <a rel="license" href="https://creativecommons.org/licenses/by/4.0">CC BY 4.0<img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1" /><img style="height:22px!important;margin-left:3px;vertical-align:text-bottom;" src="https://mirrors.creativecommons.org/presskit/icons/by.svg?ref=chooser-v1" /></a></p>
