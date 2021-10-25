@@ -156,6 +156,7 @@ Now you can access the server at `http://localhost:8080`.
 - Fallzahlen Statistik App [https://play.google.com/store/apps/details?id=com.companyname.statforms](https://play.google.com/store/apps/details?id=com.companyname.statforms)
 - Germany Covidometer [https://arashesdr.github.io/covidometer/](https://arashesdr.github.io/covidometer/)
 - Pandemie jetzt [https://pandemie.jetzt/](https://pandemie.jetzt/)
+- Corona Zahlen in Deutschland (Wordpress Plugin) [https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/](https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/)
 
 ## License
 
