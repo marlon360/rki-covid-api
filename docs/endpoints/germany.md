@@ -11,56 +11,41 @@
 
 ```json
 {
-  "cases": 4260187,
-  "deaths": 93883,
-  "recovered": 4043384,
-  "weekIncidence": 63.612507101344235,
-  "casesPer100k": 5123.186112455421,
-  "casesPerWeek": 52897,
+  "cases": 4472730,
+  "deaths": 95117,
+  "recovered": 4215170,
+  "weekIncidence": 110.06189150479662,
+  "casesPer100k": 5378.7845981321325,
+  "casesPerWeek": 91522,
   "delta": {
-    "cases": 4799,
-    "deaths": 90,
-    "recovered": 10995
+    "cases": 6573,
+    "deaths": 17,
+    "recovered": 8811
   },
   "r": {
-    "value": 0.83,
+    "value": 1.18,
     "rValue4Days": {
-      "value": 0.83,
-      "date": "2021-10-01T00:00:00.000Z"
+      "value": 1.18,
+      "date": "2021-10-21T00:00:00.000Z"
     },
     "rValue7Days": {
-      "value": 0.92,
-      "date": "2021-09-30T00:00:00.000Z"
+      "value": 1.17,
+      "date": "2021-10-20T00:00:00.000Z"
     },
-    "lastUpdate": "2021-10-04T23:47:13.000Z"
+    "lastUpdate": "2021-10-24T23:48:33.000Z"
   },
   "hospitalization": {
-    "cases7D": 1398,
-    "cases7DbyAge": {
-      "A00-A04": 50,
-      "A05-A14": 32,
-      "A15-A34": 227,
-      "A35-A59": 377,
-      "A60-A79": 365,
-      "A80+": 347
-    },
-    "incidence7D": 1.68,
-    "incidence7DbyAge": {
-      "A00-A04": 1.26,
-      "A05-A14": 0.43,
-      "A15-A34": 1.2,
-      "A35-A59": 1.32,
-      "A60-A79": 2.01,
-      "A80+": 5.85
-    },
-    "lastUpdate": "2021-10-05T06:28:25.000Z"
+    "cases7Days": 2303,
+    "incidence7Days": 2.77,
+    "date": "2021-10-25T00:00:00.000Z",
+    "lastUpdate": "2021-10-25T02:01:53.000Z"
   },
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-10-04T23:00:00.000Z",
-    "lastCheckedForUpdate": "2021-10-05T20:34:10.593Z"
+    "lastUpdate": "2021-10-24T23:00:00.000Z",
+    "lastCheckedForUpdate": "2021-10-25T11:06:58.517Z"
   }
 }
 ```
@@ -465,72 +450,102 @@ Returns the number of recovered people in germany for the last `:days` days.
 {
   "data": {
     "A00-A04": {
-      "casesMale": 43375,
-      "casesFemale": 40014,
-      "deathsMale": 2,
-      "deathsFemale": 6,
-      "casesMalePer100k": 2134.9,
-      "casesFemalePer100k": 2073.6,
-      "deathsMalePer100k": 0.1,
-      "deathsFemalePer100k": 0.3
+      "casesMale": 64370,
+      "casesFemale": 59621,
+      "deathsMale": 4,
+      "deathsFemale": 9,
+      "casesMalePer100k": 3161.5,
+      "casesFemalePer100k": 3084.3,
+      "deathsMalePer100k": 0.2,
+      "deathsFemalePer100k": 0.5,
+      "hospitalization": {
+        "cases7Days": 47,
+        "incidence7Days": 47,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     },
     "A05-A14": {
-      "casesMale": 123239,
-      "casesFemale": 112137,
+      "casesMale": 213364,
+      "casesFemale": 195741,
       "deathsMale": 3,
-      "deathsFemale": 3,
-      "casesMalePer100k": 3226.2,
-      "casesFemalePer100k": 3106.4,
+      "deathsFemale": 4,
+      "casesMalePer100k": 5527.2,
+      "casesFemalePer100k": 5365.1,
       "deathsMalePer100k": 0.1,
-      "deathsFemalePer100k": 0.1
+      "deathsFemalePer100k": 0.1,
+      "hospitalization": {
+        "cases7Days": 37,
+        "incidence7Days": 37,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     },
     "A15-A34": {
-      "casesMale": 503866,
-      "casesFemale": 499006,
-      "deathsMale": 90,
-      "deathsFemale": 51,
-      "casesMalePer100k": 5078.5,
-      "casesFemalePer100k": 5426.2,
-      "deathsMalePer100k": 0.9,
-      "deathsFemalePer100k": 0.6
+      "casesMale": 686975,
+      "casesFemale": 671273,
+      "deathsMale": 143,
+      "deathsFemale": 84,
+      "casesMalePer100k": 6998.9,
+      "casesFemalePer100k": 7371.9,
+      "deathsMalePer100k": 1.5,
+      "deathsFemalePer100k": 0.9,
+      "hospitalization": {
+        "cases7Days": 273,
+        "incidence7Days": 273,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     },
     "A35-A59": {
-      "casesMale": 635349,
-      "casesFemale": 677106,
-      "deathsMale": 2215,
-      "deathsFemale": 961,
-      "casesMalePer100k": 4364.5,
-      "casesFemalePer100k": 4714.6,
-      "deathsMalePer100k": 15.2,
-      "deathsFemalePer100k": 6.7
+      "casesMale": 803350,
+      "casesFemale": 848158,
+      "deathsMale": 3107,
+      "deathsFemale": 1314,
+      "casesMalePer100k": 5568.9,
+      "casesFemalePer100k": 5955.9,
+      "deathsMalePer100k": 21.5,
+      "deathsFemalePer100k": 9.2,
+      "hospitalization": {
+        "cases7Days": 510,
+        "incidence7Days": 510,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     },
     "A60-A79": {
-      "casesMale": 254426,
-      "casesFemale": 256076,
-      "deathsMale": 15719,
-      "deathsFemale": 8223,
-      "casesMalePer100k": 2978.1,
-      "casesFemalePer100k": 2691.6,
-      "deathsMalePer100k": 184,
-      "deathsFemalePer100k": 86.4
+      "casesMale": 296636,
+      "casesFemale": 299046,
+      "deathsMale": 18665,
+      "deathsFemale": 9890,
+      "casesMalePer100k": 3446.9,
+      "casesFemalePer100k": 3132.2,
+      "deathsMalePer100k": 216.9,
+      "deathsFemalePer100k": 103.6,
+      "hospitalization": {
+        "cases7Days": 727,
+        "incidence7Days": 727,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     },
     "A80+": {
-      "casesMale": 94793,
-      "casesFemale": 185428,
-      "deathsMale": 25543,
-      "deathsFemale": 30838,
-      "casesMalePer100k": 4380.7,
-      "casesFemalePer100k": 5271.9,
-      "deathsMalePer100k": 1180.4,
-      "deathsFemalePer100k": 876.8
+      "casesMale": 104741,
+      "casesFemale": 202238,
+      "deathsMale": 28173,
+      "deathsFemale": 33576,
+      "casesMalePer100k": 4587.5,
+      "casesFemalePer100k": 5535.9,
+      "deathsMalePer100k": 1233.9,
+      "deathsFemalePer100k": 919.1,
+      "hospitalization": {
+        "cases7Days": 709,
+        "incidence7Days": 709,
+        "date": "2021-10-25T00:00:00.000Z"
+      }
     }
   },
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-05-04T01:09:15.000Z",
-    "lastCheckedForUpdate": "2021-05-04T20:34:41.427Z"
+    "lastUpdate": "2021-10-25T02:34:17.000Z",
+    "lastCheckedForUpdate": "2021-10-25T11:07:33.049Z"
   }
 }
 ```
