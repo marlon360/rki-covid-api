@@ -154,6 +154,7 @@ Now you can access the server at `http://localhost:8080`.
 - Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland [https://www.impfung.io/](https://www.impfung.io/)
 - Discordbot at [https://germanycovid.de/discord](https://germanycovid.de/discord)
 - Fallzahlen Statistik App [https://play.google.com/store/apps/details?id=com.companyname.statforms](https://play.google.com/store/apps/details?id=com.companyname.statforms)
+- Germany Covidometer [https://arashesdr.github.io/covidometer/](https://arashesdr.github.io/covidometer/)
 
 ## License
 
