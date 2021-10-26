@@ -457,7 +457,7 @@ export async function StatesAgeGroupsResponse(
           incidence7Days:
             hospitalizationData.data[latestHospitalizationDataKey].states[
               getStateNameByAbbreviation(stateAbbreviation)
-            ].ageGroups[ageGroup].cases7Days,
+            ].ageGroups[ageGroup].incidence7Days,
           date: new Date(latestHospitalizationDataKey),
         },
       };
