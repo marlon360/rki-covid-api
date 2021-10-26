@@ -218,7 +218,7 @@ export async function GermanyAgeGroupsResponse(): Promise<{
             .cases7Days,
         incidence7Days:
           hospitalizationData.data[latestHospitalizationDataKey].ageGroups[key]
-            .cases7Days,
+            .incidence7Days,
         date: new Date(latestHospitalizationDataKey),
       },
     };
