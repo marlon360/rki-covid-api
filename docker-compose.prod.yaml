@@ -1,0 +1,21 @@
+version: "3.8"
+networks:
+  redis-net:
+services:
+  redis:
+    image: redis
+    container_name: cache
+    expose:
+      - 6379
+    networks:
+      - redis-net
+  rki-api:
+    image: marlon360/rki-covid-server:v2
+    ports:
+      - "8080:3000"
+    depends_on:
+      - redis
+    environment:
+      - REDIS_URL=redis
+    networks:
+      - redis-net
