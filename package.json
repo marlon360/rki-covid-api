@@ -16,6 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@marlon360/express-queue": "^1.0.3",
     "@types/sharp": "^0.26.1",
     "axios": "^0.21.1",
     "compression": "^1.7.4",
