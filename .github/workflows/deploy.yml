@@ -16,9 +16,6 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: Install packages
-        run: npm install
-
       - name: Install Railway
         run: npm i -g @railway/cli
 
