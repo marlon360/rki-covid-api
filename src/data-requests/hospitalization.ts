@@ -46,8 +46,7 @@ export async function getHospitalizationData(): Promise<
       // get csv as stream
       const response = await axios({
         method: "get",
-        url:
-          "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_COVID-19-Hospitalisierungen.csv",
+        url: "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_COVID-19-Hospitalisierungen.csv",
         responseType: "stream",
       });
 
@@ -103,9 +102,8 @@ export async function getHospitalizationData(): Promise<
           switch (ageGroup) {
             case "00+":
               hospitalizationDataEntry.cases7Days = parseInt(cases7days);
-              hospitalizationDataEntry.incidence7Days = parseFloat(
-                incidence7days
-              );
+              hospitalizationDataEntry.incidence7Days =
+                parseFloat(incidence7days);
               break;
             case "00-04":
               hospitalizationDataEntry.ageGroups["A00-A04"] = {
