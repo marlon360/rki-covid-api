@@ -10,7 +10,7 @@ services:
     networks:
       - redis-net
   rki-api:
-    build: 
+    build:
       context: ./
       dockerfile: ./docker/Dockerfile
     # image: docker.pkg.github.com/marlon360/rki-covid-api/rki-server:latest
