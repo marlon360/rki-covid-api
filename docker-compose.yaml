@@ -10,14 +10,16 @@ services:
     networks:
       - redis-net
   rki-api:
-    build: .
+    build: 
+      context: ./
+      dockerfile: ./docker/Dockerfile
     # image: docker.pkg.github.com/marlon360/rki-covid-api/rki-server:latest
     ports:
       - "8080:3000"
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis
+      - REDISHOST=redis
     volumes:
       - ./src/cache:/usr/src/app/dist/cache
     networks:

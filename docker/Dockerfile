@@ -29,7 +29,7 @@ WORKDIR /usr/src/app
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY package*.json ./
+COPY ./package*.json ./
 
 # Inside "npm install" there are some build tools needed
 # Install the tools, execute "npm install" and remove the tolls afterwards
