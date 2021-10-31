@@ -6,8 +6,6 @@ cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
-> :warning: **Rate Limiting**: Due to the high traffic on the server the requests are limited to 15 requests every minute. If you need more requests, you can host the server yourself.
-
 ## Donation
 
 If you use this API, please consider supporting me:
