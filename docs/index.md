@@ -116,7 +116,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis
+      - REDISHOST=redis
     networks:
       - redis-net
 ```
