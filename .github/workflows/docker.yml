@@ -36,5 +36,7 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: marlon360/rki-covid-server
+          dockerfile: "./docker/Dockerfile"
+          context: "./"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
