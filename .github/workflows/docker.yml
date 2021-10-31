@@ -6,6 +6,7 @@ on:
       - "develop"
       - "v2"
       - "v2-proxy"
+      - "railway"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -17,8 +18,8 @@ jobs:
         id: docker
         with:
           IMAGE_NAME: "rki-server"
-          DOCKERFILE_PATH: "Dockerfile"
-          BUILD_CONTEXT: "."
+          DOCKERFILE_PATH: "./docker/Dockerfile"
+          BUILD_CONTEXT: "./"
           branch_tag: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,44 +36,7 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: marlon360/rki-covid-server
+          dockerfile: "./docker/Dockerfile"
+          context: "./"
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-  deploy_dev:
-    needs: build
-    if: github.ref == 'refs/heads/develop'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on dev server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki-dev && docker-compose pull && docker-compose up -d -V
-  deploy_prod:
-    needs: build
-    if: github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on production server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki && docker-compose pull && docker-compose up -d -V
-  deploy_v2-proxy:
-    needs: build
-    if: github.ref == 'refs/heads/v2-proxy'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Restart docker container on v2 proxy server
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          passphrase: ${{ secrets.PASSPHRASE }}
-          script: cd /home/docker/rki-v2 && docker-compose pull && docker-compose up -d -V
