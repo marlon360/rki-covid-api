@@ -20,7 +20,11 @@ export async function DistrictsMapResponse() {
   // add fill color to every districts
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
-    const id = idAttribute.split("-")[1];
+    let id = idAttribute.split("-")[1];
+    // fix for missing district Eisenach
+    if (id === "16056") {
+      id = "16063";
+    }
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
