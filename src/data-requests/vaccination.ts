@@ -47,6 +47,7 @@ export interface VaccinationCoverage {
       janssen: number;
     };
     delta: number;
+    quote: number;
   };
   indication: {
     age: number;
@@ -186,6 +187,11 @@ export async function getVaccinationCoverage(): Promise<
     quotefull_18plus_total: number;
     quotefull_18to59: number;
     quotefull_gr60: number;
+    quoteboost: number;
+    quoteboost_ls18: number;
+    quoteboost_18plus_total: number;
+    quoteboost_18to59: number;
+    quoteboost_gr60: number;
   }>(quoteSheet, {
     header: [
       "ags",
@@ -204,8 +210,13 @@ export async function getVaccinationCoverage(): Promise<
       "quotefull_18plus_total",
       "quotefull_18to59",
       "quotefull_gr60",
+      "quoteboost",
+      "quoteboost_ls18",
+      "quoteboost_18plus_total",
+      "quoteboost_18to59",
+      "quoteboost_gr60",
     ],
-    range: "A4:P21",
+    range: "A4:U21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -237,6 +248,7 @@ export async function getVaccinationCoverage(): Promise<
         janssen: 0,
       },
       delta: 0,
+      quote: 0,
     },
     latestDailyVaccinations: {
       date: null,
@@ -297,6 +309,8 @@ export async function getVaccinationCoverage(): Promise<
           janssen: entry.boosterJanssen,
         },
         delta: entry.boosterDifference,
+        quote: 
+          quoteEntry.quoteboost === null ? null : quoteEntry.quoteboost / 100.0,
       }),
         (coverage.indication = {
           age: null,
@@ -347,6 +361,8 @@ export async function getVaccinationCoverage(): Promise<
             janssen: entry.boosterJanssen,
           },
           delta: entry.boosterDifference,
+          quote: 
+            quoteEntry.quoteboost === null ? null : quoteEntry.quoteboost / 100.0,
         },
         indication: {
           age: null,
