@@ -70,10 +70,7 @@ export async function StatesResponse(
     getHospitalizationData(),
   ]);
 
-  function getStateById(
-    data: ResponseData<any[]>,
-    id: number,
-  ): any | null {
+  function getStateById(data: ResponseData<any[]>, id: number): any | null {
     for (const state of data.data) {
       if (state.id == id) return state;
     }
@@ -419,7 +416,9 @@ export async function StatesRecoveredHistoryResponse(
   };
 }
 
-export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
+export async function StatesAgeGroupsResponse(
+  abbreviation?: string
+): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {
