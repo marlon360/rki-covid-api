@@ -217,7 +217,7 @@ export async function getVaccinationCoverage(): Promise<
       "quoteboost_18to59",
       "quoteboost_gr60",
     ],
-    range: "A4:N21",
+    range: "A4:U21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -422,7 +422,7 @@ function extractVaccinationHistory(
       entry["Zweitimpfungen"] ||
       entry["vollständig geimpt"] ||
       entry["vollständig geimpft"];
-    const boostVac = entry["Auffrischungsimpfung"];
+    const boostVac = entry["Auffrischungsimpfung"] || entry["Auffrischimpfung"];
     if (typeof entry.Datum == "string") {
       const dateString: string = entry.Datum;
       const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
