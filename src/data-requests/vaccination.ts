@@ -217,7 +217,7 @@ export async function getVaccinationCoverage(): Promise<
       "quoteboost_18to59",
       "quoteboost_gr60",
     ],
-    range: "A4:P21",
+    range: "A4:N21",
   });
 
   const coverage: VaccinationCoverage = {
