@@ -73,14 +73,9 @@ export async function StatesResponse(
   function getStateById(
     data: ResponseData<any[]>,
     id: number,
-    ageGroup?: string
   ): any | null {
     for (const state of data.data) {
-      if (ageGroup === undefined) {
-        if (state.id == id) return state;
-      } else {
-        if (state.id == id && state.ageGroup == ageGroup) return state;
-      }
+      if (state.id == id) return state;
     }
     return null;
   }
