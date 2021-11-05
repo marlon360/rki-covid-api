@@ -93,6 +93,7 @@ export interface VaccinationCoverage {
           janssen: number;
         };
         delta: number;
+        quote: number;
       };
       indication: {
         age: number;
@@ -309,7 +310,7 @@ export async function getVaccinationCoverage(): Promise<
           janssen: entry.boosterJanssen,
         },
         delta: entry.boosterDifference,
-        quote: 
+        quote:
           quoteEntry.quoteboost === null ? null : quoteEntry.quoteboost / 100.0,
       }),
         (coverage.indication = {
@@ -361,8 +362,10 @@ export async function getVaccinationCoverage(): Promise<
             janssen: entry.boosterJanssen,
           },
           delta: entry.boosterDifference,
-          quote: 
-            quoteEntry.quoteboost === null ? null : quoteEntry.quoteboost / 100.0,
+          quote:
+            quoteEntry.quoteboost === null
+              ? null
+              : quoteEntry.quoteboost / 100.0,
         },
         indication: {
           age: null,
