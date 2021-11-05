@@ -20,7 +20,10 @@ export async function DistrictsMapResponse() {
   // add fill color to every districts
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
-    const id = idAttribute.split("-")[1];
+    const id =
+      idAttribute.split("-")[1] === "16056"
+        ? "16063"
+        : idAttribute.split("-")[1];
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
