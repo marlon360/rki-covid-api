@@ -38,6 +38,7 @@ import {
   DistrictsLegendMapResponse,
   DistrictsMapResponse,
   IncidenceColorsResponse,
+  StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
 import { RKIError } from "./utils";
@@ -737,6 +738,17 @@ app.get("/map/states", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesMapResponse();
   res.send(response);
 });
+
+app.get(
+  "/map/states-legend",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesLegendMapResponse();
+    res.send(response);
+  }
+);
 
 app.get(
   "/map/states/legend",

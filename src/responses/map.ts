@@ -94,6 +94,40 @@ export async function StatesMapResponse() {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
+export async function StatesLegendMapResponse() {
+  const mapData = StatesMap;
+
+  const statesData = await getStatesData();
+
+  // create hashmap for faster access
+  const statesDataHashMap = statesData.data.reduce(function (map, obj) {
+    map[obj.id] = obj;
+    return map;
+  }, {});
+
+  // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const district = statesDataHashMap[id];
+    const weekIncidence =
+      (district.casesPerWeek / district.population) * 100000;
+    statePathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  return sharp(
+    getMapBackground("7-Tage-Inzidenz der Bundesländer", statesData.lastUpdate)
+  )
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .png({ quality: 75 })
+    .toBuffer();
+}
+
 export function IncidenceColorsResponse() {
   return {
     incidentRanges: weekIncidenceColorRanges.ranges,
