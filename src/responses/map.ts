@@ -158,7 +158,7 @@ function getMapBackground(headline: string, lastUpdate: Date): Buffer {
               )}</tspan>
           </text>
           <g transform="translate(32.000000, 536.000000)">
-              <rect fill="#2D81B8" x="0" y="0" width="30" height="30"></rect>
+              <rect fill="#D1D1D1" x="0" y="0" width="30" height="30"></rect>
               <rect fill="#7FD38D" x="0" y="40" width="30" height="30"></rect>
               <rect fill="#FEFFB1" x="0" y="80" width="30" height="30"></rect>
               <rect fill="#FECA81" x="0" y="120" width="30" height="30"></rect>
