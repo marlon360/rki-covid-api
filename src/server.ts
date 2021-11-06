@@ -35,6 +35,7 @@ import {
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
+  DistrictsLegendMapResponse,
   DistrictsMapResponse,
   IncidenceColorsResponse,
   StatesMapResponse,
@@ -710,6 +711,17 @@ app.get("/map/districts", queuedCache(), cache.route(), async (req, res) => {
   const response = await DistrictsMapResponse();
   res.send(response);
 });
+
+app.get(
+  "/map/districts-legend",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    res.setHeader("Content-Type", "image/png");
+    const response = await DistrictsLegendMapResponse();
+    res.send(response);
+  }
+);
 
 app.get(
   "/map/districts/legend",
