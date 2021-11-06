@@ -20,23 +20,17 @@ export async function DistrictsMapResponse() {
   // add fill color to every districts
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
-    const id =
-      idAttribute.split("-")[1] === "16056"
-        ? "16063"
-        : idAttribute.split("-")[1];
+    let id = idAttribute.split("-")[1];
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
-      weekIncidence
-    );
-    districtPathElement.attributes["stroke"] = "#DBDBDB";
-    districtPathElement.attributes["stroke-width"] = "0.9";
+    districtPathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 100 }).toBuffer();
+  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
 export async function StatesMapResponse() {
@@ -57,16 +51,15 @@ export async function StatesMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] = getColorForWeekIncidence(
-      weekIncidence
-    );
+    statePathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 100 }).toBuffer();
+  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
 export function IncidenceColorsResponse() {
