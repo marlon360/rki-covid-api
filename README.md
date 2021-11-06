@@ -6,8 +6,6 @@ cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
-> :warning: **Rate Limiting**: Due to the high traffic on the server the requests are limited to 15 requests every minute. If you need more requests, you can host the server yourself.
-
 ## Donation
 
 If you use this API, please consider supporting me:
@@ -83,6 +81,10 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Ku
 
 https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0
 
+**Hospitalization data**
+
+https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_COVID-19-Hospitalisierungen.csv
+
 ## Host it yourself
 
 ### Requirements
@@ -113,7 +115,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis
+      - REDISHOST=redis
     networks:
       - redis-net
 ```
