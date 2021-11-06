@@ -43,7 +43,9 @@ import { RKIError } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
-  host: process.env.REDIS_URL,
+  host: process.env.REDISHOST,
+  port: process.env.REDISPORT,
+  auth_pass: process.env.REDISPASSWORD,
 });
 
 Date.prototype.toJSON = function () {
