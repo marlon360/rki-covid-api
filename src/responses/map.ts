@@ -21,17 +21,11 @@ export async function DistrictsMapResponse() {
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
     let id = idAttribute.split("-")[1];
-    // fix for missing district Eisenach
-    if (id === "16056") {
-      id = "16063";
-    }
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
     districtPathElement.attributes["fill"] =
       getColorForWeekIncidence(weekIncidence);
-    districtPathElement.attributes["stroke"] = "#DBDBDB";
-    districtPathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
