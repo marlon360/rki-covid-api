@@ -472,44 +472,7 @@ export async function getVaccinationHistory(
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
 
   const sheet = workbook.Sheets[workbook.SheetNames[3]];
-<<<<<<< HEAD
-
-  const json = XLSX.utils.sheet_to_json<{
-    Datum: Date;
-  }>(sheet);
-
-  let vaccinationHistory: VaccinationHistoryEntry[] = [];
-  for (const entry of json) {
-    const firstVac = entry["Erstimpfung"] || entry["Erstimpfungen"];
-    const secVac = entry["Zweitimpfung"] || entry["Zweitimpfungen"];
-    if (typeof entry.Datum == "string") {
-      const dateString: string = entry.Datum;
-      const DateNew: Date = new Date(dateString.replace(pattern, "$3-$2-$1"));
-      vaccinationHistory.push({
-        date: DateNew,
-        vaccinated: firstVac ?? 0, // legacy attribute
-        firstVaccination: firstVac ?? 0,
-        secondVaccination: secVac ?? 0,
-      });
-    } else if (entry.Datum instanceof Date) {
-      vaccinationHistory.push({
-        date: entry.Datum,
-        vaccinated: firstVac ?? 0, // legacy attribute
-        firstVaccination: firstVac ?? 0,
-        secondVaccination: secVac ?? 0,
-      });
-    }
-  }
-
-  if (days != null) {
-    const reference_date = new Date(getDateBefore(days + 1)); // We want to see the last x days, so add 1 to days
-    vaccinationHistory = vaccinationHistory.filter(
-      (element) => element.date > reference_date
-    );
-  }
-=======
   const vaccinationHistory = extractVaccinationHistory(sheet, days);
->>>>>>> 94f326b8cb0a8d78c017ca79b1bda2e191b27d96
 
   return {
     data: vaccinationHistory,
