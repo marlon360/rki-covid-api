@@ -24,9 +24,16 @@ RUN apk update \
    libpng-dev libwebp-dev orc-dev tiff-dev poppler-dev librsvg-dev \
    libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev\
    py-gobject3-dev \
+ && apk --no-cache add msttcorefonts-installer fontconfig \
+ && update-ms-fonts \
+ && fc-cache -f \ 
  && npm install \
  && apk del .vips-deps \
  && rm -rf /var/cache/apk/*
+
+#setup full-icu
+ENV NODE_ICU_DATA=/usr/src/app/node_modules/full-icu
+
 # If you are building your code for production
 # RUN npm ci --only=production
 
