@@ -78,24 +78,29 @@ const queuedCache = () => {
   };
 };
 
-app.get("/", async (req, res) => {
+app.get("/", async function (req, res) {
   res.redirect("docs");
 });
 
-app.get("/germany", queuedCache(), cache.route(), async (req, res) => {
+app.get("/germany", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyResponse();
   res.json(response);
 });
 
-app.get("/germany/history", queuedCache(), cache.route(), async (req, res) => {
-  res.redirect("/germany/history/cases");
-});
+app.get(
+  "/germany/history",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.redirect("/germany/history/cases");
+  }
+);
 
 app.get(
   "/germany/history/cases",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyCasesHistoryResponse();
     res.json(response);
   }
@@ -105,7 +110,7 @@ app.get(
   "/germany/history/cases/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyCasesHistoryResponse(
       parseInt(req.params.days)
     );
@@ -117,7 +122,7 @@ app.get(
   "/germany/history/incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyWeekIncidenceHistoryResponse();
     res.json(response);
   }
@@ -127,7 +132,7 @@ app.get(
   "/germany/history/incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
@@ -139,7 +144,7 @@ app.get(
   "/germany/history/deaths",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyDeathsHistoryResponse();
     res.json(response);
   }
@@ -149,7 +154,7 @@ app.get(
   "/germany/history/deaths/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyDeathsHistoryResponse(
       parseInt(req.params.days)
     );
@@ -161,7 +166,7 @@ app.get(
   "/germany/history/recovered",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyRecoveredHistoryResponse();
     res.json(response);
   }
@@ -171,7 +176,7 @@ app.get(
   "/germany/history/recovered/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
@@ -183,18 +188,18 @@ app.get(
   "/germany/age-groups",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await GermanyAgeGroupsResponse();
     res.json(response);
   }
 );
 
-app.get("/states", queuedCache(), cache.route(), async (req, res) => {
+app.get("/states", queuedCache(), cache.route(), async function (req, res) {
   const response = await StatesResponse();
   res.json(response);
 });
 
-app.get("/states/history", async (req, res) => {
+app.get("/states/history", async function (req, res) {
   res.redirect("/states/history/cases");
 });
 
@@ -202,7 +207,7 @@ app.get(
   "/states/history/cases",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesCasesHistoryResponse();
     res.json(response);
   }
@@ -212,7 +217,7 @@ app.get(
   "/states/history/cases/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesCasesHistoryResponse(
       parseInt(req.params.days)
     );
@@ -224,7 +229,7 @@ app.get(
   "/states/history/deaths",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesDeathsHistoryResponse();
     res.json(response);
   }
@@ -234,7 +239,7 @@ app.get(
   "/states/history/deaths/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesDeathsHistoryResponse(
       parseInt(req.params.days)
     );
@@ -246,7 +251,7 @@ app.get(
   "/states/history/recovered",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesRecoveredHistoryResponse();
     res.json(response);
   }
@@ -256,7 +261,7 @@ app.get(
   "/states/history/recovered/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
@@ -268,7 +273,7 @@ app.get(
   "/states/history/incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesWeekIncidenceHistoryResponse();
     res.json(response);
   }
@@ -278,7 +283,7 @@ app.get(
   "/states/history/incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
@@ -290,18 +295,23 @@ app.get(
   "/states/age-groups",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesAgeGroupsResponse();
     res.json(response);
   }
 );
 
-app.get("/states/:state", queuedCache(), cache.route(), async (req, res) => {
-  const response = await StatesResponse(req.params.state);
-  res.json(response);
-});
+app.get(
+  "/states/:state",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesResponse(req.params.state);
+    res.json(response);
+  }
+);
 
-app.get("/states/:state/history", async (req, res) => {
+app.get("/states/:state/history", async function (req, res) {
   res.redirect(`/states/${req.params.state}/history/cases`);
 });
 
@@ -309,7 +319,7 @@ app.get(
   "/states/:state/history/cases",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesCasesHistoryResponse(null, req.params.state);
     res.json(response);
   }
@@ -319,7 +329,7 @@ app.get(
   "/states/:state/history/cases/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesCasesHistoryResponse(
       parseInt(req.params.days),
       req.params.state
@@ -332,7 +342,7 @@ app.get(
   "/states/:state/history/incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesWeekIncidenceHistoryResponse(
       null,
       req.params.state
@@ -345,7 +355,7 @@ app.get(
   "/states/:state/history/incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesWeekIncidenceHistoryResponse(
       parseInt(req.params.days),
       req.params.state
@@ -358,7 +368,7 @@ app.get(
   "/states/:state/history/deaths",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesDeathsHistoryResponse(null, req.params.state);
     res.json(response);
   }
@@ -368,7 +378,7 @@ app.get(
   "/states/:state/history/deaths/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesDeathsHistoryResponse(
       parseInt(req.params.days),
       req.params.state
@@ -381,7 +391,7 @@ app.get(
   "/states/:state/history/recovered",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
       null,
       req.params.state
@@ -394,7 +404,7 @@ app.get(
   "/states/:state/history/recovered/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
       parseInt(req.params.days),
       req.params.state
@@ -407,18 +417,18 @@ app.get(
   "/states/:state/age-groups",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await StatesAgeGroupsResponse(req.params.state);
     res.json(response);
   }
 );
 
-app.get("/districts", queuedCache(), cache.route(), async (req, res) => {
+app.get("/districts", queuedCache(), cache.route(), async function (req, res) {
   const response = await DistrictsResponse();
   res.json(response);
 });
 
-app.get("/districts/history", async (req, res) => {
+app.get("/districts/history", async function (req, res) {
   res.redirect("/districts/history/cases");
 });
 
@@ -426,7 +436,7 @@ app.get(
   "/districts/history/cases",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsCasesHistoryResponse();
     res.json(response);
   }
@@ -436,7 +446,7 @@ app.get(
   "/districts/history/cases/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsCasesHistoryResponse(
       parseInt(req.params.days)
     );
@@ -448,7 +458,7 @@ app.get(
   "/districts/history/incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsWeekIncidenceHistoryResponse();
     res.json(response);
   }
@@ -458,7 +468,7 @@ app.get(
   "/districts/history/frozen-incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await FrozenIncidenceHistoryResponse();
     res.json(response);
   }
@@ -468,7 +478,7 @@ app.get(
   "/districts/history/frozen-incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await FrozenIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
@@ -480,7 +490,7 @@ app.get(
   "/districts/history/incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsWeekIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
@@ -492,7 +502,7 @@ app.get(
   "/districts/history/deaths",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsDeathsHistoryResponse();
     res.json(response);
   }
@@ -502,7 +512,7 @@ app.get(
   "/districts/history/deaths/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsDeathsHistoryResponse(
       parseInt(req.params.days)
     );
@@ -514,7 +524,7 @@ app.get(
   "/districts/history/recovered",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsRecoveredHistoryResponse();
     res.json(response);
   }
@@ -524,7 +534,7 @@ app.get(
   "/districts/history/recovered/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsRecoveredHistoryResponse(
       parseInt(req.params.days)
     );
@@ -536,13 +546,13 @@ app.get(
   "/districts/:district",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsResponse(req.params.district);
     res.json(response);
   }
 );
 
-app.get("/districts/:district/history", async (req, res) => {
+app.get("/districts/:district/history", async function (req, res) {
   res.redirect(`/districts/${req.params.district}/history/cases`);
 });
 
@@ -550,7 +560,7 @@ app.get(
   "/districts/:district/history/cases",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsCasesHistoryResponse(
       null,
       req.params.district
@@ -563,7 +573,7 @@ app.get(
   "/districts/:district/history/cases/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsCasesHistoryResponse(
       parseInt(req.params.days),
       req.params.district
@@ -576,7 +586,7 @@ app.get(
   "/districts/:district/history/incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsWeekIncidenceHistoryResponse(
       null,
       req.params.district
@@ -589,7 +599,7 @@ app.get(
   "/districts/:district/history/incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsWeekIncidenceHistoryResponse(
       parseInt(req.params.days),
       req.params.district
@@ -602,7 +612,7 @@ app.get(
   "/districts/:district/history/frozen-incidence",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await FrozenIncidenceHistoryResponse(
       null,
       req.params.district
@@ -615,7 +625,7 @@ app.get(
   "/districts/:district/history/frozen-incidence/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await FrozenIncidenceHistoryResponse(
       parseInt(req.params.days),
       req.params.district
@@ -628,7 +638,7 @@ app.get(
   "/districts/:district/history/deaths",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsDeathsHistoryResponse(
       null,
       req.params.district
@@ -641,7 +651,7 @@ app.get(
   "/districts/:district/history/deaths/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsDeathsHistoryResponse(
       parseInt(req.params.days),
       req.params.district
@@ -654,7 +664,7 @@ app.get(
   "/districts/:district/history/recovered",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsRecoveredHistoryResponse(
       null,
       req.params.district
@@ -667,7 +677,7 @@ app.get(
   "/districts/:district/history/recovered/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await DistrictsRecoveredHistoryResponse(
       parseInt(req.params.days),
       req.params.district
@@ -676,16 +686,21 @@ app.get(
   }
 );
 
-app.get("/vaccinations", queuedCache(), cache.route(), async (req, res) => {
-  const response = await VaccinationResponse();
-  res.json(response);
-});
+app.get(
+  "/vaccinations",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationResponse();
+    res.json(response);
+  }
+);
 
 app.get(
   "/vaccinations/history",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await VaccinationHistoryResponse();
     res.json(response);
   }
@@ -695,7 +710,7 @@ app.get(
   "/vaccinations/history/:days",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await VaccinationHistoryResponse(
       parseInt(req.params.days)
     );
@@ -703,21 +718,26 @@ app.get(
   }
 );
 
-app.get("/map", async (req, res) => {
+app.get("/map", async function (req, res) {
   res.redirect("/map/districts");
 });
 
-app.get("/map/districts", queuedCache(), cache.route(), async (req, res) => {
-  res.setHeader("Content-Type", "image/png");
-  const response = await DistrictsMapResponse();
-  res.send(response);
-});
+app.get(
+  "/map/districts",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await DistrictsMapResponse();
+    res.send(response);
+  }
+);
 
 app.get(
   "/map/districts-legend",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     res.setHeader("Content-Type", "image/png");
     const response = await DistrictsLegendMapResponse();
     res.send(response);
@@ -728,12 +748,12 @@ app.get(
   "/map/districts/legend",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     res.json(IncidenceColorsResponse());
   }
 );
 
-app.get("/map/states", queuedCache(), cache.route(), async (req, res) => {
+app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
   res.setHeader("Content-Type", "image/png");
   const response = await StatesMapResponse();
   res.send(response);
@@ -743,7 +763,7 @@ app.get(
   "/map/states-legend",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     res.setHeader("Content-Type", "image/png");
     const response = await StatesLegendMapResponse();
     res.send(response);
@@ -754,21 +774,26 @@ app.get(
   "/map/states/legend",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     res.json(IncidenceColorsResponse());
   }
 );
 
-app.get("/testing/history", queuedCache(), cache.route(), async (req, res) => {
-  const response = await TestingHistoryResponse();
-  res.json(response);
-});
+app.get(
+  "/testing/history",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await TestingHistoryResponse();
+    res.json(response);
+  }
+);
 
 app.get(
   "/testing/history/:weeks",
   queuedCache(),
   cache.route(),
-  async (req, res) => {
+  async function (req, res) {
     const response = await TestingHistoryResponse(parseInt(req.params.weeks));
     res.json(response);
   }
