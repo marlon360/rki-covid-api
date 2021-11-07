@@ -10,6 +10,9 @@ WORKDIR /tmp
 RUN wget -O- https://github.com/libvips/libvips/releases/download/v8.11.3/vips-8.11.3.tar.gz | tar xzC /tmp \
  && apk add --no-cache zlib libxml2 glib gobject-introspection libjpeg-turbo libexif lcms2 fftw giflib libpng \
      libwebp orc tiff poppler-glib librsvg libgsf openexr libheif libimagequant pango \
+ && apk --no-cache add msttcorefonts-installer fontconfig \
+ && update-ms-fonts \
+ && fc-cache -f \
  && apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
      libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
@@ -38,6 +41,8 @@ RUN apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
  && npm install \
  && apk del .vips-deps
+#setup full-icu
+ENV NODE_ICU_DATA=/usr/src/app/node_modules/full-icu
 # If you are building your code for production
 # RUN npm ci --only=production
 
