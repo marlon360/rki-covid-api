@@ -710,6 +710,17 @@ app.get("/map/districts", queuedCache(), cache.route(), async (req, res) => {
 });
 
 app.get(
+  "/map/districts-legend",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    res.setHeader("Content-Type", "image/png");
+    const response = await DistrictsMapResponse(true);
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/districts/legend",
   queuedCache(),
   cache.route(),
@@ -723,6 +734,17 @@ app.get("/map/states", queuedCache(), cache.route(), async (req, res) => {
   const response = await StatesMapResponse();
   res.send(response);
 });
+
+app.get(
+  "/map/states-legend",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesMapResponse(true);
+    res.send(response);
+  }
+);
 
 app.get(
   "/map/states/legend",
