@@ -165,31 +165,31 @@ function getMapBackground(
             <tspan>&lt; ${ranges[0].max}</tspan>
           </text>
           <text x="48" y="60" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[1].min} - &lt; ${ranges[1].max}</tspan>
+            <tspan>${ranges[1].min} - ${ranges[1].max}</tspan>
           </text>
           <text x="48" y="100" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[2].min} - &lt; ${ranges[2].max}</tspan>
+            <tspan>${ranges[2].min + 1} - ${ranges[2].max}</tspan>
           </text>
           <text x="48" y="140" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[3].min} - &lt; ${ranges[3].max}</tspan>
+            <tspan>${ranges[3].min + 1} - ${ranges[3].max}</tspan>
           </text>
           <text x="48" y="180" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[4].min} - &lt; ${ranges[4].max}</tspan>
+            <tspan>${ranges[4].min + 1} - ${ranges[4].max}</tspan>
           </text>
           <text x="48" y="220" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[5].min} - &lt; ${ranges[5].max}</tspan>
+            <tspan>${ranges[5].min + 1} - ${ranges[5].max}</tspan>
           </text>
           <text x="48" y="260" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[6].min} - &lt; ${ranges[6].max}</tspan>
+            <tspan>${ranges[6].min + 1} - ${ranges[6].max}</tspan>
           </text>
           <text x="48" y="300" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[7].min} - &lt; ${ranges[7].max}</tspan>
+            <tspan>${ranges[7].min + 1} - ${ranges[7].max}</tspan>
           </text>
           <text x="48" y="340" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[8].min} - &lt; ${ranges[8].max}</tspan>
+            <tspan>${ranges[8].min + 1} - ${ranges[8].max}</tspan>
           </text>
           <text x="48" y="380" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[9].min} - &lt; ${ranges[9].max}</tspan>
+            <tspan>${ranges[9].min + 1} - ${ranges[9].max}</tspan>
           </text>
           <text x="48" y="420" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
             <tspan>&gt; ${ranges[10].min}</tspan>
