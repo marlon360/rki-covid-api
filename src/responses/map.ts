@@ -5,6 +5,7 @@ import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
 import { weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
+import { on } from "events";
 
 export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
@@ -156,99 +157,59 @@ function getMapBackground(
   lastUpdate: Date,
   ranges: any
 ): Buffer {
-  return Buffer.from(`
-    <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
-          <tspan x="41" y="68">${headline}</tspan>
-        </text>
-        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
-          <tspan x="41" y="103">Stand: ${lastUpdate.toLocaleDateString(
-            "de-DE",
-            { year: "numeric", month: "2-digit", day: "2-digit" }
-          )}</tspan>
-        </text>
-        <g transform="translate(32.000000, 536.000000)">
-          <rect fill="${
-            ranges[0].color
-          }" x="0" y="0" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[1].color
-          }" x="0" y="40" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[2].color
-          }" x="0" y="80" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[3].color
-          }" x="0" y="120" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[4].color
-          }" x="0" y="160" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[5].color
-          }" x="0" y="200" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[6].color
-          }" x="0" y="240" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[7].color
-          }" x="0" y="280" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[8].color
-          }" x="0" y="320" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[9].color
-          }" x="0" y="360" width="30" height="30"></rect>
-          <rect fill="${
-            ranges[10].color
-          }" x="0" y="400" width="30" height="30"></rect>
-          <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>&lt; ${ranges[0].max}</tspan>
-          </text>
-          <text x="48" y="60" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[1].min} - ${ranges[1].max}</tspan>
-          </text>
-          <text x="48" y="100" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[2].min + 1} - ${ranges[2].max}</tspan>
-          </text>
-          <text x="48" y="140" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[3].min + 1} - ${ranges[3].max}</tspan>
-          </text>
-          <text x="48" y="180" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[4].min + 1} - ${ranges[4].max}</tspan>
-          </text>
-          <text x="48" y="220" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[5].min + 1} - ${ranges[5].max}</tspan>
-          </text>
-          <text x="48" y="260" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[6].min + 1} - ${ranges[6].max}</tspan>
-          </text>
-          <text x="48" y="300" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[7].min + 1} - ${ranges[7].max}</tspan>
-          </text>
-          <text x="48" y="340" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[8].min + 1} - ${ranges[8].max}</tspan>
-          </text>
-          <text x="48" y="380" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${ranges[9].min + 1} - ${ranges[9].max}</tspan>
-          </text>
-          <text x="48" y="420" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>&gt; ${ranges[10].min}</tspan>
-          </text>
-        </g>
-        <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
-        <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
-          <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
-        </text>
-        <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
-          <tspan x="15" y="189">Grafik von</tspan>
-          <tspan x="92" y="189" font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
-        </text>
-        <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
-          <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
-        </text>
-      </g>
-    </svg>
-  `);
+  let BufString = `<svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+    <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
+    <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+      <tspan x="41" y="68">${headline}</tspan>
+    </text>
+    <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+      <tspan x="41" y="103">Stand: ${lastUpdate.toLocaleDateString("de-DE", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      })}</tspan>
+    </text>
+    <g transform="translate(32.000000, 536.000000)">
+`;
+  const rangeKeys = Object.keys(ranges);
+  const highKey = rangeKeys.length - 1;
+  for (const key in rangeKeys) {
+    const tempString = `      <rect fill="${ranges[key].color}" x="0" y="${
+      parseInt(key) * 40
+    }" width="30" height="30"></rect>
+      <text x="48" y="${
+        20 + parseInt(key) * 40
+      }" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+        <tspan>${
+          key == "0"
+            ? "&lt; " + ranges[key].max
+            : parseInt(key) == highKey
+            ? "&gt; " + ranges[(parseInt(key) - 1).toString()].max
+            : (
+                parseInt(ranges[key].min) + (parseInt(key) > 1 ? 1 : 0)
+              ).toString() +
+              " - " +
+              ranges[key].max
+        }</tspan>
+      </text>
+`;
+    BufString += tempString;
+  }
+  BufString += `    </g>
+    <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
+    <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
+      <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
+    </text>
+    <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
+      <tspan x="15" y="189">Grafik von</tspan>
+      <tspan x="92" y="189" font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
+    </text>
+    <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
+      <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
+    </text>
+  </g>
+</svg>`;
+  console.log(BufString);
+  return Buffer.from(BufString);
 }
