@@ -5,7 +5,6 @@ import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
 import { weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
-import { on } from "events";
 
 export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
