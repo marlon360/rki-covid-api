@@ -156,7 +156,7 @@ function getMapBackground(
   lastUpdate: Date,
   ranges: any
 ): Buffer {
-  let BufString = `<svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  let svg = `<svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
   <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
     <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
     <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
@@ -174,7 +174,7 @@ function getMapBackground(
   const rangeKeys = Object.keys(ranges);
   const highKey = rangeKeys.length - 1;
   for (const key in rangeKeys) {
-    const tempString = `      <rect fill="${ranges[key].color}" x="0" y="${
+    svg += `      <rect fill="${ranges[key].color}" x="0" y="${
       parseInt(key) * 40
     }" width="30" height="30"></rect>
       <text x="48" y="${
@@ -193,9 +193,8 @@ function getMapBackground(
         }</tspan>
       </text>
 `;
-    BufString += tempString;
   }
-  BufString += `    </g>
+  svg += `    </g>
     <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
     <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
       <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
@@ -209,6 +208,5 @@ function getMapBackground(
     </text>
   </g>
 </svg>`;
-  console.log(BufString);
-  return Buffer.from(BufString);
+  return Buffer.from(svg);
 }
