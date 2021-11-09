@@ -203,6 +203,8 @@ function getMapBackground(
 `;
   }
   // add the rest to svg
+  // removed absolut positioning (x="92" y="189") from text "Marlon Lückert" because,
+  // if the font is a little different overlaps are possible, and it is not needed.
   svg += `
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
@@ -211,7 +213,7 @@ function getMapBackground(
         </text>
         <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
           <tspan x="15" y="189">Grafik von</tspan>
-          <tspan x="92" y="189" font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
+          <tspan font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
         </text>
         <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
           <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
