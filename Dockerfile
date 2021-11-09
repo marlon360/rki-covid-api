@@ -1,4 +1,4 @@
-FROM rubber4duck/vips-node-alpine:latest
+FROM rubber4duck/node16-alpine-vips:latest
 
 # common build flags
 ENV CFLAGS=-O3
@@ -30,9 +30,6 @@ RUN apk update \
  && npm install \
  && apk del .vips-deps \
  && rm -rf /var/cache/apk/*
-
-#setup full-icu
-ENV NODE_ICU_DATA=/usr/src/app/node_modules/full-icu
 
 # If you are building your code for production
 # RUN npm ci --only=production

@@ -1,4 +1,4 @@
-FROM --platform=linux/arm/v7 rubber4duck/vips-node-alpine:latest
+FROM --platform=linux/arm/v7 rubber4duck/node16-alpine-vips:latest
 
 # Add QEMU
 COPY qemu-arm-static /usr/bin/
@@ -29,9 +29,6 @@ RUN apk update \
  && npm install \
  && apk del .vips-deps \
  && rm -rf /var/cache/apk/*
-
-#setup full-icu
-ENV NODE_ICU_DATA=/usr/src/app/node_modules/full-icu
 
 # If you are building your code for production
 # RUN npm ci --only=production
