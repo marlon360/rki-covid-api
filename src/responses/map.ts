@@ -156,57 +156,64 @@ function getMapBackground(
   lastUpdate: Date,
   ranges: any
 ): Buffer {
-  let svg = `<svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-  <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-    <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-    <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
-      <tspan x="41" y="68">${headline}</tspan>
-    </text>
-    <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
-      <tspan x="41" y="103">Stand: ${lastUpdate.toLocaleDateString("de-DE", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      })}</tspan>
-    </text>
-    <g transform="translate(32.000000, 536.000000)">
-`;
+  // for better readability calculate all values outside of the string
   const rangeKeys = Object.keys(ranges);
-  const highKey = rangeKeys.length - 1;
+  const border = 32; // for the legend left and down
+  const countRanges = rangeKeys.length;
+  // each range needs 40 Pixel high + 32 Pixel border at the lower edge (same as left)
+  const posYlegend = 1000 - (countRanges * 40 + border); // if the number of ranges changes
+  const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  });
+  let svg = `
+    <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
+        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+          <tspan x="41" y="68">${headline}</tspan>
+        </text>
+        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+          <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
+        </text>
+        <g id="Legend" transform="translate(${border}, ${posYlegend})">
+`;
+  const highKey = countRanges - 1;
   for (const key in rangeKeys) {
-    svg += `      <rect fill="${ranges[key].color}" x="0" y="${
-      parseInt(key) * 40
-    }" width="30" height="30"></rect>
-      <text x="48" y="${
-        20 + parseInt(key) * 40
-      }" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-        <tspan>${
-          key == "0"
-            ? "&lt; " + ranges[key].max
-            : parseInt(key) == highKey
-            ? "&gt; " + ranges[(parseInt(key) - 1).toString()].max
-            : (
-                parseInt(ranges[key].min) + (parseInt(key) > 1 ? 1 : 0)
-              ).toString() +
-              " - " +
-              ranges[key].max
-        }</tspan>
-      </text>
+    const iKey = parseInt(key); //numeric key
+    const yPosRect = iKey * 40; // y Pos for the rect's
+    const yPosText = yPosRect + 20; // y Pos for the textes
+    const range =
+      iKey == 0
+        ? "&lt; " + ranges[key].max
+        : iKey == highKey
+        ? "&gt; " + ranges[(iKey - 1).toString()].max
+        : parseInt(ranges[key].min) +
+          (iKey > 1 ? 1 : 0) +
+          " - " +
+          ranges[key].max; // this is the range text (eg. "1 - 15")
+    svg += `
+          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" width="30" height="30"></rect>
+          <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+            <tspan>${range}</tspan>
+          </text>
 `;
   }
-  svg += `    </g>
-    <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
-    <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
-      <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
-    </text>
-    <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
-      <tspan x="15" y="189">Grafik von</tspan>
-      <tspan x="92" y="189" font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
-    </text>
-    <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
-      <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
-    </text>
-  </g>
-</svg>`;
+  svg += `
+        </g>
+        <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
+        <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
+          <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
+        </text>
+        <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
+          <tspan x="15" y="189">Grafik von</tspan>
+          <tspan x="92" y="189" font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
+        </text>
+        <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
+          <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
+        </text>
+      </g>
+    </svg>`;
   return Buffer.from(svg);
 }
