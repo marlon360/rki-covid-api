@@ -1,4 +1,4 @@
-FROM node:12-alpine3.12
+FROM node:16-alpine3.12
 
 # common build flags
 ENV CFLAGS=-O3
@@ -41,8 +41,7 @@ RUN apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
  && npm install \
  && apk del .vips-deps
-#setup full-icu
-ENV NODE_ICU_DATA=/usr/src/app/node_modules/full-icu
+
 # If you are building your code for production
 # RUN npm ci --only=production
 
