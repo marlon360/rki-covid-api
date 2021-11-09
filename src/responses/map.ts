@@ -157,16 +157,17 @@ function getMapBackground(
   ranges: any
 ): Buffer {
   // for better readability calculate all values outside of the string
-  const rangeKeys = Object.keys(ranges);
-  const border = 32; // for the legend left and down
-  const countRanges = rangeKeys.length;
+  const rangeKeys = Object.keys(ranges); // all keys of ranges
+  const border = 32; // for the legend, left and down
+  const countRanges = rangeKeys.length; // number of ranges
   // each range needs 40 Pixel high + 32 Pixel border at the lower edge (same as left)
-  const posYlegend = 1000 - (countRanges * 40 + border); // if the number of ranges changes
+  const posYlegend = 1000 - (countRanges * 40 + border); // y Pos of the Legend (if the number of ranges changed)
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
+  }); // localized lastUpdate string
+  // the first part of svg
   let svg = `
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -179,20 +180,21 @@ function getMapBackground(
         </text>
         <g id="Legend" transform="translate(${border}, ${posYlegend})">
 `;
-  const highKey = countRanges - 1;
+  const highKey = countRanges - 1; // the highest key (last key)
   for (const key in rangeKeys) {
     const iKey = parseInt(key); //numeric key
     const yPosRect = iKey * 40; // y Pos for the rect's
     const yPosText = yPosRect + 20; // y Pos for the textes
-    const range =
-      iKey == 0
-        ? "&lt; " + ranges[key].max
-        : iKey == highKey
-        ? "&gt; " + ranges[(iKey - 1).toString()].max
-        : parseInt(ranges[key].min) +
-          (iKey > 1 ? 1 : 0) +
+    const range = // this is the range text (eg. "1 - 15")
+      iKey == 0 // if first key then
+        ? "&lt; " + ranges[key].max // "< 1"
+        : iKey == highKey // else if last key then
+        ? "&gt; " + ranges[(iKey - 1).toString()].max // "> ranges.max from the key bevor"
+        : parseInt(ranges[key].min) + //else then
+          (iKey > 1 ? 1 : 0) + //add 1 to range.min if key > 1
           " - " +
-          ranges[key].max; // this is the range text (eg. "1 - 15")
+          ranges[key].max; //eg. "16 - 25"
+    // add rect and text for each key to svg
     svg += `
           <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" width="30" height="30"></rect>
           <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
@@ -200,6 +202,7 @@ function getMapBackground(
           </text>
 `;
   }
+  // add the rest to svg
   svg += `
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
