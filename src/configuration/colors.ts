@@ -53,17 +53,17 @@ export const weekIncidenceColorRanges = {
     {
       min: 1000,
       max: 1500,
-      color: "#000000",
+      color: "#444444",
     },
     {
       min: 1500,
       max: 2500,
-      color: "#646464",
+      color: "#303030",
     },
     {
       min: 2500,
       max: Infinity,
-      color: "#FFFFFF",
+      color: "#000000",
     },
   ],
 };
