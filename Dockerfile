@@ -27,6 +27,7 @@ RUN apk update \
  && apk --no-cache add msttcorefonts-installer fontconfig \
  && update-ms-fonts \
  && fc-cache -f \ 
+ && npm -g install npm@6.14.15 \
  && npm install \
  && apk del .vips-deps \
  && rm -rf /var/cache/apk/*
