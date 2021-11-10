@@ -16,20 +16,16 @@ COPY package*.json ./
 # Install the buildtools, dev packages of the required shared libs
 # execute "npm install" and remove the buildtools and dev packages afterwards
 RUN apk update \
- && apk upgrade \
- && apk add --no-cache --virtual .vips-deps build-base binutils \
-   zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
-   libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev \
-   libpng-dev libwebp-dev orc-dev tiff-dev poppler-dev librsvg-dev \
-   libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev\
-   py-gobject3-dev \
- && apk --no-cache add msttcorefonts-installer fontconfig \
- && update-ms-fonts \
- && fc-cache -f \
- && npm -g install npm@6.14.15 \
- && npm install \
- && apk del .vips-deps \
- && rm -rf /var/cache/apk/*
+  && apk upgrade \
+  && apk add --no-cache --virtual .vips-deps build-base binutils \
+    zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
+    libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev \
+    libpng-dev libwebp-dev orc-dev tiff-dev poppler-dev librsvg-dev \
+    libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev\
+    py-gobject3-dev \
+  && npm install \
+  && apk del .vips-deps \
+  && rm -rf /var/cache/apk/*
 
 # If you are building your code for production
 # RUN npm ci --only=production
