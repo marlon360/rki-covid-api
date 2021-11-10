@@ -1,7 +1,7 @@
 {
   "name": "rki-server",
   "version": "1.0.0",
-  "description": "A JSON Rest API to query all relevant corona data for Germany based on the figures of the Robert Koch-Institut.",
+  "description": "",
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -12,7 +12,7 @@
     "lint": "prettier --check .",
     "lint:fix": "prettier --write ."
   },
-  "author": "Marlon Lückert",
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "@marlon360/express-queue": "^1.0.3",
