@@ -24,6 +24,12 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
+      - name: Install redis
+        run: sudo apt-get install -y redis-tools redis-server
+
+      - name: Flush redis database
+        run: redis-cli -u ${{ secrets.REDIS_URL }} FLUSHDB
+
       - name: Purge cache
         uses: jakejarvis/cloudflare-purge-action@master
         env:
