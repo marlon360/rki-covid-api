@@ -804,6 +804,15 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         url: error.url || "",
       },
     });
+  } else if (axios.isAxiosError(error)) {
+    res.json({
+      error: {
+        message: "An error occurred while fetching external data.",
+        url: error.config.url,
+        details: error.message,
+        stack: error.stack,
+      },
+    });
   } else {
     const baseError = error as Error;
     res.json({
