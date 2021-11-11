@@ -4,6 +4,7 @@ import cors from "cors";
 import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
+import axios from "axios";
 
 import {
   StatesCasesHistoryResponse,
@@ -806,6 +807,15 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         message: "There is a problem with the official RKI API.",
         rkiError: error.rkiError,
         url: error.url || "",
+      },
+    });
+  } else if (axios.isAxiosError(error)) {
+    res.json({
+      error: {
+        message: "An error occurred while fetching external data.",
+        url: error.config.url,
+        details: error.message,
+        stack: error.stack,
       },
     });
   } else {
