@@ -54,17 +54,17 @@ export const weekIncidenceColorRanges: ColorRange[] = [
   new ColorRange({
     min: 0,
     max: 1,
-    color: "#88F89B",
+    color: "#25BA94",
   }),
   new ColorRange({
     min: 1,
     max: 15,
-    color: "#7FD38D",
+    color: "#76D985",
   }),
   new ColorRange({
     min: 15,
     max: 25,
-    color: "#FEFFB1",
+    color: "#FFFFA8",
   }),
   new ColorRange({
     min: 25,
@@ -74,35 +74,45 @@ export const weekIncidenceColorRanges: ColorRange[] = [
   new ColorRange({
     min: 35,
     max: 50,
-    color: "#F08A4B",
+    color: "#F1894A",
   }),
   new ColorRange({
     min: 50,
     max: 100,
-    color: "#EB1A1D",
+    color: "#F21620",
   }),
   new ColorRange({
     min: 100,
     max: 200,
-    color: "#AB1316",
+    color: "#A9141A",
   }),
   new ColorRange({
     min: 200,
     max: 350,
-    color: "#B374DD",
+    color: "#B275DD",
   }),
   new ColorRange({
     min: 350,
     max: 500,
-    color: "#5B189B",
+    color: "#5D179B",
   }),
   new ColorRange({
     min: 500,
     max: 1000,
-    color: "#543D35",
+    color: "#17179B",
   }),
   new ColorRange({
     min: 1000,
+    max: 1500,
+    color: "#543D35",
+  }),
+  new ColorRange({
+    min: 1500,
+    max: 2500,
+    color: "#2B1B0E",
+  }),
+  new ColorRange({
+    min: 2500,
     max: Infinity,
     color: "#020003",
   }),
