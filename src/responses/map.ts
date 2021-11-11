@@ -3,7 +3,7 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import { weekIncidenceColorRanges } from "../configuration/colors";
+import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 
 export async function DistrictsMapResponse() {
@@ -61,7 +61,7 @@ export async function DistrictsLegendMapResponse() {
     getMapBackground(
       "7-Tage-Inzidenz der Landkreise",
       districtsData.lastUpdate,
-      weekIncidenceColorRanges.ranges
+      weekIncidenceColorRanges
     )
   )
     .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -128,7 +128,7 @@ export async function StatesLegendMapResponse() {
     getMapBackground(
       "7-Tage-Inzidenz der Bundesländer",
       statesData.lastUpdate,
-      weekIncidenceColorRanges.ranges
+      weekIncidenceColorRanges
     )
   )
     .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -138,13 +138,13 @@ export async function StatesLegendMapResponse() {
 
 export function IncidenceColorsResponse() {
   return {
-    incidentRanges: weekIncidenceColorRanges.ranges,
+    incidentRanges: weekIncidenceColorRanges,
   };
 }
 
 function getColorForWeekIncidence(weekIncidence: number): string {
-  for (const range of weekIncidenceColorRanges.ranges) {
-    if (weekIncidence >= range.min && weekIncidence < range.max) {
+  for (const range of weekIncidenceColorRanges) {
+    if (range.isValueInRange(weekIncidence)) {
       return range.color;
     }
   }
@@ -154,14 +154,10 @@ function getColorForWeekIncidence(weekIncidence: number): string {
 function getMapBackground(
   headline: string,
   lastUpdate: Date,
-  ranges: any
+  ranges: ColorRange[]
 ): Buffer {
-  // for better readability calculate all values outside of the string
-  const rangeKeys = Object.keys(ranges); // all keys of ranges
   const border = 32; // for the legend, left and down
-  const countRanges = rangeKeys.length; // number of ranges
-  // each range needs 40 Pixel high + 32 Pixel border at the lower edge (same as left)
-  const posYlegend = 1000 - (countRanges * 40 + border); // y Pos of the Legend (if the number of ranges changed)
+  const yStartPosition = 1000 - border * 2; // start position from the bottom, add new ranges above
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -178,34 +174,19 @@ function getMapBackground(
         <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
-        <g id="Legend" transform="translate(${border}, ${posYlegend})">
-`;
-  const highKey = countRanges - 1; // the highest key (last key)
-  for (const key in rangeKeys) {
-    const iKey = parseInt(key); //numeric key
-    const yPosRect = iKey * 40; // y Pos for the rect's
-    const yPosText = yPosRect + 20; // y Pos for the textes
-    const range = // this is the range text (eg. "1 - 15")
-      iKey == 0 // if first key then
-        ? "&lt; " + ranges[key].max // "< 1"
-        : iKey == highKey // else if last key then
-        ? "&gt; " + ranges[(iKey - 1).toString()].max // "> ranges.max from the key bevor"
-        : parseInt(ranges[key].min) + //else then
-          (iKey > 1 ? 1 : 0) + //add 1 to range.min if key > 1
-          " - " +
-          ranges[key].max; //eg. "16 - 25"
-    // add rect and text for each key to svg
-    svg += `
-          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" width="30" height="30"></rect>
-          <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${range}</tspan>
-          </text>
-`;
-  }
-  // add the rest to svg
-  // removed absolut positioning (x="92" y="189") from text "Marlon Lückert" because,
-  // if the font is a little different overlaps are possible, and it is not needed.
-  svg += `
+        <g id="Legend" transform="translate(${border}, 0)">
+        ${ranges.map((range, index) => {
+          return `
+          <g transform="translate(0, ${yStartPosition - index * 40})">
+            <rect fill="${
+              range.color
+            }" x="0" y="0" width="30" height="30"></rect>
+            <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+              <tspan>${range.toString()}</tspan>
+            </text>
+          </g>
+          `;
+        })}
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
         <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
