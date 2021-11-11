@@ -5,6 +5,8 @@ import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
 import axios from "axios";
+import { weekIncidenceColorRanges } from "./configuration/colors";
+import { checkParmColormap } from "./utils";
 
 import {
   StatesCasesHistoryResponse,
@@ -41,6 +43,10 @@ import {
   StatesMapResponse,
 } from "./responses/map";
 import { RKIError } from "./utils";
+
+const defaultColormap = "default";
+const Legend = true;
+const noLegend = false;
 
 const cache = require("express-redis-cache")({
   expire: 1800,
@@ -725,7 +731,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse();
+    const response = await DistrictsMapResponse(defaultColormap, noLegend);
     res.send(response);
   }
 );
@@ -736,7 +742,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(true);
+    const response = await DistrictsMapResponse(defaultColormap, Legend);
     res.send(response);
   }
 );
@@ -746,13 +752,13 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse());
+    res.json(IncidenceColorsResponse(defaultColormap));
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse();
+  const response = await StatesMapResponse(defaultColormap, noLegend);
   res.send(response);
 });
 
@@ -762,7 +768,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesMapResponse(true);
+    const response = await StatesMapResponse(defaultColormap, Legend);
     res.send(response);
   }
 );
@@ -772,7 +778,117 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse());
+    res.json(IncidenceColorsResponse(defaultColormap));
+  }
+);
+
+app.get(
+  "/map/districts/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.setHeader("Content-Type", "image/png");
+      const response = await DistrictsMapResponse(checkedColormap, noLegend);
+      res.send(response);
+    }
+  }
+);
+
+app.get(
+  "/map/districts-legend/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.setHeader("Content-Type", "image/png");
+      const response = await DistrictsMapResponse(checkedColormap, Legend);
+      res.send(response);
+    }
+  }
+);
+
+app.get(
+  "/map/districts/legend/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.json(IncidenceColorsResponse(checkedColormap));
+    }
+  }
+);
+
+app.get(
+  "/map/states/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.setHeader("Content-Type", "image/png");
+      const response = await StatesMapResponse(checkedColormap, noLegend);
+      res.send(response);
+    }
+  }
+);
+
+app.get(
+  "/map/states-legend/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.setHeader("Content-Type", "image/png");
+      const response = await StatesMapResponse(checkedColormap, Legend);
+      res.send(response);
+    }
+  }
+);
+
+app.get(
+  "/map/states/legend/:colormap",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedColormap = checkParmColormap(
+      req.params.colormap,
+      weekIncidenceColorRanges
+    );
+    if (req.params.colormap != checkedColormap) {
+      throw new TypeError(checkedColormap);
+    } else {
+      res.json(IncidenceColorsResponse(checkedColormap));
+    }
   }
 );
 

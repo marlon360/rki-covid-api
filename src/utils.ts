@@ -177,6 +177,18 @@ export function cleanupString(input: string): string {
   return input.replace(/[^a-zA-ZäöüÄÖÜß\-]/g, "");
 }
 
+export function checkParmColormap(
+  colormap: string,
+  ColorRanges: Object
+): string {
+  const colormaps = Object.keys(ColorRanges);
+  if (colormaps.includes(colormap)) {
+    return colormap;
+  } else {
+    return "Wrong ':colormap' parameter! Must be one of: " + colormaps;
+  }
+}
+
 export interface RKIErrorResponse {
   code: number;
   message: string;

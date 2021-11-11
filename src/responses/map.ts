@@ -7,7 +7,8 @@ import { weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 
 export async function DistrictsMapResponse(
-  legend: boolean = false
+  colormap: string,
+  legend: boolean
 ): Promise<Buffer> {
   const mapData = DistrictsMap;
 
@@ -26,8 +27,10 @@ export async function DistrictsMapResponse(
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      colormap
+    );
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -38,7 +41,7 @@ export async function DistrictsMapResponse(
       getMapBackground(
         "7-Tage-Inzidenz der Landkreise",
         districtsData.lastUpdate,
-        weekIncidenceColorRanges.ranges
+        weekIncidenceColorRanges[colormap].ranges
       )
     )
       .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -51,7 +54,8 @@ export async function DistrictsMapResponse(
 }
 
 export async function StatesMapResponse(
-  legend: boolean = false
+  colormap: string,
+  legend: boolean
 ): Promise<Buffer> {
   const mapData = StatesMap;
 
@@ -70,8 +74,10 @@ export async function StatesMapResponse(
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      colormap
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
@@ -83,7 +89,7 @@ export async function StatesMapResponse(
       getMapBackground(
         "7-Tage-Inzidenz der Bundesländer",
         statesData.lastUpdate,
-        weekIncidenceColorRanges.ranges
+        weekIncidenceColorRanges[colormap].ranges
       )
     )
       .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -94,14 +100,17 @@ export async function StatesMapResponse(
   }
 }
 
-export function IncidenceColorsResponse() {
+export function IncidenceColorsResponse(colormap: string) {
   return {
-    incidentRanges: weekIncidenceColorRanges.ranges,
+    incidentRanges: weekIncidenceColorRanges[colormap].ranges,
   };
 }
 
-function getColorForWeekIncidence(weekIncidence: number): string {
-  for (const range of weekIncidenceColorRanges.ranges) {
+function getColorForWeekIncidence(
+  weekIncidence: number,
+  colormap: string
+): string {
+  for (const range of weekIncidenceColorRanges[colormap].ranges) {
     if (weekIncidence >= range.min && weekIncidence < range.max) {
       return range.color;
     }
@@ -112,7 +121,7 @@ function getColorForWeekIncidence(weekIncidence: number): string {
 function getMapBackground(
   headline: string,
   lastUpdate: Date,
-  ranges: any
+  ranges: Object
 ): Buffer {
   // for better readability calculate all values outside of the string
   const rangeKeys = Object.keys(ranges); // all keys of ranges
