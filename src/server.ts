@@ -4,6 +4,7 @@ import cors from "cors";
 import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
+import axios from "axios";
 
 import {
   StatesCasesHistoryResponse,
