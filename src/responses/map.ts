@@ -111,7 +111,10 @@ function getColorForWeekIncidence(
   colormap: string
 ): string {
   for (const range of weekIncidenceColorRanges[colormap].ranges) {
-    if (weekIncidence >= range.min && weekIncidence < range.max) {
+    if (
+      (weekIncidence >= range.min && weekIncidence < range.max) ||
+      (weekIncidence == range.min && weekIncidence == range.max)
+    ) {
       return range.color;
     }
   }
@@ -153,17 +156,14 @@ function getMapBackground(
     const yPosRect = iKey * 40; // y Pos for the rect's
     const yPosText = yPosRect + 20; // y Pos for the textes
     const range = // this is the range text (eg. "1 - 15")
-      iKey == 0 // if first key then
-        ? "&lt; " + ranges[key].max // "< 1"
+      ranges[key].min == ranges[key].max // if min == max then
+        ? "= " + ranges[key].max // e.g. "= 0"
         : iKey == highKey // else if last key then
-        ? "&gt; " + ranges[(iKey - 1).toString()].max // "> ranges.max from the key bevor"
-        : parseInt(ranges[key].min) + //else then
-          (iKey > 1 ? 1 : 0) + //add 1 to range.min if key > 1
-          " - " +
-          ranges[key].max; //eg. "16 - 25"
+        ? "&gt; " + ranges[key].min // e.g. "> 1000"
+        : "&gt; " + ranges[key].min + " - " + ranges[key].max; //e.g. "> 15 - 25"
     // add rect and text for each key to svg
     svg += `
-          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" width="30" height="30"></rect>
+          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="30" height="30" fill-opacity="0.98" fill-rule="evenodd"></rect>
           <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
             <tspan>${range}</tspan>
           </text>
