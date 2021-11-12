@@ -47,7 +47,7 @@ export const weekIncidenceColorRanges: ColorRange[] = [
   new ColorRange({
     min: 0,
     max: 0,
-    color: "#CDCDCD",
+    color: "#E2E2E2",
     compareFn: (value: number, range: ColorRange) => value === range.min,
     label: "keine Fälle übermittelt",
   }),
@@ -104,12 +104,12 @@ export const weekIncidenceColorRanges: ColorRange[] = [
   new ColorRange({
     min: 1000,
     max: 1500,
-    color: "#543D35",
+    color: "#68463B",
   }),
   new ColorRange({
     min: 1500,
     max: 2500,
-    color: "#2B1B0E",
+    color: "#6D6D6D",
   }),
   new ColorRange({
     min: 2500,
