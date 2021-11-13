@@ -127,17 +127,15 @@ function getMapBackground(
   ranges: Object
 ): Buffer {
   // for better readability calculate all values outside of the string
-  const rangeKeys = Object.keys(ranges); // all keys of ranges
-  const border = 32; // for the legend, left and down
-  const countRanges = rangeKeys.length; // number of ranges
-  // each range needs 40 Pixel high + 32 Pixel border at the lower edge (same as left)
-  const posYlegend = 1000 - (countRanges * 40 + border); // y Pos of the Legend (if the number of ranges changed)
+  const rangeKeys = Object.keys(ranges);
+  const border = 30;
+  const countRanges = rangeKeys.length;
+  const posYlegend = 1000 - (countRanges * 40 + border);
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }); // localized lastUpdate string
-  // the first part of svg
+  });
   let svg = `
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
@@ -150,18 +148,17 @@ function getMapBackground(
         </text>
         <g id="Legend" transform="translate(${border}, ${posYlegend})">
 `;
-  const highKey = countRanges - 1; // the highest key (last key)
+  const highKey = countRanges - 1;
   for (const key in rangeKeys) {
-    const iKey = parseInt(key); //numeric key
-    const yPosRect = iKey * 40; // y Pos for the rect's
-    const yPosText = yPosRect + 20; // y Pos for the textes
-    const range = // this is the range text (eg. "1 - 15")
-      ranges[key].min == ranges[key].max // if min == max then
-        ? "= " + ranges[key].max // e.g. "= 0"
-        : iKey == highKey // else if last key then
-        ? "&gt; " + ranges[key].min // e.g. "> 1000"
-        : "&gt; " + ranges[key].min + " - " + ranges[key].max; //e.g. "> 15 - 25"
-    // add rect and text for each key to svg
+    const iKey = parseInt(key);
+    const yPosRect = iKey * 40;
+    const yPosText = yPosRect + 20;
+    const range =
+      ranges[key].min == ranges[key].max
+        ? "keine Fälle übermittelt"
+        : iKey == highKey
+        ? "&gt; " + ranges[key].min
+        : "&gt; " + ranges[key].min + " - " + ranges[key].max;
     svg += `
           <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="30" height="30" fill-opacity="0.98" fill-rule="evenodd"></rect>
           <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
@@ -169,9 +166,6 @@ function getMapBackground(
           </text>
 `;
   }
-  // add the rest to svg
-  // removed absolut positioning (x="92" y="189") from text "Marlon Lückert" because,
-  // if the font is a little different overlaps are possible, and it is not needed.
   svg += `
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
