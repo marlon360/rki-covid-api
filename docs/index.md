@@ -1,16 +1,21 @@
-# Robert Koch-Institut API (v2)
+# Robert Koch-Institut API - by Marlon Lückert
 
 A JSON Rest API to query all relevant corona data for Germany based on the figures of the Robert Koch-Institut.
 
-cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests - age groups 👶👩‍🦳👴
+cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests - age groups 👶👩‍🦳👴 - hospitalization 🏥
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
-## Donation
+## ☕️ Donation
 
 If you use this API, please consider supporting me:
 
 <a href='https://ko-fi.com/marlon360' target='_blank'><img height='35' style='border:0px;height:48px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+## 🐙 Open Source
+
+This software is open-source and available on GitHub ([https://github.com/marlon360/rki-covid-api](https://github.com/marlon360/rki-covid-api)).
+Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-covid-api/issues/new) if you have any questions or problems.
 
 ## 🇩🇪 Übersicht
 
@@ -24,6 +29,7 @@ If you use this API, please consider supporting me:
 - Karten mit Bundesländern und Landkreisen
 - Anzahl der wöchentlich durchgeführen PCR-Tests, Anzahl der positiven Tests sowie der Positiv Quote
 - Fallzahlen und Todesfälle pro Altersgruppe
+- Hospitalisierungsrate
 
 ## 🇺🇸 Overview
 
@@ -37,6 +43,7 @@ If you use this API, please consider supporting me:
 - maps for states and districts
 - number of performed PCR-test, number of positive tests and positivity rate
 - cases and deaths per age group
+- hospitalization
 
 ## Endpoints
 

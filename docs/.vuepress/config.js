@@ -1,6 +1,6 @@
 module.exports = {
-  title: "Robert Koch-Institut API (v2)",
-  description: "An API to fetch COVID-19 data from RKI via JSON",
+  title: "Robert Koch-Institut COVID-19 API - von Marlon Lückert",
+  description: "Eine REST API (JSON), die alle relevanten Zahlen zur Corona Lage in Deutschland liefert, basierend auf den Daten des RKI. Inzidenzen, Fälle, Hospitalisierung, Altersgruppen, Impfquote.",
   dest: "dist/docs",
   base: "/docs/",
   themeConfig: {
