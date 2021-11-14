@@ -130,8 +130,10 @@ function getMapBackground(
   const overlayHigh = 1000;
   const rangeKeys = Object.keys(ranges);
   const border = 30;
-  const colorRectHigh = 30;
-  const countRanges = rangeKeys.length;
+  const rectSides = 30;
+  const gap = 10;
+  const diffPos = rectSides + gap;
+  const highKey = rangeKeys.length - 1;
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -148,11 +150,10 @@ function getMapBackground(
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
         <g id="Legend" transform="translate(${border}, -${border})">`;
-  const highKey = countRanges - 1;
   for (const key in rangeKeys) {
     const iKey = parseInt(key);
-    const yPosRect = overlayHigh - colorRectHigh - iKey * 40;
-    const yPosText = yPosRect + colorRectHigh / 2;
+    const yPosRect = overlayHigh - rectSides - iKey * diffPos;
+    const yPosText = yPosRect + rectSides / 2;
     const range =
       ranges[key].min == ranges[key].max
         ? "keine Fälle übermittelt"
@@ -160,14 +161,11 @@ function getMapBackground(
         ? "&gt; " + ranges[key].min
         : "&gt; " + ranges[key].min + " - " + ranges[key].max;
     svg += `
-          <g id="${iKey + 1}.Bereich">
-            <rect fill="${
-              ranges[key].color
-            }" x="0" y="${yPosRect}" rx="5" ry="5" width="30" height="30" fill-opacity="0.98" fill-rule="evenodd"></rect>
-            <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-              <tspan x="40" y="${yPosText}" dy=".25em">${range}</tspan>
-            </text>
-          </g>`;
+          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="${rectSides}" height="${rectSides}" fill-opacity="0.98" fill-rule="evenodd"></rect>
+          <rect x="${diffPos}" y="${yPosRect}" fill="#CDCDCD" width="100" height="15"></rect>
+          <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+            <tspan x="${diffPos}" y="${yPosText}" dy=".35em">${range}</tspan>
+          </text>`;
   }
   svg += `
         </g>
