@@ -1,5 +1,5 @@
 export const weekIncidenceColorRanges = {
-  default: {
+  old: {
     ranges: [
       { min: 0, max: 0, color: "#ADADAD" },
       { min: 0, max: 1, color: "#3BEB47" },
@@ -15,9 +15,9 @@ export const weekIncidenceColorRanges = {
       { min: 1000, max: Infinity, color: "#020003" },
     ],
   },
-  alternate1: {
+  default: {
     ranges: [
-      { min: 0, max: 0, color: "#ADADAD" },
+      { min: 0, max: 0, color: "#CDCDCD" },
       { min: 0, max: 1, color: "#25BA94" },
       { min: 1, max: 15, color: "#76D985" },
       { min: 15, max: 25, color: "#FFFFA8" },
@@ -30,7 +30,7 @@ export const weekIncidenceColorRanges = {
       { min: 500, max: 1000, color: "#17179B" },
       { min: 1000, max: 1500, color: "#543D35" },
       { min: 1500, max: 2500, color: "#2B1B0E" },
-      { min: 2500, max: Infinity, color: "#000000" },
+      { min: 2500, max: Infinity, color: "#020003" },
     ],
   },
   rki: {

@@ -127,32 +127,32 @@ function getMapBackground(
   ranges: Object
 ): Buffer {
   // for better readability calculate all values outside of the string
+  const overlayHigh = 1000;
   const rangeKeys = Object.keys(ranges);
   const border = 30;
+  const colorRectHigh = 30;
   const countRanges = rangeKeys.length;
-  const posYlegend = 1000 - (countRanges * 40 + border);
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   });
   let svg = `
-    <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg width="850px" height="${overlayHigh}px" viewBox="0 0 850 ${overlayHigh}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+        <rect fill="#F4F8FB" x="0" y="0" width="850" height="${overlayHigh}"></rect>
+        <text id="Headline" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+        <text id="Datenstand" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
-        <g id="Legend" transform="translate(${border}, ${posYlegend})">
-`;
+        <g id="Legend" transform="translate(${border}, -${border})">`;
   const highKey = countRanges - 1;
   for (const key in rangeKeys) {
     const iKey = parseInt(key);
-    const yPosRect = iKey * 40;
-    const yPosText = yPosRect + 20;
+    const yPosRect = overlayHigh - colorRectHigh - iKey * 40;
+    const yPosText = yPosRect + colorRectHigh / 2;
     const range =
       ranges[key].min == ranges[key].max
         ? "keine Fälle übermittelt"
@@ -160,11 +160,14 @@ function getMapBackground(
         ? "&gt; " + ranges[key].min
         : "&gt; " + ranges[key].min + " - " + ranges[key].max;
     svg += `
-          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="30" height="30" fill-opacity="0.98" fill-rule="evenodd"></rect>
-          <text x="48" y="${yPosText}" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan>${range}</tspan>
-          </text>
-`;
+          <g id="${iKey + 1}.Bereich">
+            <rect fill="${
+              ranges[key].color
+            }" x="0" y="${yPosRect}" rx="5" ry="5" width="30" height="30" fill-opacity="0.98" fill-rule="evenodd"></rect>
+            <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+              <tspan x="40" y="${yPosText}" dy=".25em">${range}</tspan>
+            </text>
+          </g>`;
   }
   svg += `
         </g>
