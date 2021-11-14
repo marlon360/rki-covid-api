@@ -46,7 +46,7 @@ import { RKIError } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
-  host: process.env.REDISHOST,
+  host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
 });
