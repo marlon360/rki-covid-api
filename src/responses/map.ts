@@ -162,7 +162,6 @@ function getMapBackground(
         : "&gt; " + ranges[key].min + " - " + ranges[key].max;
     svg += `
           <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="${rectSides}" height="${rectSides}" fill-opacity="0.98" fill-rule="evenodd"></rect>
-          <rect x="${diffPos}" y="${yPosRect}" fill="#CDCDCD" width="100" height="15"></rect>
           <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
             <tspan x="${diffPos}" y="${yPosText}" dy=".35em">${range}</tspan>
           </text>`;
