@@ -802,7 +802,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(defaultColormap, noLegend);
+    const response = await DistrictsMapResponse();
     res.send(response);
   }
 );
@@ -813,7 +813,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(defaultColormap, Legend);
+    const response = await DistrictsMapResponse();
     res.send(response);
   }
 );
@@ -823,13 +823,13 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse(defaultColormap));
+    res.json(IncidenceColorsResponse());
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse(defaultColormap, noLegend);
+  const response = await StatesMapResponse();
   res.send(response);
 });
 
@@ -839,7 +839,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesMapResponse(defaultColormap, Legend);
+    const response = await StatesMapResponse();
     res.send(response);
   }
 );
@@ -849,7 +849,7 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse(defaultColormap));
+    res.json(IncidenceColorsResponse());
   }
 );
 
@@ -866,7 +866,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await DistrictsMapResponse(checkedColormap, noLegend);
+      const response = await DistrictsMapResponse();
       res.send(response);
     }
   }
@@ -885,7 +885,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await DistrictsMapResponse(checkedColormap, Legend);
+      const response = await DistrictsMapResponse();
       res.send(response);
     }
   }
@@ -903,7 +903,7 @@ app.get(
     if (req.params.colormap != checkedColormap) {
       throw new TypeError(checkedColormap);
     } else {
-      res.json(IncidenceColorsResponse(checkedColormap));
+      res.json(IncidenceColorsResponse());
     }
   }
 );
@@ -921,7 +921,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await StatesMapResponse(checkedColormap, noLegend);
+      const response = await StatesMapResponse();
       res.send(response);
     }
   }
@@ -940,7 +940,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await StatesMapResponse(checkedColormap, Legend);
+      const response = await StatesMapResponse();
       res.send(response);
     }
   }
@@ -958,7 +958,7 @@ app.get(
     if (req.params.colormap != checkedColormap) {
       throw new TypeError(checkedColormap);
     } else {
-      res.json(IncidenceColorsResponse(checkedColormap));
+      res.json(IncidenceColorsResponse());
     }
   }
 );
