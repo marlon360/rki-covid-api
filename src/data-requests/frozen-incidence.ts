@@ -64,7 +64,7 @@ export async function getFrozenIncidenceHistory(
       });
 
       if (days != null) {
-        const reference_date = new Date(getDateBefore(days - 1));
+        const reference_date = new Date(getDateBefore(days));
         history = history.filter((element) => element.date > reference_date);
       }
 
@@ -135,7 +135,7 @@ export async function getStatesFrozenIncidenceHistory(
     });
 
     if (days != null) {
-      const reference_date = new Date(getDateBefore(days - 1));
+      const reference_date = new Date(getDateBefore(days));
       history = history.filter((element) => element.date > reference_date);
     }
 
