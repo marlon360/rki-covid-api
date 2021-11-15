@@ -575,31 +575,31 @@ Returns the number of recovered people in germany for the last `:days` days.
     "history": [
       {
         "weekIncidence": 213.65875024446805,
-        "date": "2021-11-08T23:00:00.000Z"
+        "date": "2021-11-09T00:00:00.000Z"
       },
       {
         "weekIncidence": 232.1218544191271,
-        "date": "2021-11-09T23:00:00.000Z"
+        "date": "2021-11-10T00:00:00.000Z"
       },
       {
         "weekIncidence": 249.11060402346553,
-        "date": "2021-11-10T23:00:00.000Z"
+        "date": "2021-11-11T00:00:00.000Z"
       },
       {
         "weekIncidence": 263.69059979064883,
-        "date": "2021-11-11T23:00:00.000Z"
+        "date": "2021-11-12T00:00:00.000Z"
       },
       {
         "weekIncidence": 277.35784260606,
-        "date": "2021-11-12T23:00:00.000Z"
+        "date": "2021-11-13T00:00:00.000Z"
       },
       {
         "weekIncidence": 288.962672625304,
-        "date": "2021-11-13T23:00:00.000Z"
+        "date": "2021-11-14T00:00:00.000Z"
       },
       {
         "weekIncidence": 302.97505390864444,
-        "date": "2021-11-14T23:00:00.000Z"
+        "date": "2021-11-15T00:00:00.000Z"
       }
     ]
   },
@@ -607,8 +607,8 @@ Returns the number of recovered people in germany for the last `:days` days.
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-11-15T06:26:37.000Z",
-    "lastCheckedForUpdate": "2021-11-15T19:18:18.245Z"
+    "lastUpdate": "2021-11-15T07:26:37.000Z",
+    "lastCheckedForUpdate": "2021-11-15T21:12:27.928Z"
   }
 }
 ```
