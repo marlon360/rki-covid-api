@@ -15,6 +15,7 @@ import {
   StatesResponse,
   StatesWeekIncidenceHistoryResponse,
   StatesAgeGroupsResponse,
+  StatesFrozenIncidenceHistoryResponse,
 } from "./responses/states";
 import {
   GermanyAgeGroupsResponse,
@@ -23,6 +24,7 @@ import {
   GermanyRecoveredHistoryResponse,
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
+  GermanyFrozenIncidenceHistoryResponse,
 } from "./responses/germany";
 import {
   DistrictsCasesHistoryResponse,
@@ -137,6 +139,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await GermanyWeekIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyFrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyFrozenIncidenceHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
@@ -293,6 +317,27 @@ app.get(
     res.json(response);
   }
 );
+app.get(
+  "/states/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
 
 app.get(
   "/states/age-groups",
@@ -360,6 +405,32 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesWeekIncidenceHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
       parseInt(req.params.days),
       req.params.state
     );

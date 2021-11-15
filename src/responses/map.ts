@@ -3,13 +3,10 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import { weekIncidenceColorRanges } from "../configuration/colors";
+import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 
-export async function DistrictsMapResponse(
-  colormap: string,
-  legend: boolean
-): Promise<Buffer> {
+export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -23,40 +20,56 @@ export async function DistrictsMapResponse(
   // add fill color to every districts
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
-    const id = idAttribute.split("-")[1];
+    let id = idAttribute.split("-")[1];
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
-      weekIncidence,
-      colormap
-    );
+    districtPathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (legend) {
-    // map with legend is requested
-    return sharp(
-      getMapBackground(
-        "7-Tage-Inzidenz der Landkreise",
-        districtsData.lastUpdate,
-        weekIncidenceColorRanges[colormap].ranges
-      )
-    )
-      .composite([{ input: svgBuffer, top: 100, left: 180 }])
-      .png({ quality: 75 })
-      .toBuffer();
-  } else {
-    // map without legend is requested
-    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  }
+  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesMapResponse(
-  colormap: string,
-  legend: boolean
-): Promise<Buffer> {
+export async function DistrictsLegendMapResponse() {
+  const mapData = DistrictsMap;
+
+  const districtsData = await getDistrictsData();
+
+  // create hashmap for faster access
+  const districtsDataHashMap = districtsData.data.reduce(function (map, obj) {
+    map[obj.ags] = obj;
+    return map;
+  }, {});
+
+  // add fill color to every districts
+  for (const districtPathElement of mapData.children) {
+    const idAttribute = districtPathElement.attributes.id;
+    let id = idAttribute.split("-")[1];
+    const district = districtsDataHashMap[id];
+    const weekIncidence =
+      (district.casesPerWeek / district.population) * 100000;
+    districtPathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  return sharp(
+    getMapBackground(
+      "7-Tage-Inzidenz der Landkreise",
+      districtsData.lastUpdate,
+      weekIncidenceColorRanges
+    )
+  )
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .png({ quality: 75 })
+    .toBuffer();
+}
+
+export async function StatesMapResponse() {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -74,47 +87,64 @@ export async function StatesMapResponse(
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] = getColorForWeekIncidence(
-      weekIncidence,
-      colormap
-    );
+    statePathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (legend) {
-    return sharp(
-      getMapBackground(
-        "7-Tage-Inzidenz der Bundesländer",
-        statesData.lastUpdate,
-        weekIncidenceColorRanges[colormap].ranges
-      )
-    )
-      .composite([{ input: svgBuffer, top: 100, left: 180 }])
-      .png({ quality: 75 })
-      .toBuffer();
-  } else {
-    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  }
+  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export function IncidenceColorsResponse(colormap: string) {
+export async function StatesLegendMapResponse() {
+  const mapData = StatesMap;
+
+  const statesData = await getStatesData();
+
+  // create hashmap for faster access
+  const statesDataHashMap = statesData.data.reduce(function (map, obj) {
+    map[obj.id] = obj;
+    return map;
+  }, {});
+
+  // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const district = statesDataHashMap[id];
+    const weekIncidence =
+      (district.casesPerWeek / district.population) * 100000;
+    statePathElement.attributes["fill"] =
+      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  return sharp(
+    getMapBackground(
+      "7-Tage-Inzidenz der Bundesländer",
+      statesData.lastUpdate,
+      weekIncidenceColorRanges
+    )
+  )
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .png({ quality: 75 })
+    .toBuffer();
+}
+
+export function IncidenceColorsResponse() {
   return {
-    incidentRanges: weekIncidenceColorRanges[colormap].ranges,
+    incidentRanges: weekIncidenceColorRanges,
   };
 }
 
-function getColorForWeekIncidence(
-  weekIncidence: number,
-  colormap: string
-): string {
-  for (const range of weekIncidenceColorRanges[colormap].ranges) {
-    if (
-      (weekIncidence >= range.min && weekIncidence < range.max) ||
-      (weekIncidence == range.min && weekIncidence == range.max)
-    ) {
+function getColorForWeekIncidence(weekIncidence: number): string {
+  for (const range of weekIncidenceColorRanges) {
+    if (range.isValueInRange(weekIncidence)) {
       return range.color;
     }
   }
@@ -124,49 +154,40 @@ function getColorForWeekIncidence(
 function getMapBackground(
   headline: string,
   lastUpdate: Date,
-  ranges: Object
+  ranges: ColorRange[]
 ): Buffer {
-  // for better readability calculate all values outside of the string
-  const overlayHigh = 1000;
-  const rangeKeys = Object.keys(ranges);
-  const border = 30;
-  const rectSides = 30;
-  const gap = 10;
-  const diffPos = rectSides + gap;
-  const highKey = rangeKeys.length - 1;
+  const border = 32; // for the legend, left and down
+  const rectsize = 30; //x and y of the rects
+  const yStartPosition = 1000 - rectsize; // start position from the bottom, add new ranges above
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  });
+  }); // localized lastUpdate string
+
   let svg = `
-    <svg width="850px" height="${overlayHigh}px" viewBox="0 0 850 ${overlayHigh}" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect fill="#F4F8FB" x="0" y="0" width="850" height="${overlayHigh}"></rect>
-        <text id="Headline" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+        <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
+        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Datenstand" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
-        <g id="Legend" transform="translate(${border}, -${border})">`;
-  for (const key in rangeKeys) {
-    const iKey = parseInt(key);
-    const yPosRect = overlayHigh - rectSides - iKey * diffPos;
-    const yPosText = yPosRect + rectSides / 2;
-    const range =
-      ranges[key].min == ranges[key].max
-        ? "keine Fälle übermittelt"
-        : iKey == highKey
-        ? "&gt; " + ranges[key].min
-        : "&gt; " + ranges[key].min + " - " + ranges[key].max;
-    svg += `
-          <rect fill="${ranges[key].color}" x="0" y="${yPosRect}" rx="5" ry="5" width="${rectSides}" height="${rectSides}" fill-opacity="0.98" fill-rule="evenodd"></rect>
-          <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
-            <tspan x="${diffPos}" y="${yPosText}" dy=".35em">${range}</tspan>
-          </text>`;
-  }
-  svg += `
+        <g id="Legend" transform="translate(${border}, -${border})">
+        ${ranges.map((range, index) => {
+          return `
+          <g transform="translate(0, ${yStartPosition - index * 40})">
+            <rect fill="${
+              range.color
+            }" x="0" y="0" width="30" height="30"></rect>
+            <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+              <tspan>${range.toString()}</tspan>
+            </text>
+          </g>
+          `;
+        })}
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
         <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
