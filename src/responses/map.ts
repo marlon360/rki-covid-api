@@ -157,7 +157,8 @@ function getMapBackground(
   ranges: ColorRange[]
 ): Buffer {
   const border = 32; // for the legend, left and down
-  const yStartPosition = 1000 - border * 2; // start position from the bottom, add new ranges above
+  const rectsidesize = 30; //x and y of the rects
+  const yStartPosition = 1000 - rectsidesize; // start position from the bottom, add new ranges above
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -174,7 +175,7 @@ function getMapBackground(
         <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
-        <g id="Legend" transform="translate(${border}, 0)">
+        <g id="Legend" transform="translate(${border}, -${border})">
         ${ranges.map((range, index) => {
           return `
           <g transform="translate(0, ${yStartPosition - index * 40})">

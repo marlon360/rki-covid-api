@@ -18,6 +18,10 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
+import {
+  getStatesFrozenIncidenceHistory,
+  StatesFrozenIncidenceData,
+} from "../data-requests/frozen-incidence";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -227,5 +231,31 @@ export async function GermanyAgeGroupsResponse(): Promise<{
   return {
     data: data,
     meta: new ResponseMeta(AgeGroupsData.lastUpdate),
+  };
+}
+
+interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
+  data: {};
+}
+
+export async function GermanyFrozenIncidenceHistoryResponse(
+  days?: number
+): Promise<StatesFrozenIncidenceHistoryData> {
+  const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
+    days
+  );
+
+  let data = {};
+  frozenIncidenceHistoryData.data.forEach((historyData) => {
+    if (historyData.abbreviation == null) {
+      historyData.abbreviation = "Bund";
+      historyData.name = "Bundesgebiet";
+      data = historyData;
+    }
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
   };
 }
