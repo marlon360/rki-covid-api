@@ -34,7 +34,9 @@ export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
   });
   return {
     data: states,
-    lastUpdate: new Date(data.features[0].attributes.Aktualisierung),
+    lastUpdate: new Date(
+      data.features[0].attributes.Aktualisierung + 60 * 60 * 1000
+    ),
   };
 }
 
