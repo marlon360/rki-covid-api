@@ -118,14 +118,14 @@ export async function getStatesFrozenIncidenceHistory(
   const lastUpdate = new Date(dateString);
 
   let states = json.map((states) => {
-    const name = states["__EMPTY"];
+    const name = states["__EMPTY"]; //there is no header
     const abbreviation = getStateAbbreviationByName(name);
 
     let history = [];
 
     // get all date keys
     const dateKeys = Object.keys(states);
-    // ignore the first three elements (rowNumber, LK, LKNR)
+    // ignore the first element (witch is the state)
     dateKeys.splice(0, 1);
     dateKeys.forEach((dateKey) => {
       const date = new Date(
