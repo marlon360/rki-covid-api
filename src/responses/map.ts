@@ -6,7 +6,7 @@ import { getStatesData } from "../data-requests/states";
 import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 
-export async function DistrictsMapResponse() {
+export async function DistrictsMapResponse(palette: string) {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -24,8 +24,10 @@ export async function DistrictsMapResponse() {
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      palette
+    );
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -33,7 +35,7 @@ export async function DistrictsMapResponse() {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function DistrictsLegendMapResponse() {
+export async function DistrictsLegendMapResponse(palette: string) {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -51,8 +53,10 @@ export async function DistrictsLegendMapResponse() {
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      palette
+    );
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -61,7 +65,7 @@ export async function DistrictsLegendMapResponse() {
     getMapBackground(
       "7-Tage-Inzidenz der Landkreise",
       districtsData.lastUpdate,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[palette]
     )
   )
     .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -69,7 +73,7 @@ export async function DistrictsLegendMapResponse() {
     .toBuffer();
 }
 
-export async function StatesMapResponse() {
+export async function StatesMapResponse(palette: string) {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -87,8 +91,10 @@ export async function StatesMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      palette
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
@@ -98,7 +104,7 @@ export async function StatesMapResponse() {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesLegendMapResponse() {
+export async function StatesLegendMapResponse(palette: string) {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -116,8 +122,10 @@ export async function StatesLegendMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForWeekIncidence(
+      weekIncidence,
+      palette
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
@@ -128,7 +136,7 @@ export async function StatesLegendMapResponse() {
     getMapBackground(
       "7-Tage-Inzidenz der Bundesländer",
       statesData.lastUpdate,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[palette]
     )
   )
     .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -136,14 +144,17 @@ export async function StatesLegendMapResponse() {
     .toBuffer();
 }
 
-export function IncidenceColorsResponse() {
+export function IncidenceColorsResponse(palette: string) {
   return {
     incidentRanges: weekIncidenceColorRanges,
   };
 }
 
-function getColorForWeekIncidence(weekIncidence: number): string {
-  for (const range of weekIncidenceColorRanges) {
+function getColorForWeekIncidence(
+  weekIncidence: number,
+  palette: string
+): string {
+  for (const range of weekIncidenceColorRanges[palette]) {
     if (range.isValueInRange(weekIncidence)) {
       return range.color;
     }
