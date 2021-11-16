@@ -192,7 +192,7 @@ function getMapBackground(
           <g transform="translate(0, ${yStartPosition - index * 40})">
             <rect fill="${
               range.color
-            }" x="0" y="0" width="30" height="30"></rect>
+            }" x="0" y="0" width="30" height="30" opacity="0.98"></rect>
             <text x="40" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
               <tspan>${range.toString()}</tspan>
             </text>
