@@ -41,8 +41,10 @@ import {
 import { TestingHistoryResponse } from "./responses/testing";
 import {
   DistrictsMapResponse,
+  DistrictsLegendMapResponse,
   IncidenceColorsResponse,
   StatesMapResponse,
+  StatesLegendMapResponse,
 } from "./responses/map";
 import { RKIError } from "./utils";
 
@@ -813,7 +815,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse();
+    const response = await DistrictsLegendMapResponse();
     res.send(response);
   }
 );
@@ -839,7 +841,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesMapResponse();
+    const response = await StatesLegendMapResponse();
     res.send(response);
   }
 );
@@ -885,7 +887,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await DistrictsMapResponse();
+      const response = await DistrictsLegendMapResponse();
       res.send(response);
     }
   }
@@ -940,7 +942,7 @@ app.get(
       throw new TypeError(checkedColormap);
     } else {
       res.setHeader("Content-Type", "image/png");
-      const response = await StatesMapResponse();
+      const response = await StatesLegendMapResponse();
       res.send(response);
     }
   }
