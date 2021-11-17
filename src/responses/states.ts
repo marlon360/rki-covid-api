@@ -25,6 +25,10 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
+import {
+  StatesFrozenIncidenceData,
+  getStatesFrozenIncidenceHistory,
+} from "../data-requests/frozen-incidence";
 
 interface StateData extends IStateData {
   abbreviation: string;
@@ -457,5 +461,33 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   return {
     data: data,
     meta: new ResponseMeta(AgeGroupsData.lastUpdate),
+  };
+}
+
+interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
+  data: {
+    [key: string]: StatesFrozenIncidenceData;
+  };
+}
+
+export async function StatesFrozenIncidenceHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesFrozenIncidenceHistoryData> {
+  const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
+    days,
+    abbreviation
+  );
+
+  let data = {};
+  frozenIncidenceHistoryData.data.forEach((historyData) => {
+    if (historyData.abbreviation != null) {
+      data[historyData.abbreviation] = historyData;
+    }
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
   };
 }
