@@ -113,6 +113,9 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
 // 0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
 //min,max,color;min,max,color; ........... ;min,Infinity,color; if a semicolon at the end is a option
 
+// this function is called by GetCheckedPalette, input: userPaletteString given from ?userpalette= example above and build
+// a valid userpalette and append this to weekIncidenceColorRanges
+// output: the name of the userPalette (always "user")
 function BuildUserPalette(userPaletteString: string): string {
   //if a semicolon at the end of userPaletteString, remove it
   if (userPaletteString.substring(0, userPaletteString.length - 1) == ";") {
@@ -173,7 +176,7 @@ function BuildUserPalette(userPaletteString: string): string {
         } überprüfen.`
       );
     }
-    // third element must be 6 digit hex (string is uppercase!) bevor test, remove all spaces (if available)
+    // third element must be 6 digit hex, bevor test, remove all spaces (if available)
     // and convert to upper case
     userRange[z][2] = userRange[z][2].toUpperCase().replace(/ /g, "");
     if (!userRange[z][2].match(/^[0-9A-F]{6}$/)) {
@@ -232,7 +235,8 @@ function BuildUserPalette(userPaletteString: string): string {
   // return name of the user palette
   return "user";
 }
-
+// this function is called by function GetCheckedPalette input: a palette string from req given by ?palette=
+// output: checked palette
 function CheckParmPalette(palette: string): string {
   const palettes = Object.keys(weekIncidenceColorRanges);
   if (palettes.includes(palette)) {
@@ -244,6 +248,7 @@ function CheckParmPalette(palette: string): string {
   }
 }
 
+//this function is called by server.ts /map links, needs the req, returns a valid palette
 export function GetCheckedPalette(req): string {
   // first check if both possible parameters are given -> Error not allowed
   if (req.query.userpalette != undefined && req.query.palette != undefined) {
