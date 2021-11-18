@@ -15,30 +15,33 @@ Returns a Heatmap (PNG) of week incidences for districts.
 
 ** All map links can be extended with the following parameters **
 
-| Parameter        | Description                                              |
-| ---------------- | -------------------------------------------------------- |
-| ?palette=default | use the default palette (colors/ranges since 2021-11-12) |
-| ?palette=old     | use the old default palette (bevor 2021-11-12)           |
-| ?palette=rki     | use rki palette (colors/ranges like the rki use)         |
-| ?userpalette=    | use a userpalette example and rules below                |
+| Parameter               | Description                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------- |
+| ?palette=default        | use the default palette (colors/ranges since 2021-11-12) is the same as without |
+| ?palette=old            | use the old default palette (bevor 2021-11-12)                                  |
+| ?palette=rki            | use rki palette (colors/ranges like the rki on their webside use)               |
+| ?userpalette=0,0,...... | use a userpalette example and rules below                                       |
 
 this is a example userpalette witch must be given after ?userpalette=
-0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077
+
+0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
+range 1 ; range 2 ; range 3 ; range 4 ; range 5 ; range 6 ; range 7 ; range 8 ; range 9 ;
+
 witch meens the following
 
-| Range | >min | <=max    | color  |
-| ----- | ---- | -------- | ------ | ----------------------------------------------------------- |
-| 1     | 0    | 0        | CDCDCD | special range min=max=0 can be used but this is not a must! |
-| 2     | 0    | 5        | FFFCCC | first range must start with min=0                           |
-| 3     | 5    | 25       | FFF380 | min next range must be max last range                       |
-| 4     | 25   | 50       | FFB534 | hex values for color must be 6 gigit without #              |
-| 5     | 50   | 100      | D43624 |
-| 6     | 100  | 250      | 951214 |
-| 7     | 250  | 500      | 671212 |
-| 8     | 500  | 1000     | DD0085 |
-| 9     | 1000 | Infinity | 7A0077 | last range max must be "Infinity"                           |
+| Range | >min | <=max    | color  | remark or rule                                                          |
+| ----- | ---- | -------- | ------ | ----------------------------------------------------------------------- | --- |
+| 1     | 0    | 0        | CDCDCD | special range min=max=0 can be used but this is not a must!             |
+| 2     | 0    | 5        | FFFCCC | first range must start with min=0                                       |
+| 3     | 5    | 25       | FFF380 | min next range must be max last range                                   |
+| 4     | 25   | 50       | FFB534 | hex values for color must be 6 gigit without prefix, upper or lowercase |     |
+| 5     | 50   | 100      | D43624 |                                                                         |
+| 6     | 100  | 250      | 951214 |                                                                         |
+| 7     | 250  | 500      | 671212 |                                                                         |
+| 8     | 500  | 1000     | DD0085 |                                                                         |
+| 9     | 1000 | Infinity | 7A0077 | last range max must be "Infinity"                                       |
 
-every range needs 3 values (min, max, color) separated by comma (,) and terminated by semicolion (;) except the last one!
+every range needs 3 values (min, max, color) separated by comma (,) and terminated by semicolion (;) after the last range the ; is a option!
 
 ### Response
 
