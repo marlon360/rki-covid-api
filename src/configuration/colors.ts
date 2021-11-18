@@ -109,9 +109,131 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
   ],
 };
 
-// for further enhancment user definable colors and ranges
-export const userweekIncidenceColorRange: ColorRange[] = [
-  new ColorRange({ min: 0, max: 0, color: "#000000" }),
-  new ColorRange({ min: 0, max: undefined, color: "#000000" }),
-  new ColorRange({ min: undefined, max: Infinity, color: "#000000" }),
-];
+// example string for user palette
+// 0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077
+
+function BuildUserPalette(colorRangeString: string) {
+  const ranges = colorRangeString.split(";");
+  const countRanges = ranges.length;
+  // ranges.length muss >=3 und <=15 sein
+  if (countRanges < 3 || countRanges > 15) {
+    throw new Error("Anzahl der Bereiche muss <=3 und <=15 sein!");
+  }
+  let userRanges = [];
+  let userRange = [];
+  ranges.forEach((range) => {
+    const z = ranges.indexOf(range);
+    userRange[z] = range.split(",");
+    // some errorchecks
+    // every range needs 3 elements
+    if (userRange[z].length != 3) {
+      throw new Error(
+        `Fehler im ${z + 1}.Bereich. Jeder Bereich muss 3 Werte enthalten!`
+      );
+    }
+    // first range min must be "0"
+    if (z == 0 && parseInt(userRange[z][0]) != 0) {
+      throw new Error(
+        `Fehler im ${z + 1}.Bereich. ${z + 1}.Bereich.min muss "0" sein`
+      );
+    }
+    // dont allow min > max
+    if (parseInt(userRange[z][0]) > parseInt(userRange[z][1])) {
+      throw new Error(
+        `Fehler im ${z + 1}.Bereich. ${z + 1}.Bereich.min > ${
+          z + 1
+        }.Bereich.max`
+      );
+    }
+    // first and second element must be an number, or first a number and second "Infinity" only for last range set
+    if (
+      isNaN(parseInt(userRange[z][0])) ||
+      (isNaN(parseInt(userRange[z][1])) && userRange[z][1] != "Infinity")
+    ) {
+      throw new Error(
+        `Fehler im ${
+          z + 1
+        }.Bereich. Die ersten beiden Werte müssen Zahlen oder 'Infinity' im 2.Wert enthalten!`
+      );
+    }
+    // third element must be 6 digit hex
+    if (!userRange[z][2].match(/^[0-9a-fA-F]{6}$/)) {
+      throw new Error(
+        `Fehler im ${
+          z + 1
+        }.Bereich. Der dritte Wert muss eine 6 stellige Hexadezimale Zahl enthalten. Z.B. 'FFFD00`
+      );
+    }
+    // after first range check if range.min = range-1.max
+    if (z != 0 && parseInt(userRange[z][0]) != parseInt(userRange[z - 1][1])) {
+      throw new Error(
+        `Fehler im ${z + 1}.Bereich. min != max im ${z}.Bereich!`
+      );
+    }
+    // all checks passed, now write the Objects to userRanges array
+    // first check if range.min = range.max witch meens thats a fixed vale e.g. "0" or any other (if another value makes sense !?) and write special Object
+    if (parseInt(userRange[z][0]) == parseInt(userRange[z][1])) {
+      userRanges.push({
+        min: parseInt(userRange[z][0]),
+        max: parseInt(userRange[z][1]),
+        color: "#" + userRange[z][2],
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      });
+    } else if (userRange[z][1] == "Infinity") {
+      // "Infinity" marks last range, write specal object
+      userRanges.push({
+        min: parseInt(userRange[z][0]),
+        max: Infinity,
+        color: "#" + userRange[z][2],
+      });
+    } else {
+      // all others write "normal" objects
+      userRanges.push({
+        min: parseInt(userRange[z][0]),
+        max: parseInt(userRange[z][1]),
+        color: "#" + userRange[z][2],
+      });
+    }
+  });
+  weekIncidenceColorRanges["user"] = userRanges.map((range) => {
+    return new ColorRange(range);
+  }); //create user palette Object and write to othe hard coded palettes
+  return "user"; // return name of the user palette
+}
+
+function CheckParmPalette(palette: string, ColorRanges: Object): string {
+  const palettes = Object.keys(ColorRanges);
+  if (palettes.includes(palette)) {
+    return palette;
+  } else {
+    return "Wrong ':colormap' parameter! Must be one of: " + palettes;
+  }
+}
+
+export function GetCheckedPalette(req) {
+  let checkedPalette: string;
+  if (req.query.userpalette != undefined && req.query.palette != undefined) {
+    throw new Error(
+      "Die Parameter 'palette=' und 'userpalette=' dürfen nicht zusammen angegeben werden!"
+    );
+  }
+  // if parameter userpalette= is given build user palette
+  if (req.query.userpalette != undefined) {
+    checkedPalette = BuildUserPalette(req.query.userpalette.toString());
+  } else if (req.query.palette != undefined) {
+    // if parameter palette= is given check if the hard coded palette exists, if not returnvalu will be the Errortext!
+    checkedPalette = CheckParmPalette(
+      req.query.palette.toString(),
+      weekIncidenceColorRanges
+    );
+    if (req.query.palette != checkedPalette) {
+      //if a Errortext is returned -> error message
+      throw new Error(checkedPalette);
+    }
+  } else {
+    //if no parameter is given user default palette
+    checkedPalette = "default";
+  }
+  return checkedPalette;
+}

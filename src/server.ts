@@ -5,9 +5,7 @@ import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
 import axios from "axios";
-import { weekIncidenceColorRanges } from "./configuration/colors";
-import { checkParmColormap } from "./utils";
-
+import { GetCheckedPalette } from "./configuration/colors";
 import {
   StatesCasesHistoryResponse,
   StatesDeathsHistoryResponse,
@@ -47,8 +45,6 @@ import {
   StatesLegendMapResponse,
 } from "./responses/map";
 import { RKIError } from "./utils";
-
-const defaultColormap = "default";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
@@ -801,8 +797,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(defaultColormap);
+    const response = await DistrictsMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -812,8 +809,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse(defaultColormap);
+    const response = await DistrictsLegendMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -823,13 +821,15 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse(defaultColormap));
+    const checkedPalette = GetCheckedPalette(req);
+    res.json(IncidenceColorsResponse(checkedPalette));
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
+  const checkedPalette = GetCheckedPalette(req);
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse(defaultColormap);
+  const response = await StatesMapResponse(checkedPalette);
   res.send(response);
 });
 
@@ -838,8 +838,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse(defaultColormap);
+    const response = await StatesLegendMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -849,117 +850,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse(defaultColormap));
-  }
-);
-
-app.get(
-  "/map/districts/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.setHeader("Content-Type", "image/png");
-      const response = await DistrictsMapResponse(checkedColormap);
-      res.send(response);
-    }
-  }
-);
-
-app.get(
-  "/map/districts-legend/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.setHeader("Content-Type", "image/png");
-      const response = await DistrictsLegendMapResponse(checkedColormap);
-      res.send(response);
-    }
-  }
-);
-
-app.get(
-  "/map/districts/legend/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.json(IncidenceColorsResponse(checkedColormap));
-    }
-  }
-);
-
-app.get(
-  "/map/states/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.setHeader("Content-Type", "image/png");
-      const response = await StatesMapResponse(checkedColormap);
-      res.send(response);
-    }
-  }
-);
-
-app.get(
-  "/map/states-legend/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.setHeader("Content-Type", "image/png");
-      const response = await StatesLegendMapResponse(checkedColormap);
-      res.send(response);
-    }
-  }
-);
-
-app.get(
-  "/map/states/legend/:colormap",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedColormap = checkParmColormap(
-      req.params.colormap,
-      weekIncidenceColorRanges
-    );
-    if (req.params.colormap != checkedColormap) {
-      throw new TypeError(checkedColormap);
-    } else {
-      res.json(IncidenceColorsResponse(checkedColormap));
-    }
+    const checkedPalette = GetCheckedPalette(req);
+    res.json(IncidenceColorsResponse(checkedPalette));
   }
 );
 
