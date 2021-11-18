@@ -209,8 +209,8 @@ function BuildUserPalette(userPaletteString: string): string {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       });
-    } else if (userRange[z][1] == "INFINITY") {
-      // "INFINITY" marks last range, write specal object
+    } else if (userRange[z][1] == "Infinity") {
+      // "Infinity" marks last range, write specal object
       userRanges.push({
         min: parseInt(userRange[z][0]),
         max: Infinity,
