@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states`
+`GET https://api.fritz.box:8080/states`
 [Open](/states)
 
 ### Response
@@ -102,7 +102,7 @@ Returns the data for a single `:state` state.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH`
+`GET https://api.fritz.box:8080/states/HH`
 [Open](/states/HH)
 
 | Parameter | Description        |
@@ -161,7 +161,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/history/frozen-incidence/7`
+`GET https://api.fritz.box:8080/states/history/frozen-incidence/7`
 [Open](/states/history/frozen-incidence/7)
 
 **Parameters**
@@ -182,7 +182,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/age-groups`
+`GET https://api.fritz.box:8080/states/age-groups`
 [Open](/states/age-groups)
 
 ### Response
@@ -279,7 +279,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH/history/frozen-incidence/7`
+`GET https://api.fritz.box:8080/states/HH/history/frozen-incidence/7`
 [Open](/states/HH/history/frozen-incidence/7)
 
 **Parameters**
@@ -301,7 +301,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH/age-groups`
+`GET https://api.fritz.box:8080/states/HH/age-groups`
 [Open](/states/HH/age-groups)
 
 ### Response

@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.corona-zahlen.org/districts`
+`GET https://api.fritz.box:8080/districts`
 [Open](/districts)
 
 ### Response
@@ -84,7 +84,7 @@ Returns the data for a single district identified by `:ags` AGS (Allgemeiner Gem
 
 ### Request
 
-`GET https://api.corona-zahlen.org/districts/02000`
+`GET https://api.fritz.box:8080/districts/02000`
 [Open](/districts/02000)
 
 | Parameter | Description                    |
@@ -139,7 +139,7 @@ Redirects to `/districts/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/districts/history/frozen-incidence/7`
+`GET https://api.fritz.box:8080/districts/history/frozen-incidence/7`
 [Open](/districts/history/frozen-incidence/7)
 
 **Parameters**

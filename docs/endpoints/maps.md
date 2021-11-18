@@ -25,27 +25,26 @@ Returns a Heatmap (PNG) of week incidences for districts.
 this is a example userpalette witch must be given after ?userpalette=
 
 0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
-.range 1. ; .range 2 ; .range 3. ; ..range 4. ; ..range 5.. ; ..range 6... ; ..range 7... ; ...range 8... ; .....range 9...... ;
 
 witch meens the following
 
-| Range | >min | <=max    | color  | remark or rule                                                          |
-| ----- | ---- | -------- | ------ | ----------------------------------------------------------------------- |
-| 1     | 0    | 0        | CDCDCD | special range min=max=0 can be used but this is not a must!             |
-| 2     | 0    | 5        | FFFCCC | first range must start with min=0                                       |
-| 3     | 5    | 25       | FFF380 | min next range must be max last range                                   |
-| 4     | 25   | 50       | FFB534 | hex values for color must be 6 gigit without prefix, upper or lowercase |
-| 5     | 50   | 100      | D43624 |                                                                         |
-| 6     | 100  | 250      | 951214 |                                                                         |
-| 7     | 250  | 500      | 671212 |                                                                         |
-| 8     | 500  | 1000     | DD0085 |                                                                         |
-| 9     | 1000 | Infinity | 7A0077 | last range max must be "Infinity"                                       |
+| Stringpart            | >min | <=max    | Color  | Remark or Rule                                                          |
+| --------------------- | ---- | -------- | ------ | ----------------------------------------------------------------------- |
+| 0,0,CDCDCD;           | 0    | 0        | CDCDCD | special range min=max=0 can be used but this is not a must!             |
+| 0,5,FFFCCC;           | 0    | 5        | FFFCCC | first range must start with min=0                                       |
+| 5,25,FFF380;          | 5    | 25       | FFF380 | min next range must be max last range                                   |
+| 25,50,FFB534;         | 25   | 50       | FFB534 | hex values for color must be 6 gigit without prefix, upper or lowercase |
+| 50,100,D43624;        | 50   | 100      | D43624 |                                                                         |
+| 100,250,951214;       | 100  | 250      | 951214 |                                                                         |
+| 250,500,671212;       | 250  | 500      | 671212 |                                                                         |
+| 500,1000,DD0085;      | 500  | 1000     | DD0085 |                                                                         |
+| 1000,Infinity,7A0077; | 1000 | Infinity | 7A0077 | last range max must be "Infinity".                                      |
 
-every range needs 3 values (min, max, color) separated by comma (,) and terminated by semicolion (;) after the last range the ; is a option!
+every range needs 3 values (min, max, color) separated by , and terminated by ; after the last range the ; is a option!
 
 ### Response
 
-<img alt="districts map" src="https://api.corona-zahlen.org/map/districts?palette=default" width="300">
+<img alt="districts map" src="https://api.fritz.box:8080/map/districts?palette=default" width="300">
 
 ## `/map/districts-legend`
 
@@ -53,12 +52,12 @@ Returns a Heatmap (PNG) of week incidences for districts with a legend and headl
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/districts-legend?palette=rki`
+`GET https://api.fritz.box:8080/map/districts-legend?palette=rki`
 [Open](/map/districts-legend?palette=rki)
 
 ### Response
 
-<img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend?palette=rki" width="300">
+<img alt="districts legend map" src="https://api.fritz.box:8080/map/districts-legend?palette=rki" width="300">
 
 ## `/map/districts/legend`
 
@@ -66,7 +65,7 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/districts/legend?palette=default`
+`GET https://api.fritz.box:8080/map/districts/legend?palette=default`
 [Open](/map/districts/legend?palette=default)
 
 ### Response
@@ -155,12 +154,12 @@ Returns a Heatmap (PNG) of week incidences for states.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/states`
+`GET https://api.fritz.box:8080/map/states`
 [Open](/map/states)
 
 ### Response
 
-<img alt="states map" src="https://api.corona-zahlen.org/map/states?userpalette=0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077" width="300">
+<img alt="states map" src="https://api.fritz.box:8080/map/states?userpalette=0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077" width="300">
 
 ## `/map/states-legend`
 
@@ -168,12 +167,12 @@ Returns a Heatmap (PNG) of week incidences for states with a legend and headline
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/states-legend`
+`GET https://api.fritz.box:8080/map/states-legend`
 [Open](/map/states-legend)
 
 ### Response
 
-<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend" width="300">
+<img alt="states legend map" src="https://api.fritz.box:8080/map/states-legend" width="300">
 
 ## `/map/states/legend`
 
@@ -181,7 +180,7 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/states/legend?palette=rki`
+`GET https://api.fritz.box:8080/map/states/legend?palette=rki`
 [Open](/map/states/legend?palette=rki)
 
 ### Response
