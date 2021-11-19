@@ -164,6 +164,8 @@ Now you can access the server at `http://localhost:8080`.
 - Germany Covidometer [https://arashesdr.github.io/covidometer/](https://arashesdr.github.io/covidometer/)
 - Pandemie jetzt [https://pandemie.jetzt/](https://pandemie.jetzt/)
 - Corona Zahlen in Deutschland (Wordpress Plugin) [https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/](https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/)
+- 7-Tage-Inzidenzen der letzten Tage [https://corona-germany.justus-d.de/](https://corona-germany.justus-d.de/)
+- Die Krankenhausampel für einen (beliebigen) Landkreis als freies und anpassbares Skript für alle Webseitenbetreiber [https://krankenhausampel.info/](https://krankenhausampel.info/)
 
 ## License
 
