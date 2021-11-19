@@ -117,3 +117,48 @@ export const weekIncidenceColorRanges: ColorRange[] = [
     color: "#020003",
   }),
 ];
+
+export const hospitalizationIncidenceColorRanges: ColorRange[] = [
+  new ColorRange({
+    min: 0,
+    max: 0,
+    color: "#E2E2E2",
+    compareFn: (value: number, range: ColorRange) => value === range.min,
+    label: "keine Fälle übermittelt",
+  }),
+  new ColorRange({
+    min: 0,
+    max: 1,
+    color: "#FCF9CA",
+  }),
+  new ColorRange({
+    min: 1,
+    max: 3,
+    color: "#FFDA9C",
+  }),
+  new ColorRange({
+    min: 3,
+    max: 6,
+    color: "#F7785B",
+  }),
+  new ColorRange({
+    min: 6,
+    max: 9,
+    color: "#FF3A25",
+  }),
+  new ColorRange({
+    min: 9,
+    max: 12,
+    color: "#D80182",
+  }),
+  new ColorRange({
+    min: 12,
+    max: 15,
+    color: "#770175",
+  }),
+  new ColorRange({
+    min: 15,
+    max: Infinity,
+    color: "#000000",
+  }),
+];

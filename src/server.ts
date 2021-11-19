@@ -43,6 +43,8 @@ import {
   DistrictsLegendMapResponse,
   DistrictsMapResponse,
   IncidenceColorsResponse,
+  StatesHospitalizationLegendMapResponse,
+  StatesHospitalizationMapResponse,
   StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
@@ -921,6 +923,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.json(IncidenceColorsResponse());
+  }
+);
+
+app.get(
+  "/map/states-legend/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationLegendMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationMapResponse();
+    res.send(response);
   }
 );
 
