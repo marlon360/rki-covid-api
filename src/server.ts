@@ -5,7 +5,7 @@ import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
 import axios from "axios";
-
+import { GetCheckedPalette } from "./configuration/colors";
 import {
   StatesCasesHistoryResponse,
   StatesDeathsHistoryResponse,
@@ -800,8 +800,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse();
+    const response = await DistrictsMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -811,8 +812,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse();
+    const response = await DistrictsLegendMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -822,13 +824,15 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse());
+    const checkedPalette = GetCheckedPalette(req);
+    res.json(IncidenceColorsResponse(checkedPalette));
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
+  const checkedPalette = GetCheckedPalette(req);
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse();
+  const response = await StatesMapResponse(checkedPalette);
   res.send(response);
 });
 
@@ -837,8 +841,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req);
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse();
+    const response = await StatesLegendMapResponse(checkedPalette);
     res.send(response);
   }
 );
@@ -848,7 +853,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.json(IncidenceColorsResponse());
+    const checkedPalette = GetCheckedPalette(req);
+    res.json(IncidenceColorsResponse(checkedPalette));
   }
 );
 
