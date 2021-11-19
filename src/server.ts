@@ -23,6 +23,7 @@ import {
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
   GermanyFrozenIncidenceHistoryResponse,
+  GermanyHospitalizationHistoryResponse,
 } from "./responses/germany";
 import {
   DistrictsCasesHistoryResponse,
@@ -203,6 +204,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await GermanyRecoveredHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
