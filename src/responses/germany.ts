@@ -199,23 +199,28 @@ export async function GermanyHospitalizationHistoryResponse(
 ): Promise<
   GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
 > {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const hospitalizationData = await getHospitalizationData();
   const history = [];
-  let historyKeys = Object.keys(hospitalizationData.data);
+  let dateKeys = Object.keys(hospitalizationData.data);
   if (days != undefined) {
     const reference_date = new Date(getDateBefore(days));
-    historyKeys = historyKeys.filter((date) => new Date(date) > reference_date);
+    dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
-  historyKeys.sort((a, b) => {
+  dateKeys.sort((a, b) => {
     const dateA = new Date(a);
     const dateB = new Date(b);
     return dateA.getTime() - dateB.getTime();
   });
-  historyKeys.forEach((key) => {
+  dateKeys.forEach((dateKey) => {
     history.push({
-      cases7Days: hospitalizationData.data[key].cases7Days,
-      incidence7Days: hospitalizationData.data[key].incidence7Days,
-      date: new Date(key),
+      cases7Days: hospitalizationData.data[dateKey].cases7Days,
+      incidence7Days: hospitalizationData.data[dateKey].incidence7Days,
+      date: new Date(dateKey),
     });
   });
 

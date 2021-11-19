@@ -16,8 +16,11 @@ import {
   AddDaysToDate,
   getDayDifference,
   getStateAbbreviationById,
+  getStateAbbreviationByName,
   getStateIdByAbbreviation,
+  getStateIdByName,
   getStateNameByAbbreviation,
+  getDateBefore,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -417,6 +420,90 @@ export async function StatesRecoveredHistoryResponse(
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
+  };
+}
+// : Promise<StatesHospitalizationHistory>
+interface StatesHospitalizationHistory {
+  [key: string]: StateHistory<{
+    cases7Days: number;
+    incidence7Days: number;
+    date: Date;
+    meta: ResponseMeta;
+  }>;
+}
+export async function StatesHospitalizationHistoryResponse(
+  days?: number,
+  p_abbreviation?: string
+): Promise<{ data: {}; meta: ResponseMeta }> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+  const hospitalizationData = await getHospitalizationData();
+  let dateKeys = Object.keys(hospitalizationData.data);
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
+    dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
+  }
+  dateKeys.sort((a, b) => {
+    const dateA = new Date(a);
+    const dateB = new Date(b);
+    return dateA.getTime() - dateB.getTime();
+  });
+  const historyData = {};
+  let abbreviationList = [];
+  for (let id = 1; id <= 16; id++) {
+    abbreviationList[id - 1] = getStateAbbreviationById(id);
+  }
+  dateKeys.forEach((dateKey) => {
+    const stateNameKeys = Object.keys(hospitalizationData.data[dateKey].states);
+    if (!p_abbreviation) {
+      stateNameKeys.forEach((stateName) => {
+        const id = getStateIdByName(stateName);
+        const abbreviation = getStateAbbreviationByName(stateName);
+        if (!historyData[abbreviation]) {
+          historyData[abbreviation] = {
+            id: id,
+            name: stateName,
+            history: [],
+          };
+        }
+        historyData[abbreviation].history.push({
+          cases7Days:
+            hospitalizationData.data[dateKey].states[stateName].cases7Days,
+          incidence7Days:
+            hospitalizationData.data[dateKey].states[stateName].incidence7Days,
+          date: new Date(dateKey),
+        });
+      });
+    } else if (abbreviationList.includes(p_abbreviation)) {
+      const id = getStateIdByAbbreviation(p_abbreviation);
+      const stateName = getStateNameByAbbreviation(p_abbreviation);
+      if (!historyData[p_abbreviation]) {
+        historyData[p_abbreviation] = {
+          id: id,
+          name: stateName,
+          history: [],
+        };
+      }
+      historyData[p_abbreviation].history.push({
+        cases7Days:
+          hospitalizationData.data[dateKey].states[stateName].cases7Days,
+        incidence7Days:
+          hospitalizationData.data[dateKey].states[stateName].incidence7Days,
+        date: new Date(dateKey),
+      });
+    } else {
+      throw new Error(
+        `Abbreviation ${p_abbreviation} is not allowed. Please choose one of: ${abbreviationList}`
+      );
+    }
+  });
+
+  return {
+    data: historyData,
+    meta: new ResponseMeta(hospitalizationData.lastUpdate),
   };
 }
 

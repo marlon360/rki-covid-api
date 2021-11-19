@@ -612,3 +612,24 @@ Returns the number of recovered people in germany for the last `:days` days.
   }
 }
 ```
+
+## `/germany/history/hospitalization`
+
+## `/germany/history/hospitalization/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/history/hospitalization/7`
+[Open](/germany/history/hospitalization/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
+
+### Response
+
+```json
+{}
+```
