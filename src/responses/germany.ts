@@ -22,6 +22,7 @@ import {
   getStatesFrozenIncidenceHistory,
   StatesFrozenIncidenceData,
 } from "../data-requests/frozen-incidence";
+import { getDateBefore } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -190,6 +191,42 @@ export async function GermanyRecoveredHistoryResponse(
   return {
     data: history,
     meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+  };
+}
+
+export async function GermanyHospitalizationHistoryResponse(
+  days?: number
+): Promise<
+  GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
+> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+  const hospitalizationData = await getHospitalizationData();
+  const history = [];
+  let dateKeys = Object.keys(hospitalizationData.data);
+  if (days != undefined) {
+    const reference_date = new Date(getDateBefore(days));
+    dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
+  }
+  dateKeys.sort((a, b) => {
+    const dateA = new Date(a);
+    const dateB = new Date(b);
+    return dateA.getTime() - dateB.getTime();
+  });
+  dateKeys.forEach((dateKey) => {
+    history.push({
+      cases7Days: hospitalizationData.data[dateKey].cases7Days,
+      incidence7Days: hospitalizationData.data[dateKey].incidence7Days,
+      date: new Date(dateKey),
+    });
+  });
+
+  return {
+    data: history,
+    meta: new ResponseMeta(hospitalizationData.lastUpdate),
   };
 }
 

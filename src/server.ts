@@ -14,6 +14,7 @@ import {
   StatesWeekIncidenceHistoryResponse,
   StatesAgeGroupsResponse,
   StatesFrozenIncidenceHistoryResponse,
+  StatesHospitalizationHistoryResponse,
 } from "./responses/states";
 import {
   GermanyAgeGroupsResponse,
@@ -23,6 +24,7 @@ import {
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
   GermanyFrozenIncidenceHistoryResponse,
+  GermanyHospitalizationHistoryResponse,
 } from "./responses/germany";
 import {
   DistrictsCasesHistoryResponse,
@@ -210,6 +212,28 @@ app.get(
 );
 
 app.get(
+  "/germany/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/germany/age-groups",
   queuedCache(),
   cache.route(),
@@ -332,6 +356,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
@@ -479,6 +525,32 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days),
       req.params.state
     );
