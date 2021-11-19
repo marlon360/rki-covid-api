@@ -631,5 +631,50 @@ Returns the number of recovered people in germany for the last `:days` days.
 ### Response
 
 ```json
-{}
+{
+  "data": [
+    {
+      "cases7Days": 6207,
+      "incidence7Days": 7.46,
+      "date": "2021-11-13T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 6103,
+      "incidence7Days": 7.34,
+      "date": "2021-11-14T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 6060,
+      "incidence7Days": 7.29,
+      "date": "2021-11-15T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 5888,
+      "incidence7Days": 7.08,
+      "date": "2021-11-16T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 5606,
+      "incidence7Days": 6.74,
+      "date": "2021-11-17T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 5116,
+      "incidence7Days": 6.15,
+      "date": "2021-11-18T00:00:00.000Z"
+    },
+    {
+      "cases7Days": 4437,
+      "incidence7Days": 5.34,
+      "date": "2021-11-19T00:00:00.000Z"
+    }
+  ],
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2021-11-19T03:01:47.000Z",
+    "lastCheckedForUpdate": "2021-11-19T15:34:49.633Z"
+  }
+}
 ```
