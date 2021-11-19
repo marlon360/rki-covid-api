@@ -3,8 +3,17 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
+import {
+  ColorRange,
+  hospitalizationIncidenceColorRanges,
+  weekIncidenceColorRanges,
+} from "../configuration/colors";
 import sharp from "sharp";
+import {
+  getHospitalizationData,
+  getLatestHospitalizationDataKey,
+} from "../data-requests/hospitalization";
+import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
 
 export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
@@ -24,8 +33,10 @@ export async function DistrictsMapResponse() {
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -51,8 +62,10 @@ export async function DistrictsLegendMapResponse() {
     const district = districtsDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    districtPathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    districtPathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -87,8 +100,10 @@ export async function StatesMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
@@ -116,8 +131,10 @@ export async function StatesLegendMapResponse() {
     const district = statesDataHashMap[id];
     const weekIncidence =
       (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] =
-      getColorForWeekIncidence(weekIncidence);
+    statePathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
   }
@@ -136,15 +153,86 @@ export async function StatesLegendMapResponse() {
     .toBuffer();
 }
 
+export async function StatesHospitalizationMapResponse() {
+  const mapData = StatesMap;
+
+  const hospitalizationData = await getHospitalizationData();
+  const latestHospitalizationData =
+    hospitalizationData.data[
+      getLatestHospitalizationDataKey(hospitalizationData.data)
+    ];
+
+  // // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const state =
+      latestHospitalizationData.states[
+        getStateNameByAbbreviation(getStateAbbreviationById(parseInt(id)))
+      ];
+
+    statePathElement.attributes["fill"] = getColorForValue(
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+}
+
+export async function StatesHospitalizationLegendMapResponse() {
+  const mapData = StatesMap;
+
+  const hospitalizationData = await getHospitalizationData();
+  const latestHospitalizationData =
+    hospitalizationData.data[
+      getLatestHospitalizationDataKey(hospitalizationData.data)
+    ];
+
+  // // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const state =
+      latestHospitalizationData.states[
+        getStateNameByAbbreviation(getStateAbbreviationById(parseInt(id)))
+      ];
+
+    statePathElement.attributes["fill"] = getColorForValue(
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  return sharp(
+    getMapBackground(
+      "Hospitalisierungsinzidenz",
+      hospitalizationData.lastUpdate,
+      hospitalizationIncidenceColorRanges
+    )
+  )
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .png({ quality: 75 })
+    .toBuffer();
+}
+
 export function IncidenceColorsResponse() {
   return {
     incidentRanges: weekIncidenceColorRanges,
   };
 }
 
-function getColorForWeekIncidence(weekIncidence: number): string {
-  for (const range of weekIncidenceColorRanges) {
-    if (range.isValueInRange(weekIncidence)) {
+function getColorForValue(value: number, ranges: ColorRange[]): string {
+  for (const range of ranges) {
+    if (range.isValueInRange(value)) {
       return range.color;
     }
   }
