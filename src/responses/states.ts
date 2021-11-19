@@ -422,19 +422,28 @@ export async function StatesRecoveredHistoryResponse(
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
   };
 }
-// : Promise<StatesHospitalizationHistory>
+
 interface StatesHospitalizationHistory {
-  [key: string]: StateHistory<{
-    cases7Days: number;
-    incidence7Days: number;
-    date: Date;
-    meta: ResponseMeta;
-  }>;
+  data: {
+    [abbreviation: string]: {
+      id: number;
+      name: string;
+      history: [
+        {
+          cases7Days: number;
+          incidence7Days: number;
+          date: Date;
+        }
+      ];
+    };
+  };
+  meta: ResponseMeta;
 }
+
 export async function StatesHospitalizationHistoryResponse(
   days?: number,
   p_abbreviation?: string
-): Promise<{ data: {}; meta: ResponseMeta }> {
+): Promise<StatesHospitalizationHistory> {
   if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
