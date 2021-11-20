@@ -155,6 +155,21 @@ Redirects to `/states/history/cases`
 
 ## `/states/history/incidence/:days`
 
+## `/states/history/frozen-incidence`
+
+## `/states/history/frozen-incidence/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/states/history/frozen-incidence/7`
+[Open](/states/history/frozen-incidence/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
+
 ## `/states/history/deaths`
 
 ## `/states/history/deaths/:days`
@@ -162,6 +177,10 @@ Redirects to `/states/history/cases`
 ## `/states/history/recovered`
 
 ## `/states/history/recovered/:days`
+
+## `/states/history/hospitalization`
+
+## `/states/history/hospitalization/:days`
 
 ## `/states/age-groups`
 
@@ -258,6 +277,22 @@ Redirects to `/states/history/cases`
 
 ## `/states/:state/history/incidence/:days`
 
+## `/states/:state/history/frozen-incidence`
+
+## `/states/:state/history/frozen-incidence/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/states/HH/history/frozen-incidence/7`
+[Open](/states/HH/history/frozen-incidence/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
+| :states   | Abbreviation of the state             |
+
 ## `/states/:state/history/deaths`
 
 ## `/states/:state/history/deaths/:days`
@@ -265,6 +300,10 @@ Redirects to `/states/history/cases`
 ## `/states/:state/history/recovered`
 
 ## `/states/:state/history/recovered/:days`
+
+## `/states/:state/history/hospitalization`
+
+## `/states/:state/history/hospitalization/:days`
 
 ## `/states/:state/age-groups`
 

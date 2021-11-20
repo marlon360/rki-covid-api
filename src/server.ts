@@ -4,6 +4,7 @@ import cors from "cors";
 import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
+import axios from "axios";
 
 import {
   StatesCasesHistoryResponse,
@@ -12,6 +13,8 @@ import {
   StatesResponse,
   StatesWeekIncidenceHistoryResponse,
   StatesAgeGroupsResponse,
+  StatesFrozenIncidenceHistoryResponse,
+  StatesHospitalizationHistoryResponse,
 } from "./responses/states";
 import {
   GermanyAgeGroupsResponse,
@@ -20,6 +23,8 @@ import {
   GermanyRecoveredHistoryResponse,
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
+  GermanyFrozenIncidenceHistoryResponse,
+  GermanyHospitalizationHistoryResponse,
 } from "./responses/germany";
 import {
   DistrictsCasesHistoryResponse,
@@ -38,6 +43,8 @@ import {
   DistrictsLegendMapResponse,
   DistrictsMapResponse,
   IncidenceColorsResponse,
+  StatesHospitalizationLegendMapResponse,
+  StatesHospitalizationMapResponse,
   StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
@@ -45,7 +52,7 @@ import { RKIError } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
-  host: process.env.REDISHOST,
+  host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
 });
@@ -141,6 +148,28 @@ app.get(
 );
 
 app.get(
+  "/germany/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyFrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/germany/history/deaths",
   queuedCache(),
   cache.route(),
@@ -178,6 +207,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await GermanyRecoveredHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
@@ -292,6 +343,50 @@ app.get(
 );
 
 app.get(
+  "/states/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/states/age-groups",
   queuedCache(),
   cache.route(),
@@ -365,6 +460,32 @@ app.get(
 );
 
 app.get(
+  "/states/:state/history/frozen-incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/frozen-incidence/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/states/:state/history/deaths",
   queuedCache(),
   cache.route(),
@@ -406,6 +527,32 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days),
       req.params.state
     );
@@ -780,6 +927,28 @@ app.get(
 );
 
 app.get(
+  "/map/states-legend/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationLegendMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
   "/testing/history",
   queuedCache(),
   cache.route(),
@@ -806,6 +975,15 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         message: "There is a problem with the official RKI API.",
         rkiError: error.rkiError,
         url: error.url || "",
+      },
+    });
+  } else if (axios.isAxiosError(error)) {
+    res.json({
+      error: {
+        message: "An error occurred while fetching external data.",
+        url: error.config.url,
+        details: error.message,
+        stack: error.stack,
       },
     });
   } else {
