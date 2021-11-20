@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 # where available (npm@5+)
-COPY package*.json ./
+COPY ./package*.json ./
 
 # Inside "npm install" the build tools and dev packages are needed to compile "sharp"
 # against globaly installed lib vips in newest version
