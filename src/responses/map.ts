@@ -76,7 +76,7 @@ export async function DistrictsLegendMapResponse(
       weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "xor" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
@@ -150,7 +150,7 @@ export async function StatesLegendMapResponse(
       weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "xor" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
@@ -217,7 +217,7 @@ export async function StatesHospitalizationLegendMapResponse(
       weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "xor" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
@@ -254,6 +254,7 @@ function getMapBackground(
   let svg = `
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" fill-rule="evenodd">
+        <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
         <text id="headline" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
