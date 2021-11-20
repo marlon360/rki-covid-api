@@ -44,69 +44,183 @@ export class ColorRange {
 }
 
 interface weekIncidenceColorRanges {
-  [palette: string]: ColorRange[];
+  [type: string]: {
+    [palette: string]: ColorRange[];
+  };
 }
 
 export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
-  default: [
-    new ColorRange({
-      min: 0,
-      max: 0,
-      color: "#E2E2E2",
-      compareFn: (value: number, range: ColorRange) => value === range.min,
-      label: "keine Fälle übermittelt",
-    }),
-    new ColorRange({ min: 0, max: 1, color: "#25BA94" }),
-    new ColorRange({ min: 1, max: 15, color: "#76D985" }),
-    new ColorRange({ min: 15, max: 25, color: "#FFFFA8" }),
-    new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
-    new ColorRange({ min: 35, max: 50, color: "#F1894A" }),
-    new ColorRange({ min: 50, max: 100, color: "#F21620" }),
-    new ColorRange({ min: 100, max: 200, color: "#A9141A" }),
-    new ColorRange({ min: 200, max: 350, color: "#B275DD" }),
-    new ColorRange({ min: 350, max: 500, color: "#5D179B" }),
-    new ColorRange({ min: 500, max: 1000, color: "#17179B" }),
-    new ColorRange({ min: 1000, max: 1500, color: "#68463B" }),
-    new ColorRange({ min: 1500, max: 2500, color: "#6D6D6D" }),
-    new ColorRange({ min: 2500, max: Infinity, color: "#020003" }),
-  ],
-  old: [
-    new ColorRange({
-      min: 0,
-      max: 0,
-      color: "#CDCDCD",
-      compareFn: (value: number, range: ColorRange) => value === range.min,
-      label: "keine Fälle übermittelt",
-    }),
-    new ColorRange({ min: 0, max: 1, color: "#3BEB47" }),
-    new ColorRange({ min: 1, max: 15, color: "#7FD38D" }),
-    new ColorRange({ min: 15, max: 25, color: "#FEFFB1" }),
-    new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
-    new ColorRange({ min: 35, max: 50, color: "#F08A4B" }),
-    new ColorRange({ min: 50, max: 100, color: "#EB1A1D" }),
-    new ColorRange({ min: 100, max: 200, color: "#AB1316" }),
-    new ColorRange({ min: 200, max: 350, color: "#B374DD" }),
-    new ColorRange({ min: 350, max: 500, color: "#5B189B" }),
-    new ColorRange({ min: 500, max: 1000, color: "#543D35" }),
-    new ColorRange({ min: 1000, max: Infinity, color: "#020003" }),
-  ],
-  rki: [
-    new ColorRange({
-      min: 0,
-      max: 0,
-      color: "#CDCDCD",
-      compareFn: (value: number, range: ColorRange) => value === range.min,
-      label: "keine Fälle übermittelt",
-    }),
-    new ColorRange({ min: 0, max: 5, color: "#FFFCCC" }),
-    new ColorRange({ min: 5, max: 25, color: "#FFF380" }),
-    new ColorRange({ min: 25, max: 50, color: "#FFB534" }),
-    new ColorRange({ min: 50, max: 100, color: "#D43624" }),
-    new ColorRange({ min: 100, max: 250, color: "#951214" }),
-    new ColorRange({ min: 250, max: 500, color: "#671212" }),
-    new ColorRange({ min: 500, max: 1000, color: "#DD0085" }),
-    new ColorRange({ min: 1000, max: Infinity, color: "#7A0077" }),
-  ],
+  incidenceMap: {
+    default: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#E2E2E2",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 1, color: "#25BA94" }),
+      new ColorRange({ min: 1, max: 15, color: "#76D985" }),
+      new ColorRange({ min: 15, max: 25, color: "#FFFFA8" }),
+      new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
+      new ColorRange({ min: 35, max: 50, color: "#F1894A" }),
+      new ColorRange({ min: 50, max: 100, color: "#F21620" }),
+      new ColorRange({ min: 100, max: 200, color: "#A9141A" }),
+      new ColorRange({ min: 200, max: 350, color: "#B275DD" }),
+      new ColorRange({ min: 350, max: 500, color: "#5D179B" }),
+      new ColorRange({ min: 500, max: 1000, color: "#17179B" }),
+      new ColorRange({ min: 1000, max: 1500, color: "#68463B" }),
+      new ColorRange({ min: 1500, max: 2500, color: "#6D6D6D" }),
+      new ColorRange({ min: 2500, max: Infinity, color: "#020003" }),
+    ],
+    old: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#CDCDCD",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 1, color: "#3BEB47" }),
+      new ColorRange({ min: 1, max: 15, color: "#7FD38D" }),
+      new ColorRange({ min: 15, max: 25, color: "#FEFFB1" }),
+      new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
+      new ColorRange({ min: 35, max: 50, color: "#F08A4B" }),
+      new ColorRange({ min: 50, max: 100, color: "#EB1A1D" }),
+      new ColorRange({ min: 100, max: 200, color: "#AB1316" }),
+      new ColorRange({ min: 200, max: 350, color: "#B374DD" }),
+      new ColorRange({ min: 350, max: 500, color: "#5B189B" }),
+      new ColorRange({ min: 500, max: 1000, color: "#543D35" }),
+      new ColorRange({ min: 1000, max: Infinity, color: "#020003" }),
+    ],
+    rki: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#CDCDCD",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 5, color: "#FFFCCC" }),
+      new ColorRange({ min: 5, max: 25, color: "#FFF380" }),
+      new ColorRange({ min: 25, max: 50, color: "#FFB534" }),
+      new ColorRange({ min: 50, max: 100, color: "#D43624" }),
+      new ColorRange({ min: 100, max: 250, color: "#951214" }),
+      new ColorRange({ min: 250, max: 500, color: "#671212" }),
+      new ColorRange({ min: 500, max: 1000, color: "#DD0085" }),
+      new ColorRange({ min: 1000, max: Infinity, color: "#7A0077" }),
+    ],
+  },
+  hospitalizationMap: {
+    default: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#E2E2E2",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 1, color: "#FCF9CA" }),
+      new ColorRange({
+        min: 1,
+        max: 3,
+        color: "#FFDA9C",
+        label: "> 1 - 3: keine einheitlichen Regeln",
+      }),
+      new ColorRange({
+        min: 3,
+        max: 6,
+        color: "#F7785B",
+        label: "> 3 - 6: 2G-Regel",
+      }),
+      new ColorRange({
+        min: 6,
+        max: 9,
+        color: "#FF3A25",
+        label: "> 6 - 9: 2G-Plus-Regel",
+      }),
+      new ColorRange({
+        min: 9,
+        max: 12,
+        color: "#D80182",
+        label: "> 9 - 12: > 9 weitere Maßnahmen",
+      }),
+      new ColorRange({ min: 12, max: 15, color: "#770175" }),
+      new ColorRange({ min: 15, max: Infinity, color: "#000000" }),
+    ],
+    grey: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#F0F0F0",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 1, color: "#E1E1E1" }),
+      new ColorRange({
+        min: 1,
+        max: 3,
+        color: "#BEBEBE",
+        label: "> 1 - 3: keine einheitlichen Regeln",
+      }),
+      new ColorRange({
+        min: 3,
+        max: 6,
+        color: "#9B9B9B",
+        label: "> 3 - 6: 2G-Regel",
+      }),
+      new ColorRange({
+        min: 6,
+        max: 9,
+        color: "#787878",
+        label: "> 6 - 9: 2G-Plus-Regel",
+      }),
+      new ColorRange({
+        min: 9,
+        max: 12,
+        color: "#555555",
+        label: "> 9 - 12: > 9 weitere Maßnahmen",
+      }),
+      new ColorRange({ min: 12, max: 15, color: "#323232" }),
+      new ColorRange({ min: 15, max: Infinity, color: "#0F0F0F" }),
+    ],
+    gruenrot: [
+      new ColorRange({
+        min: 0,
+        max: 0,
+        color: "#046010",
+        compareFn: (value: number, range: ColorRange) => value === range.min,
+        label: "keine Fälle übermittelt",
+      }),
+      new ColorRange({ min: 0, max: 1, color: "#28520E" }),
+      new ColorRange({
+        min: 1,
+        max: 3,
+        color: "#4C450B",
+        label: "> 1 - 3: keine einheitlichen Regeln",
+      }),
+      new ColorRange({
+        min: 3,
+        max: 6,
+        color: "#703709",
+        label: "> 3 - 6: 2G-Regel",
+      }),
+      new ColorRange({
+        min: 6,
+        max: 9,
+        color: "#932907",
+        label: "> 6 - 9: 2G-Plus-Regel",
+      }),
+      new ColorRange({
+        min: 9,
+        max: 12,
+        color: "#B71B05",
+        label: "> 9 - 12: > 9 weitere Maßnahmen",
+      }),
+      new ColorRange({ min: 12, max: 15, color: "#DB0E02" }),
+      new ColorRange({ min: 15, max: Infinity, color: "#FF0000" }),
+    ],
+  },
 };
 
 // example string for user palette (thats a copy of the rki palette)
@@ -116,7 +230,10 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
 // this function is called by GetCheckedPalette, input: userPaletteString given from ?userpalette= example above and build
 // a valid userpalette and append this to weekIncidenceColorRanges
 // output: the name of the userPalette (always "user")
-function BuildUserPalette(userPaletteString: string): string {
+function BuildUserPalette(
+  paletteType: string,
+  userPaletteString: string
+): { paletteType: string; palette: string } {
   //if a semicolon at the end of userPaletteString, remove it
   if (userPaletteString.substring(0, userPaletteString.length - 1) == ";") {
     userPaletteString = userPaletteString.substring(
@@ -229,41 +346,53 @@ function BuildUserPalette(userPaletteString: string): string {
     }
   });
   //create user palette Object and write to other hard coded palettes
-  weekIncidenceColorRanges["user"] = userRanges.map((range) => {
+  weekIncidenceColorRanges[paletteType]["user"] = userRanges.map((range) => {
     return new ColorRange(range);
   });
   // return name of the user palette
-  return "user";
+  return { paletteType: paletteType, palette: "user" };
 }
 // this function is called by function GetCheckedPalette input: a palette string from req given by ?palette=
 // output: checked palette
-function CheckParmPalette(palette: string): string {
-  const palettes = Object.keys(weekIncidenceColorRanges);
+function CheckParmPalette(
+  paletteType: string,
+  palette: string
+): { paletteType: string; palette: string } {
+  const palettes = Object.keys(weekIncidenceColorRanges[paletteType]);
   if (palettes.includes(palette)) {
-    return palette;
+    return { paletteType: paletteType, palette: palette };
   } else {
     throw new Error(
-      `Falscher Parameter '?palette=${palette}' ! ${palette} existiert nicht. Gültig ist nur eine aus: ${palettes}`
+      `Falscher Parameter '?palette=${palette}' ! ${palette} existiert nicht, oder ist für den typ: ${paletteType} nicht vorgesehen. Gültig ist nur eine aus: ${palettes}`
     );
   }
 }
 
 //this function is called by server.ts /map links, needs the req, returns a valid palette
-export function GetCheckedPalette(req): string {
+export function GetCheckedPalette(
+  req,
+  paletteType: string
+): { paletteType: string; palette: string } {
   // first check if both possible parameters are given -> Error not allowed
-  if (req.query.userpalette != undefined && req.query.palette != undefined) {
+  if (req.query.userpalette && req.query.palette) {
     throw new Error(
       "Die Parameter 'palette=' und 'userpalette=' dürfen nicht zusammen angegeben werden!"
     );
   }
   // set palette to 'default', will be changed if a parameter is given
-  let checkedPalette = "default";
+  let checkedPalette = { paletteType: paletteType, palette: "default" };
   // if parameter userpalette= is given build user palette, function returns new palette name
-  if (req.query.userpalette != undefined) {
-    checkedPalette = BuildUserPalette(req.query.userpalette.toString());
-  } else if (req.query.palette != undefined) {
+  if (req.query.userpalette) {
+    checkedPalette = BuildUserPalette(
+      paletteType,
+      req.query.userpalette.toString()
+    );
+  } else if (req.query.palette) {
     // if parameter palette= is given check if the hard coded palette exists, function returns palette name!
-    checkedPalette = CheckParmPalette(req.query.palette.toString());
+    checkedPalette = CheckParmPalette(
+      paletteType,
+      req.query.palette.toString()
+    );
   }
   return checkedPalette;
 }

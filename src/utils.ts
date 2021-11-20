@@ -156,6 +156,45 @@ export function getStateNameByAbbreviation(
   }
 }
 
+export function getStateIdByName(name: string): number | null {
+  switch (name) {
+    case "Baden-Württemberg":
+      return 8;
+    case "Bayern":
+      return 9;
+    case "Berlin":
+      return 11;
+    case "Brandenburg":
+      return 12;
+    case "Bremen":
+      return 4;
+    case "Hamburg":
+      return 2;
+    case "Hessen":
+      return 6;
+    case "Mecklenburg-Vorpommern":
+      return 13;
+    case "Niedersachsen":
+      return 3;
+    case "Nordrhein-Westfalen":
+      return 5;
+    case "Rheinland-Pfalz":
+      return 7;
+    case "Saarland":
+      return 10;
+    case "Sachsen":
+      return 14;
+    case "Sachsen-Anhalt":
+      return 15;
+    case "Schleswig-Holstein":
+      return 1;
+    case "Thüringen":
+      return 16;
+    default:
+      return null;
+  }
+}
+
 export function getDateBefore(days: number): string {
   let offsetDate = new Date();
   offsetDate.setHours(0, 0, 0, 0);
