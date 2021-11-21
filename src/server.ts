@@ -874,9 +874,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req);
+    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(checkedPalette);
+    const response = await DistrictsMapResponse(
+      checkedPalette.paletteType,
+      checkedPalette.palette
+    );
     res.send(response);
   }
 );
@@ -886,9 +889,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req);
+    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse(checkedPalette);
+    const response = await DistrictsLegendMapResponse(
+      checkedPalette.paletteType,
+      checkedPalette.palette
+    );
     res.send(response);
   }
 );
@@ -898,15 +904,23 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req);
-    res.json(IncidenceColorsResponse(checkedPalette));
+    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
+    res.json(
+      IncidenceColorsResponse(
+        checkedPalette.paletteType,
+        checkedPalette.palette
+      )
+    );
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
-  const checkedPalette = GetCheckedPalette(req);
+  const checkedPalette = GetCheckedPalette(req, "incidenceMap");
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse(checkedPalette);
+  const response = await StatesMapResponse(
+    checkedPalette.paletteType,
+    checkedPalette.palette
+  );
   res.send(response);
 });
 
@@ -915,9 +929,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req);
+    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse(checkedPalette);
+    const response = await StatesLegendMapResponse(
+      checkedPalette.paletteType,
+      checkedPalette.palette
+    );
     res.send(response);
   }
 );
@@ -927,8 +944,13 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req);
-    res.json(IncidenceColorsResponse(checkedPalette));
+    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
+    res.json(
+      IncidenceColorsResponse(
+        checkedPalette.paletteType,
+        checkedPalette.palette
+      )
+    );
   }
 );
 
@@ -937,8 +959,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationLegendMapResponse();
+    const response = await StatesHospitalizationLegendMapResponse(
+      checkedPalette.paletteType,
+      checkedPalette.palette
+    );
     res.send(response);
   }
 );
@@ -948,9 +974,28 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationMapResponse();
+    const response = await StatesHospitalizationMapResponse(
+      checkedPalette.paletteType,
+      checkedPalette.palette
+    );
     res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization/legend",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
+    res.json(
+      IncidenceColorsResponse(
+        checkedPalette.paletteType,
+        checkedPalette.palette
+      )
+    );
   }
 );
 

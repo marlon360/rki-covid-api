@@ -3,11 +3,7 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import {
-  ColorRange,
-  hospitalizationIncidenceColorRanges,
-  weekIncidenceColorRanges,
-} from "../configuration/colors";
+import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 import {
   getHospitalizationData,
@@ -15,7 +11,10 @@ import {
 } from "../data-requests/hospitalization";
 import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
 
-export async function DistrictsMapResponse(palette: string) {
+export async function DistrictsMapResponse(
+  paletteType: string,
+  palette: string
+) {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -35,7 +34,7 @@ export async function DistrictsMapResponse(palette: string) {
       (district.casesPerWeek / district.population) * 100000;
     districtPathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
   }
 
@@ -44,7 +43,10 @@ export async function DistrictsMapResponse(palette: string) {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function DistrictsLegendMapResponse(palette: string) {
+export async function DistrictsLegendMapResponse(
+  paletteType: string,
+  palette: string
+) {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -64,7 +66,7 @@ export async function DistrictsLegendMapResponse(palette: string) {
       (district.casesPerWeek / district.population) * 100000;
     districtPathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
   }
 
@@ -74,15 +76,15 @@ export async function DistrictsLegendMapResponse(palette: string) {
     getMapBackground(
       "7-Tage-Inzidenz der Landkreise",
       districtsData.lastUpdate,
-      weekIncidenceColorRanges[palette]
+      weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export async function StatesMapResponse(palette: string) {
+export async function StatesMapResponse(paletteType: string, palette: string) {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -102,7 +104,7 @@ export async function StatesMapResponse(palette: string) {
       (district.casesPerWeek / district.population) * 100000;
     statePathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -113,7 +115,10 @@ export async function StatesMapResponse(palette: string) {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesLegendMapResponse(palette: string) {
+export async function StatesLegendMapResponse(
+  paletteType: string,
+  palette: string
+) {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -133,7 +138,7 @@ export async function StatesLegendMapResponse(palette: string) {
       (district.casesPerWeek / district.population) * 100000;
     statePathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -145,15 +150,18 @@ export async function StatesLegendMapResponse(palette: string) {
     getMapBackground(
       "7-Tage-Inzidenz der Bundesländer",
       statesData.lastUpdate,
-      weekIncidenceColorRanges[palette]
+      weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export async function StatesHospitalizationMapResponse() {
+export async function StatesHospitalizationMapResponse(
+  paletteType: string,
+  palette: string
+) {
   const mapData = StatesMap;
 
   const hospitalizationData = await getHospitalizationData();
@@ -173,7 +181,7 @@ export async function StatesHospitalizationMapResponse() {
 
     statePathElement.attributes["fill"] = getColorForValue(
       state.incidence7Days,
-      hospitalizationIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -184,7 +192,10 @@ export async function StatesHospitalizationMapResponse() {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesHospitalizationLegendMapResponse() {
+export async function StatesHospitalizationLegendMapResponse(
+  paletteType: string,
+  palette: string
+) {
   const mapData = StatesMap;
 
   const hospitalizationData = await getHospitalizationData();
@@ -204,7 +215,7 @@ export async function StatesHospitalizationLegendMapResponse() {
 
     statePathElement.attributes["fill"] = getColorForValue(
       state.incidence7Days,
-      hospitalizationIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -216,17 +227,17 @@ export async function StatesHospitalizationLegendMapResponse() {
     getMapBackground(
       "Hospitalisierungsinzidenz",
       hospitalizationData.lastUpdate,
-      hospitalizationIncidenceColorRanges
+      weekIncidenceColorRanges[paletteType][palette]
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
+    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export function IncidenceColorsResponse() {
+export function IncidenceColorsResponse(paletteType: string, palette: string) {
   return {
-    incidentRanges: weekIncidenceColorRanges,
+    incidentRanges: weekIncidenceColorRanges[paletteType][palette],
   };
 }
 
