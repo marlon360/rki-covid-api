@@ -1,5 +1,3 @@
-import { mainModule } from "process";
-
 export class ColorRange {
   min: number; // minimum number of range (number not included >)
   max: number; // maximum number of range (number included <=)
@@ -61,19 +59,71 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 1, color: "#25BA94" }),
-      new ColorRange({ min: 1, max: 15, color: "#76D985" }),
-      new ColorRange({ min: 15, max: 25, color: "#FFFFA8" }),
-      new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
-      new ColorRange({ min: 35, max: 50, color: "#F1894A" }),
-      new ColorRange({ min: 50, max: 100, color: "#F21620" }),
-      new ColorRange({ min: 100, max: 200, color: "#A9141A" }),
-      new ColorRange({ min: 200, max: 350, color: "#B275DD" }),
-      new ColorRange({ min: 350, max: 500, color: "#5D179B" }),
-      new ColorRange({ min: 500, max: 1000, color: "#17179B" }),
-      new ColorRange({ min: 1000, max: 1500, color: "#68463B" }),
-      new ColorRange({ min: 1500, max: 2500, color: "#6D6D6D" }),
-      new ColorRange({ min: 2500, max: Infinity, color: "#020003" }),
+      new ColorRange({
+        min: 0,
+        max: 1,
+        color: "#25BA94",
+      }),
+      new ColorRange({
+        min: 1,
+        max: 15,
+        color: "#76D985",
+      }),
+      new ColorRange({
+        min: 15,
+        max: 25,
+        color: "#FFFFA8",
+      }),
+      new ColorRange({
+        min: 25,
+        max: 35,
+        color: "#FECA81",
+      }),
+      new ColorRange({
+        min: 35,
+        max: 50,
+        color: "#F1894A",
+      }),
+      new ColorRange({
+        min: 50,
+        max: 100,
+        color: "#F21620",
+      }),
+      new ColorRange({
+        min: 100,
+        max: 200,
+        color: "#A9141A",
+      }),
+      new ColorRange({
+        min: 200,
+        max: 350,
+        color: "#B275DD",
+      }),
+      new ColorRange({
+        min: 350,
+        max: 500,
+        color: "#5D179B",
+      }),
+      new ColorRange({
+        min: 500,
+        max: 1000,
+        color: "#17179B",
+      }),
+      new ColorRange({
+        min: 1000,
+        max: 1500,
+        color: "#68463B",
+      }),
+      new ColorRange({
+        min: 1500,
+        max: 2500,
+        color: "#6D6D6D",
+      }),
+      new ColorRange({
+        min: 2500,
+        max: Infinity,
+        color: "#020003",
+      }),
     ],
     old: [
       new ColorRange({
@@ -83,17 +133,61 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 1, color: "#3BEB47" }),
-      new ColorRange({ min: 1, max: 15, color: "#7FD38D" }),
-      new ColorRange({ min: 15, max: 25, color: "#FEFFB1" }),
-      new ColorRange({ min: 25, max: 35, color: "#FECA81" }),
-      new ColorRange({ min: 35, max: 50, color: "#F08A4B" }),
-      new ColorRange({ min: 50, max: 100, color: "#EB1A1D" }),
-      new ColorRange({ min: 100, max: 200, color: "#AB1316" }),
-      new ColorRange({ min: 200, max: 350, color: "#B374DD" }),
-      new ColorRange({ min: 350, max: 500, color: "#5B189B" }),
-      new ColorRange({ min: 500, max: 1000, color: "#543D35" }),
-      new ColorRange({ min: 1000, max: Infinity, color: "#020003" }),
+      new ColorRange({
+        min: 0,
+        max: 1,
+        color: "#3BEB47",
+      }),
+      new ColorRange({
+        min: 1,
+        max: 15,
+        color: "#7FD38D",
+      }),
+      new ColorRange({
+        min: 15,
+        max: 25,
+        color: "#FEFFB1",
+      }),
+      new ColorRange({
+        min: 25,
+        max: 35,
+        color: "#FECA81",
+      }),
+      new ColorRange({
+        min: 35,
+        max: 50,
+        color: "#F08A4B",
+      }),
+      new ColorRange({
+        min: 50,
+        max: 100,
+        color: "#EB1A1D",
+      }),
+      new ColorRange({
+        min: 100,
+        max: 200,
+        color: "#AB1316",
+      }),
+      new ColorRange({
+        min: 200,
+        max: 350,
+        color: "#B374DD",
+      }),
+      new ColorRange({
+        min: 350,
+        max: 500,
+        color: "#5B189B",
+      }),
+      new ColorRange({
+        min: 500,
+        max: 1000,
+        color: "#543D35",
+      }),
+      new ColorRange({
+        min: 1000,
+        max: Infinity,
+        color: "#020003",
+      }),
     ],
     rki: [
       new ColorRange({
@@ -103,14 +197,46 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 5, color: "#FFFCCC" }),
-      new ColorRange({ min: 5, max: 25, color: "#FFF380" }),
-      new ColorRange({ min: 25, max: 50, color: "#FFB534" }),
-      new ColorRange({ min: 50, max: 100, color: "#D43624" }),
-      new ColorRange({ min: 100, max: 250, color: "#951214" }),
-      new ColorRange({ min: 250, max: 500, color: "#671212" }),
-      new ColorRange({ min: 500, max: 1000, color: "#DD0085" }),
-      new ColorRange({ min: 1000, max: Infinity, color: "#7A0077" }),
+      new ColorRange({
+        min: 0,
+        max: 5,
+        color: "#FFFCCC",
+      }),
+      new ColorRange({
+        min: 5,
+        max: 25,
+        color: "#FFF380",
+      }),
+      new ColorRange({
+        min: 25,
+        max: 50,
+        color: "#FFB534",
+      }),
+      new ColorRange({
+        min: 50,
+        max: 100,
+        color: "#D43624",
+      }),
+      new ColorRange({
+        min: 100,
+        max: 250,
+        color: "#951214",
+      }),
+      new ColorRange({
+        min: 250,
+        max: 500,
+        color: "#671212",
+      }),
+      new ColorRange({
+        min: 500,
+        max: 1000,
+        color: "#DD0085",
+      }),
+      new ColorRange({
+        min: 1000,
+        max: Infinity,
+        color: "#7A0077",
+      }),
     ],
   },
   hospitalizationMap: {
@@ -122,7 +248,11 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 1, color: "#FCF9CA" }),
+      new ColorRange({
+        min: 0,
+        max: 1,
+        color: "#FCF9CA",
+      }),
       new ColorRange({
         min: 1,
         max: 3,
@@ -147,8 +277,16 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         color: "#D80182",
         label: "> 9 - 12: > 9 weitere Maßnah.",
       }),
-      new ColorRange({ min: 12, max: 15, color: "#770175" }),
-      new ColorRange({ min: 15, max: Infinity, color: "#000000" }),
+      new ColorRange({
+        min: 12,
+        max: 15,
+        color: "#770175",
+      }),
+      new ColorRange({
+        min: 15,
+        max: Infinity,
+        color: "#000000",
+      }),
     ],
     grey: [
       new ColorRange({
@@ -158,7 +296,11 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 1, color: "#E1E1E1" }),
+      new ColorRange({
+        min: 0,
+        max: 1,
+        color: "#E1E1E1",
+      }),
       new ColorRange({
         min: 1,
         max: 3,
@@ -183,8 +325,16 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         color: "#555555",
         label: "> 9 - 12: > 9 weitere Maßnah.",
       }),
-      new ColorRange({ min: 12, max: 15, color: "#323232" }),
-      new ColorRange({ min: 15, max: Infinity, color: "#0F0F0F" }),
+      new ColorRange({
+        min: 12,
+        max: 15,
+        color: "#323232",
+      }),
+      new ColorRange({
+        min: 15,
+        max: Infinity,
+        color: "#0F0F0F",
+      }),
     ],
     greenred: [
       new ColorRange({
@@ -194,7 +344,11 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         compareFn: (value: number, range: ColorRange) => value === range.min,
         label: "keine Fälle übermittelt",
       }),
-      new ColorRange({ min: 0, max: 1, color: "#28520E" }),
+      new ColorRange({
+        min: 0,
+        max: 1,
+        color: "#28520E",
+      }),
       new ColorRange({
         min: 1,
         max: 3,
@@ -219,24 +373,29 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
         color: "#B71B05",
         label: "> 9 - 12: > 9 weitere Maßnah.",
       }),
-      new ColorRange({ min: 12, max: 15, color: "#DB0E02" }),
-      new ColorRange({ min: 15, max: Infinity, color: "#FF0000" }),
+      new ColorRange({
+        min: 12,
+        max: 15,
+        color: "#DB0E02",
+      }),
+      new ColorRange({
+        min: 15,
+        max: Infinity,
+        color: "#FF0000",
+      }),
     ],
   },
 };
 
 // example string for user palette (thats a copy of the rki palette)
 // 0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
-//min,max,color;min,max,color; ........... ;min,Infinity,color; if a semicolon at the end is a option
+//min,max,color,label?;min,max,color,label?; ........... ;min,Infinity,color,label?; a semicolon at the end is a option
 
-// this function is called by GetCheckedPalette, input: userPaletteString given from ?userpalette= example above and build
-// a valid userpalette and append this to weekIncidenceColorRanges
-// output: the name of the userPalette (always "user")
 function BuildUserPalette(
   paletteType: string,
   paletteStr: string
 ): { paletteType: string; palette: string } {
-  //remove a semicolon at the end and/or beginning of userPaletteString if available
+  //remove a semicolon at the end and/or beginning of paletteString if available
   if (paletteStr.substring(paletteStr.length - 1, paletteStr.length) == ";") {
     paletteStr = paletteStr.substring(0, paletteStr.length - 1);
   }
@@ -272,30 +431,10 @@ function BuildUserPalette(
       );
     }
 
-    // first range min must be "0" if not throw a error
-    if (index == 0 && parseInt(userRange[index][0]) != 0) {
-      throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${
-          index + 1
-        }.Bereich.min muss "0" sein! ${ranges[index]} überprüfen.`
-      );
-    } else {
-      var min = parseInt(userRange[index][0]);
-    }
-
-    // dont allow min > max -> throw error
-    if (min > parseInt(userRange[index][1])) {
-      throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${index + 1}.Bereich.min > ${
-          index + 1
-        }.Bereich.max. ${ranges[index]} überprüfen.`
-      );
-    }
-
     // first and second element must be an number, or first a number and second "Infinity" for last range.
     // if this is not the last range it will be filtered out in one of the next tests
     if (
-      isNaN(min) ||
+      isNaN(parseInt(userRange[index][0])) ||
       (isNaN(parseInt(userRange[index][1])) &&
         userRange[index][1].trim().toLowerCase() != "infinity")
     ) {
@@ -309,7 +448,37 @@ function BuildUserPalette(
     } else if (userRange[index][1].trim().toLowerCase() == "infinity") {
       var max: number = Infinity;
     } else {
+      var min = parseInt(userRange[index][0]);
       max = parseInt(userRange[index][1]);
+    }
+
+    // first range min must be "0" if not throw a error
+    if (index == 0 && min != 0) {
+      throw new Error(
+        `Fehler im ${index + 1}.Bereich. ${
+          index + 1
+        }.Bereich.min muss "0" sein! ${ranges[index]} überprüfen.`
+      );
+    }
+
+    // dont allow min > max -> throw error
+    if (min > max) {
+      throw new Error(
+        `Fehler im ${index + 1}.Bereich. ${index + 1}.Bereich.min > ${
+          index + 1
+        }.Bereich.max. ${ranges[index]} überprüfen.`
+      );
+    }
+
+    // after first range check if range.min = range-1.max
+    if (index > 0 && min != parseInt(userRange[index - 1][1])) {
+      throw new Error(
+        `Fehler im ${index + 1}.Bereich. ${
+          index + 1
+        }.Bereich.min != ${index}.Bereich.max! ${ranges[index]} oder ${
+          ranges[index - 1]
+        }`
+      );
     }
 
     // third element must be 6 digit hex, bevor test, remove all spaces (if available)
@@ -326,21 +495,10 @@ function BuildUserPalette(
     } else {
       var color: string = `#${userRange[index][2]}`;
     }
-
-    // after first range check if range.min = range-1.max
-    if (index > 0 && min != parseInt(userRange[index - 1][1])) {
-      throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${
-          index + 1
-        }.Bereich.min != ${index}.Bereich.max! ${ranges[index]} oder ${
-          ranges[index - 1]
-        }`
-      );
-    }
     // all checks passed, now write the Objects to userRanges array
 
     // if a label is given and not empty it must be pushed too
-    if (userRange[index].length == 4 && userRange[index][3].trim != "") {
+    if (userRange[index].length == 4 && userRange[index][3].trim() != "") {
       // check if this is the first range and range.min = range.max = 0 witch meens thats a
       // fixed range for value "0" and write special Object with comparefunction and label
       const label: string = userRange[index][3].trim();
@@ -363,14 +521,14 @@ function BuildUserPalette(
       }
     } else {
       // check if this is the first range and range.min = range.max = 0 witch meens thats a
-      // fixed range for value "0" and write special Object with comparefunction and label
+      // fixed range for value "0" and write special Object with comparefunction and standart label
       if (index == 0 && min == 0 && max == 0) {
         userRanges.push({
           min: min,
           max: max,
           color: color,
           compareFn: (value: number, range: ColorRange) => value === range.min,
-          label: "keine Fälle übermittelt", //standart label for spezial object min=max=0
+          label: "keine Fälle übermittelt",
         });
       } else {
         // all others write "normal" objects without label
@@ -388,12 +546,10 @@ function BuildUserPalette(
     return new ColorRange(range);
   });
 
-  // return name of the user palette; palette is always "user"!
+  // return object with paletteType and palette; palette is always "user"!
   return { paletteType: paletteType, palette: "user" };
 }
 
-// this function is called by function GetCheckedPalette input: a palette string from req given by ?palette=
-// output: checked palette
 function CheckParmPalette(
   paletteType: string,
   palette: string
@@ -408,7 +564,6 @@ function CheckParmPalette(
   }
 }
 
-//this function is called by server.ts /map links, needs the req, returns a valid palette
 export function GetCheckedPalette(
   req,
   paletteType: string
