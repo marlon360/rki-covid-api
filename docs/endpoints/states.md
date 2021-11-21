@@ -178,6 +178,10 @@ Redirects to `/states/history/cases`
 
 ## `/states/history/recovered/:days`
 
+## `/states/history/hospitalization`
+
+## `/states/history/hospitalization/:days`
+
 ## `/states/age-groups`
 
 ### Request
@@ -296,6 +300,10 @@ Redirects to `/states/history/cases`
 ## `/states/:state/history/recovered`
 
 ## `/states/:state/history/recovered/:days`
+
+## `/states/:state/history/hospitalization`
+
+## `/states/:state/history/hospitalization/:days`
 
 ## `/states/:state/age-groups`
 

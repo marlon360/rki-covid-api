@@ -237,3 +237,29 @@ Returns the incident ranges for the colors.
   ]
 }
 ```
+
+## `/map/states/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states/hospitalization`
+[Open](/map/states/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
+
+## `/map/states-legend/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states with a legend and headline.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states-legend/hospitalization`
+[Open](/map/states-legend/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">

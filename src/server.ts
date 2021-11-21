@@ -14,6 +14,7 @@ import {
   StatesWeekIncidenceHistoryResponse,
   StatesAgeGroupsResponse,
   StatesFrozenIncidenceHistoryResponse,
+  StatesHospitalizationHistoryResponse,
 } from "./responses/states";
 import {
   GermanyAgeGroupsResponse,
@@ -23,6 +24,7 @@ import {
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
   GermanyFrozenIncidenceHistoryResponse,
+  GermanyHospitalizationHistoryResponse,
 } from "./responses/germany";
 import {
   DistrictsCasesHistoryResponse,
@@ -41,6 +43,8 @@ import {
   DistrictsLegendMapResponse,
   DistrictsMapResponse,
   IncidenceColorsResponse,
+  StatesHospitalizationLegendMapResponse,
+  StatesHospitalizationMapResponse,
   StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
@@ -210,6 +214,28 @@ app.get(
 );
 
 app.get(
+  "/germany/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyHospitalizationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/germany/age-groups",
   queuedCache(),
   cache.route(),
@@ -332,6 +358,28 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesFrozenIncidenceHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
@@ -479,6 +527,32 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days),
       req.params.state
     );
@@ -855,6 +929,28 @@ app.get(
   async function (req, res) {
     const checkedPalette = GetCheckedPalette(req);
     res.json(IncidenceColorsResponse(checkedPalette));
+  }
+);
+
+app.get(
+  "/map/states-legend/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationLegendMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    res.setHeader("Content-Type", "image/png");
+    const response = await StatesHospitalizationMapResponse();
+    res.send(response);
   }
 );
 
