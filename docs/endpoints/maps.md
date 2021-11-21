@@ -22,25 +22,32 @@ Returns a Heatmap (PNG) of week incidences for districts.
 | ?palette=rki            | use rki palette (colors/ranges like the rki on their webside use)               |
 | ?userpalette=0,0,...... | use a userpalette example and rules below                                       |
 
-this is a example userpalette witch must be given after ?userpalette=
+A example userpalette witch must be given after ?userpalette= as follows:
+0,0,CDCDCD,ein test;0,5,FFFCCC;5,25,FFF380,test2;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
 
-0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
+witch meens the following:
 
-witch meens the following
+| Stringpart            | >min | <=max    | Color  | Label                                                             |
+| --------------------- | ---- | -------- | ------ | ----------------------------------------------------------------- |
+| 0,0,CDCDCD,ein test;  | 0    | 0        | CDCDCD | instead of "> 0 - 0" the text "ein test" is printed in the legend |
+| 0,5,FFFCCC;           | 0    | 5        | FFFCCC |                                                                   |
+| 5,25,FFF380,test2;    | 5    | 25       | FFF380 | instead of "> 5 - 25" the text "text2" is printed in the legend   |
+| 25,50,FFB534;         | 25   | 50       | FFB534 |                                                                   |
+| 50,100,D43624;        | 50   | 100      | D43624 |                                                                   |
+| 100,250,951214;       | 100  | 250      | 951214 |                                                                   |
+| 250,500,671212;       | 250  | 500      | 671212 |                                                                   |
+| 500,1000,DD0085;      | 500  | 1000     | DD0085 |                                                                   |
+| 1000,Infinity,7A0077; | 1000 | Infinity | 7A0077 |                                                                   |
 
-| Stringpart            | >min | <=max    | Color  | Remark or Rule                                                          |
-| --------------------- | ---- | -------- | ------ | ----------------------------------------------------------------------- |
-| 0,0,CDCDCD;           | 0    | 0        | CDCDCD | special range min=max=0 can be used but this is not a must!             |
-| 0,5,FFFCCC;           | 0    | 5        | FFFCCC | first range must start with min=0                                       |
-| 5,25,FFF380;          | 5    | 25       | FFF380 | min next range must be max last range                                   |
-| 25,50,FFB534;         | 25   | 50       | FFB534 | hex values for color must be 6 gigit without prefix, upper or lowercase |
-| 50,100,D43624;        | 50   | 100      | D43624 |                                                                         |
-| 100,250,951214;       | 100  | 250      | 951214 |                                                                         |
-| 250,500,671212;       | 250  | 500      | 671212 |                                                                         |
-| 500,1000,DD0085;      | 500  | 1000     | DD0085 |                                                                         |
-| 1000,Infinity,7A0077; | 1000 | Infinity | 7A0077 | last range max must be "Infinity".                                      |
+Rules:
 
-every range needs 3 values (min, max, color) separated by , and terminated by ; after the last range the ; is a option!
+- every range needs 3 or as option 4 values (min, max, color, option: label)
+  separated by , and terminated by ; after the last range the ; is a option, at the beginning too.
+- special range min = max = 0 can be used but this is not a must! but ....
+- first range must start with min = 0.
+- min next range must be max last range.
+- hex values for color must be 6 gigit without prefix, upper or lowercase or mixed (e.g. "0f1a3D").
+- last range max must be "Infinity" upper- or lowercase, or mixed. (e.g. "infinity" or "InFiNiTy").
 
 ### Response
 

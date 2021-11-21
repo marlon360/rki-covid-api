@@ -1,3 +1,5 @@
+import { mainModule } from "process";
+
 export class ColorRange {
   min: number; // minimum number of range (number not included >)
   max: number; // maximum number of range (number included <=)
@@ -232,126 +234,164 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
 // output: the name of the userPalette (always "user")
 function BuildUserPalette(
   paletteType: string,
-  userPaletteString: string
+  paletteStr: string
 ): { paletteType: string; palette: string } {
-  //if a semicolon at the end of userPaletteString, remove it
-  if (userPaletteString.substring(0, userPaletteString.length - 1) == ";") {
-    userPaletteString = userPaletteString.substring(
-      0,
-      userPaletteString.length - 1
-    );
+  //remove a semicolon at the end and/or beginning of userPaletteString if available
+  if (paletteStr.substring(paletteStr.length - 1, paletteStr.length) == ";") {
+    paletteStr = paletteStr.substring(0, paletteStr.length - 1);
   }
-  const ranges = userPaletteString.split(";"); // split the string in ranges
+  if (paletteStr.substring(0, 1) == ";") {
+    paletteStr = paletteStr.substring(1, paletteStr.length);
+  }
+
+  const ranges = paletteStr.split(";"); // split the string in ranges
   const countRanges = ranges.length; // number of ranges
+
   // first check, ranges.length must be >=3 and <=15 sein, if not throw a error
   if (countRanges < 3 || countRanges > 15) {
     throw new Error(
-      `Anzahl der Bereiche! Soll: ">=3 <=15". Ist: "${countRanges}". ${userPaletteString} überprüfen`
+      `Anzahl der Bereiche! Soll: ">=3 <=15". Ist: "${countRanges}". ${paletteStr} überprüfen`
     );
   }
+
   let userRanges = [];
   let userRange = [];
-  ranges.forEach((range) => {
-    const z = ranges.indexOf(range); // rangenumber
-    userRange[z] = range.split(","); // split the range into parameters
-    // some errorchecks
-    // every range needs 3 elements if not throw a error
-    if (userRange[z].length != 3) {
+  ranges.forEach((range, index) => {
+    userRange[index] = range.split(","); // split the range into single parameters
+
+    // errorchecks:
+
+    // every range needs 3 or 4 elements if not throw a error
+    if (userRange[index].length != 3 && userRange[index].length != 4) {
       throw new Error(
-        `Fehler im ${z + 1}.Bereich. Jeder Bereich muss 3 Werte enthalten! ${
-          ranges[z]
-        } überprüfen.`
+        `Fehler im ${
+          index + 1
+        }.Bereich. Jeder Bereich muss 3 oder 4 Werte enthalten! "${
+          ranges[index]
+        }" überprüfen.`
       );
     }
+
     // first range min must be "0" if not throw a error
-    if (z == 0 && parseInt(userRange[z][0]) != 0) {
+    if (index == 0 && parseInt(userRange[index][0]) != 0) {
       throw new Error(
-        `Fehler im ${z + 1}.Bereich. ${z + 1}.Bereich.min muss "0" sein! ${
-          ranges[z]
-        } überprüfen.`
+        `Fehler im ${index + 1}.Bereich. ${
+          index + 1
+        }.Bereich.min muss "0" sein! ${ranges[index]} überprüfen.`
       );
+    } else {
+      var min = parseInt(userRange[index][0]);
     }
+
     // dont allow min > max -> throw error
-    if (parseInt(userRange[z][0]) > parseInt(userRange[z][1])) {
+    if (min > parseInt(userRange[index][1])) {
       throw new Error(
-        `Fehler im ${z + 1}.Bereich. ${z + 1}.Bereich.min > ${
-          z + 1
-        }.Bereich.max. ${ranges[z]} überprüfen.`
+        `Fehler im ${index + 1}.Bereich. ${index + 1}.Bereich.min > ${
+          index + 1
+        }.Bereich.max. ${ranges[index]} überprüfen.`
       );
     }
+
     // first and second element must be an number, or first a number and second "Infinity" for last range.
     // if this is not the last range it will be filtered out in one of the next tests
     if (
-      isNaN(parseInt(userRange[z][0])) ||
-      (isNaN(parseInt(userRange[z][1])) && userRange[z][1] != "Infinity")
+      isNaN(min) ||
+      (isNaN(parseInt(userRange[index][1])) &&
+        userRange[index][1].trim().toLowerCase() != "infinity")
     ) {
       throw new Error(
         `Fehler im ${
-          z + 1
+          index + 1
         }.Bereich. Die ersten beiden Werte müssen Zahlen oder "Infinity" im 2.Wert enthalten! ${
-          ranges[z]
+          ranges[index]
         } überprüfen.`
       );
+    } else if (userRange[index][1].trim().toLowerCase() == "infinity") {
+      var max: number = Infinity;
+    } else {
+      max = parseInt(userRange[index][1]);
     }
+
     // third element must be 6 digit hex, bevor test, remove all spaces (if available)
     // and convert to upper case
-    userRange[z][2] = userRange[z][2].toUpperCase().replace(/ /g, "");
-    if (!userRange[z][2].match(/^[0-9A-F]{6}$/)) {
+    userRange[index][2] = userRange[index][2].toUpperCase().replace(/ /g, "");
+    if (!userRange[index][2].match(/^[0-9A-F]{6}$/)) {
       throw new Error(
         `Fehler im ${
-          z + 1
+          index + 1
         }.Bereich. Der dritte Wert muss eine 6 stellige Hexadezimale Zahl ohne Prefix enthalten. z.B. "FFFD000". ${
-          ranges[z]
+          ranges[index]
         } überprüfen.`
       );
+    } else {
+      var color: string = `#${userRange[index][2]}`;
     }
+
     // after first range check if range.min = range-1.max
-    if (z != 0 && parseInt(userRange[z][0]) != parseInt(userRange[z - 1][1])) {
+    if (index > 0 && min != parseInt(userRange[index - 1][1])) {
       throw new Error(
-        `Fehler im ${z + 1}.Bereich. ${
-          z + 1
-        }.Bereich.min != ${z}.Bereich.max! ${ranges[z]} oder ${ranges[z - 1]}`
+        `Fehler im ${index + 1}.Bereich. ${
+          index + 1
+        }.Bereich.min != ${index}.Bereich.max! ${ranges[index]} oder ${
+          ranges[index - 1]
+        }`
       );
     }
     // all checks passed, now write the Objects to userRanges array
 
-    // first check if this is the first range and range.min = range.max = 0 witch meens thats a
-    // fixed range for value "0" and write special Object with comparefunction and label
-    if (
-      z == 0 &&
-      parseInt(userRange[z][0]) == 0 &&
-      parseInt(userRange[z][1]) == 0
-    ) {
-      userRanges.push({
-        min: parseInt(userRange[z][0]),
-        max: parseInt(userRange[z][1]),
-        color: "#" + userRange[z][2],
-        compareFn: (value: number, range: ColorRange) => value === range.min,
-        label: "keine Fälle übermittelt",
-      });
-    } else if (userRange[z][1] == "Infinity") {
-      // "Infinity" marks last range, write specal object
-      userRanges.push({
-        min: parseInt(userRange[z][0]),
-        max: Infinity,
-        color: "#" + userRange[z][2],
-      });
+    // if a label is given and not empty it must be pushed too
+    if (userRange[index].length == 4 && userRange[index][3].trim != "") {
+      // check if this is the first range and range.min = range.max = 0 witch meens thats a
+      // fixed range for value "0" and write special Object with comparefunction and label
+      const label: string = userRange[index][3].trim();
+      if (index == 0 && min == 0 && max == 0) {
+        userRanges.push({
+          min: min,
+          max: max,
+          color: color,
+          compareFn: (value: number, range: ColorRange) => value === range.min,
+          label: label,
+        });
+      } else {
+        // all others write "normal" objects with label
+        userRanges.push({
+          min: min,
+          max: max,
+          color: color,
+          label: label,
+        });
+      }
     } else {
-      // all others write "normal" objects
-      userRanges.push({
-        min: parseInt(userRange[z][0]),
-        max: parseInt(userRange[z][1]),
-        color: "#" + userRange[z][2],
-      });
+      // check if this is the first range and range.min = range.max = 0 witch meens thats a
+      // fixed range for value "0" and write special Object with comparefunction and label
+      if (index == 0 && min == 0 && max == 0) {
+        userRanges.push({
+          min: min,
+          max: max,
+          color: color,
+          compareFn: (value: number, range: ColorRange) => value === range.min,
+          label: "keine Fälle übermittelt", //standart label for spezial object min=max=0
+        });
+      } else {
+        // all others write "normal" objects without label
+        userRanges.push({
+          min: min,
+          max: max,
+          color: color,
+        });
+      }
     }
   });
+
   //create user palette Object and write to other hard coded palettes
   weekIncidenceColorRanges[paletteType]["user"] = userRanges.map((range) => {
     return new ColorRange(range);
   });
-  // return name of the user palette
+
+  // return name of the user palette; palette is always "user"!
   return { paletteType: paletteType, palette: "user" };
 }
+
 // this function is called by function GetCheckedPalette input: a palette string from req given by ?palette=
 // output: checked palette
 function CheckParmPalette(
