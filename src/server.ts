@@ -960,7 +960,7 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "hospitalisationMap");
+    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
     res.json(
       IncidenceColorsResponse(
         checkedPalette.paletteType,

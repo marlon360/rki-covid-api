@@ -10,7 +10,7 @@ Returns a Heatmap (PNG) of week incidences for districts.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/map/districts`
+`GET http://api.fritz.box:8080/map/districts`
 [Open](/map/districts)
 
 ** All map links can be extended with the following parameters **
@@ -44,7 +44,7 @@ every range needs 3 values (min, max, color) separated by , and terminated by ; 
 
 ### Response
 
-<img alt="districts map" src="https://api.fritz.box:8080/map/districts?palette=default" width="300">
+<img alt="districts map" src="http://api.fritz.box:8080/map/districts?palette=default" width="300">
 
 ## `/map/districts-legend`
 
@@ -52,12 +52,12 @@ Returns a Heatmap (PNG) of week incidences for districts with a legend and headl
 
 ### Request
 
-`GET https://api.fritz.box:8080/map/districts-legend?palette=rki`
+`GET http://api.fritz.box:8080/map/districts-legend?palette=rki`
 [Open](/map/districts-legend?palette=rki)
 
 ### Response
 
-<img alt="districts legend map" src="https://api.fritz.box:8080/map/districts-legend?palette=rki" width="300">
+<img alt="districts legend map" src="http://api.fritz.box:8080/map/districts-legend?palette=rki" width="300">
 
 ## `/map/districts/legend`
 
@@ -65,7 +65,7 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET https://api.fritz.box:8080/map/districts/legend?palette=default`
+`GET http://api.fritz.box:8080/map/districts/legend?palette=default`
 [Open](/map/districts/legend?palette=default)
 
 ### Response
@@ -154,12 +154,12 @@ Returns a Heatmap (PNG) of week incidences for states.
 
 ### Request
 
-`GET https://api.fritz.box:8080/map/states`
+`GET http://api.fritz.box:8080/map/states`
 [Open](/map/states)
 
 ### Response
 
-<img alt="states map" src="https://api.fritz.box:8080/map/states?userpalette=0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077" width="300">
+<img alt="states map" src="http://api.fritz.box:8080/map/states?userpalette=0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077" width="300">
 
 ## `/map/states-legend`
 
@@ -167,12 +167,12 @@ Returns a Heatmap (PNG) of week incidences for states with a legend and headline
 
 ### Request
 
-`GET https://api.fritz.box:8080/map/states-legend`
+`GET http://api.fritz.box:8080/map/states-legend`
 [Open](/map/states-legend)
 
 ### Response
 
-<img alt="states legend map" src="https://api.fritz.box:8080/map/states-legend" width="300">
+<img alt="states legend map" src="http://api.fritz.box:8080/map/states-legend" width="300">
 
 ## `/map/states/legend`
 
@@ -180,7 +180,7 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET https://api.fritz.box:8080/map/states/legend?palette=rki`
+`GET http://api.fritz.box:8080/map/states/legend?palette=rki`
 [Open](/map/states/legend?palette=rki)
 
 ### Response
@@ -233,6 +233,102 @@ Returns the incident ranges for the colors.
       "min": 1000,
       "max": null,
       "color": "#7A0077"
+    }
+  ]
+}
+```
+
+## `/map/states/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states.
+
+| Parameter               | Description                                                     |
+| ----------------------- | --------------------------------------------------------------- |
+| ?palette=default        | use the default palette, thats the same as without              |
+| ?palette=grey           | use a grayscale palette                                         |
+| ?palette=greenred       | use a palette which runs from green (0) to red (> 15)           |
+| ?userpalette=0,0,...... | use a userpalette example and rules at the top of this document |
+
+### Request
+
+`GET http://api.fritz.box:8080/map/states/hospitalization`
+[Open](/map/states/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="http://api.fritz.box:8080/map/states/hospitalization" width="300">
+
+## `/map/states-legend/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states with a legend and headline.
+
+### Request
+
+`GET http://api.fritz.box:8080/map/states-legend/hospitalization`
+[Open](/map/states-legend/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="http://api.fritz.box:8080/map/states-legend/hospitalization" width="300">
+
+## `/map/states/hospitalization/legend`
+
+Returns the incident ranges for the colors.
+
+### Request
+
+`GET http://api.fritz.box:8080/map/states/hospitalization/legend`
+[Open](/map/states/hospitalization/legend)
+
+### Response
+
+```json
+{
+  "incidentRanges": [
+    {
+      "min": 0,
+      "max": 0,
+      "color": "#E2E2E2",
+      "label": "keine Fälle übermittelt"
+    },
+    {
+      "min": 0,
+      "max": 1,
+      "color": "#FCF9CA"
+    },
+    {
+      "min": 1,
+      "max": 3,
+      "color": "#FFDA9C",
+      "label": "> 1 - 3: keine einheitl. Regeln"
+    },
+    {
+      "min": 3,
+      "max": 6,
+      "color": "#F7785B",
+      "label": "> 3 - 6: 2G-Regel"
+    },
+    {
+      "min": 6,
+      "max": 9,
+      "color": "#FF3A25",
+      "label": "> 6 - 9: 2G-Plus-Regel"
+    },
+    {
+      "min": 9,
+      "max": 12,
+      "color": "#D80182",
+      "label": "> 9 - 12: > 9 weitere Maßnah."
+    },
+    {
+      "min": 12,
+      "max": 15,
+      "color": "#770175"
+    },
+    {
+      "min": 15,
+      "max": null,
+      "color": "#000000"
     }
   ]
 }

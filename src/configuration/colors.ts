@@ -184,7 +184,7 @@ export const weekIncidenceColorRanges: weekIncidenceColorRanges = {
       new ColorRange({ min: 12, max: 15, color: "#323232" }),
       new ColorRange({ min: 15, max: Infinity, color: "#0F0F0F" }),
     ],
-    gruenrot: [
+    greenred: [
       new ColorRange({
         min: 0,
         max: 0,
