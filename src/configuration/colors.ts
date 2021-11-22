@@ -44,7 +44,7 @@ export class ColorRange {
 }
 
 interface weekIncidenceColorRanges {
-  [type: string]: {
+  [paletteType: string]: {
     [palette: string]: ColorRange[];
   };
 }
