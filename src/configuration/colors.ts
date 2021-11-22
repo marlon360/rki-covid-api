@@ -406,7 +406,7 @@ function BuildUserPalette(
   const ranges = paletteStr.split(";"); // split the string in ranges
   const countRanges = ranges.length; // number of ranges
 
-  // first check, ranges.length must be >=3 and <=15 sein, if not throw a error
+  // first check, ranges.length must be >=3 and <=15
   if (countRanges < 3 || countRanges > 15) {
     throw new Error(
       `Anzahl der Bereiche! Soll: ">=3 <=15". Ist: "${countRanges}". ${paletteStr} überprüfen`
@@ -416,6 +416,12 @@ function BuildUserPalette(
   let userRanges = [];
   let userRange = [];
   ranges.forEach((range, index) => {
+    //define variables for parameters
+    let max: number;
+    let min: number;
+    let color: string;
+    let label: string;
+
     userRange[index] = range.split(","); // split the range into single parameters
 
     // errorchecks:
@@ -446,38 +452,36 @@ function BuildUserPalette(
         } überprüfen.`
       );
     } else if (userRange[index][1].trim().toLowerCase() == "infinity") {
-      var max: number = Infinity;
+      max = Infinity;
     } else {
-      var min = parseInt(userRange[index][0]);
+      min = parseInt(userRange[index][0]);
       max = parseInt(userRange[index][1]);
     }
 
     // first range min must be "0" if not throw a error
     if (index == 0 && min != 0) {
       throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${
-          index + 1
-        }.Bereich.min muss "0" sein! ${ranges[index]} überprüfen.`
+        `1.Bereich.min muss "0" sein (IST: ${min})! ${ranges[index]} überprüfen.`
       );
     }
 
     // dont allow min > max -> throw error
     if (min > max) {
       throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${index + 1}.Bereich.min > ${
+        `Fehler im ${index + 1}.Bereich. ${index + 1}.Bereich.min (${min})> ${
           index + 1
-        }.Bereich.max. ${ranges[index]} überprüfen.`
+        }.Bereich.max (${max}). ${ranges[index]} überprüfen.`
       );
     }
 
     // after first range check if range.min = range-1.max
     if (index > 0 && min != parseInt(userRange[index - 1][1])) {
       throw new Error(
-        `Fehler im ${index + 1}.Bereich. ${
+        `${
           index + 1
-        }.Bereich.min != ${index}.Bereich.max! ${ranges[index]} oder ${
-          ranges[index - 1]
-        }`
+        }.Bereich.min (IST: ${min}) != ${index}.Bereich.max (IST: ${parseInt(
+          userRange[index - 1][1]
+        )})! ${ranges[index]} oder ${ranges[index - 1]} überprüfen.`
       );
     }
 
@@ -488,12 +492,14 @@ function BuildUserPalette(
       throw new Error(
         `Fehler im ${
           index + 1
-        }.Bereich. Der dritte Wert muss eine 6 stellige Hexadezimale Zahl ohne Prefix enthalten. z.B. "FFFD000". ${
-          ranges[index]
-        } überprüfen.`
+        }.Bereich. Der dritte Wert muss eine 6 stellige Hexadezimale Zahl ohne Prefix enthalten. z.B. "FFFD00" (IST: ${userRange[
+          index
+        ][2]
+          .toUpperCase()
+          .replace(/ /g, "")}). ${ranges[index]} überprüfen.`
       );
     } else {
-      var color: string = `#${userRange[index][2]}`;
+      color = `#${userRange[index][2]}`;
     }
     // all checks passed, now write the Objects to userRanges array
 
