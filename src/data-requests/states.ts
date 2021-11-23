@@ -135,11 +135,11 @@ export async function getLastStateCasesHistory(
   ResponseData<{ id: number; name: string; cases: number; date: Date }[]>
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
@@ -180,11 +180,11 @@ export async function getLastStateDeathsHistory(
   ResponseData<{ id: number; name: string; deaths: number; date: Date }[]>
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(
@@ -225,11 +225,11 @@ export async function getLastStateRecoveredHistory(
   ResponseData<{ id: number; name: string; recovered: number; date: Date }[]>
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/RKI_COVID19/FeatureServer/0/query?where=${whereParams.join(

@@ -444,7 +444,7 @@ function extractVaccinationHistory(
     }
   }
 
-  if (days == null) {
+  if (days) {
     days = json.length;
   } //to filter out undefined dates
   const reference_date = new Date(getDateBefore(days + 1));

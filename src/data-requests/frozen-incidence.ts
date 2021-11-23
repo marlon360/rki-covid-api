@@ -3,7 +3,7 @@ import XLSX from "xlsx";
 import { getDateBefore, getStateAbbreviationByName, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
-export interface FrozenIncidenceData {
+export interface DistrictsFrozenIncidenceData {
   ags: string;
   name: string;
   history: {
@@ -12,10 +12,10 @@ export interface FrozenIncidenceData {
   }[];
 }
 
-export async function getFrozenIncidenceHistory(
+export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
-): Promise<ResponseData<FrozenIncidenceData[]>> {
+): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
     {
@@ -58,15 +58,15 @@ export async function getFrozenIncidenceHistory(
         history.push({ weekIncidence: district[dateKey], date });
       });
 
-      if (days != null) {
-        const reference_date = new Date(getDateBefore(days - 1));
+      if (days) {
+        const reference_date = new Date(getDateBefore(days));
         history = history.filter((element) => element.date > reference_date);
       }
 
       return { ags, name, history };
     });
 
-  if (ags != null) {
+  if (ags) {
     districts = districts.filter((district) => district.ags === ags);
   }
 
@@ -129,15 +129,15 @@ export async function getStatesFrozenIncidenceHistory(
       history.push({ weekIncidence: states[dateKey], date });
     });
 
-    if (days != null) {
-      const reference_date = new Date(getDateBefore(days - 1));
+    if (days) {
+      const reference_date = new Date(getDateBefore(days));
       history = history.filter((element) => element.date > reference_date);
     }
 
     return { abbreviation, name, history };
   });
 
-  if (abbreviation != null) {
+  if (abbreviation) {
     states = states.filter((states) => states.abbreviation === abbreviation);
   }
 
