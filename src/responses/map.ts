@@ -3,7 +3,10 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import { getDistrictsFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
+import {
+  getDistrictsFrozenIncidenceHistory,
+  getStatesFrozenIncidenceHistory,
+} from "../data-requests/frozen-incidence";
 import {
   ColorRange,
   hospitalizationIncidenceColorRanges,
@@ -157,7 +160,7 @@ export async function StatesLegendMapResponse() {
 
 // Begin history map respones
 export async function DistrictsHistoryMapResponse(
-  type: string, // "map" for map without legend, "legendMap" for map with legend
+  mapType: string, // "map" for map without legend, "legendMap" for map with legend
   dateString: string
 ) {
   const date = new Date(dateString);
@@ -185,7 +188,7 @@ export async function DistrictsHistoryMapResponse(
     const district = districtsIncidenceDataHashMap[id];
     if (district.history.length == 0) {
       throw new Error(
-        `Das Datum ${dateString} ist nicht, oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
+        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
       );
     }
     const weekIncidence = district.history[0].weekIncidence;
@@ -197,9 +200,68 @@ export async function DistrictsHistoryMapResponse(
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (type == "map") {
+  if (mapType == "map") {
     return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  } else if (type == "legendMap") {
+  } else if (mapType == "legendMap") {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Landkreise",
+        date,
+        weekIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  }
+}
+
+export async function StatesHistoryMapResponse(
+  mapType: string, // "map" for map without legend, "legendMap" for map with legend
+  dateString: string
+) {
+  const date = new Date(dateString);
+  const mapData = StatesMap;
+
+  const statesIncidenceHistory = await getStatesFrozenIncidenceHistory(
+    null,
+    null,
+    date
+  );
+
+  // create hashmap for faster access
+  const statesIncidenceHistoryDataHashMap = statesIncidenceHistory.data.reduce(
+    function (map, obj) {
+      map[obj.id] = obj;
+      return map;
+    },
+    {}
+  );
+
+  // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const state = statesIncidenceHistoryDataHashMap[id];
+    if (state.history.length == 0) {
+      throw new Error(
+        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${statesIncidenceHistory.lastUpdate}`
+      );
+    }
+    const weekIncidence = state.history[0].weekIncidence;
+    statePathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  if (mapType == "map") {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  } else if (mapType == "legendMap") {
     return sharp(
       getMapBackground(
         "7-Tage-Inzidenz der Landkreise",

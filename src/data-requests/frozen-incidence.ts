@@ -1,6 +1,11 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, getStateAbbreviationByName, RKIError } from "../utils";
+import {
+  getDateBefore,
+  getStateAbbreviationByName,
+  getStateIdByName,
+  RKIError,
+} from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface DistrictsFrozenIncidenceData {
@@ -65,16 +70,15 @@ export async function getDistrictsFrozenIncidenceHistory(
       }
       if (date) {
         const filterDate = date.toDateString();
-        history = history.filter((element) => {
-          const elementDate = element.date.toDateString();
-          return elementDate === filterDate;
-        });
+        history = history.filter(
+          (element) => element.date.toDateString() === filterDate
+        );
       }
 
       return { ags, name, history };
     });
 
-  if (ags != null) {
+  if (ags) {
     districts = districts.filter((district) => district.ags === ags);
   }
 
@@ -86,6 +90,7 @@ export async function getDistrictsFrozenIncidenceHistory(
 
 export interface StatesFrozenIncidenceData {
   abbreviation: string;
+  id: number;
   name: string;
   history: {
     date: Date;
@@ -95,7 +100,8 @@ export interface StatesFrozenIncidenceData {
 
 export async function getStatesFrozenIncidenceHistory(
   days?: number,
-  abbreviation?: string
+  abbreviation?: string,
+  date?: Date
 ): Promise<ResponseData<StatesFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
@@ -115,14 +121,15 @@ export async function getStatesFrozenIncidenceHistory(
 
   // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const dateString = sheet["A2"].v
+  const lastUpdateDateString = sheet["A2"].v
     .replace("Stand: ", "")
     .replace(date_pattern, "$3-$2-$1");
-  const lastUpdate = new Date(dateString);
+  const lastUpdate = new Date(lastUpdateDateString);
 
   let states = json.map((states) => {
     const name = states["__EMPTY"]; //there is no header
     const abbreviation = getStateAbbreviationByName(name);
+    const id = getStateIdByName(name);
 
     let history = [];
 
@@ -137,12 +144,18 @@ export async function getStatesFrozenIncidenceHistory(
       history.push({ weekIncidence: states[dateKey], date });
     });
 
-    if (days != null) {
+    if (days) {
       const reference_date = new Date(getDateBefore(days));
       history = history.filter((element) => element.date > reference_date);
     }
+    if (date) {
+      const filterDate = date.toDateString();
+      history = history.filter(
+        (element) => element.date.toDateString() === filterDate
+      );
+    }
 
-    return { abbreviation, name, history };
+    return { abbreviation, id, name, history };
   });
 
   if (abbreviation != null) {
