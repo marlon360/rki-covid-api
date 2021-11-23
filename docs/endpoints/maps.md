@@ -30,6 +30,46 @@ Returns a Heatmap (PNG) of week incidences for districts with a legend and headl
 
 <img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend" width="300">
 
+## `/map/districts/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for districts for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/districts/history/2021-11-01`
+[Open](/map/districts/history/2021-11-01)
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
+### Response
+
+<img alt="districts map" src="https://api.corona-zahlen.org/map/districts/history/2021-11-01" width="300">
+
+## `/map/districts-legend/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for districts with a legend and headline for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/districts-legend/history/30`
+[Open](/map/districts-legend/history/30)
+
+### Response
+
+<img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend/history/30" width="300">
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
 ## `/map/districts/legend`
 
 Returns the incident ranges for the colors.
