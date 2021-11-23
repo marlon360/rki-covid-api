@@ -293,7 +293,7 @@ Returns a Heatmap (PNG) of hospitalization incidences for states.
 
 ### Response
 
-<img alt="states legend map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
+<img alt="states hospitalization map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
 
 ## `/map/states-legend/hospitalization`
 
@@ -306,4 +306,4 @@ Returns a Heatmap (PNG) of hospitalization incidences for states with a legend a
 
 ### Response
 
-<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">
+<img alt="states legend hospitalization map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">
