@@ -902,8 +902,8 @@ app.get(
         `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${req.params.date} überprüfen.`
       );
     }
-    res.setHeader("Content-Type", "image/png");
     const response = await DistrictsHistoryMapResponse("map", dateString);
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
