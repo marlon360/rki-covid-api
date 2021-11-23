@@ -42,13 +42,14 @@ import { TestingHistoryResponse } from "./responses/testing";
 import {
   DistrictsLegendMapResponse,
   DistrictsMapResponse,
+  DistrictsHistoryMapResponse,
   IncidenceColorsResponse,
   StatesHospitalizationLegendMapResponse,
   StatesHospitalizationMapResponse,
   StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
-import { RKIError } from "./utils";
+import { RKIError, getDateBefore } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
@@ -881,12 +882,69 @@ app.get(
 );
 
 app.get(
+  "/map/districts/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let dateString: string;
+    // Parametercheck
+    if (
+      req.params.date.match(
+        /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/
+      ) &&
+      !(new Date(req.params.date).getTime() > new Date().getTime())
+    ) {
+      dateString = req.params.date;
+    } else if (!isNaN(parseInt(req.params.date))) {
+      dateString = getDateBefore(parseInt(req.params.date));
+    } else {
+      throw new Error(
+        `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${req.params.date} überprüfen.`
+      );
+    }
+    res.setHeader("Content-Type", "image/png");
+    const response = await DistrictsHistoryMapResponse("map", dateString);
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/districts-legend",
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.setHeader("Content-Type", "image/png");
     const response = await DistrictsLegendMapResponse();
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/districts-legend/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let dateString: string;
+    // Parametercheck
+    if (
+      req.params.date.match(
+        /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/
+      ) &&
+      !(new Date(req.params.date).getTime() > new Date().getTime())
+    ) {
+      dateString = req.params.date;
+    } else if (
+      req.params.date.match(/^[0-9]+$/) &&
+      !isNaN(parseInt(req.params.date))
+    ) {
+      dateString = getDateBefore(parseInt(req.params.date));
+    } else {
+      throw new Error(
+        `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${req.params.date} überprüfen.`
+      );
+    }
+    const response = await DistrictsHistoryMapResponse("legendMap", dateString);
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );

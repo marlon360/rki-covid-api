@@ -14,7 +14,8 @@ export interface DistrictsFrozenIncidenceData {
 
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
-  ags?: string
+  ags?: string,
+  date?: Date
 ): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
@@ -58,9 +59,16 @@ export async function getDistrictsFrozenIncidenceHistory(
         history.push({ weekIncidence: district[dateKey], date });
       });
 
-      if (days != null) {
+      if (days) {
         const reference_date = new Date(getDateBefore(days));
         history = history.filter((element) => element.date > reference_date);
+      }
+      if (date) {
+        const filterDate = date.toDateString();
+        history = history.filter((element) => {
+          const elementDate = element.date.toDateString();
+          return elementDate === filterDate;
+        });
       }
 
       return { ags, name, history };

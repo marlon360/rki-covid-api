@@ -3,6 +3,7 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
+import { getDistrictsFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 import {
   ColorRange,
   hospitalizationIncidenceColorRanges,
@@ -15,6 +16,7 @@ import {
 } from "../data-requests/hospitalization";
 import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
 
+// Begin normal map responses
 export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
 
@@ -153,6 +155,65 @@ export async function StatesLegendMapResponse() {
     .toBuffer();
 }
 
+// Begin history map respones
+export async function DistrictsHistoryMapResponse(
+  type: string, // "map" for map without legend, "legendMap" for map with legend
+  dateString: string
+) {
+  const date = new Date(dateString);
+  const mapData = DistrictsMap;
+
+  const districtsIncidenceHistory = await getDistrictsFrozenIncidenceHistory(
+    null,
+    null,
+    date
+  );
+
+  // create hashmap for faster access
+  const districtsIncidenceDataHashMap = districtsIncidenceHistory.data.reduce(
+    function (map, obj) {
+      map[obj.ags] = obj;
+      return map;
+    },
+    {}
+  );
+
+  // add fill color to every districts
+  for (const districtPathElement of mapData.children) {
+    const idAttribute = districtPathElement.attributes.id;
+    let id = idAttribute.split("-")[1];
+    const district = districtsIncidenceDataHashMap[id];
+    if (district.history.length == 0) {
+      throw new Error(
+        `Das Datum ${dateString} ist nicht, oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
+      );
+    }
+    const weekIncidence = district.history[0].weekIncidence;
+    districtPathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  if (type == "map") {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  } else if (type == "legendMap") {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Landkreise",
+        date,
+        weekIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  }
+}
+
+//Begin hospitalisation map resonses
 export async function StatesHospitalizationMapResponse() {
   const mapData = StatesMap;
 
