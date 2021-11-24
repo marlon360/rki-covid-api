@@ -4,27 +4,39 @@ FROM node:16-alpine3.12
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
 
-WORKDIR /tmp
+ARG VIPS_VERSION=8.11.3
 
-# build dependencies, compile vips-8.11.3 and cleanup.
-RUN wget -O- https://github.com/libvips/libvips/releases/download/v8.11.3/vips-8.11.3.tar.gz | tar xzC /tmp \
- && apk add --no-cache zlib libxml2 glib gobject-introspection libjpeg-turbo libexif lcms2 fftw giflib libpng \
-     libwebp orc tiff poppler-glib librsvg libgsf openexr libheif libimagequant pango \
- && apk --no-cache add msttcorefonts-installer fontconfig \
- && update-ms-fonts \
- && fc-cache -f \
- && apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
-     libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
-     poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
- && cd vips-8.11.3 \
- && ./configure --prefix=/usr \
-                --disable-static \
-                --disable-dependency-tracking \
-                --enable-silent-rules \
- && make -s install-strip \
- && cd .. \
- && rm -rf vips-8.11.3 /var/cache/apk/* \
- && apk del .vips-deps
+# System update, build dependencies, compile vips-8.11.3 and cleanup.
+# Also to npm@6.14.15 is downgraded to prevent warnings and to keep the json-lockfile 
+RUN set -x -o pipefail \
+  && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz | tar xzC /tmp \
+  && apk update \
+  && apk upgrade \
+  && apk add \
+    zlib libxml2 glib gobject-introspection libjpeg-turbo \
+    libexif lcms2 fftw giflib libpng libwebp orc tiff poppler-glib \
+    librsvg libgsf openexr libheif libimagequant pango fontconfig \
+  && apk add --virtual .ms-fonts msttcorefonts-installer \
+  && update-ms-fonts 2>/dev/null \
+  && fc-cache -f \
+  && apk del .ms-fonts\
+  && apk add \
+    --virtual .vips-dependencies build-base binutils zlib-dev \
+    libxml2-dev glib-dev gobject-introspection-dev libjpeg-turbo-dev \
+    libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev \
+    orc-dev tiff-dev poppler-dev librsvg-dev libgsf-dev openexr-dev \
+    libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
+  && cd /tmp/vips-${VIPS_VERSION} \
+  && ./configure --prefix=/usr \
+                 --disable-static \
+                 --disable-dependency-tracking \
+                 --enable-silent-rules \
+  && make -s install-strip \
+  && cd .. \
+  && npm -g install npm@6.14.15 \
+  && rm -rf /tmp/vips-${VIPS_VERSION} \
+  && apk del --purge .vips-dependencies \
+  && rm -rf /var/cache/apk/*
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -34,13 +46,15 @@ WORKDIR /usr/src/app
 # where available (npm@5+)
 COPY ./package*.json ./
 
-# Inside "npm install" there are some build tools needed
-# Install the tools, execute "npm install" and remove the tools afterwards
+# Inside "npm install" the build tools and dev packages are needed to compile "sharp"
+# against globaly installed lib vips in newest version
+# Install the buildtools, dev packages of the required shared libs
+# execute "npm install" and remove the buildtools and dev packages afterwards
 RUN apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2-dev glib-dev gobject-introspection-dev \
      libjpeg-turbo-dev libexif-dev lcms2-dev fftw-dev giflib-dev libpng-dev libwebp-dev orc-dev tiff-dev \
      poppler-dev librsvg-dev libgsf-dev openexr-dev libheif-dev libimagequant-dev pango-dev py-gobject3-dev \
- && npm install \
- && apk del .vips-deps
+  && npm install \
+  && apk del .vips-deps
 
 # If you are building your code for production
 # RUN npm ci --only=production

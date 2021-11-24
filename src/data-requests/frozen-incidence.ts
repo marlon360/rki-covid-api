@@ -40,10 +40,7 @@ export async function getDistrictsFrozenIncidenceHistory(
 
   // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const dateString = sheet["A2"].v
-    .replace("Stand: ", "")
-    .replace(date_pattern, "$3-$2-$1");
-  const lastUpdate = new Date(dateString);
+  const lastUpdate = new Date(response.headers["last-modified"]);
 
   let districts = json
     .filter((district) => !!district["NR"])
@@ -119,12 +116,8 @@ export async function getStatesFrozenIncidenceHistory(
   // table starts in row 3 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 2 });
 
-  // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const lastUpdateDateString = sheet["A2"].v
-    .replace("Stand: ", "")
-    .replace(date_pattern, "$3-$2-$1");
-  const lastUpdate = new Date(lastUpdateDateString);
+  const lastUpdate = new Date(response.headers["last-modified"]);
 
   let states = json.map((states) => {
     const name = states["__EMPTY"]; //there is no header

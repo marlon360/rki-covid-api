@@ -4,6 +4,16 @@ module.exports = {
     "Eine REST API (JSON), die alle relevanten Zahlen zur Corona Lage in Deutschland liefert, basierend auf den Daten des RKI. Inzidenzen, Fälle, Hospitalisierung, Altersgruppen, Impfquote.",
   dest: "dist/docs",
   base: "/docs/",
+  head: [
+    [
+      "script",
+      {
+        async: "",
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1283448820212568",
+        crossorigin: "anonymous",
+      },
+    ],
+  ],
   themeConfig: {
     sidebar: [
       {
