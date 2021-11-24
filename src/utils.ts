@@ -233,3 +233,21 @@ export class RKIError extends Error {
     this.url = url;
   }
 }
+
+export function checkDateParameterForMaps(parmsDate: string) {
+  let dateString: string;
+  // Parametercheck
+  if (
+    parmsDate.match(/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/) &&
+    !(new Date(parmsDate).getTime() > new Date().getTime())
+  ) {
+    dateString = parmsDate;
+  } else if (parmsDate.match(/^[0-9]+$/) && !isNaN(parseInt(parmsDate))) {
+    dateString = getDateBefore(parseInt(parmsDate));
+  } else {
+    throw new Error(
+      `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${parmsDate} überprüfen.`
+    );
+  }
+  return dateString;
+}
