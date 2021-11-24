@@ -46,6 +46,7 @@ import {
   IncidenceColorsResponse,
   StatesHospitalizationLegendMapResponse,
   StatesHospitalizationMapResponse,
+  StatesHospitalizationHistoryMapResponse,
   StatesLegendMapResponse,
   StatesMapResponse,
   StatesHistoryMapResponse,
@@ -1060,6 +1061,72 @@ app.get(
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
     const response = await StatesHospitalizationMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states-legend/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let dateString: string;
+    // Parametercheck
+    if (
+      req.params.date.match(
+        /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/
+      ) &&
+      !(new Date(req.params.date).getTime() > new Date().getTime())
+    ) {
+      dateString = req.params.date;
+    } else if (
+      req.params.date.match(/^[0-9]+$/) &&
+      !isNaN(parseInt(req.params.date))
+    ) {
+      dateString = getDateBefore(parseInt(req.params.date));
+    } else {
+      throw new Error(
+        `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${req.params.date} überprüfen.`
+      );
+    }
+    const response = await StatesHospitalizationHistoryMapResponse(
+      "legendMap",
+      dateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let dateString: string;
+    // Parametercheck
+    if (
+      req.params.date.match(
+        /^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/
+      ) &&
+      !(new Date(req.params.date).getTime() > new Date().getTime())
+    ) {
+      dateString = req.params.date;
+    } else if (
+      req.params.date.match(/^[0-9]+$/) &&
+      !isNaN(parseInt(req.params.date))
+    ) {
+      dateString = getDateBefore(parseInt(req.params.date));
+    } else {
+      throw new Error(
+        `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${req.params.date} überprüfen.`
+      );
+    }
+    const response = await StatesHospitalizationHistoryMapResponse(
+      "map",
+      dateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );

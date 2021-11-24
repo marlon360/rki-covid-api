@@ -353,6 +353,53 @@ export function IncidenceColorsResponse() {
   };
 }
 
+// Begin history hospitalisation maps
+export async function StatesHospitalizationHistoryMapResponse(
+  mapType: string,
+  dateString: string
+) {
+  const date = new Date(dateString).toISOString();
+  const mapData = StatesMap;
+
+  const hospitalizationData = await getHospitalizationData();
+  if (!hospitalizationData.data[date]) {
+    throw new Error(
+      `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Hospitalisierungs Daten des RKI werden täglich meist zwischen 3 und 5 Uhr aktualisiert. Letzte Aktualisierung: ${hospitalizationData.lastUpdate}`
+    );
+  }
+  const hospitalizationDataDayStates = hospitalizationData.data[date].states;
+
+  // // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const stateName = statePathElement.attributes.name;
+    const state = hospitalizationDataDayStates[stateName];
+
+    statePathElement.attributes["fill"] = getColorForValue(
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  if (mapType == "map") {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  } else if (mapType == "legendMap") {
+    return sharp(
+      getMapBackground(
+        "Hospitalisierungsinzidenz",
+        new Date(date),
+        hospitalizationIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  }
+}
+
 function getColorForValue(value: number, ranges: ColorRange[]): string {
   for (const range of ranges) {
     if (range.isValueInRange(value)) {
