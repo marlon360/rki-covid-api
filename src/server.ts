@@ -50,6 +50,7 @@ import {
   StatesLegendMapResponse,
   StatesMapResponse,
   StatesHistoryMapResponse,
+  mapTypes,
 } from "./responses/map";
 import { RKIError, checkDateParameterForMaps } from "./utils";
 
@@ -890,7 +891,7 @@ app.get(
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await DistrictsHistoryMapResponse(
-      "map",
+      mapTypes.map,
       checkedDateString
     );
     res.setHeader("Content-Type", "image/png");
@@ -916,7 +917,7 @@ app.get(
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await DistrictsHistoryMapResponse(
-      "legendMap",
+      mapTypes.legendMap,
       checkedDateString
     );
     res.setHeader("Content-Type", "image/png");
@@ -945,7 +946,10 @@ app.get(
   cache.route(),
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
-    const response = await StatesHistoryMapResponse("map", checkedDateString);
+    const response = await StatesHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
     res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
@@ -969,7 +973,7 @@ app.get(
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHistoryMapResponse(
-      "legendMap",
+      mapTypes.legendMap,
       checkedDateString
     );
     res.setHeader("Content-Type", "image/png");
@@ -1015,7 +1019,7 @@ app.get(
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
-      "legendMap",
+      mapTypes.legendMap,
       checkedDateString
     );
     res.setHeader("Content-Type", "image/png");
@@ -1030,7 +1034,7 @@ app.get(
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
-      "map",
+      mapTypes.map,
       checkedDateString
     );
     res.setHeader("Content-Type", "image/png");

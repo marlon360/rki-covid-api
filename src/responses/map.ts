@@ -19,6 +19,10 @@ import {
 } from "../data-requests/hospitalization";
 import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
 
+export enum mapTypes {
+  map,
+  legendMap,
+}
 // Begin normal map responses
 export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
@@ -160,7 +164,7 @@ export async function StatesLegendMapResponse() {
 
 // Begin history map respones
 export async function DistrictsHistoryMapResponse(
-  mapType: string, // "map" for map without legend, "legendMap" for map with legend
+  mapType: mapTypes = mapTypes.map,
   dateString: string
 ) {
   const date = new Date(dateString);
@@ -200,9 +204,9 @@ export async function DistrictsHistoryMapResponse(
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (mapType == "map") {
+  if (mapType == mapTypes.map) {
     return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  } else if (mapType == "legendMap") {
+  } else if (mapType == mapTypes.legendMap) {
     return sharp(
       getMapBackground(
         "7-Tage-Inzidenz der Landkreise",
@@ -217,7 +221,7 @@ export async function DistrictsHistoryMapResponse(
 }
 
 export async function StatesHistoryMapResponse(
-  mapType: string, // "map" for map without legend, "legendMap" for map with legend
+  mapType: mapTypes = mapTypes.map,
   dateString: string
 ) {
   const date = new Date(dateString);
@@ -259,9 +263,9 @@ export async function StatesHistoryMapResponse(
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (mapType == "map") {
+  if (mapType == mapTypes.map) {
     return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  } else if (mapType == "legendMap") {
+  } else if (mapType == mapTypes.legendMap) {
     return sharp(
       getMapBackground(
         "7-Tage-Inzidenz der Landkreise",
@@ -355,7 +359,7 @@ export function IncidenceColorsResponse() {
 
 // Begin history hospitalisation maps
 export async function StatesHospitalizationHistoryMapResponse(
-  mapType: string,
+  mapType: mapTypes = mapTypes.map,
   dateString: string
 ) {
   const date = new Date(dateString).toISOString();
@@ -384,9 +388,9 @@ export async function StatesHospitalizationHistoryMapResponse(
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  if (mapType == "map") {
+  if (mapType == mapTypes.map) {
     return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-  } else if (mapType == "legendMap") {
+  } else if (mapType == mapTypes.legendMap) {
     return sharp(
       getMapBackground(
         "Hospitalisierungsinzidenz",
