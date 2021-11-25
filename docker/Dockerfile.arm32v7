@@ -1,8 +1,7 @@
-FROM rubber4duck/node16-alpine-vips:latest
+FROM --platform=linux/arm/v7 rubber4duck/node16-alpine-vips:latest
 
-# common build flags
-ENV CFLAGS=-O3
-ENV CXXFLAGS=-O3
+# Add QEMU
+COPY qemu-arm-static /usr/bin/
 
 # Create app directory
 WORKDIR /usr/src/app
