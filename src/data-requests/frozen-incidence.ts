@@ -1,14 +1,9 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import {
-  getDateBefore,
-  getStateAbbreviationById,
-  getStateAbbreviationByName,
-  RKIError,
-} from "../utils";
+import { getDateBefore, getStateAbbreviationByName, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
-export interface FrozenIncidenceData {
+export interface DistrictsFrozenIncidenceData {
   ags: string;
   name: string;
   history: {
@@ -17,10 +12,10 @@ export interface FrozenIncidenceData {
   }[];
 }
 
-export async function getFrozenIncidenceHistory(
+export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
-): Promise<ResponseData<FrozenIncidenceData[]>> {
+): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
     {
@@ -39,10 +34,7 @@ export async function getFrozenIncidenceHistory(
 
   // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const dateString = sheet["A2"].v
-    .replace("Stand: ", "")
-    .replace(date_pattern, "$3-$2-$1");
-  const lastUpdate = new Date(dateString);
+  const lastUpdate = new Date(response.headers["last-modified"]);
 
   let districts = json
     .filter((district) => !!district["NR"])
@@ -110,12 +102,8 @@ export async function getStatesFrozenIncidenceHistory(
   // table starts in row 3 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 2 });
 
-  // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
-  const dateString = sheet["A2"].v
-    .replace("Stand: ", "")
-    .replace(date_pattern, "$3-$2-$1");
-  const lastUpdate = new Date(dateString);
+  const lastUpdate = new Date(response.headers["last-modified"]);
 
   let states = json.map((states) => {
     const name = states["__EMPTY"]; //there is no header

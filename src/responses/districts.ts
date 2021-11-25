@@ -17,8 +17,8 @@ import {
   getStateAbbreviationByName,
 } from "../utils";
 import {
-  FrozenIncidenceData,
-  getFrozenIncidenceHistory,
+  DistrictsFrozenIncidenceData,
+  getDistrictsFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
 
 interface DistrictData extends IDistrictData {
@@ -379,7 +379,7 @@ export async function DistrictsRecoveredHistoryResponse(
 
 interface FrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: FrozenIncidenceData;
+    [key: string]: DistrictsFrozenIncidenceData;
   };
 }
 
@@ -387,7 +387,10 @@ export async function FrozenIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<FrozenIncidenceHistoryData> {
-  const frozenIncidenceHistoryData = await getFrozenIncidenceHistory(days, ags);
+  const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(
+    days,
+    ags
+  );
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
