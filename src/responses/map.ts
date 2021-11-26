@@ -192,7 +192,7 @@ export async function DistrictsHistoryMapResponse(
     const district = districtsIncidenceDataHashMap[id];
     if (district.history.length == 0) {
       throw new Error(
-        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
+        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden wöchentlich Donnerstags meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
       );
     }
     const weekIncidence = district.history[0].weekIncidence;
@@ -249,7 +249,7 @@ export async function StatesHistoryMapResponse(
     const state = statesIncidenceHistoryDataHashMap[id];
     if (state.history.length == 0) {
       throw new Error(
-        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden Mo - Fr meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${statesIncidenceHistory.lastUpdate}`
+        `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden wöchentlich Donnerstags meist zwischen 8 und 10 Uhr aktualisiert. Letzte Aktualisierung: ${statesIncidenceHistory.lastUpdate}`
       );
     }
     const weekIncidence = state.history[0].weekIncidence;
