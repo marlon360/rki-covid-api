@@ -99,8 +99,8 @@ export async function getStatesFrozenIncidenceHistory(
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets["BL_7-Tage-Inzidenz (fixiert)"];
-  // table starts in row 3 (parameter is zero indexed)
-  const json = XLSX.utils.sheet_to_json(sheet, { range: 2 });
+  // table starts in row 5 (parameter is zero indexed)
+  const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
 
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   const lastUpdate = new Date(response.headers["last-modified"]);
