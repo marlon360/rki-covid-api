@@ -168,6 +168,7 @@ Now you can access the server at `http://localhost:8080`.
 - 7-Tage-Inzidenzen der letzten Tage (https://corona-germany.justus-d.de/)
 - Die Krankenhausampel für einen (beliebigen) Landkreis als freies und anpassbares Skript für alle Webseitenbetreiber (https://krankenhausampel.info/)
 - Corona_Ampel_Bayern, Übersicht über aktuelle Zahlen für Bayern und deren Landkreise. (https://corona-ampel-bayern.de)
+- Casumer Corona Tracker - Eine Svelte PWA zur Überwachungfrei  konfigurierbarer Landkreise (https://cct.grenninc.ga)
 
 ## License
 
