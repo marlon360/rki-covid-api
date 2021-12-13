@@ -17,6 +17,19 @@ Returns a Heatmap (PNG) of week incidences for districts.
 
 <img alt="districts map" src="https://api.corona-zahlen.org/map/districts" width="300">
 
+## `/map/districts-legend`
+
+Returns a Heatmap (PNG) of week incidences for districts with a legend and headline.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/districts-legend`
+[Open](/map/districts-legend)
+
+### Response
+
+<img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend" width="300">
+
 ## `/map/districts/legend`
 
 Returns the incident ranges for the colors.
@@ -103,6 +116,19 @@ Returns a Heatmap (PNG) of week incidences for states.
 
 <img alt="states map" src="https://api.corona-zahlen.org/map/states" width="300">
 
+## `/map/states-legend`
+
+Returns a Heatmap (PNG) of week incidences for states with a legend and headline.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states-legend`
+[Open](/map/states-legend)
+
+### Response
+
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend" width="300">
+
 ## `/map/states/legend`
 
 Returns the incident ranges for the colors.
@@ -175,3 +201,29 @@ Returns the incident ranges for the colors.
   ]
 }
 ```
+
+## `/map/states/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states/hospitalization`
+[Open](/map/states/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
+
+## `/map/states-legend/hospitalization`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states with a legend and headline.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states-legend/hospitalization`
+[Open](/map/states-legend/hospitalization)
+
+### Response
+
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">

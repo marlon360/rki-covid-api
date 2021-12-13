@@ -1,16 +1,21 @@
-# Robert Koch-Institut API (v2)
+# Robert Koch-Institut API - by Marlon Lückert
 
 A JSON Rest API to query all relevant corona data for Germany based on the figures of the Robert Koch-Institut.
 
-cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests - age groups 👶👩‍🦳👴
+cases 🤧 - deaths ☠️ - recovered 🟢 - **R value** 📈 - week incidence 📅 - **time series** 🗓 - states - districts - **vaccinations** 💉 - **maps** 🗺 - PCR-tests - age groups 👶👩‍🦳👴 - hospitalization 🏥
 
 [https://api.corona-zahlen.org](https://api.corona-zahlen.org)
 
-## Donation
+## ☕️ Donation
 
 If you use this API, please consider supporting me:
 
 <a href='https://ko-fi.com/marlon360' target='_blank'><img height='35' style='border:0px;height:48px;' src='https://az743702.vo.msecnd.net/cdn/kofi3.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+
+## 🐙 Open Source
+
+This software is open-source and available on GitHub ([https://github.com/marlon360/rki-covid-api](https://github.com/marlon360/rki-covid-api)).
+Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-covid-api/issues/new) if you have any questions or problems.
 
 ## 🇩🇪 Übersicht
 
@@ -24,6 +29,7 @@ If you use this API, please consider supporting me:
 - Karten mit Bundesländern und Landkreisen
 - Anzahl der wöchentlich durchgeführen PCR-Tests, Anzahl der positiven Tests sowie der Positiv Quote
 - Fallzahlen und Todesfälle pro Altersgruppe
+- Hospitalisierungsrate
 
 ## 🇺🇸 Overview
 
@@ -37,6 +43,7 @@ If you use this API, please consider supporting me:
 - maps for states and districts
 - number of performed PCR-test, number of positive tests and positivity rate
 - cases and deaths per age group
+- hospitalization
 
 ## Endpoints
 
@@ -67,7 +74,7 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmon
 
 **R value**
 
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Projekte_RKI/Nowcasting_Zahlen.xlsx?__blob=publicationFile
+https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv
 
 **Testing data**
 
@@ -80,6 +87,10 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Ku
 **Age groups**
 
 https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0
+
+**Hospitalization data**
+
+https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_COVID-19-Hospitalisierungen.csv
 
 ## Host it yourself
 
@@ -111,7 +122,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis
+      - REDISHOST=redis
     networks:
       - redis-net
 ```
@@ -129,6 +140,7 @@ Now you can access the server at `http://localhost:8080`.
 - CoronaBot Deutschland (https://twitter.com/CoronaBot_DEU)
 - Fallzahlen Aktuell - Inzidenz & mehr aus DE
   (https://play.google.com/store/apps/details?id=com.kokoschka.michael.casestoday&hl=de)
+- ImpfPush - Benachrichtigung über aktuelle Inzidenz-Zahlen aus Ihrer Region (https://www.impfpush.de)
 - Home Assistant Integration (https://github.com/thebino/rki_covid)
 - Corona Charts für Deutschland (https://corona.maximilianhaindl.de)
 - Corona Infos für das Berchtesgadener Land mit Zusatzinfos (https://covid.webreload.de/)
@@ -150,6 +162,13 @@ Now you can access the server at `http://localhost:8080`.
 - Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland (https://www.impfung.io/)
 - Discordbot at (https://germanycovid.de/discord)
 - Web App for vaccination numbers which issues a Push Notification whenever the new vaccination numbers are available (https://vacstats.laurenzfg.com)
+- Fallzahlen Statistik App (https://play.google.com/store/apps/details?id=com.companyname.statforms)
+- Germany Covidometer (https://arashesdr.github.io/covidometer/)
+- Pandemie jetzt (https://pandemie.jetzt/)
+- Corona Zahlen in Deutschland (Wordpress Plugin) (https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/)
+- 7-Tage-Inzidenzen der letzten Tage (https://corona-germany.justus-d.de/)
+- Die Krankenhausampel für einen (beliebigen) Landkreis als freies und anpassbares Skript für alle Webseitenbetreiber (https://krankenhausampel.info/)
+- Corona_Ampel_Bayern, Übersicht über aktuelle Zahlen für Bayern und deren Landkreise. (https://corona-ampel-bayern.de)
 
 ## License
 

@@ -14,6 +14,15 @@ import {
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData } from "../data-requests/states";
+import {
+  getHospitalizationData,
+  getLatestHospitalizationDataKey,
+} from "../data-requests/hospitalization";
+import {
+  getStatesFrozenIncidenceHistory,
+  StatesFrozenIncidenceData,
+} from "../data-requests/frozen-incidence";
+import { getDateBefore } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -24,12 +33,26 @@ interface GermanyData extends IResponseMeta {
   casesPer100k: number;
   r: {
     value: number;
-    date: Date;
+    rValue4Days: {
+      value: number;
+      date: Date;
+    };
+    rValue7Days: {
+      value: number;
+      date: Date;
+    };
+    lastUpdate: Date;
   };
   delta: {
     cases: number;
     deaths: number;
     recovered: number;
+  };
+  hospitalization: {
+    date: Date;
+    cases7Days: number;
+    incidence7Days: number;
+    lastUpdate: Date;
   };
 }
 
@@ -44,6 +67,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     newRecoveredData,
     statesData,
     rData,
+    hospitalizationData,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -53,6 +77,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getNewRecovered(),
     getStatesData(),
     getRValue(),
+    getHospitalizationData(),
   ]);
 
   // calculate week incidence
@@ -79,8 +104,22 @@ export async function GermanyResponse(): Promise<GermanyData> {
       recovered: newRecoveredData.data,
     },
     r: {
-      value: rData.data,
-      date: rData.lastUpdate,
+      value: rData.data.rValue4Days.value, // legacy
+      rValue4Days: rData.data.rValue4Days,
+      rValue7Days: rData.data.rValue7Days,
+      lastUpdate: rData.lastUpdate,
+    },
+    hospitalization: {
+      cases7Days:
+        hospitalizationData.data[
+          getLatestHospitalizationDataKey(hospitalizationData.data)
+        ].cases7Days,
+      incidence7Days:
+        hospitalizationData.data[
+          getLatestHospitalizationDataKey(hospitalizationData.data)
+        ].incidence7Days,
+      date: new Date(getLatestHospitalizationDataKey(hospitalizationData.data)),
+      lastUpdate: hospitalizationData.lastUpdate,
     },
     meta: new ResponseMeta(statesData.lastUpdate),
   };
@@ -155,13 +194,105 @@ export async function GermanyRecoveredHistoryResponse(
   };
 }
 
+export async function GermanyHospitalizationHistoryResponse(
+  days?: number
+): Promise<
+  GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
+> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+  const hospitalizationData = await getHospitalizationData();
+  const history = [];
+  let dateKeys = Object.keys(hospitalizationData.data);
+  if (days != undefined) {
+    const reference_date = new Date(getDateBefore(days));
+    dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
+  }
+  dateKeys.sort((a, b) => {
+    const dateA = new Date(a);
+    const dateB = new Date(b);
+    return dateA.getTime() - dateB.getTime();
+  });
+  dateKeys.forEach((dateKey) => {
+    history.push({
+      cases7Days: hospitalizationData.data[dateKey].cases7Days,
+      incidence7Days: hospitalizationData.data[dateKey].incidence7Days,
+      date: new Date(dateKey),
+    });
+  });
+
+  return {
+    data: history,
+    meta: new ResponseMeta(hospitalizationData.lastUpdate),
+  };
+}
+
 export async function GermanyAgeGroupsResponse(): Promise<{
-  data: { [ageGroup: string]: AgeGroupData };
+  data: {
+    [ageGroup: string]: AgeGroupData & {
+      hospitalization: {
+        cases7Days: number;
+        incidence7Days: number;
+        date: Date;
+      };
+    };
+  };
   meta: ResponseMeta;
 }> {
   const AgeGroupsData = await getGermanyAgeGroups();
+  const hospitalizationData = await getHospitalizationData();
+
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
+    hospitalizationData.data
+  );
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((key) => {
+    data[key] = {
+      ...AgeGroupsData.data[key],
+      hospitalization: {
+        cases7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].ageGroups[key]
+            .cases7Days,
+        incidence7Days:
+          hospitalizationData.data[latestHospitalizationDataKey].ageGroups[key]
+            .incidence7Days,
+        date: new Date(latestHospitalizationDataKey),
+      },
+    };
+  });
+
   return {
-    data: AgeGroupsData.data,
+    data: data,
     meta: new ResponseMeta(AgeGroupsData.lastUpdate),
+  };
+}
+
+interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
+  data: {};
+}
+
+export async function GermanyFrozenIncidenceHistoryResponse(
+  days?: number
+): Promise<StatesFrozenIncidenceHistoryData> {
+  const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
+    days
+  );
+
+  let data = {};
+  frozenIncidenceHistoryData.data.forEach((historyData) => {
+    if (historyData.abbreviation == null) {
+      historyData.abbreviation = "Bund";
+      historyData.name = "Bundesgebiet";
+      data = historyData;
+    }
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
   };
 }
