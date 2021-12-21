@@ -176,6 +176,7 @@ export async function getVaccinationCoverage(): Promise<
     state: string;
     totalvaccination: number;
     total1: number;
+    total1_5to11: number;
     totalfull: number;
     totalbooster: number;
     quote1: number;
@@ -199,6 +200,7 @@ export async function getVaccinationCoverage(): Promise<
       "state",
       "totalvaccination",
       "total1",
+      "total1_5to11:",
       "totalfull",
       "totalbooster",
       "quote1",
@@ -217,7 +219,7 @@ export async function getVaccinationCoverage(): Promise<
       "quoteboost_18to59",
       "quoteboost_gr60",
     ],
-    range: "A4:U21",
+    range: "A4:V21",
   });
 
   const coverage: VaccinationCoverage = {

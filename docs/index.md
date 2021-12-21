@@ -122,7 +122,7 @@ services:
     depends_on:
       - redis
     environment:
-      - REDIS_URL=redis
+      - REDISHOST=redis
     networks:
       - redis-net
 ```
@@ -160,10 +160,18 @@ Now you can access the server at `http://localhost:8080`.
 - Wordpress Widget zur Anzeige der letzen 3 Inzidenzen für einen Landkreis [https://github.com/p-tenz/widget-7d-incidence](https://github.com/p-tenz/widget-7d-incidence)
 - Informatives Dashboard, zum schnellen Überblick des Status der Corona-Schutzimpfungen in Deutschland [https://www.impfung.io/](https://www.impfung.io/)
 - Discordbot at [https://germanycovid.de/discord](https://germanycovid.de/discord)
+- Web App for vaccination numbers which issues a Push Notification whenever the new vaccination numbers are available [https://vacstats.laurenzfg.com](https://vacstats.laurenzfg.com)
 - Fallzahlen Statistik App [https://play.google.com/store/apps/details?id=com.companyname.statforms](https://play.google.com/store/apps/details?id=com.companyname.statforms)
 - Germany Covidometer [https://arashesdr.github.io/covidometer/](https://arashesdr.github.io/covidometer/)
 - Pandemie jetzt [https://pandemie.jetzt/](https://pandemie.jetzt/)
 - Corona Zahlen in Deutschland (Wordpress Plugin) [https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/](https://de.wordpress.org/plugins/corona-zahlen-deutschland-cng/)
+- 7-Tage-Inzidenzen der letzten Tage [https://corona-germany.justus-d.de/](https://corona-germany.justus-d.de/)
+- Die Krankenhausampel für einen (beliebigen) Landkreis als freies und anpassbares Skript für alle Webseitenbetreiber [https://krankenhausampel.info/](https://krankenhausampel.info/)
+- Corona_Ampel_Bayern, Übersicht über aktuelle Zahlen für Bayern und deren Landkreise. [https://corona-ampel-bayern.de](https://corona-ampel-bayern.de)
+- Casumer Corona Tracker - Eine Svelte PWA zur Überwachung frei konfigurierbarer Landkreise [https://cct.greeninc.ga](https://cct.greeninc.ga)
+- Covid Landkreis Zahlen Chatbot auf Telegram [https://t.me/COVID_19_GER_bot](https://t.me/COVID_19_GER_bot)
+- DiscordCoronaBot, Zahlen, Tägliche Updates und Vorhersagen zu Covid-19 [https://github.com/GlaubeKeinemDev/DiscordCoronaBot](https://github.com/GlaubeKeinemDev/DiscordCoronaBot)
+- Statistik für Baden-Württemberg mit Differenz zum Vortag [https://corona-in-bw.de](https://corona-in-bw.de)
 
 ## License
 
