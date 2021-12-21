@@ -169,6 +169,9 @@ Now you can access the server at `http://localhost:8080`.
 - Die Krankenhausampel für einen (beliebigen) Landkreis als freies und anpassbares Skript für alle Webseitenbetreiber [https://krankenhausampel.info/](https://krankenhausampel.info/)
 - Corona_Ampel_Bayern, Übersicht über aktuelle Zahlen für Bayern und deren Landkreise. [https://corona-ampel-bayern.de](https://corona-ampel-bayern.de)
 - Casumer Corona Tracker - Eine Svelte PWA zur Überwachung frei konfigurierbarer Landkreise [https://cct.greeninc.ga](https://cct.greeninc.ga)
+- Covid Landkreis Zahlen Chatbot auf Telegram [https://t.me/COVID_19_GER_bot](https://t.me/COVID_19_GER_bot)
+- DiscordCoronaBot, Zahlen, Tägliche Updates und Vorhersagen zu Covid-19 [https://github.com/GlaubeKeinemDev/DiscordCoronaBot](https://github.com/GlaubeKeinemDev/DiscordCoronaBot)
+- Statistik für Baden-Württemberg mit Differenz zum Vortag [https://corona-in-bw.de](https://corona-in-bw.de)
 
 ## License
 
