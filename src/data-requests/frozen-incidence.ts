@@ -124,10 +124,15 @@ export async function getStatesFrozenIncidenceHistory(
     const dateKeys = Object.keys(states);
     // ignore the first element (witch is the state)
     dateKeys.splice(0, 1);
-    dateKeys.forEach((dateKey) => {
-      const date = new Date(
-        dateKey.toString().replace(date_pattern, "$3-$2-$1")
-      );
+    let date: Date;
+    dateKeys.forEach((dateKey, index) => {
+      date = new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1"));
+      // check if date is a valid date, if not add 1 day to previus date (hopefully it is not the first datekey ....)
+      if (isNaN(date.getTime())) {
+        const pDate = new Date(dateKeys[index - 1]);
+        date = AddDaysToDate(pDate, 1);
+        dateKeys[index] = date.toISOString().split("T").shift();
+      }
       history.push({ weekIncidence: states[dateKey], date });
     });
 
