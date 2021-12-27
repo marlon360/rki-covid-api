@@ -32,7 +32,6 @@ export async function getDistrictsFrozenIncidenceHistory(
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
 
-  // date is in cell A2
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   const lastUpdate = new Date(response.headers["last-modified"]);
 
@@ -48,10 +47,15 @@ export async function getDistrictsFrozenIncidenceHistory(
       const dateKeys = Object.keys(district);
       // ignore the first three elements (rowNumber, LK, LKNR)
       dateKeys.splice(0, 3);
-      dateKeys.forEach((dateKey) => {
-        const date = new Date(
-          dateKey.toString().replace(date_pattern, "$3-$2-$1")
-        );
+      let date: Date;
+      dateKeys.forEach((dateKey, index) => {
+        date = new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1"));
+        // check if date is a valid date, if not add 1 day to previus date (hopefully it is not the first datekey ....)
+        if (isNaN(date.getTime())) {
+          const pDate = new Date(dateKeys[index - 1]);
+          date = AddDaysToDate(pDate, 1);
+          dateKeys[index] = date.toISOString().split("T").shift();
+        }
         history.push({ weekIncidence: district[dateKey], date });
       });
 
@@ -116,10 +120,15 @@ export async function getStatesFrozenIncidenceHistory(
     const dateKeys = Object.keys(states);
     // ignore the first element (witch is the state)
     dateKeys.splice(0, 1);
-    dateKeys.forEach((dateKey) => {
-      const date = new Date(
-        dateKey.toString().replace(date_pattern, "$3-$2-$1")
-      );
+    let date: Date;
+    dateKeys.forEach((dateKey, index) => {
+      date = new Date(dateKey.toString().replace(date_pattern, "$3-$2-$1"));
+      // check if date is a valid date, if not add 1 day to previus date (hopefully it is not the first datekey ....)
+      if (isNaN(date.getTime())) {
+        const pDate = new Date(dateKeys[index - 1]);
+        date = AddDaysToDate(pDate, 1);
+        dateKeys[index] = date.toISOString().split("T").shift();
+      }
       history.push({ weekIncidence: states[dateKey], date });
     });
 
