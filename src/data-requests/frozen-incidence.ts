@@ -1,6 +1,11 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, getStateAbbreviationByName, RKIError } from "../utils";
+import {
+  getDateBefore,
+  getStateAbbreviationByName,
+  RKIError,
+  AddDaysToDate,
+} from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface DistrictsFrozenIncidenceData {
