@@ -1056,7 +1056,7 @@ app.get(
 
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {
-    res.status(503).json({
+    res.status(error.rkiError.code).json({
       error: {
         message: "There is a problem with the official RKI API.",
         rkiError: error.rkiError,
@@ -1075,8 +1075,8 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   } else if (error instanceof ParamError) {
     res.status(error.paramError.code).json({
       error: {
-        message: error.paramError.message,
-        paramError: error.paramError.details,
+        message: "There is a problem with a request parameter.",
+        paramError: error.paramError,
         url: error.url || "",
       },
     });
