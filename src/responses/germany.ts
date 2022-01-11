@@ -18,10 +18,7 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import {
-  getStatesFrozenIncidenceHistory,
-  StatesFrozenIncidenceData,
-} from "../data-requests/frozen-incidence";
+import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 import { getDateBefore } from "../utils";
 
 interface GermanyData extends IResponseMeta {
@@ -130,24 +127,24 @@ interface GermanyHistoryData<T> extends IResponseMeta {
   meta: ResponseMeta;
 }
 
-export async function GermanyCasesHistoryResponse(
-  days?: number
-): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
-  const history = await getLastCasesHistory(days);
+export async function GermanyCasesHistoryResponse(parameter: {
+  days: number;
+}): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
+  const history = await getLastCasesHistory(parameter.days);
   return {
     data: history,
     meta: new ResponseMeta(new Date(history[history.length - 1].date)),
   };
 }
 
-export async function GermanyWeekIncidenceHistoryResponse(
-  days?: number
-): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
-  if (days != null) {
-    days += 6;
+export async function GermanyWeekIncidenceHistoryResponse(parameter: {
+  days: number;
+}): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
+  if (parameter.days) {
+    parameter.days += 6;
   }
 
-  const history = await getLastCasesHistory(days);
+  const history = await getLastCasesHistory(parameter.days);
   const statesData = await getStatesData();
 
   const population = statesData.data
@@ -174,41 +171,36 @@ export async function GermanyWeekIncidenceHistoryResponse(
   };
 }
 
-export async function GermanyDeathsHistoryResponse(
-  days?: number
-): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
-  const history = await getLastDeathsHistory(days);
+export async function GermanyDeathsHistoryResponse(parameter: {
+  days: number;
+}): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
+  const history = await getLastDeathsHistory(parameter.days);
   return {
     data: history,
     meta: new ResponseMeta(new Date(history[history.length - 1].date)),
   };
 }
 
-export async function GermanyRecoveredHistoryResponse(
-  days?: number
-): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
-  const history = await getLastRecoveredHistory(days);
+export async function GermanyRecoveredHistoryResponse(parameter: {
+  days: number;
+}): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
+  const history = await getLastRecoveredHistory(parameter.days);
   return {
     data: history,
     meta: new ResponseMeta(new Date(history[history.length - 1].date)),
   };
 }
 
-export async function GermanyHospitalizationHistoryResponse(
-  days?: number
-): Promise<
+export async function GermanyHospitalizationHistoryResponse(parameter: {
+  days: number;
+}): Promise<
   GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
 > {
-  if (days != null && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const hospitalizationData = await getHospitalizationData();
   const history = [];
   let dateKeys = Object.keys(hospitalizationData.data);
-  if (days != undefined) {
-    const reference_date = new Date(getDateBefore(days));
+  if (parameter.days) {
+    const reference_date = new Date(getDateBefore(parameter.days));
     dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
   dateKeys.sort((a, b) => {
@@ -275,11 +267,11 @@ interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
   data: {};
 }
 
-export async function GermanyFrozenIncidenceHistoryResponse(
-  days?: number
-): Promise<StatesFrozenIncidenceHistoryData> {
+export async function GermanyFrozenIncidenceHistoryResponse(parameter: {
+  days: number;
+}): Promise<StatesFrozenIncidenceHistoryData> {
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
-    days
+    parameter.days
   );
 
   let data = {};

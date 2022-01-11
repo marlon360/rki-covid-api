@@ -48,10 +48,16 @@ import {
   StatesLegendMapResponse,
   StatesMapResponse,
 } from "./responses/map";
-import { RKIError } from "./utils";
+import {
+  RKIError,
+  ParamError,
+  checkDays,
+  checkAbbreviation,
+  checkAgs,
+} from "./utils";
 
 const cache = require("express-redis-cache")({
-  expire: 1800,
+  expire: { 200: 1800, 400: 10, 503: 60, xxx: 180 },
   host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
@@ -108,7 +114,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyCasesHistoryResponse();
+    const response = await GermanyCasesHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -118,9 +126,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyCasesHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyCasesHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -130,7 +138,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyWeekIncidenceHistoryResponse();
+    const response = await GermanyWeekIncidenceHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -140,9 +150,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyWeekIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyWeekIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -152,7 +162,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyFrozenIncidenceHistoryResponse();
+    const response = await GermanyFrozenIncidenceHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -162,9 +174,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyFrozenIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyFrozenIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -174,7 +186,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyDeathsHistoryResponse();
+    const response = await GermanyDeathsHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -184,9 +198,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyDeathsHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyDeathsHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -196,7 +210,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyRecoveredHistoryResponse();
+    const response = await GermanyRecoveredHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -206,9 +222,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyRecoveredHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyRecoveredHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -218,7 +234,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyHospitalizationHistoryResponse();
+    const response = await GermanyHospitalizationHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -228,9 +246,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await GermanyHospitalizationHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await GermanyHospitalizationHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -246,7 +264,7 @@ app.get(
 );
 
 app.get("/states", queuedCache(), cache.route(), async function (req, res) {
-  const response = await StatesResponse();
+  const response = await StatesResponse({ abbreviation: null });
   res.json(response);
 });
 
@@ -259,7 +277,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesCasesHistoryResponse();
+    const response = await StatesCasesHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -269,9 +290,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesCasesHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesCasesHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -281,7 +303,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesDeathsHistoryResponse();
+    const response = await StatesDeathsHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -291,9 +316,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesDeathsHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesDeathsHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -303,7 +329,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesRecoveredHistoryResponse();
+    const response = await StatesRecoveredHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -313,9 +342,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesRecoveredHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesRecoveredHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -325,7 +355,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesWeekIncidenceHistoryResponse();
+    const response = await StatesWeekIncidenceHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -335,9 +368,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesWeekIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesWeekIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -347,7 +381,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesFrozenIncidenceHistoryResponse();
+    const response = await StatesFrozenIncidenceHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -357,9 +394,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesFrozenIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesFrozenIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -369,7 +407,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesHospitalizationHistoryResponse();
+    const response = await StatesHospitalizationHistoryResponse({
+      days: null,
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -379,9 +420,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesHospitalizationHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await StatesHospitalizationHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -391,7 +433,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesAgeGroupsResponse();
+    const response = await StatesAgeGroupsResponse({
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -401,7 +445,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesResponse(req.params.state);
+    const response = await StatesResponse({
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -415,7 +461,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesCasesHistoryResponse(null, req.params.state);
+    const response = await StatesCasesHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -425,10 +474,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesCasesHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesCasesHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -438,10 +487,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesWeekIncidenceHistoryResponse(
-      null,
-      req.params.state
-    );
+    const response = await StatesWeekIncidenceHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -451,10 +500,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesWeekIncidenceHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesWeekIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -464,10 +513,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesFrozenIncidenceHistoryResponse(
-      null,
-      req.params.state
-    );
+    const response = await StatesFrozenIncidenceHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -477,10 +526,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesFrozenIncidenceHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesFrozenIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -490,7 +539,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesDeathsHistoryResponse(null, req.params.state);
+    const response = await StatesDeathsHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -500,10 +552,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesDeathsHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesDeathsHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -513,10 +565,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesRecoveredHistoryResponse(
-      null,
-      req.params.state
-    );
+    const response = await StatesRecoveredHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -526,10 +578,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesRecoveredHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesRecoveredHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -539,10 +591,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesHospitalizationHistoryResponse(
-      null,
-      req.params.state
-    );
+    const response = await StatesHospitalizationHistoryResponse({
+      days: null,
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -552,10 +604,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesHospitalizationHistoryResponse(
-      parseInt(req.params.days),
-      req.params.state
-    );
+    const response = await StatesHospitalizationHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
@@ -565,13 +617,17 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await StatesAgeGroupsResponse(req.params.state);
+    const response = await StatesAgeGroupsResponse({
+      abbreviation: checkAbbreviation(req.params.state, req.url),
+    });
     res.json(response);
   }
 );
 
 app.get("/districts", queuedCache(), cache.route(), async function (req, res) {
-  const response = await DistrictsResponse();
+  const response = await DistrictsResponse({
+    ags: null,
+  });
   res.json(response);
 });
 
@@ -584,7 +640,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsCasesHistoryResponse();
+    const response = await DistrictsCasesHistoryResponse({
+      days: null,
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -594,9 +653,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsCasesHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await DistrictsCasesHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -606,7 +666,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsWeekIncidenceHistoryResponse();
+    const response = await DistrictsWeekIncidenceHistoryResponse({
+      days: null,
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -616,7 +679,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await FrozenIncidenceHistoryResponse();
+    const response = await FrozenIncidenceHistoryResponse({
+      days: null,
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -626,9 +692,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await FrozenIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await FrozenIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -638,9 +705,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsWeekIncidenceHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await DistrictsWeekIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -650,7 +718,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsDeathsHistoryResponse();
+    const response = await DistrictsDeathsHistoryResponse({
+      days: null,
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -660,9 +731,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsDeathsHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await DistrictsDeathsHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -672,7 +744,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsRecoveredHistoryResponse();
+    const response = await DistrictsRecoveredHistoryResponse({
+      days: null,
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -682,9 +757,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsRecoveredHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await DistrictsRecoveredHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: null,
+    });
     res.json(response);
   }
 );
@@ -694,7 +770,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsResponse(req.params.district);
+    const response = await DistrictsResponse({
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -708,10 +786,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsCasesHistoryResponse(
-      null,
-      req.params.district
-    );
+    const response = await DistrictsCasesHistoryResponse({
+      days: null,
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -721,10 +799,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsCasesHistoryResponse(
-      parseInt(req.params.days),
-      req.params.district
-    );
+    const response = await DistrictsCasesHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -734,10 +812,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsWeekIncidenceHistoryResponse(
-      null,
-      req.params.district
-    );
+    const response = await DistrictsWeekIncidenceHistoryResponse({
+      days: null,
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -747,10 +825,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsWeekIncidenceHistoryResponse(
-      parseInt(req.params.days),
-      req.params.district
-    );
+    const response = await DistrictsWeekIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -760,10 +838,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await FrozenIncidenceHistoryResponse(
-      null,
-      req.params.district
-    );
+    const response = await FrozenIncidenceHistoryResponse({
+      days: null,
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -773,10 +851,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await FrozenIncidenceHistoryResponse(
-      parseInt(req.params.days),
-      req.params.district
-    );
+    const response = await FrozenIncidenceHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -786,10 +864,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsDeathsHistoryResponse(
-      null,
-      req.params.district
-    );
+    const response = await DistrictsDeathsHistoryResponse({
+      days: null,
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -799,10 +877,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsDeathsHistoryResponse(
-      parseInt(req.params.days),
-      req.params.district
-    );
+    const response = await DistrictsDeathsHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -812,10 +890,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsRecoveredHistoryResponse(
-      null,
-      req.params.district
-    );
+    const response = await DistrictsRecoveredHistoryResponse({
+      days: null,
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -825,10 +903,10 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsRecoveredHistoryResponse(
-      parseInt(req.params.days),
-      req.params.district
-    );
+    const response = await DistrictsRecoveredHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+      ags: checkAgs(req.params.district, req.url),
+    });
     res.json(response);
   }
 );
@@ -838,7 +916,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await VaccinationResponse();
+    const response = await VaccinationResponse({
+      abbreviation: null,
+    });
     res.json(response);
   }
 );
@@ -848,7 +928,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await VaccinationHistoryResponse();
+    const response = await VaccinationHistoryResponse({
+      days: null,
+    });
     res.json(response);
   }
 );
@@ -858,9 +940,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await VaccinationHistoryResponse(
-      parseInt(req.params.days)
-    );
+    const response = await VaccinationHistoryResponse({
+      days: checkDays(req.params.days, req.url),
+    });
     res.json(response);
   }
 );
@@ -953,7 +1035,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await TestingHistoryResponse();
+    const response = await TestingHistoryResponse({
+      weeks: null,
+    });
     res.json(response);
   }
 );
@@ -963,14 +1047,16 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await TestingHistoryResponse(parseInt(req.params.weeks));
+    const response = await TestingHistoryResponse({
+      weeks: checkDays(req.params.weeks, req.url),
+    });
     res.json(response);
   }
 );
 
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {
-    res.json({
+    res.status(503).json({
       error: {
         message: "There is a problem with the official RKI API.",
         rkiError: error.rkiError,
@@ -978,7 +1064,7 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
       },
     });
   } else if (axios.isAxiosError(error)) {
-    res.json({
+    res.status(503).json({
       error: {
         message: "An error occurred while fetching external data.",
         url: error.config.url,
@@ -986,9 +1072,17 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         stack: error.stack,
       },
     });
+  } else if (error instanceof ParamError) {
+    res.status(error.paramError.code).json({
+      error: {
+        message: error.paramError.message,
+        paramError: error.paramError.details,
+        url: error.url || "",
+      },
+    });
   } else {
     const baseError = error as Error;
-    res.json({
+    res.status(400).json({
       error: {
         message: "An error occurred.",
         details: baseError.message,

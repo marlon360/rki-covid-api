@@ -11,7 +11,10 @@ interface VaccinationData extends IResponseMeta {
 }
 
 export async function VaccinationResponse(
-  abbreviation?: string
+  parameter: {
+    abbreviation: string;
+  }
+  // filter for state is missing!
 ): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
 
@@ -27,10 +30,10 @@ interface VaccinationHistoryData extends IResponseMeta {
   };
 }
 
-export async function VaccinationHistoryResponse(
-  days?: number
-): Promise<VaccinationHistoryData> {
-  const vaccinationData = await getVaccinationHistory(days);
+export async function VaccinationHistoryResponse(parameter: {
+  days: number;
+}): Promise<VaccinationHistoryData> {
+  const vaccinationData = await getVaccinationHistory(parameter.days);
 
   return {
     data: {
