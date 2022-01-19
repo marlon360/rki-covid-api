@@ -20,7 +20,11 @@ function clearEntry(entry: any) {
 
 interface quotes {
   total: number;
-  "A12-A17": number;
+  "A05-A17": {
+    total: number;
+    "A05-A11": number;
+    "A12-A17": number;
+  };
   "A18+": {
     total: number;
     "A18-A59": number;
@@ -36,6 +40,7 @@ export interface VaccinationCoverage {
     moderna: number;
     astraZeneca: number;
     janssen: number;
+    novavax: number;
   };
   delta: number;
   quote: number;
@@ -46,6 +51,7 @@ export interface VaccinationCoverage {
       biontech: number;
       moderna: number;
       astraZeneca: number;
+      novavax: number;
     };
     delta: number;
     quote: number;
@@ -73,6 +79,7 @@ export interface VaccinationCoverage {
         moderna: number;
         astraZeneca: number;
         janssen: number;
+        novavax: number;
       };
       delta: number;
       quote: number;
@@ -83,6 +90,7 @@ export interface VaccinationCoverage {
           biontech: number;
           moderna: number;
           astraZeneca: number;
+          novavax: number;
         };
         delta: number;
         quote: number;
@@ -127,11 +135,13 @@ export async function getVaccinationCoverage(): Promise<
     firstModerna: number;
     firstAstraZeneca: number;
     firstJanssen: number;
+    firstNovavax: number;
     firstDifference: number;
     fullVaccinated: number;
     fullBiontech: number;
     fullModerna: number;
     fullAstraZeneca: number;
+    fullNovavax: number;
     fullDifference: number;
     boosterVaccination: number;
     boosterBiontech: number;
@@ -147,11 +157,13 @@ export async function getVaccinationCoverage(): Promise<
       "firstModerna",
       "firstAstraZeneca",
       "firstJanssen",
+      "firstNovavax",
       "firstDifference",
       "fullVaccinated",
       "fullBiontech",
       "fullModerna",
       "fullAstraZeneca",
+      "fullNovavax",
       "fullDifference",
       "boosterVaccination",
       "boosterBiontech",
@@ -159,7 +171,7 @@ export async function getVaccinationCoverage(): Promise<
       "boosterJanssen",
       "boosterDifference",
     ],
-    range: "A4:R21",
+    range: "A4:T21",
   });
 
   const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
@@ -168,16 +180,19 @@ export async function getVaccinationCoverage(): Promise<
     state: string;
     vaccination: number;
     n1st: number;
-    n1st5to11: number;
     n2nd: number;
     n3rd: number;
     q1st: number;
     q1stls18: number;
+    q1st5to11: number;
+    q1st12to17: number;
     q1st18plus: number;
     q1st18to59: number;
     q1stgr60: number;
     q2nd: number;
     q2ndls18: number;
+    q2nd5to11: number;
+    q2nd12to17: number;
     q2nd18plus: number;
     q2nd18to59: number;
     q2ndgr60: number;
@@ -192,16 +207,19 @@ export async function getVaccinationCoverage(): Promise<
       "state",
       "vaccination",
       "n1st",
-      "n1st5to11:",
       "n2nd",
       "n3rd",
       "q1st",
       "q1stls18",
+      "n1st5to11:",
+      "q1st12to17",
       "q1st18plus",
       "q1st18to59",
       "q1stgr60",
       "q2nd",
       "q2ndls18",
+      "q2nd5to11",
+      "q2nd12to17",
       "q2nd18plus",
       "q2nd18to59",
       "q2ndgr60",
@@ -211,7 +229,7 @@ export async function getVaccinationCoverage(): Promise<
       "q3rd18to59",
       "q3rdgr60",
     ],
-    range: "A4:V21",
+    range: "A4:Y21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -222,12 +240,17 @@ export async function getVaccinationCoverage(): Promise<
       moderna: 0,
       astraZeneca: 0,
       janssen: 0,
+      novavax: 0,
     },
     delta: 0,
     quote: 0,
     quotes: {
       total: 0,
-      "A12-A17": 0,
+      "A05-A17": {
+        total: 0,
+        "A05-A11": 0,
+        "A12-A17": 0,
+      },
       "A18+": {
         total: 0,
         "A18-A59": 0,
@@ -240,12 +263,17 @@ export async function getVaccinationCoverage(): Promise<
         biontech: 0,
         moderna: 0,
         astraZeneca: 0,
+        novavax: 0,
       },
       delta: 0,
       quote: 0,
       quotes: {
         total: 0,
-        "A12-A17": 0,
+        "A05-A17": {
+          total: 0,
+          "A05-A11": 0,
+          "A12-A17": 0,
+        },
         "A18+": {
           total: 0,
           "A18-A59": 0,
@@ -264,7 +292,11 @@ export async function getVaccinationCoverage(): Promise<
       quote: 0,
       quotes: {
         total: 0,
-        "A12-A17": 0,
+        "A05-A17": {
+          total: 0,
+          "A05-A11": 0,
+          "A12-A17": 0,
+        },
         "A18+": {
           total: 0,
           "A18-A59": 0,
@@ -296,16 +328,25 @@ export async function getVaccinationCoverage(): Promise<
         moderna: entry.firstModerna,
         astraZeneca: entry.firstAstraZeneca,
         janssen: entry.firstJanssen,
+        novavax: entry.firstNovavax == null ? null : entry.firstNovavax,
       };
       coverage.delta = entry.firstDifference;
       coverage.quote =
         quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3);
       coverage.quotes.total =
         quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3);
-      coverage.quotes["A12-A17"] =
+      coverage.quotes["A05-A17"].total =
         quotes.q1stls18 === null
           ? null
           : limitDecimals(quotes.q1stls18 / 100.0, 3);
+      coverage.quotes["A05-A17"]["A05-A11"] =
+        quotes.q1st5to11 === null
+          ? null
+          : limitDecimals(quotes.q1st5to11 / 100.0, 3);
+      coverage.quotes["A05-A17"]["A12-A17"] =
+        quotes.q1st12to17 === null
+          ? null
+          : limitDecimals(quotes.q1st12to17 / 100.0, 3);
       coverage.quotes["A18+"].total =
         quotes.q1st18plus === null
           ? null
@@ -324,6 +365,7 @@ export async function getVaccinationCoverage(): Promise<
           biontech: entry.fullBiontech,
           moderna: entry.fullModerna,
           astraZeneca: entry.fullAstraZeneca,
+          novavax: entry.firstNovavax === null ? null : entry.firstNovavax,
         },
         delta: entry.fullDifference,
         quote:
@@ -331,10 +373,20 @@ export async function getVaccinationCoverage(): Promise<
         quotes: {
           total:
             quotes.q2nd === null ? null : limitDecimals(quotes.q2nd / 100.0, 3),
-          "A12-A17":
-            quotes.q2ndls18 === null
-              ? null
-              : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q2ndls18 === null
+                ? null
+                : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            "A05-A11":
+              quotes.q2nd5to11 === null
+                ? null
+                : limitDecimals(quotes.q2nd5to11 / 100.0, 3),
+            "A12-A17":
+              quotes.q2nd12to17 === null
+                ? null
+                : limitDecimals(quotes.q2nd12to17 / 100.0, 3),
+          },
           "A18+": {
             total:
               quotes.q2nd18plus === null
@@ -364,10 +416,17 @@ export async function getVaccinationCoverage(): Promise<
         quotes: {
           total:
             quotes.q3rd === null ? null : limitDecimals(quotes.q3rd / 100.0, 3),
-          "A12-A17":
-            quotes.q3rdls18 === null
-              ? null
-              : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q3rdls18 === null
+                ? null
+                : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+            "A05-A11": null, // not publisched at this time!
+            "A12-A17":
+              quotes.q3rdls18 === null
+                ? null
+                : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+          },
           "A18+": {
             total:
               quotes.q3rd18plus === null
@@ -399,6 +458,7 @@ export async function getVaccinationCoverage(): Promise<
           moderna: entry.firstModerna,
           astraZeneca: entry.firstAstraZeneca,
           janssen: entry.firstJanssen,
+          novavax: entry.firstNovavax === null ? null : entry.firstNovavax,
         },
         delta: entry.firstDifference,
         quote:
@@ -406,10 +466,20 @@ export async function getVaccinationCoverage(): Promise<
         quotes: {
           total:
             quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3),
-          "A12-A17":
-            quotes.q1stls18 === null
-              ? null
-              : limitDecimals(quotes.q1stls18 / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q1stls18 === null
+                ? null
+                : limitDecimals(quotes.q1stls18 / 100.0, 3),
+            "A05-A11":
+              quotes.q1st5to11 === null
+                ? null
+                : limitDecimals(quotes.q1st5to11 / 100.0, 3),
+            "A12-A17":
+              quotes.q1st12to17 === null
+                ? null
+                : limitDecimals(quotes.q1st12to17 / 100.0, 3),
+          },
           "A18+": {
             total:
               quotes.q1st18plus === null
@@ -431,6 +501,7 @@ export async function getVaccinationCoverage(): Promise<
             biontech: entry.fullBiontech,
             moderna: entry.fullModerna,
             astraZeneca: entry.fullAstraZeneca,
+            novavax: entry.fullNovavax === null ? null : entry.fullNovavax,
           },
           delta: entry.fullDifference,
           quote:
@@ -440,10 +511,20 @@ export async function getVaccinationCoverage(): Promise<
               quotes.q2nd === null
                 ? null
                 : limitDecimals(quotes.q2nd / 100.0, 3),
-            "A12-A17":
-              quotes.q2ndls18 === null
-                ? null
-                : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            "A05-A17": {
+              total:
+                quotes.q2ndls18 === null
+                  ? null
+                  : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+              "A05-A11":
+                quotes.q2nd5to11 === null
+                  ? null
+                  : limitDecimals(quotes.q2nd5to11 / 100.0, 3),
+              "A12-A17":
+                quotes.q2nd12to17 === null
+                  ? null
+                  : limitDecimals(quotes.q2nd12to17 / 100.0, 3),
+            },
             "A18+": {
               total:
                 quotes.q2nd18plus === null
@@ -475,10 +556,17 @@ export async function getVaccinationCoverage(): Promise<
               quotes.q3rd === null
                 ? null
                 : limitDecimals(quotes.q3rd / 100.0, 3),
-            "A12-A17":
-              quotes.q3rdls18 === null
-                ? null
-                : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            "A05-A17": {
+              total:
+                quotes.q3rdls18 === null
+                  ? null
+                  : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+              "A05-A11": null, // not published at this time!
+              "A12-A17":
+                quotes.q3rdls18 === null
+                  ? null
+                  : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            },
             "A18+": {
               total:
                 quotes.q3rd18plus === null
