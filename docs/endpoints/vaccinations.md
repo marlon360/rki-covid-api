@@ -24,6 +24,8 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `vaccination.janssen` Number of people who were vaccinated with Janssen
 
+`vaccination.novavax` Number of people who were vaccinated with Novavax
+
 `delta` New first vaccination compared to yesterday
 
 `quote` Quote of first vaccinated people (legacy)
@@ -32,9 +34,15 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `quotes.total` Quote of first vaccinated people (same as `quote`)
 
-`quotes.A12-A17` Quote of first vaccinated people with age >=12 to <=17 years
+`quotes.A05-A17` Quote of first vaccinated people in age-group < 18 years
 
-`quotes.A18+` Quote of first vaccinated people with agegroup >= 18 years
+`quotes.A05-A17.total` Quote of fist vaccinated people with age < 18 years
+
+`quotes.A05-A17.A05-A11` Quote of first vaccinated people with age >=5 to <=11 years
+
+`quotes.A05-A17.A12-A17` Quote of first vaccinated people with age >=12 to <=17 years
+
+`quotes.A18+` Quote of first vaccinated people in agegroup >= 18 years
 
 `quotes.A18+.total` Quote of first vaccinated people with age >= 18 years
 
@@ -44,6 +52,14 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `secondVaccination.vaccinated` Number of people who got the second vaccination
 
+`secondVaccination.vaccination.biontech` Number of people who received their second dose of BioNTech
+
+`secondVaccination.vaccination.moderna` Number of people who received their second dose of Moderna
+
+`secondVaccination.vaccination.astraZeneca` Number of people who received their second dose of AstraZeneca
+
+`secondVaccination.vaccination.novavax` Number of people who received their second dose of Novavax
+
 `secondVaccination.delta` New second vaccinations compared to yesterday
 
 `secondVaccination.quote` Quote of full vaccinated people (legacy)
@@ -52,7 +68,13 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `secondVaccination.quotes.total` Quote of full vaccinated people (same as `secondVaccination.quote`)
 
-`secondVaccination.quotes.A12-A17` Quote of full vaccinated people with age >=12 to <=17 years
+`secondVaccination.quotes.A05-A17` Quote of full vaccinated people in age-group < 18 years
+
+`secondVaccination.quotes.A05-A17.total` Quote of full vaccinated people with age < 18 years
+
+`secondVacciantion.quotes.A05-A17.A05-A11` Quote of full vaccinated people with age >=5 to <=11 years
+
+`secondVaccination.quotes.A05-A17.A12-A17` Quote of full vaccinated people with age >=12 to <=17 years
 
 `secondVaccination.quotes.A18+` Quote of full vaccinated people with agegroup >= 18 years
 
@@ -62,11 +84,7 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `secondVaccination.quotes.A18+.A60+` Quote of full vaccinated people with age >= 60 years
 
-`secondVaccination.vaccination.biontech` Number of people who received their second dose of BioNTech
-
-`secondVaccination.vaccination.moderna` Number of people who received their second dose of Moderna
-
-`secondVaccination.vaccination.astraZeneca` Number of people who received their second dose of AstraZeneca
+`boostervaccination.vaccinated` Number of people who got the booster vaccination
 
 `boosterVaccination.vaccination.biontech` Number of people who received their booster dose of BioNTech
 
@@ -82,7 +100,13 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `boosterVaccination.quotes.total` Quote of boostered people (same as `boosterVaccination.quote`)
 
-`boosterVaccination.quotes.A12-A17` Quote of boostered people with age >=12 to <=17 years
+`boosterVaccination.quotes.A05-A17` Quote of boostered people in age-group < 18 years
+
+`boosterVacciantion.quotes.A05-A17.total` Quote of boostered people with age < 18 years
+
+`boosterVaccination.quotes.A05-A17.A05-A11` Quote of boostered people with age >=5 to <=11 years
+
+`boosterVaccination.quotes.A05-A17.A12-A17` Quote of boostered people with age >=12 to <=17 years
 
 `boosterVaccination.quotes.A18+` Quote of boostered people with agegroup >= 18 years
 
@@ -96,224 +120,228 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 
 ```json
 {
-  "data":
-  {
-    "administeredVaccinations":152496126,
-    "vaccinated":61930498,
-    "vaccination":
-    {
-      "biontech":44139701,
-      "moderna":4942335,
-      "astraZeneca":9269166,
-      "janssen":3579296
+  "data":{
+    "administeredVaccinations":165778972,
+    "vaccinated":63091660,
+    "vaccination":{
+      "biontech":45148040,
+      "moderna":5068927,
+      "astraZeneca":9274331,
+      "janssen":3600362,
+      "novavax":null
     },
-    "delta":43404,
-    "quote":0.745,
-    "quotes":
-    {
-      "total":0.745,
-      "A12-A17":0.606,
-      "A18+":
-      {
-        "total":0.846,
-        "A18-A59":0.778,
-        "A60+":0.883
-      }
-    },
-    "secondVaccination":
-    {
-      "vaccinated":59574879,
-      "vaccination":
-      {
-        "biontech":46842638,
-        "moderna":5681616,
-        "astraZeneca":3471329
+    "delta":28255,
+    "quote":0.759,
+    "quotes":{
+      "total":0.759,
+      "A05-A17":{
+        "total":0.394,
+        "A05-A11":0.185,
+        "A12-A17":0.639
       },
-      "delta":81268,
-      "quote":0.716,
-      "quotes":
-      {
-        "total":0.716,
-        "A12-A17":0.539,
-        "A18+":
-        {
-          "total":0.823,
-          "A18-A59":0.796,
-          "A60+":0.874
-        }
+      "A18+":{
+        "total":0.854,
+        "A18-A59":0.788,
+        "A60+":0.886
       }
     },
-    "boosterVaccination":
-    {
-      "vaccinated":34570045,
-      "vaccination":
-      {
-        "biontech":21575727,
-        "moderna":12986294,
-        "janssen":4067
+    "secondVaccination":{
+      "vaccinated":61692608,
+      "vaccination":{
+        "biontech":48513441,
+        "moderna":6105850,
+        "astraZeneca":3472955,
+        "novavax":null
       },
-      "delta":470517,
-      "quote":0.416,
-      "quotes":
-      {
-        "total":0.416,
-        "A12-A17":0.079,
-        "A18+":
-        {
-          "total":0.493,
-          "A18-A59":0.411,
-          "A60+":0.646
-        }
-      }
-    },
-    "latestDailyVaccinations":
-    {
-      "date":"2022-01-06T00:00:00.000Z",
-      "vaccinated":43404,
-      "firstVaccination":43404,
-      "secondVaccination":81268,
-      "boosterVaccination":470517
-    },
-    "states":
-    {
-      "BW":
-      {
-        "name":"Baden-Württemberg",
-        "administeredVaccinations":20047413,
-        "vaccinated":8000730,
-        "vaccination":
-        {
-          "biontech":5728206,
-          "moderna":617589,
-          "astraZeneca":1179235,
-          "janssen":475700
+      "delta":61342,
+      "quote":0.742,
+      "quotes":{
+        "total":0.742,
+        "A05-A17":{
+          "total":0.329,
+          "A05-A11":0.103,
+          "A12-A17":0.592
         },
-        "delta":4041,
-        "quote":0.721,
-        "quotes":
-        {
-          "total":0.721,
-          "A12-A17":0.575,
-          "A18+":
-          {
-            "total":0.821,
-            "A18-A59":0.757,
-            "A60+":0.871
+        "A18+":{
+          "total":0.843,
+          "A18-A59":0.822,
+          "A60+":0.882
+        }
+      }
+    },
+    "boosterVaccination":{
+      "vaccinated":44595066,
+      "vaccination":{
+        "biontech":27354329,
+        "moderna":17221883,
+        "janssen":13940
+      },
+      "delta":244327,
+      "quote":0.536,
+      "quotes":{
+        "total":0.536,
+        "A05-A17":{
+          "total":0.224,
+          "A05-A11":null,
+          "A12-A17":0.224
+        },
+        "A18+":{
+          "total":0.628,
+          "A18-A59":0.564,
+          "A60+":0.747
+        }
+      }
+    },
+    "latestDailyVaccinations":{
+      "date":"2022-02-02T00:00:00.000Z",
+      "vaccinated":28255,
+      "firstVaccination":28255,
+      "secondVaccination":61342,
+      "boosterVaccination":244327
+    },
+    "states":{
+      "BW":{
+        "name":"Baden-Württemberg",
+        "administeredVaccinations":21653961,
+        "vaccinated":8147963,
+        "vaccination":{
+          "biontech":5854442,
+          "moderna":634312,
+          "astraZeneca":1179774,
+          "janssen":479435,
+          "novavax":null
+        },
+        "delta":3253,
+        "quote":0.734,
+        "quotes":{
+          "total":0.734,
+          "A05-A17":{
+            "total":0.372,
+            "A05-A11":0.165,
+            "A12-A17":0.608
+          },
+          "A18+":{
+            "total":0.829,
+            "A18-A59":0.767,
+            "A60+":0.874
           }
         },
-        "secondVaccination":
-        {
-          "vaccinated":7771045,
-          "vaccination":
-          {
-            "biontech":6176357,
-            "moderna":719509,
-            "astraZeneca":399479
+        "secondVaccination":{
+          "vaccinated":8058055,
+          "vaccination":{
+            "biontech":6400109,
+            "moderna":778778,
+            "astraZeneca":399733,
+            "novavax":null
           },
-          "delta":4035,
-          "quote":0.7,
-          "quotes":
-          {
-            "total":0.7,
-            "A12-A17":0.502,
-            "A18+":
-            {
-              "total":0.808,
-              "A18-A59":0.783,
-              "A60+":0.86
+          "delta":6900,
+          "quote":0.726,
+          "quotes":{
+            "total":0.726,
+            "A05-A17":{
+              "total":0.312,
+              "A05-A11":0.09,
+              "A12-A17":0.564
+            },
+            "A18+":{
+              "total":0.829,
+              "A18-A59":0.81,
+              "A60+":0.868
             }
           }
         },
-        "boosterVaccination":
-        {
-          "vaccinated":4751338,
-          "vaccination":
-          {
-            "biontech":2911520,
-            "moderna":1838534,
-            "janssen":86
+        "boosterVaccination":{
+          "vaccinated":5927378,
+          "vaccination":{
+            "biontech":3603852,
+            "moderna":2321635,
+            "janssen":395
           },
-          "delta":34809,
-          "quote":0.428,
-          "quotes":
-          {
-            "total":0.428,
-            "A12-A17":0.502,
-            "A18+":
-            {
-              "total":0.507,
-              "A18-A59":0.442,
-              "A60+":0.641
+          "delta":22633,
+          "quote":0.534,
+          "quotes":{
+            "total":0.534,
+            "A05-A17":{
+              "total":0.245,
+              "A05-A11":null,
+              "A12-A17":0.312
+            },
+            "A18+":{
+              "total":0.626,
+              "A18-A59":0.575,
+              "A60+":0.73
             }
           }
         }
       },
       ...
-      "Bund":
-      {
+      "Bund":{
         "name":"Bundesressorts",
-        "administeredVaccinations":484493,
-        "vaccinated":200288,
-        "vaccination":
-        {
-          "biontech":88672,
-          "moderna":83224,
-          "astraZeneca":20255,
-          "janssen":8137
+        "administeredVaccinations":522103,
+        "vaccinated":201333,
+        "vaccination":{
+          "biontech":89660,
+          "moderna":83274,
+          "astraZeneca":20261,
+          "janssen":8138,
+          "novavax":null
         },
-        "delta":45,
+        "delta":21,
         "quote":null,
-        "quotes":
-        {
+        "quotes":{
           "total":null,
-          "A12-A17":null,
-          "A18+":
-          {
+          "A05-A17":{
+            "total":null,
+            "A05-A11":null,
+            "A12-A17":null
+          },
+          "A18+":{
             "total":null,
             "A18-A59":null,
             "A60+":null
           }
         },
-        "secondVaccination":
-        {
-          "vaccinated":190434,
-          "vaccination":
-          {
-            "biontech":85832,
-            "moderna":86628,
-            "astraZeneca":9837
+        "secondVaccination":{
+          "vaccinated":193648,
+          "vaccination":{
+            "biontech":88886,
+            "moderna":86782,
+            "astraZeneca":9842,
+            "novavax":null
           },
-          "delta":145,
+          "delta":66,
           "quote":null,
-          "quotes":
-          {
+          "quotes":{
             "total":null,
-            "A12-A17":null,
-            "A18+":
-            {
+            "A05-A17":{
+              "total":null,
+              "A05-A11":null,
+              "A12-A17":null
+            },
+            "A18+":{
               "total":null,
               "A18-A59":null,
               "A60+":null
             }
           }
         },
-        "boosterVaccination":
-        {
-          "vaccinated":101908,
-          "vaccination":
-          {
-            "biontech":74195,
-            "moderna":27695,
+        "boosterVaccination":{
+          "vaccinated":135260,
+          "vaccination":{
+            "biontech":103136,
+            "moderna":32105,
             "janssen":2
           },
-          "delta":1135,
+          "delta":521,
           "quote":null,
-          "quotes":
-          {
+          "quotes":{
             "total":null,
-            "A12-A17":null,
-            "A18+":
-            {
+            "A05-A17":{
+              "total":null,
+              "A05-A11":null,
+              "A12-A17":null
+            },
+            "A18+":{
               "total":null,
               "A18-A59":null,
               "A60+":null
@@ -323,13 +351,12 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
       }
     }
   },
-  "meta":
-  {
+  "meta":{
     "source":"Robert Koch-Institut",
     "contact":"Marlon Lueckert (m.lueckert@me.com)",
     "info":"https://github.com/marlon360/rki-covid-api",
-    "lastUpdate":"2022-01-07T07:58:27.000Z",
-    "lastCheckedForUpdate":"2022-01-08T13:00:46.855Z"
+    "lastUpdate":"2022-02-03T08:17:51.000Z",
+    "lastCheckedForUpdate":"2022-02-03T15:06:37.103Z"
   }
 }
 ```
