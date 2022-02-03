@@ -36,7 +36,7 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `quotes.A05-A17` Quote of first vaccinated people in age-group < 18 years
 
-`quotes.A05-A17.total` Quote of fist vaccinated people with age < 18 years
+`quotes.A05-A17.total` Quote of first vaccinated people with age < 18 years
 
 `quotes.A05-A17.A05-A11` Quote of first vaccinated people with age >=5 to <=11 years
 
