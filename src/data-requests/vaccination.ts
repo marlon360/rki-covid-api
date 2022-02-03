@@ -211,7 +211,7 @@ export async function getVaccinationCoverage(): Promise<
       "n3rd",
       "q1st",
       "q1stls18",
-      "n1st5to11:",
+      "q1st5to11",
       "q1st12to17",
       "q1st18plus",
       "q1st18to59",
