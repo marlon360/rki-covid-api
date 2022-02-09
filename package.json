@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "pm2-runtime start ecosystem.config.yaml --env production",
     "dev": "node dist/server.js",
+    "dev:watch": "nodemon --watch src src/server.ts",
     "build": "tsc && npm run docs:build",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
@@ -36,6 +37,8 @@
     "@types/node": "^16.11.6",
     "prettier": "2.4.1",
     "typescript": "^4.4.4",
-    "vuepress": "^1.9.5"
+    "vuepress": "^1.9.5",
+    "nodemon": "^2.0.15",
+    "ts-node": "^10.5.0"
   }
 }
