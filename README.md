@@ -82,7 +82,8 @@ https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Testzahlen-ge
 
 **Frozen-Incidence data**
 
-https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile
+https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile
 
 **Age groups**
 
@@ -172,7 +173,8 @@ Now you can access the server at `http://localhost:8080`.
 - Casumer Corona Tracker - Eine Svelte PWA zur Überwachung frei konfigurierbarer Landkreise (https://cct.greeninc.ga)
 - Covid Landkreis Zahlen Chatbot auf Telegram (https://t.me/COVID_19_GER_bot)
 - DiscordCoronaBot, Zahlen, Tägliche Updates und Vorhersagen zu Covid-19 (https://github.com/GlaubeKeinemDev/DiscordCoronaBot)
-- Statistik für Baden-Württemberg mit Differenz zum Vortag (corona-in-bw.de)
+- Statistik für Baden-Württemberg mit Differenz zum Vortag (https://corona-in-bw.de)
+- Covid 19 Statistics Germany (https://covid19ger.netlify.app/)
 
 ## License
 
@@ -181,5 +183,3 @@ Now you can access the server at `http://localhost:8080`.
 ## Acknowledgements
 
 Special thanks to [@Rubber1Duck](https://github.com/Rubber1Duck) for all of his contributions and effort to keep this API running!
-
-And thanks to [@shinebar1001](https://github.com/shinebar1001) for providing a reverse proxy after the server IP got banned!

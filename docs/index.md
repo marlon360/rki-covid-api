@@ -82,7 +82,8 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 
 **Frozen-Incidence data**
 
-[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?\_\_blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile)
+[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?\_\_blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile)
+[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?\_\_blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile)
 
 **Age groups**
 
@@ -172,6 +173,7 @@ Now you can access the server at `http://localhost:8080`.
 - Covid Landkreis Zahlen Chatbot auf Telegram [https://t.me/COVID_19_GER_bot](https://t.me/COVID_19_GER_bot)
 - DiscordCoronaBot, Zahlen, Tägliche Updates und Vorhersagen zu Covid-19 [https://github.com/GlaubeKeinemDev/DiscordCoronaBot](https://github.com/GlaubeKeinemDev/DiscordCoronaBot)
 - Statistik für Baden-Württemberg mit Differenz zum Vortag [https://corona-in-bw.de](https://corona-in-bw.de)
+- Covid 19 Statistics Germany [https://covid19ger.netlify.app/](https://covid19ger.netlify.app/)
 
 ## License
 
