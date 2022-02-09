@@ -36,31 +36,30 @@ export async function getDistrictsFrozenIncidenceHistory(
   const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
   const lastUpdate = new Date(response.headers["last-modified"]);
 
-  let districts = json
-    .map((district) => {
-      const name = district["LK"];
-      const ags = district["LKNR"].toString().padStart(5, "0");
+  let districts = json.map((district) => {
+    const name = district["LK"];
+    const ags = district["LKNR"].toString().padStart(5, "0");
 
-      let history = [];
+    let history = [];
 
-      // get all date keys
-      const dateKeys = Object.keys(district);
-      // ignore the first two elements (LK, LKNR)
-      dateKeys.splice(0, 2);
-      dateKeys.forEach((dateKey) => {
-        const date = new Date(
-          dateKey.toString().replace(date_pattern, "$3-$2-$1")
-        );
-        history.push({ weekIncidence: district[dateKey], date });
-      });
-
-      if (days != null) {
-        const reference_date = new Date(getDateBefore(days));
-        history = history.filter((element) => element.date > reference_date);
-      }
-
-      return { ags, name, history };
+    // get all date keys
+    const dateKeys = Object.keys(district);
+    // ignore the first two elements (LK, LKNR)
+    dateKeys.splice(0, 2);
+    dateKeys.forEach((dateKey) => {
+      const date = new Date(
+        dateKey.toString().replace(date_pattern, "$3-$2-$1")
+      );
+      history.push({ weekIncidence: district[dateKey], date });
     });
+
+    if (days != null) {
+      const reference_date = new Date(getDateBefore(days));
+      history = history.filter((element) => element.date > reference_date);
+    }
+
+    return { ags, name, history };
+  });
 
   if (ags != null) {
     districts = districts.filter((district) => district.ags === ags);
