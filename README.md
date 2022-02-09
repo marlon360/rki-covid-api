@@ -183,5 +183,3 @@ Now you can access the server at `http://localhost:8080`.
 ## Acknowledgements
 
 Special thanks to [@Rubber1Duck](https://github.com/Rubber1Duck) for all of his contributions and effort to keep this API running!
-
-And thanks to [@shinebar1001](https://github.com/shinebar1001) for providing a reverse proxy after the server IP got banned!
