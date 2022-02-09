@@ -207,6 +207,20 @@ export function getDayDifference(date1: Date, date2: Date): number {
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
+export function getDateFromString(dateString: string): Date {
+  if (dateString.indexOf("/") > -1) {
+    // probably this format: 8/25/21: m/d/y
+    const parts = dateString.split("/");
+    return new Date(
+      `20${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`
+    );
+  } else {
+    // probably this format: 01.12.2020: dd.mm.yyyy
+    const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+    return new Date(dateString.replace(date_pattern, "$3-$2-$1"));
+  }
+}
+
 export function AddDaysToDate(date: Date, days: number): Date {
   return new Date(date.getTime() + days * 1000 * 60 * 60 * 24);
 }
