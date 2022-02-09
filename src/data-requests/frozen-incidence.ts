@@ -17,7 +17,7 @@ export async function getDistrictsFrozenIncidenceHistory(
   ags?: string
 ): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
   const response = await axios.get(
-    "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
+    "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
     {
       responseType: "arraybuffer",
     }
@@ -37,7 +37,6 @@ export async function getDistrictsFrozenIncidenceHistory(
   const lastUpdate = new Date(response.headers["last-modified"]);
 
   let districts = json
-    .filter((district) => !!district["NR"])
     .map((district) => {
       const name = district["LK"];
       const ags = district["LKNR"].toString().padStart(5, "0");
@@ -46,8 +45,8 @@ export async function getDistrictsFrozenIncidenceHistory(
 
       // get all date keys
       const dateKeys = Object.keys(district);
-      // ignore the first three elements (rowNumber, LK, LKNR)
-      dateKeys.splice(0, 3);
+      // ignore the first two elements (LK, LKNR)
+      dateKeys.splice(0, 2);
       dateKeys.forEach((dateKey) => {
         const date = new Date(
           dateKey.toString().replace(date_pattern, "$3-$2-$1")
@@ -87,7 +86,7 @@ export async function getStatesFrozenIncidenceHistory(
   abbreviation?: string
 ): Promise<ResponseData<StatesFrozenIncidenceData[]>> {
   const response = await axios.get(
-    "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab.xlsx?__blob=publicationFile",
+    "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
     {
       responseType: "arraybuffer",
     }
@@ -106,7 +105,7 @@ export async function getStatesFrozenIncidenceHistory(
   const lastUpdate = new Date(response.headers["last-modified"]);
 
   let states = json.map((states) => {
-    const name = states["__EMPTY"]; //there is no header
+    const name = states["MeldeLandkreisBundesland"];
     const abbreviation = getStateAbbreviationByName(name);
 
     let history = [];
