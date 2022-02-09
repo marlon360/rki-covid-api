@@ -1,12 +1,21 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import {
-  getDateBefore,
-  getStateAbbreviationByName,
-  RKIError,
-  getDateFromString,
-} from "../utils";
+import { getDateBefore, getStateAbbreviationByName, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
+
+function getDateFromString(dateString: string): Date {
+  if (dateString.indexOf("/") > -1) {
+    // probably this format: 8/25/21: m/d/y
+    const parts = dateString.split("/");
+    return new Date(
+      `20${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`
+    );
+  } else {
+    // probably this format: 01.12.2020: dd.mm.yyyy
+    const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
+    return new Date(dateString.replace(date_pattern, "$3-$2-$1"));
+  }
+}
 
 export interface DistrictsFrozenIncidenceData {
   ags: string;
@@ -116,7 +125,7 @@ export async function getDistrictsFrozenIncidenceHistory(
     ? districts.length > 0 && districts[0].history.length > 0
     : districts.length > 0 &&
       districts[0].history.length > 0 &&
-      districts[0].history.length < days;
+      districts[0].history[0].date > new Date(getDateBefore(days));
 
   if (fetchArchiveData) {
     let archiveData = await getDistrictsFrozenIncidenceHistoryArchive();
@@ -254,7 +263,7 @@ export async function getStatesFrozenIncidenceHistory(
     ? states.length > 0 && states[0].history.length > 0
     : states.length > 0 &&
       states[0].history.length > 0 &&
-      states[0].history.length < days;
+      states[0].history[0].date > new Date(getDateBefore(days));
 
   if (fetchArchiveData) {
     // load all archive data
