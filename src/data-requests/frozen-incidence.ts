@@ -112,18 +112,11 @@ export async function getDistrictsFrozenIncidenceHistory(
   }
 
   // do we need to fetch archive data as well?
-  let fetchArchiveData = false;
-  if (days === null) {
-    fetchArchiveData = districts.length > 0 && districts[0].history.length > 0; // check if we got data already;
-  } else {
-    const reference_date = new Date(getDateBefore(days));
-    if (districts.length > 0 && districts[0].history.length > 0) {
-      // check if we got data already
-      if (districts[0].history.length < days) {
-        fetchArchiveData = true;
-      }
-    }
-  }
+  const fetchArchiveData = !days
+    ? districts.length > 0 && districts[0].history.length > 0
+    : districts.length > 0 &&
+      districts[0].history.length > 0 &&
+      districts[0].history.length < days;
 
   if (fetchArchiveData) {
     let archiveData = await getDistrictsFrozenIncidenceHistoryArchive();
@@ -257,18 +250,11 @@ export async function getStatesFrozenIncidenceHistory(
   }
 
   // do we need to fetch archive data as well?
-  let fetchArchiveData = false;
-  if (days === null) {
-    fetchArchiveData = states.length > 0 && states[0].history.length > 0; // check if we got data already;
-  } else {
-    const reference_date = new Date(getDateBefore(days));
-    if (states.length > 0 && states[0].history.length > 0) {
-      // check if we got data already
-      if (states[0].history.length < days) {
-        fetchArchiveData = true;
-      }
-    }
-  }
+  const fetchArchiveData = !days
+    ? states.length > 0 && states[0].history.length > 0
+    : states.length > 0 &&
+      states[0].history.length > 0 &&
+      states[0].history.length < days;
 
   if (fetchArchiveData) {
     // load all archive data
