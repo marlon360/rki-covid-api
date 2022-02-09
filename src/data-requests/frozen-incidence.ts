@@ -125,7 +125,7 @@ export async function getDistrictsFrozenIncidenceHistory(
     ? districts.length > 0 && districts[0].history.length > 0
     : districts.length > 0 &&
       districts[0].history.length > 0 &&
-      districts[0].history[0].date > new Date(getDateBefore(days));
+      districts[0].history[0].date > new Date(getDateBefore(days - 1));
 
   if (fetchArchiveData) {
     let archiveData = await getDistrictsFrozenIncidenceHistoryArchive();
@@ -263,7 +263,7 @@ export async function getStatesFrozenIncidenceHistory(
     ? states.length > 0 && states[0].history.length > 0
     : states.length > 0 &&
       states[0].history.length > 0 &&
-      states[0].history[0].date > new Date(getDateBefore(days));
+      states[0].history[0].date > new Date(getDateBefore(days - 1));
 
   if (fetchArchiveData) {
     // load all archive data
