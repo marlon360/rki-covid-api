@@ -69,7 +69,7 @@ export async function getDistrictsRecoveredData(): Promise<
   }
   const districts = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       recovered: feature.attributes.recovered,
     };
   });
@@ -88,7 +88,7 @@ export async function getNewDistrictCases(): Promise<
   const data = response.data;
   const districts = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       cases: feature.attributes.cases,
     };
   });
@@ -107,7 +107,7 @@ export async function getNewDistrictDeaths(): Promise<
   const data = response.data;
   const districts = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       deaths: feature.attributes.deaths,
     };
   });
@@ -129,7 +129,7 @@ export async function getNewDistrictRecovered(): Promise<
   }
   const districts = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       recovered: feature.attributes.recovered,
     };
   });
@@ -147,7 +147,7 @@ export async function getLastDistrictCasesHistory(
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
   if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`);
+    whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 36
     if (days != null) {
@@ -176,7 +176,7 @@ export async function getLastDistrictCasesHistory(
     date: Date;
   }[] = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       name: feature.attributes.Landkreis,
       cases: feature.attributes.cases,
       date: new Date(feature.attributes.MeldeDatum),
@@ -199,7 +199,7 @@ export async function getLastDistrictDeathsHistory(
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
   if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`);
+    whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
     if (days != null) {
@@ -228,7 +228,7 @@ export async function getLastDistrictDeathsHistory(
     date: Date;
   }[] = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       name: feature.attributes.Landkreis,
       deaths: feature.attributes.deaths,
       date: new Date(feature.attributes.MeldeDatum),
@@ -251,7 +251,7 @@ export async function getLastDistrictRecoveredHistory(
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
   if (ags != null) {
-    whereParams.push(`IdLandkreis = '${ags}'`);
+    whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
     if (days != null) {
@@ -280,7 +280,7 @@ export async function getLastDistrictRecoveredHistory(
     date: Date;
   }[] = data.features.map((feature) => {
     return {
-      ags: feature.attributes.IdLandkreis,
+      ags: feature.attributes.IdLandkreis.padStart(5, "0"),
       name: feature.attributes.Landkreis,
       recovered: feature.attributes.recovered,
       date: new Date(feature.attributes.MeldeDatum),
