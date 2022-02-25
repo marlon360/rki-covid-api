@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states`
+`GET http://api.fritz.box:8080/states`
 [Open](/states)
 
 ### Response
@@ -102,7 +102,7 @@ Returns the data for a single `:state` state.
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH`
+`GET http://api.fritz.box:8080/states/HH`
 [Open](/states/HH)
 
 | Parameter | Description        |
@@ -161,7 +161,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/history/frozen-incidence/7`
+`GET http://api.fritz.box:8080/states/history/frozen-incidence/7`
 [Open](/states/history/frozen-incidence/7)
 
 **Parameters**
@@ -184,7 +184,7 @@ Redirects to `/states/history/cases`
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/history/hospitalization/7`
+`GET http://api.fritz.box:8080/states/history/hospitalization/7`
 [Open](/states/history/hospitalization/7)
 
 **Parameters**
@@ -464,7 +464,7 @@ Since 2021-03-09 the RKI is publisching adjusted (predicted) values for cases7Da
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/age-groups`
+`GET http://api.fritz.box:8080/states/age-groups`
 [Open](/states/age-groups)
 
 ### Response
@@ -561,7 +561,7 @@ Since 2021-03-09 the RKI is publisching adjusted (predicted) values for cases7Da
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH/history/frozen-incidence/7`
+`GET http://api.fritz.box:8080/states/HH/history/frozen-incidence/7`
 [Open](/states/HH/history/frozen-incidence/7)
 
 **Parameters**
@@ -587,7 +587,7 @@ Since 2021-03-09 the RKI is publisching adjusted (predicted) values for cases7Da
 
 ### Request
 
-`GET https://api.corona-zahlen.org/states/HH/age-groups`
+`GET http://api.fritz.box:8080/states/HH/age-groups`
 [Open](/states/HH/age-groups)
 
 ### Response
