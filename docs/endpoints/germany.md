@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany`
+`GET https://api.corona-zahlen.org/germany`
 [Open](/germany)
 
 ### Response
@@ -60,7 +60,7 @@ Returns the total cases in germany for every day.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/cases`
+`GET https://api.corona-zahlen.org/germany/history/cases`
 [Open](/germany/history/cases)
 
 ### Response
@@ -98,7 +98,7 @@ Returns the total cases in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/cases/7`
+`GET https://api.corona-zahlen.org/germany/history/cases/7`
 [Open](/germany/history/cases)
 
 **Parameters**
@@ -157,7 +157,7 @@ Returns the history of week incidences in germany.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/incidence`
+`GET https://api.corona-zahlen.org/germany/history/incidence`
 [Open](/germany/history/incidence)
 
 ### Response
@@ -206,7 +206,7 @@ Returns the week incidence in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/incidence/3`
+`GET https://api.corona-zahlen.org/germany/history/incidence/3`
 [Open](/germany/history/incidence/3)
 
 **Parameters**
@@ -249,7 +249,7 @@ Returns the number of deaths in germany for every day.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/deaths`
+`GET https://api.corona-zahlen.org/germany/history/deaths`
 [Open](/germany/history/deaths)
 
 ### Response
@@ -287,7 +287,7 @@ Returns the number of deaths in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/deaths/7`
+`GET https://api.corona-zahlen.org/germany/history/deaths/7`
 [Open](/germany/history/deaths/7)
 
 **Parameters**
@@ -346,7 +346,7 @@ Returns the number of recovered people in germany for every day.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/recovered`
+`GET https://api.corona-zahlen.org/germany/history/recovered`
 [Open](/germany/history/recovered)
 
 ### Response
@@ -384,7 +384,7 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/recovered/7`
+`GET https://api.corona-zahlen.org/germany/history/recovered/7`
 [Open](/germany/history/recovered/7)
 
 **Parameters**
@@ -441,7 +441,7 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/age-groups`
+`GET https://api.corona-zahlen.org/germany/age-groups`
 [Open](/germany/age-groups)
 
 ### Response
@@ -556,7 +556,7 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 ### Request
 
-`GET https://api.fritz.box:8080/germany/history/frozen-incidence/7`
+`GET https://api.corona-zahlen.org/germany/history/frozen-incidence/7`
 [Open](/germany/history/frozen-incidence/7)
 
 **Parameters**
@@ -575,31 +575,31 @@ Returns the number of recovered people in germany for the last `:days` days.
     "history": [
       {
         "weekIncidence": 213.65875024446805,
-        "date": "2021-11-08T23:00:00.000Z"
+        "date": "2021-11-09T00:00:00.000Z"
       },
       {
         "weekIncidence": 232.1218544191271,
-        "date": "2021-11-09T23:00:00.000Z"
+        "date": "2021-11-10T00:00:00.000Z"
       },
       {
         "weekIncidence": 249.11060402346553,
-        "date": "2021-11-10T23:00:00.000Z"
+        "date": "2021-11-11T00:00:00.000Z"
       },
       {
         "weekIncidence": 263.69059979064883,
-        "date": "2021-11-11T23:00:00.000Z"
+        "date": "2021-11-12T00:00:00.000Z"
       },
       {
         "weekIncidence": 277.35784260606,
-        "date": "2021-11-12T23:00:00.000Z"
+        "date": "2021-11-13T00:00:00.000Z"
       },
       {
         "weekIncidence": 288.962672625304,
-        "date": "2021-11-13T23:00:00.000Z"
+        "date": "2021-11-14T00:00:00.000Z"
       },
       {
         "weekIncidence": 302.97505390864444,
-        "date": "2021-11-14T23:00:00.000Z"
+        "date": "2021-11-15T00:00:00.000Z"
       }
     ]
   },
@@ -607,8 +607,172 @@ Returns the number of recovered people in germany for the last `:days` days.
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-11-15T06:26:37.000Z",
-    "lastCheckedForUpdate": "2021-11-15T19:18:18.245Z"
+    "lastUpdate": "2021-11-15T07:26:37.000Z",
+    "lastCheckedForUpdate": "2021-11-15T21:12:27.928Z"
+  }
+}
+```
+
+## `/germany/history/hospitalization`
+
+## `/germany/history/hospitalization/:days`
+
+### Request
+
+`GET https://api.corona-zahlen.org/germany/history/hospitalization/7`
+[Open](/germany/history/hospitalization/7)
+
+**Parameters**
+
+| Parameter | Description                           |
+| --------- | ------------------------------------- |
+| :days     | Number of days in the past from today |
+
+### Response
+
+`cases7Days` updated number of hospitalization cases of the last 7 days.
+
+`incidence7Days` updated 7 day incidence of hospitalization.
+
+`date` publishing date of all values.
+
+Since 2021-03-09 the RKI is publisching adjusted (predicted) values for cases7Days and incidence7Days. If these values ​​are available, they are output below. These values are unavailable bevor 2021-03-09 and for the last 3 days.
+
+`fixedCases7Days` the number of 7 day cases witch is published at `date` first (fixed, that will never change!).
+
+`updatedCases7Days` the today updated number of 7 day cases and the same as `cases7Days`.
+
+`adjustedLowerCases7Days` the 95% lower limit adjusted (predicted) number of 7 day cases.
+
+`adjustedCases7Days` the adjusted (predicted) number of 7 day cases.
+
+`adjustedUpperCases7Days` the 95% upper limit adjusted (predicted) number of 7 day cases.
+
+`fixedIncidence7Days` the 7 day incidence witch is published at `date` first (fixed, that will never change!).
+
+`updatedIncidence7Days` the today updated 7 day incidence and the same as `incidence7Days`.
+
+`adjustedLowerIncidence7Days` the 95% lower limit adjusted (predicted) 7 day incidence.
+
+`adjustedIncidence7Days` the adjusted (predicted) 7 day incidence.
+
+`adjustedUpperIncidence7Days` the 95% upper limit adjusted (predicted) 7 day incidence.
+
+```json
+{
+  "data": [
+    {
+      "cases7Days": 7629,
+      "incidence7Days": 9.17,
+      "date": "2022-02-19T00:00:00.000Z",
+      "fixedCases7Days": 5301,
+      "updatedCases7Days": 7629,
+      "adjustedLowerCases7Days": 9606,
+      "adjustedCases7Days": 9840,
+      "adjustedUpperCases7Days": 10024,
+      "fixedIncidence7Days": 6.37,
+      "updatedIncidence7Days": 9.17,
+      "adjustedLowerIncidence7Days": 11.55,
+      "adjustedIncidence7Days": 11.83,
+      "adjustedUpperIncidence7Days": 12.06
+    },
+    {
+      "cases7Days": 7491,
+      "incidence7Days": 9.01,
+      "date": "2022-02-20T00:00:00.000Z",
+      "fixedCases7Days": 5213,
+      "updatedCases7Days": 7491,
+      "adjustedLowerCases7Days": 9634,
+      "adjustedCases7Days": 9866,
+      "adjustedUpperCases7Days": 10061,
+      "fixedIncidence7Days": 6.27,
+      "updatedIncidence7Days": 9.01,
+      "adjustedLowerIncidence7Days": 11.59,
+      "adjustedIncidence7Days": 11.87,
+      "adjustedUpperIncidence7Days": 12.1
+    },
+    {
+      "cases7Days": 7415,
+      "incidence7Days": 8.92,
+      "date": "2022-02-21T00:00:00.000Z",
+      "fixedCases7Days": 5040,
+      "updatedCases7Days": 7415,
+      "adjustedLowerCases7Days": 9705,
+      "adjustedCases7Days": 9936,
+      "adjustedUpperCases7Days": 10125,
+      "fixedIncidence7Days": 6.06,
+      "updatedIncidence7Days": 8.92,
+      "adjustedLowerIncidence7Days": 11.67,
+      "adjustedIncidence7Days": 11.95,
+      "adjustedUpperIncidence7Days": 12.18
+    },
+    {
+      "cases7Days": 7137,
+      "incidence7Days": 8.58,
+      "date": "2022-02-22T00:00:00.000Z",
+      "fixedCases7Days": 5165,
+      "updatedCases7Days": 7137,
+      "adjustedLowerCases7Days": 9764,
+      "adjustedCases7Days": 10003,
+      "adjustedUpperCases7Days": 10249,
+      "fixedIncidence7Days": 6.21,
+      "updatedIncidence7Days": 8.58,
+      "adjustedLowerIncidence7Days": 11.74,
+      "adjustedIncidence7Days": 12.03,
+      "adjustedUpperIncidence7Days": 12.33
+    },
+    {
+      "cases7Days": 6607,
+      "incidence7Days": 7.95,
+      "date": "2022-02-23T00:00:00.000Z",
+      "fixedCases7Days": 5275,
+      "updatedCases7Days": 6607,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.34,
+      "updatedIncidence7Days": 7.95,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
+    },
+    {
+      "cases7Days": 6034,
+      "incidence7Days": 7.26,
+      "date": "2022-02-24T00:00:00.000Z",
+      "fixedCases7Days": 5217,
+      "updatedCases7Days": 6034,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.27,
+      "updatedIncidence7Days": 7.26,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
+    },
+    {
+      "cases7Days": 5221,
+      "incidence7Days": 6.28,
+      "date": "2022-02-25T00:00:00.000Z",
+      "fixedCases7Days": 5221,
+      "updatedCases7Days": 5221,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.28,
+      "updatedIncidence7Days": 6.28,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
+    }
+  ],
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-02-25T04:05:31.000Z",
+    "lastCheckedForUpdate": "2022-02-25T06:41:49.840Z"
   }
 }
 ```

@@ -214,9 +214,23 @@ export async function GermanyRecoveredHistoryResponse(
 export async function GermanyHospitalizationHistoryResponse(
   days?: number
 ): Promise<
-  GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
+  GermanyHistoryData<{
+    cases7Days: number; //legacy
+    incidence7Days: number; //legacy
+    date: Date;
+    fixedCases7Days: number;
+    updatedCases7Days: number;
+    adjustedLowerCases7Days: number;
+    adjustedCases7Days: number;
+    adjustedUpperCases7Days: number;
+    fixedIncidence7Days: number;
+    updatedIncidence7Days: number;
+    adjustedLowerIncidence7Days: number;
+    adjustedIncidence7Days: number;
+    adjustedUpperIncidence7Days: number;
+  }>
 > {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -224,7 +238,7 @@ export async function GermanyHospitalizationHistoryResponse(
   const hospitalizationData = await getHospitalizationData();
   const history = [];
   let dateKeys = Object.keys(hospitalizationData.data);
-  if (days) {
+  if (days != undefined) {
     const reference_date = new Date(getDateBefore(days));
     dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
@@ -235,9 +249,26 @@ export async function GermanyHospitalizationHistoryResponse(
   });
   dateKeys.forEach((dateKey) => {
     history.push({
-      cases7Days: hospitalizationData.data[dateKey].cases7Days,
-      incidence7Days: hospitalizationData.data[dateKey].incidence7Days,
+      cases7Days: hospitalizationData.data[dateKey].cases7Days, //legacy
+      incidence7Days: hospitalizationData.data[dateKey].incidence7Days, //legacy
       date: new Date(dateKey),
+      fixedCases7Days: hospitalizationData.data[dateKey].fixedCases7Days,
+      updatedCases7Days: hospitalizationData.data[dateKey].updatedCases7Days,
+      adjustedLowerCases7Days:
+        hospitalizationData.data[dateKey].adjustedLowerCases7Days,
+      adjustedCases7Days: hospitalizationData.data[dateKey].adjustedCases7Days,
+      adjustedUpperCases7Days:
+        hospitalizationData.data[dateKey].adjustedUpperCases7Days,
+      fixedIncidence7Days:
+        hospitalizationData.data[dateKey].fixedIncidence7Days,
+      updatedIncidence7Days:
+        hospitalizationData.data[dateKey].updatedIncidence7Days,
+      adjustedLowerIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedLowerIncidence7Days,
+      adjustedIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedIncidence7Days,
+      adjustedUpperIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedUpperIncidence7Days,
     });
   });
 
