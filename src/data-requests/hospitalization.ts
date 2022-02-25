@@ -18,13 +18,33 @@ export interface AgeGroupData {
 
 export interface HospitalizationData {
   [date: string]: {
-    cases7Days: number;
-    incidence7Days: number;
+    cases7Days: number; //legacy
+    fixedCases7Days: number;
+    updatedCases7Days: number;
+    adjustedLowerCases7Days: number;
+    adjustedCases7Days: number;
+    adjustedUpperCases7Days: number;
+    incidence7Days: number; //legacy
+    fixedIncidence7Days: number;
+    updatedIncidence7Days: number;
+    adjustedLowerIncidence7Days: number;
+    adjustedIncidence7Days: number;
+    adjustedUpperIncidence7Days: number;
     ageGroups: AgeGroups;
     states: {
       [state: string]: {
-        cases7Days: number;
-        incidence7Days: number;
+        cases7Days: number; //legacy
+        fixedCases7Days: number;
+        updatedCases7Days: number;
+        adjustedLowerCases7Days: number;
+        adjustedCases7Days: number;
+        adjustedUpperCases7Days: number;
+        incidence7Days: number; // legacy
+        fixedIncidence7Days: number;
+        updatedIncidence7Days: number;
+        adjustedLowerIncidence7Days: number;
+        adjustedIncidence7Days: number;
+        adjustedUpperIncidence7Days: number;
         ageGroups: AgeGroups;
       };
     };
@@ -69,7 +89,17 @@ export async function getHospitalizationData(): Promise<
           if (!dateEntry) {
             dateEntry = {
               cases7Days: undefined,
+              fixedCases7Days: null,
+              updatedCases7Days: null,
+              adjustedLowerCases7Days: null,
+              adjustedCases7Days: null,
+              adjustedUpperCases7Days: null,
               incidence7Days: undefined,
+              fixedIncidence7Days: null,
+              updatedIncidence7Days: null,
+              adjustedLowerIncidence7Days: null,
+              adjustedIncidence7Days: null,
+              adjustedUpperIncidence7Days: null,
               ageGroups: {} as AgeGroups,
               states: {},
             };
@@ -78,7 +108,17 @@ export async function getHospitalizationData(): Promise<
           // default hospitalization data entry
           let hospitalizationDataEntry = {
             cases7Days: undefined,
+            fixedCases7Days: null,
+            updatedCases7Days: null,
+            adjustedLowerCases7Days: null,
+            adjustedCases7Days: null,
+            adjustedUpperCases7Days: null,
             incidence7Days: undefined,
+            fixedIncidence7Days: null,
+            updatedIncidence7Days: null,
+            adjustedLowerIncidence7Days: null,
+            adjustedIncidence7Days: null,
+            adjustedUpperIncidence7Days: null,
             ageGroups: {} as AgeGroups,
           };
 
@@ -161,8 +201,114 @@ export async function getHospitalizationData(): Promise<
         console.error(err.message);
         reject(err.message);
       });
+
+      // now add the adjusted values
+      // Create the adjusted values data parser
+      const adjParser = parse({
+        delimiter: ",",
+        from: 2,
+      });
+
+      // get adjusted values csv as stream
+      const adjResponse = await axios({
+        method: "get",
+        url: "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_adjustierte-COVID-19-Hospitalisierungen.csv",
+        responseType: "stream",
+      });
+
+      // pipe adjusted values csv stream to adjusted values csv parser
+      adjResponse.data.pipe(adjParser);
+
+      // read the adjusted values parser stream and add values to hospitalizationDataObject
+      adjParser.on("readable", function () {
+        let record;
+        while ((record = adjParser.read())) {
+          let [
+            date,
+            state,
+            id,
+            ageGroup,
+            fixedCases7Days,
+            updatedCases7Days,
+            adjustedCases7Days,
+            adjustedLowerCases7Days,
+            adjustedUpperCases7Days,
+            population,
+            fixedIncidence7Days,
+            updatedIncidence7Days,
+            adjustedIncidence7Days,
+            adjustedLowerIncidence7Days,
+            adjustedUpperIncidence7Days,
+          ] = record;
+
+          date = new Date(date).toISOString();
+
+          if (id === "00") {
+            hospitalizationDataObject[date].fixedCases7Days =
+              parseInt(fixedCases7Days);
+            hospitalizationDataObject[date].updatedCases7Days =
+              parseInt(updatedCases7Days);
+            hospitalizationDataObject[date].adjustedLowerCases7Days = parseInt(
+              adjustedLowerCases7Days
+            );
+            hospitalizationDataObject[date].adjustedCases7Days =
+              parseInt(adjustedCases7Days);
+            hospitalizationDataObject[date].adjustedUpperCases7Days = parseInt(
+              adjustedUpperCases7Days
+            );
+            hospitalizationDataObject[date].fixedIncidence7Days =
+              parseFloat(fixedIncidence7Days);
+            hospitalizationDataObject[date].updatedIncidence7Days = parseFloat(
+              updatedIncidence7Days
+            );
+            hospitalizationDataObject[date].adjustedLowerIncidence7Days =
+              parseFloat(adjustedLowerIncidence7Days);
+            hospitalizationDataObject[date].adjustedIncidence7Days = parseFloat(
+              adjustedIncidence7Days
+            );
+            hospitalizationDataObject[date].adjustedUpperIncidence7Days =
+              parseFloat(adjustedUpperIncidence7Days);
+          } else {
+            hospitalizationDataObject[date].states[state].fixedCases7Days =
+              parseInt(fixedCases7Days);
+            hospitalizationDataObject[date].states[state].updatedCases7Days =
+              parseInt(updatedCases7Days);
+            hospitalizationDataObject[date].states[
+              state
+            ].adjustedLowerCases7Days = parseInt(adjustedLowerCases7Days);
+            hospitalizationDataObject[date].states[state].adjustedCases7Days =
+              parseInt(adjustedCases7Days);
+            hospitalizationDataObject[date].states[
+              state
+            ].adjustedUpperCases7Days = parseInt(adjustedUpperCases7Days);
+            hospitalizationDataObject[date].states[state].fixedIncidence7Days =
+              parseFloat(fixedIncidence7Days);
+            hospitalizationDataObject[date].states[
+              state
+            ].updatedIncidence7Days = parseFloat(updatedIncidence7Days);
+            hospitalizationDataObject[date].states[
+              state
+            ].adjustedLowerIncidence7Days = parseFloat(
+              adjustedLowerIncidence7Days
+            );
+            hospitalizationDataObject[date].states[
+              state
+            ].adjustedIncidence7Days = parseFloat(adjustedIncidence7Days);
+            hospitalizationDataObject[date].states[
+              state
+            ].adjustedUpperIncidence7Days = parseFloat(
+              adjustedUpperIncidence7Days
+            );
+          }
+        }
+      });
+      // Catch any error
+      adjParser.on("error", function (err) {
+        console.error(err.message);
+        reject(err.message);
+      });
       // When we are done, test that the parsed output matched what expected
-      parser.on("end", function () {
+      adjParser.on("end", function () {
         resolve(hospitalizationDataObject);
       });
     }
