@@ -1,10 +1,10 @@
-FROM node:16-alpine3.12
+FROM node:16-alpine3.14
 
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
 
-ARG VIPS_VERSION=8.11.3
+ARG VIPS_VERSION=8.11.4
 
 # System update, build dependencies, compile vips-8.11.3 and cleanup.
 # Also to npm@6.14.15 is downgraded to prevent warnings and to keep the json-lockfile 
