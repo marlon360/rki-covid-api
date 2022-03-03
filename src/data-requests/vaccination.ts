@@ -365,7 +365,7 @@ export async function getVaccinationCoverage(): Promise<
           biontech: entry.fullBiontech,
           moderna: entry.fullModerna,
           astraZeneca: entry.fullAstraZeneca,
-          novavax: entry.firstNovavax === null ? null : entry.firstNovavax,
+          novavax: entry.fullNovavax === null ? null : entry.fullNovavax,
         },
         delta: entry.fullDifference,
         quote:
