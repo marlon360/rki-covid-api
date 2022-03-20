@@ -3,15 +3,19 @@ import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import { StatesHospitalizationHistoryResponse } from "./states";
-import { ColorRange, weekIncidenceColorRanges } from "../configuration/colors";
-import { getStateAbbreviationById } from "../utils";
+import {
+  ColorRange,
+  hospitalizationIncidenceColorRanges,
+  weekIncidenceColorRanges,
+} from "../configuration/colors";
 import sharp from "sharp";
+import {
+  getHospitalizationData,
+  getLatestHospitalizationDataKey,
+} from "../data-requests/hospitalization";
+import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
 
-export async function DistrictsMapResponse(
-  paletteType: string,
-  palette: string
-) {
+export async function DistrictsMapResponse() {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -31,7 +35,7 @@ export async function DistrictsMapResponse(
       (district.casesPerWeek / district.population) * 100000;
     districtPathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     );
   }
 
@@ -40,10 +44,7 @@ export async function DistrictsMapResponse(
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function DistrictsLegendMapResponse(
-  paletteType: string,
-  palette: string
-) {
+export async function DistrictsLegendMapResponse() {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -63,7 +64,7 @@ export async function DistrictsLegendMapResponse(
       (district.casesPerWeek / district.population) * 100000;
     districtPathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     );
   }
 
@@ -73,15 +74,15 @@ export async function DistrictsLegendMapResponse(
     getMapBackground(
       "7-Tage-Inzidenz der Landkreise",
       districtsData.lastUpdate,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export async function StatesMapResponse(paletteType: string, palette: string) {
+export async function StatesMapResponse() {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -101,7 +102,7 @@ export async function StatesMapResponse(paletteType: string, palette: string) {
       (district.casesPerWeek / district.population) * 100000;
     statePathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -112,10 +113,7 @@ export async function StatesMapResponse(paletteType: string, palette: string) {
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesLegendMapResponse(
-  paletteType: string,
-  palette: string
-) {
+export async function StatesLegendMapResponse() {
   const mapData = StatesMap;
 
   const statesData = await getStatesData();
@@ -135,7 +133,7 @@ export async function StatesLegendMapResponse(
       (district.casesPerWeek / district.population) * 100000;
     statePathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -147,33 +145,35 @@ export async function StatesLegendMapResponse(
     getMapBackground(
       "7-Tage-Inzidenz der Bundesländer",
       statesData.lastUpdate,
-      weekIncidenceColorRanges[paletteType][palette]
+      weekIncidenceColorRanges
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export async function StatesHospitalizationMapResponse(
-  paletteType: string,
-  palette: string
-) {
+export async function StatesHospitalizationMapResponse() {
   const mapData = StatesMap;
 
-  const hospitalizationData = await StatesHospitalizationHistoryResponse(1);
-  const latestHospitalizationData = hospitalizationData.data;
+  const hospitalizationData = await getHospitalizationData();
+  const latestHospitalizationData =
+    hospitalizationData.data[
+      getLatestHospitalizationDataKey(hospitalizationData.data)
+    ];
 
   // // add fill color to every districts
   for (const statePathElement of mapData.children) {
     const idAttribute = statePathElement.attributes.id;
     const id = idAttribute.split("-")[1];
     const state =
-      latestHospitalizationData[getStateAbbreviationById(parseInt(id))];
+      latestHospitalizationData.states[
+        getStateNameByAbbreviation(getStateAbbreviationById(parseInt(id)))
+      ];
 
     statePathElement.attributes["fill"] = getColorForValue(
-      state.history[0].incidence7Days,
-      weekIncidenceColorRanges[paletteType][palette]
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -184,25 +184,27 @@ export async function StatesHospitalizationMapResponse(
   return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
 }
 
-export async function StatesHospitalizationLegendMapResponse(
-  paletteType: string,
-  palette: string
-) {
+export async function StatesHospitalizationLegendMapResponse() {
   const mapData = StatesMap;
 
-  const hospitalizationData = await StatesHospitalizationHistoryResponse(1);
-  const latestHospitalizationData = hospitalizationData.data;
+  const hospitalizationData = await getHospitalizationData();
+  const latestHospitalizationData =
+    hospitalizationData.data[
+      getLatestHospitalizationDataKey(hospitalizationData.data)
+    ];
 
   // // add fill color to every districts
   for (const statePathElement of mapData.children) {
     const idAttribute = statePathElement.attributes.id;
     const id = idAttribute.split("-")[1];
     const state =
-      latestHospitalizationData[getStateAbbreviationById(parseInt(id))];
+      latestHospitalizationData.states[
+        getStateNameByAbbreviation(getStateAbbreviationById(parseInt(id)))
+      ];
 
     statePathElement.attributes["fill"] = getColorForValue(
-      state.history[0].incidence7Days,
-      weekIncidenceColorRanges[paletteType][palette]
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
     );
     statePathElement.attributes["stroke"] = "#DBDBDB";
     statePathElement.attributes["stroke-width"] = "0.9";
@@ -213,18 +215,18 @@ export async function StatesHospitalizationLegendMapResponse(
   return sharp(
     getMapBackground(
       "Hospitalisierungsinzidenz",
-      hospitalizationData.meta.lastUpdate,
-      weekIncidenceColorRanges[paletteType][palette]
+      hospitalizationData.lastUpdate,
+      hospitalizationIncidenceColorRanges
     )
   )
-    .composite([{ input: svgBuffer, top: 100, left: 180, blend: "darken" }])
+    .composite([{ input: svgBuffer, top: 100, left: 180 }])
     .png({ quality: 75 })
     .toBuffer();
 }
 
-export function IncidenceColorsResponse(paletteType: string, palette: string) {
+export function IncidenceColorsResponse() {
   return {
-    incidentRanges: weekIncidenceColorRanges[paletteType][palette],
+    incidentRanges: weekIncidenceColorRanges,
   };
 }
 
@@ -250,15 +252,15 @@ function getMapBackground(
     month: "2-digit",
     day: "2-digit",
   }); // localized lastUpdate string
-
+  // the first part of svg
   let svg = `
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <g id="Artboard" fill-rule="evenodd">
+      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-        <text id="headline" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Datenstand" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
         <g id="Legend" transform="translate(${border}, -${border})">
@@ -267,8 +269,8 @@ function getMapBackground(
           <g transform="translate(0, ${yStartPosition - index * 40})">
             <rect fill="${
               range.color
-            }" x="0" y="0" width="30" height="30" rx="5" ry="5" opacity="0.98"></rect>
-            <text x="40" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+            }" x="0" y="0" width="30" height="30"></rect>
+            <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
               <tspan>${range.toString()}</tspan>
             </text>
           </g>

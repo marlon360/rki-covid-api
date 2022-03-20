@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.fritz.box:8080/testing/history`
+`GET https://api.corona-zahlen.org/testing/history`
 [Open](/testing/history)
 
 ### Response
@@ -82,7 +82,7 @@
 
 ### Request
 
-`GET https://api.fritz.box:8080/testing/history/7`
+`GET https://api.corona-zahlen.org/testing/history/7`
 [Open](/testing/history/7)
 
 **Parameters**

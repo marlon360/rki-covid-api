@@ -5,7 +5,7 @@ import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
 import axios from "axios";
-import { GetCheckedPalette } from "./configuration/colors";
+
 import {
   StatesCasesHistoryResponse,
   StatesDeathsHistoryResponse,
@@ -40,19 +40,21 @@ import {
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
-  DistrictsMapResponse,
   DistrictsLegendMapResponse,
+  DistrictsMapResponse,
   IncidenceColorsResponse,
-  StatesMapResponse,
-  StatesLegendMapResponse,
-  StatesHospitalizationMapResponse,
   StatesHospitalizationLegendMapResponse,
+  StatesHospitalizationMapResponse,
+  StatesLegendMapResponse,
+  StatesMapResponse,
 } from "./responses/map";
 import { RKIError } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
-  host: process.env.REDIS_URL,
+  host: process.env.REDISHOST || process.env.REDIS_URL,
+  port: process.env.REDISPORT,
+  auth_pass: process.env.REDISPASSWORD,
 });
 
 Date.prototype.toJSON = function () {
@@ -339,6 +341,7 @@ app.get(
     res.json(response);
   }
 );
+
 app.get(
   "/states/history/frozen-incidence",
   queuedCache(),
@@ -524,6 +527,32 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await StatesRecoveredHistoryResponse(
+      parseInt(req.params.days),
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
+      null,
+      req.params.state
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:state/history/hospitalization/:days",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days),
       req.params.state
     );
@@ -845,12 +874,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsMapResponse(
-      checkedPalette.paletteType,
-      checkedPalette.palette
-    );
+    const response = await DistrictsMapResponse();
     res.send(response);
   }
 );
@@ -860,12 +885,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse(
-      checkedPalette.paletteType,
-      checkedPalette.palette
-    );
+    const response = await DistrictsLegendMapResponse();
     res.send(response);
   }
 );
@@ -875,23 +896,13 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
-    res.json(
-      IncidenceColorsResponse(
-        checkedPalette.paletteType,
-        checkedPalette.palette
-      )
-    );
+    res.json(IncidenceColorsResponse());
   }
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
-  const checkedPalette = GetCheckedPalette(req, "incidenceMap");
   res.setHeader("Content-Type", "image/png");
-  const response = await StatesMapResponse(
-    checkedPalette.paletteType,
-    checkedPalette.palette
-  );
+  const response = await StatesMapResponse();
   res.send(response);
 });
 
@@ -900,12 +911,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse(
-      checkedPalette.paletteType,
-      checkedPalette.palette
-    );
+    const response = await StatesLegendMapResponse();
     res.send(response);
   }
 );
@@ -915,13 +922,7 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "incidenceMap");
-    res.json(
-      IncidenceColorsResponse(
-        checkedPalette.paletteType,
-        checkedPalette.palette
-      )
-    );
+    res.json(IncidenceColorsResponse());
   }
 );
 
@@ -930,12 +931,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationLegendMapResponse(
-      checkedPalette.paletteType,
-      checkedPalette.palette
-    );
+    const response = await StatesHospitalizationLegendMapResponse();
     res.send(response);
   }
 );
@@ -945,28 +942,9 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationMapResponse(
-      checkedPalette.paletteType,
-      checkedPalette.palette
-    );
+    const response = await StatesHospitalizationMapResponse();
     res.send(response);
-  }
-);
-
-app.get(
-  "/map/states/hospitalization/legend",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const checkedPalette = GetCheckedPalette(req, "hospitalizationMap");
-    res.json(
-      IncidenceColorsResponse(
-        checkedPalette.paletteType,
-        checkedPalette.palette
-      )
-    );
   }
 );
 

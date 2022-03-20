@@ -15,13 +15,12 @@ import {
 import {
   AddDaysToDate,
   getDayDifference,
-  getDateBefore,
   getStateAbbreviationById,
   getStateAbbreviationByName,
   getStateIdByAbbreviation,
-  getStateNameByAbbreviation,
   getStateIdByName,
-  fixDigit,
+  getStateNameByAbbreviation,
+  getDateBefore,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -94,11 +93,8 @@ export async function StatesResponse(
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
       abbreviation: getStateAbbreviationById(state.id),
-      weekIncidence: fixDigit(
-        (state.casesPerWeek / state.population) * 100000,
-        2
-      ),
-      casesPer100k: fixDigit((state.cases / state.population) * 100000, 0),
+      weekIncidence: (state.casesPerWeek / state.population) * 100000,
+      casesPer100k: (state.cases / state.population) * 100000,
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
@@ -120,9 +116,9 @@ export async function StatesResponse(
     };
   });
 
-  if (abbreviation) {
+  if (abbreviation != null) {
     const id = getStateIdByAbbreviation(abbreviation);
-    if (id) {
+    if (id != null) {
       states = states.filter((state) => {
         return state.id == id;
       });
@@ -156,14 +152,14 @@ export async function StatesCasesHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -215,14 +211,14 @@ export async function StatesWeekIncidenceHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   // add 6 days to calculate week incidence
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
@@ -297,7 +293,7 @@ export async function StatesWeekIncidenceHistoryResponse(
         sum += stateHistory[dayOffset].cases;
       }
       incidenceData[abbr].history.push({
-        weekIncidence: fixDigit((sum / state.population) * 100000, 2),
+        weekIncidence: (sum / state.population) * 100000,
         date: date,
       });
     }
@@ -316,7 +312,7 @@ export async function StatesDeathsHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesDeathsHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -375,7 +371,7 @@ export async function StatesRecoveredHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesRecoveredHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -592,7 +588,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   meta: ResponseMeta;
 }> {
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
   const AgeGroupsData = await getStatesAgeGroups(id);
@@ -641,11 +637,6 @@ export async function StatesFrozenIncidenceHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesFrozenIncidenceHistoryData> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
     days,
     abbreviation
@@ -653,7 +644,7 @@ export async function StatesFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation) {
+    if (historyData.abbreviation != null) {
       data[historyData.abbreviation] = historyData;
     }
   });

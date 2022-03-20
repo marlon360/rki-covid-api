@@ -18,8 +18,11 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
-import { fixDigit, getDateBefore } from "../utils";
+import {
+  getStatesFrozenIncidenceHistory,
+  StatesFrozenIncidenceData,
+} from "../data-requests/frozen-incidence";
+import { getDateBefore } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -85,8 +88,8 @@ export async function GermanyResponse(): Promise<GermanyData> {
     casesPerWeek += state.casesPerWeek;
   }
 
-  const weekIncidence = fixDigit((casesPerWeek / population) * 100000, 2);
-  const casesPer100k = fixDigit((casesData.data / population) * 100000, 0);
+  const weekIncidence = (casesPerWeek / population) * 100000;
+  const casesPer100k = (casesData.data / population) * 100000;
 
   return {
     cases: casesData.data,
@@ -130,27 +133,17 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 export async function GermanyCasesHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const history = await getLastCasesHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyWeekIncidenceHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
@@ -163,51 +156,41 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
-  for (let i = 6; i < history.length; i++) {
+  for (let i = 6; i < history.history.length; i++) {
     const date = history[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
       sum += history[dayOffset].cases;
     }
     weekIncidenceHistory.push({
-      weekIncidence: fixDigit((sum / population) * 100000, 2),
+      weekIncidence: (sum / population) * 100000,
       date: date,
     });
   }
 
   return {
     data: weekIncidenceHistory,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyDeathsHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const history = await getLastDeathsHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyRecoveredHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const history = await getLastRecoveredHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUddate),
   };
 }
 
@@ -326,11 +309,6 @@ interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
 export async function GermanyFrozenIncidenceHistoryResponse(
   days?: number
 ): Promise<StatesFrozenIncidenceHistoryData> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
     days
   );

@@ -10,7 +10,9 @@ interface VaccinationData extends IResponseMeta {
   data: VaccinationCoverage;
 }
 
-export async function VaccinationResponse(): Promise<VaccinationData> {
+export async function VaccinationResponse(
+  abbreviation?: string
+): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
 
   return {

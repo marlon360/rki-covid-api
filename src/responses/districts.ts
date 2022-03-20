@@ -13,7 +13,6 @@ import {
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
-  fixDigit,
   getDayDifference,
   getStateAbbreviationByName,
 } from "../utils";
@@ -72,14 +71,8 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       stateAbbreviation: getStateAbbreviationByName(district.state),
       recovered:
         getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
-      weekIncidence: fixDigit(
-        (district.casesPerWeek / district.population) * 100000,
-        2
-      ),
-      casesPer100k: fixDigit(
-        (district.cases / district.population) * 100000,
-        0
-      ),
+      weekIncidence: (district.casesPerWeek / district.population) * 100000,
+      casesPer100k: (district.cases / district.population) * 100000,
       delta: {
         cases: getDistrictByAgs(districtNewCasesData, district.ags)?.cases ?? 0,
         deaths:
@@ -91,7 +84,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     };
   });
 
-  if (ags) {
+  if (ags != null) {
     districts = districts.filter((districts) => {
       return districts.ags == ags;
     });
@@ -124,18 +117,15 @@ export async function DistrictsCasesHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
   const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if (days) {
-    //to prevent invalid lowDate
-    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
-  }
+
   const data: DistrictsCasesHistory = {};
+
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
       data[historyData.ags] = {
@@ -143,17 +133,6 @@ export async function DistrictsCasesHistoryResponse(
         name: historyData.name,
         history: [],
       };
-    }
-    // if history is empty and lowDate is missing and lowDate is set insert lowDate
-    if (
-      lowDate != null &&
-      historyData.date > lowDate &&
-      data[historyData.ags].history.length == 0
-    ) {
-      data[historyData.ags].history.push({
-        cases: 0,
-        date: lowDate,
-      });
     }
     if (data[historyData.ags].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -181,18 +160,6 @@ export async function DistrictsCasesHistoryResponse(
       date: new Date(historyData.date),
     });
   }
-  // now fill top dates to highDate for each ags
-  for (const ags of Object.keys(data)) {
-    while (data[ags].history[data[ags].history.length - 1].date < highDate) {
-      data[ags].history.push({
-        cases: 0,
-        date: AddDaysToDate(
-          data[ags].history[data[ags].history.length - 1].date,
-          1
-        ),
-      });
-    }
-  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -206,14 +173,14 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   // add 6 days to calculate week incidence
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
@@ -230,11 +197,6 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     return null;
   }
 
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if (days) {
-    //to prevent invalid lowDate
-    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
-  }
   const data: DistrictsCasesHistory = {};
 
   for (const historyData of statesHistoryData.data) {
@@ -244,17 +206,6 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         name: historyData.name,
         history: [],
       };
-    }
-    // if history is empty and lowDate is missing and lowDate is set insert lowDate
-    if (
-      lowDate != null &&
-      historyData.date > lowDate &&
-      data[historyData.ags].history.length == 0
-    ) {
-      data[historyData.ags].history.push({
-        cases: 0,
-        date: lowDate,
-      });
     }
     if (data[historyData.ags].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -282,18 +233,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
       date: new Date(historyData.date),
     });
   }
-  // now fill top dates to highDate for each ags
-  for (const ags of Object.keys(data)) {
-    while (data[ags].history[data[ags].history.length - 1].date < highDate) {
-      data[ags].history.push({
-        cases: 0,
-        date: AddDaysToDate(
-          data[ags].history[data[ags].history.length - 1].date,
-          1
-        ),
-      });
-    }
-  }
+
   const incidenceData: DistrictsWeekIncidenceHistory = {};
 
   for (const ags of Object.keys(data)) {
@@ -313,7 +253,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
         sum += districtHistory[dayOffset].cases;
       }
       incidenceData[ags].history.push({
-        weekIncidence: fixDigit((sum / district.population) * 100000, 2),
+        weekIncidence: (sum / district.population) * 100000,
         date: date,
       });
     }
@@ -332,18 +272,15 @@ export async function DistrictsDeathsHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
   const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if (days) {
-    // to prevent invalid lowDate
-    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
-  }
+
   const data: DistrictsDeathsHistory = {};
+
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
       data[historyData.ags] = {
@@ -351,17 +288,6 @@ export async function DistrictsDeathsHistoryResponse(
         name: historyData.name,
         history: [],
       };
-    }
-    // if history is empty and lowDate is missing and lowDate is set insert lowDate
-    if (
-      lowDate != null &&
-      historyData.date > lowDate &&
-      data[historyData.ags].history.length == 0
-    ) {
-      data[historyData.ags].history.push({
-        deaths: 0,
-        date: lowDate,
-      });
     }
     if (data[historyData.ags].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -389,18 +315,6 @@ export async function DistrictsDeathsHistoryResponse(
       date: new Date(historyData.date),
     });
   }
-  // now fill top dates to highDate for each ags
-  for (const ags of Object.keys(data)) {
-    while (data[ags].history[data[ags].history.length - 1].date < highDate) {
-      data[ags].history.push({
-        deaths: 0,
-        date: AddDaysToDate(
-          data[ags].history[data[ags].history.length - 1].date,
-          1
-        ),
-      });
-    }
-  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -414,18 +328,15 @@ export async function DistrictsRecoveredHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
   const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, should be yesterday
-  if (days) {
-    // to prevent invalid lowDate
-    var lowDate = AddDaysToDate(highDate, (days - 1) * -1); // lowest date
-  }
+
   const data: DistrictsRecoveredHistory = {};
+
   for (const historyData of statesHistoryData.data) {
     if (data[historyData.ags] == null) {
       data[historyData.ags] = {
@@ -433,17 +344,6 @@ export async function DistrictsRecoveredHistoryResponse(
         name: historyData.name,
         history: [],
       };
-    }
-    // if history is empty and lowDate is missing and lowDate is set insert lowDate
-    if (
-      lowDate != null &&
-      historyData.date > lowDate &&
-      data[historyData.ags].history.length == 0
-    ) {
-      data[historyData.ags].history.push({
-        recovered: 0,
-        date: lowDate,
-      });
     }
     if (data[historyData.ags].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -471,25 +371,13 @@ export async function DistrictsRecoveredHistoryResponse(
       date: new Date(historyData.date),
     });
   }
-  // now fill top dates to highDate for each ags
-  for (const ags of Object.keys(data)) {
-    while (data[ags].history[data[ags].history.length - 1].date < highDate) {
-      data[ags].history.push({
-        recovered: 0,
-        date: AddDaysToDate(
-          data[ags].history[data[ags].history.length - 1].date,
-          1
-        ),
-      });
-    }
-  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
   };
 }
 
-interface DistrictsFrozenIncidenceHistoryData extends IResponseMeta {
+interface FrozenIncidenceHistoryData extends IResponseMeta {
   data: {
     [key: string]: DistrictsFrozenIncidenceData;
   };
@@ -498,12 +386,7 @@ interface DistrictsFrozenIncidenceHistoryData extends IResponseMeta {
 export async function FrozenIncidenceHistoryResponse(
   days?: number,
   ags?: string
-): Promise<DistrictsFrozenIncidenceHistoryData> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
+): Promise<FrozenIncidenceHistoryData> {
   const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(
     days,
     ags
@@ -511,7 +394,7 @@ export async function FrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    data[(+historyData.ags).toString()] = historyData;
+    data[historyData.ags] = historyData;
   });
 
   return {

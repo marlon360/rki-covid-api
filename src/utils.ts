@@ -1,3 +1,5 @@
+import axios from "axios";
+
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
     case 1:
@@ -234,6 +236,44 @@ export class RKIError extends Error {
   }
 }
 
-export function fixDigit(num: number, dig: number): number {
-  return Math.round(num * 10 ** dig) / 10 ** dig;
+export function parseDate(dateString: string): Date {
+  const parts = dateString.split(",");
+  const dateParts = parts[0].split(".");
+  const timeParts = parts[1].replace("Uhr", "").split(":");
+  return new Date(
+    parseInt(dateParts[2]),
+    parseInt(dateParts[1]) - 1,
+    parseInt(dateParts[0]),
+    parseInt(timeParts[0]),
+    parseInt(timeParts[1])
+  );
+}
+
+export async function getDataAlternateSource(url: string, blId?: string) {
+  // If a specific table is given download this state data only
+  let stateIdList = [];
+  for (let id = 1; id <= 16; id++) {
+    stateIdList[id - 1] = id.toString().padStart(2, "0");
+  }
+  if (blId && stateIdList.includes(blId)) {
+    const urlOne = url.replace("Covid19_hubv", `Covid19_${blId}_hubv`);
+    const response = await axios.get(urlOne);
+    var data = response.data;
+  }
+  // else download all 16 state data
+  else {
+    const urlOne = url.replace("Covid19_hubv", "Covid19_01_hubv");
+    let response = await axios.get(urlOne);
+    var data = response.data;
+    for (let i = 2; i <= 16; i++) {
+      const id = i.toString().padStart(2, "0");
+      const urlX = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
+      response = await axios.get(urlX);
+      // append the data
+      for (const feature of response.data.features) {
+        data.features.push(feature);
+      }
+    }
+  }
+  return data;
 }

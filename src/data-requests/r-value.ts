@@ -1,6 +1,5 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { fixDigit } from "../utils";
 
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {
@@ -32,7 +31,7 @@ function parseRValue(data: ArrayBuffer): {
   for (let offset = 5; offset < 9; offset++) {
     denominator += json[json.length - offset]["PS_COVID_Faelle"];
   }
-  const rValue4Days = fixDigit(numerator / denominator, 2);
+  const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
   // the 7-day r-value is always one day before the 4-day r-value!
   const entry = json[json.length - 2];

@@ -10,48 +10,12 @@ Returns a Heatmap (PNG) of week incidences for districts.
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/districts`
+`GET https://api.corona-zahlen.org/map/districts`
 [Open](/map/districts)
-
-** All map links can be extended with the following parameters **
-
-| Parameter               | Description                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------- |
-| ?palette=default        | use the default palette (colors/ranges since 2021-11-12) is the same as without |
-| ?palette=old            | use the old default palette (bevor 2021-11-12)                                  |
-| ?palette=rki            | use rki palette (colors/ranges like the rki on their webside use)               |
-| ?userpalette=0,0,...... | use a userpalette example and rules below                                       |
-
-A example userpalette witch must be given after ?userpalette= as follows:
-0,0,CDCDCD,ein test;0,5,FFFCCC;5,25,FFF380,test2;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077;
-
-witch meens the following:
-
-| Stringpart            | >min | <=max    | Color  | Label                                                             |
-| --------------------- | ---- | -------- | ------ | ----------------------------------------------------------------- |
-| 0,0,CDCDCD,ein test;  | 0    | 0        | CDCDCD | instead of "> 0 - 0" the text "ein test" is printed in the legend |
-| 0,5,FFFCCC;           | 0    | 5        | FFFCCC |                                                                   |
-| 5,25,FFF380,test2;    | 5    | 25       | FFF380 | instead of "> 5 - 25" the text "text2" is printed in the legend   |
-| 25,50,FFB534;         | 25   | 50       | FFB534 |                                                                   |
-| 50,100,D43624;        | 50   | 100      | D43624 |                                                                   |
-| 100,250,951214;       | 100  | 250      | 951214 |                                                                   |
-| 250,500,671212;       | 250  | 500      | 671212 |                                                                   |
-| 500,1000,DD0085;      | 500  | 1000     | DD0085 |                                                                   |
-| 1000,Infinity,7A0077; | 1000 | Infinity | 7A0077 |                                                                   |
-
-Rules:
-
-- every range needs 3 or as option 4 values (min, max, color, option: label)
-  separated by , and terminated by ; after the last range the ; is a option, at the beginning too.
-- special range min = max = 0 can be used but this is not a must! but ....
-- first range must start with min = 0.
-- min next range must be max last range.
-- hex values for color must be 6 gigit without prefix, upper or lowercase or mixed (e.g. "0f1a3D").
-- last range max must be "Infinity" upper- or lowercase, or mixed. (e.g. "infinity" or "InFiNiTy").
 
 ### Response
 
-<img alt="districts map" src="http://api.fritz.box:8080/map/districts?palette=default" width="300">
+<img alt="districts map" src="https://api.corona-zahlen.org/map/districts" width="300">
 
 ## `/map/districts-legend`
 
@@ -59,12 +23,12 @@ Returns a Heatmap (PNG) of week incidences for districts with a legend and headl
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/districts-legend?palette=rki`
-[Open](/map/districts-legend?palette=rki)
+`GET https://api.corona-zahlen.org/map/districts-legend`
+[Open](/map/districts-legend)
 
 ### Response
 
-<img alt="districts legend map" src="http://api.fritz.box:8080/map/districts-legend?palette=rki" width="300">
+<img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend" width="300">
 
 ## `/map/districts/legend`
 
@@ -72,8 +36,8 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/districts/legend?palette=default`
-[Open](/map/districts/legend?palette=default)
+`GET https://api.corona-zahlen.org/map/districts/legend`
+[Open](/map/districts/legend)
 
 ### Response
 
@@ -82,24 +46,18 @@ Returns the incident ranges for the colors.
   "incidentRanges": [
     {
       "min": 0,
-      "max": 0,
-      "color": "#E2E2E2",
-      "label": "keine Fälle übermittelt"
-    },
-    {
-      "min": 0,
       "max": 1,
-      "color": "#25BA94"
+      "color": "#2D81B8"
     },
     {
       "min": 1,
-      "max": 15,
-      "color": "#76D985"
+      "max": 5,
+      "color": "#7FD38D"
     },
     {
       "min": 15,
       "max": 25,
-      "color": "#FFFFA8"
+      "color": "#FEFFB1"
     },
     {
       "min": 25,
@@ -109,45 +67,35 @@ Returns the incident ranges for the colors.
     {
       "min": 35,
       "max": 50,
-      "color": "#F1894A"
+      "color": "#F08A4B"
     },
     {
       "min": 50,
       "max": 100,
-      "color": "#F21620"
+      "color": "#EB1A1D"
     },
     {
       "min": 100,
       "max": 200,
-      "color": "#A9141A"
+      "color": "#AB1316"
     },
     {
       "min": 200,
       "max": 350,
-      "color": "#B275DD"
+      "color": "#B374DD"
     },
     {
       "min": 350,
       "max": 500,
-      "color": "#5D179B"
+      "color": "#5B189B"
     },
     {
       "min": 500,
       "max": 1000,
-      "color": "#17179B"
+      "color": "#543D35"
     },
     {
       "min": 1000,
-      "max": 1500,
-      "color": "#68463B"
-    },
-    {
-      "min": 1500,
-      "max": 2500,
-      "color": "#6D6D6D"
-    },
-    {
-      "min": 2500,
       "max": null,
       "color": "#020003"
     }
@@ -161,12 +109,12 @@ Returns a Heatmap (PNG) of week incidences for states.
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/states`
+`GET https://api.corona-zahlen.org/map/states`
 [Open](/map/states)
 
 ### Response
 
-<img alt="states map" src="http://api.fritz.box:8080/map/states?userpalette=0,0,CDCDCD;0,5,FFFCCC;5,25,FFF380;25,50,FFB534;50,100,D43624;100,250,951214;250,500,671212;500,1000,DD0085;1000,Infinity,7A0077" width="300">
+<img alt="states map" src="https://api.corona-zahlen.org/map/states" width="300">
 
 ## `/map/states-legend`
 
@@ -174,12 +122,12 @@ Returns a Heatmap (PNG) of week incidences for states with a legend and headline
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/states-legend`
+`GET https://api.corona-zahlen.org/map/states-legend`
 [Open](/map/states-legend)
 
 ### Response
 
-<img alt="states legend map" src="http://api.fritz.box:8080/map/states-legend" width="300">
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend" width="300">
 
 ## `/map/states/legend`
 
@@ -187,8 +135,8 @@ Returns the incident ranges for the colors.
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/states/legend?palette=rki`
-[Open](/map/states/legend?palette=rki)
+`GET https://api.corona-zahlen.org/map/states/legend`
+[Open](/map/states/legend)
 
 ### Response
 
@@ -197,49 +145,58 @@ Returns the incident ranges for the colors.
   "incidentRanges": [
     {
       "min": 0,
-      "max": 0,
-      "color": "#CDCDCD",
-      "label": "keine Fälle übermittelt"
+      "max": 1,
+      "color": "#2D81B8"
     },
     {
-      "min": 0,
+      "min": 1,
       "max": 5,
-      "color": "#FFFCCC"
+      "color": "#7FD38D"
     },
     {
-      "min": 5,
+      "min": 15,
       "max": 25,
-      "color": "#FFF380"
+      "color": "#FEFFB1"
     },
     {
       "min": 25,
+      "max": 35,
+      "color": "#FECA81"
+    },
+    {
+      "min": 35,
       "max": 50,
-      "color": "#FFB534"
+      "color": "#F08A4B"
     },
     {
       "min": 50,
       "max": 100,
-      "color": "#D43624"
+      "color": "#EB1A1D"
     },
     {
       "min": 100,
-      "max": 250,
-      "color": "#951214"
+      "max": 200,
+      "color": "#AB1316"
     },
     {
-      "min": 250,
+      "min": 200,
+      "max": 350,
+      "color": "#B374DD"
+    },
+    {
+      "min": 350,
       "max": 500,
-      "color": "#671212"
+      "color": "#5B189B"
     },
     {
       "min": 500,
       "max": 1000,
-      "color": "#DD0085"
+      "color": "#543D35"
     },
     {
       "min": 1000,
       "max": null,
-      "color": "#7A0077"
+      "color": "#020003"
     }
   ]
 }
@@ -249,21 +206,14 @@ Returns the incident ranges for the colors.
 
 Returns a Heatmap (PNG) of hospitalization incidences for states.
 
-| Parameter               | Description                                                     |
-| ----------------------- | --------------------------------------------------------------- |
-| ?palette=default        | use the default palette, thats the same as without              |
-| ?palette=grey           | use a grayscale palette                                         |
-| ?palette=greenred       | use a palette which runs from green (0) to red (> 15)           |
-| ?userpalette=0,0,...... | use a userpalette example and rules at the top of this document |
-
 ### Request
 
-`GET http://api.fritz.box:8080/map/states/hospitalization`
+`GET https://api.corona-zahlen.org/map/states/hospitalization`
 [Open](/map/states/hospitalization)
 
 ### Response
 
-<img alt="states legend map" src="http://api.fritz.box:8080/map/states/hospitalization" width="300">
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
 
 ## `/map/states-legend/hospitalization`
 
@@ -271,72 +221,9 @@ Returns a Heatmap (PNG) of hospitalization incidences for states with a legend a
 
 ### Request
 
-`GET http://api.fritz.box:8080/map/states-legend/hospitalization`
+`GET https://api.corona-zahlen.org/map/states-legend/hospitalization`
 [Open](/map/states-legend/hospitalization)
 
 ### Response
 
-<img alt="states legend map" src="http://api.fritz.box:8080/map/states-legend/hospitalization" width="300">
-
-## `/map/states/hospitalization/legend`
-
-Returns the incident ranges for the colors.
-
-### Request
-
-`GET http://api.fritz.box:8080/map/states/hospitalization/legend`
-[Open](/map/states/hospitalization/legend)
-
-### Response
-
-```json
-{
-  "incidentRanges": [
-    {
-      "min": 0,
-      "max": 0,
-      "color": "#E2E2E2",
-      "label": "keine Fälle übermittelt"
-    },
-    {
-      "min": 0,
-      "max": 1,
-      "color": "#FCF9CA"
-    },
-    {
-      "min": 1,
-      "max": 3,
-      "color": "#FFDA9C",
-      "label": "> 1 - 3: keine einheitl. Regeln"
-    },
-    {
-      "min": 3,
-      "max": 6,
-      "color": "#F7785B",
-      "label": "> 3 - 6: 2G-Regel"
-    },
-    {
-      "min": 6,
-      "max": 9,
-      "color": "#FF3A25",
-      "label": "> 6 - 9: 2G-Plus-Regel"
-    },
-    {
-      "min": 9,
-      "max": 12,
-      "color": "#D80182",
-      "label": "> 9 - 12: > 9 weitere Maßnah."
-    },
-    {
-      "min": 12,
-      "max": 15,
-      "color": "#770175"
-    },
-    {
-      "min": 15,
-      "max": null,
-      "color": "#000000"
-    }
-  ]
-}
-```
+<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">

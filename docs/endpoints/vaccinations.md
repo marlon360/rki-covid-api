@@ -4,7 +4,7 @@
 
 ### Request
 
-`GET https://api.fritz.box:8080/vaccinations`
+`GET https://api.corona-zahlen.org/vaccinations`
 [Open](/vaccinations)
 
 ### Response
@@ -365,7 +365,7 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 
 ### Request
 
-`GET https://api.fritz.box:8080/vaccinations/history`
+`GET https://api.corona-zahlen.org/vaccinations/history`
 [Open](/vaccinations/history)
 
 ### Response
@@ -417,7 +417,7 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 
 ### Request
 
-`GET https://api.fritz.box:8080/vaccinations/history/7`
+`GET https://api.corona-zahlen.org/vaccinations/history/7`
 [Open](/vaccinations/history/7)
 
 **Parameters**

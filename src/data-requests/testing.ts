@@ -59,7 +59,7 @@ export async function getTestingHistory(
     }
   }
 
-  if (weeks) {
+  if (weeks != null) {
     testingHistory = testingHistory.slice(-weeks);
   }
 
