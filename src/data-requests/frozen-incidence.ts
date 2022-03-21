@@ -90,7 +90,6 @@ export async function getDistrictsFrozenIncidenceHistory(
   // table starts in row 5 (parameter is zero indexed)
   const json = XLSX.utils.sheet_to_json(sheet, { range: 4 });
 
-  // date is in cell A2
   const lastUpdate = new Date(response.headers["last-modified"]);
 
   let districts = json.map((district) => {
@@ -108,7 +107,7 @@ export async function getDistrictsFrozenIncidenceHistory(
       history.push({ weekIncidence: district[dateKey], date });
     });
 
-    if (days != null) {
+    if (days) {
       const reference_date = new Date(getDateBefore(days));
       history = history.filter((element) => element.date > reference_date);
     }
@@ -116,7 +115,7 @@ export async function getDistrictsFrozenIncidenceHistory(
     return { ags, name, history };
   });
 
-  if (ags != null) {
+  if (ags) {
     districts = districts.filter((district) => district.ags === ags);
   }
 
@@ -130,11 +129,11 @@ export async function getDistrictsFrozenIncidenceHistory(
   if (fetchArchiveData) {
     let archiveData = await getDistrictsFrozenIncidenceHistoryArchive();
     // filter by abbreviation
-    if (ags != null) {
+    if (ags) {
       archiveData = archiveData.filter((district) => district.ags === ags);
     }
     // filter by days
-    if (days != null) {
+    if (days) {
       const reference_date = new Date(getDateBefore(days));
       archiveData = archiveData.map((district) => {
         district.history = district.history.filter(

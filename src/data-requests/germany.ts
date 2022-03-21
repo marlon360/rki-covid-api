@@ -79,7 +79,7 @@ export async function getLastCasesHistory(
   days?: number
 ): Promise<{ history: { cases: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuerFall IN(1,0)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -144,7 +144,7 @@ export async function getLastDeathsHistory(
   days?: number
 ): Promise<{ history: { deaths: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuerTodesfall IN(1,0,-9)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -208,9 +208,9 @@ export async function getLastDeathsHistory(
 
 export async function getLastRecoveredHistory(
   days?: number
-): Promise<{ history: { recovered: number; date: Date }[]; lastUddate: Date }> {
+): Promise<{ history: { recovered: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuGenesen IN(1,0,-9)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -268,7 +268,7 @@ export async function getLastRecoveredHistory(
     });
   return {
     history: history,
-    lastUddate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
   };
 }
 

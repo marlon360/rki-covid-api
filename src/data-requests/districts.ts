@@ -190,17 +190,17 @@ export async function getLastDistrictCasesHistory(
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 36
-    if (days != null) {
+    if (days) {
       days = Math.min(days, 36);
     } else {
       days = 36;
     }
   }
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -260,11 +260,11 @@ export async function getLastDistrictDeathsHistory(
   ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
-    if (days != null) {
+    if (days) {
       days = Math.min(days, 30);
     } else {
       days = 30;
@@ -330,7 +330,7 @@ export async function getLastDistrictRecoveredHistory(
   ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
@@ -340,7 +340,7 @@ export async function getLastDistrictRecoveredHistory(
       days = 30;
     }
   }
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }

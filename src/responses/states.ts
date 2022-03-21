@@ -116,9 +116,9 @@ export async function StatesResponse(
     };
   });
 
-  if (abbreviation != null) {
+  if (abbreviation) {
     const id = getStateIdByAbbreviation(abbreviation);
-    if (id != null) {
+    if (id) {
       states = states.filter((state) => {
         return state.id == id;
       });
@@ -159,7 +159,7 @@ export async function StatesCasesHistoryResponse(
   }
 
   let id = null;
-  if (abbreviation != null) {
+  if (abbreviation) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -175,6 +175,19 @@ export async function StatesCasesHistoryResponse(
         name: historyData.name,
         history: [],
       };
+    }
+    // if days not givven history data should start on 2020-01-01
+    const lowestDate =
+      days &&
+      AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
+        new Date("2020-01-01")
+        ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
+        : new Date("2020-01-01");
+    if (data[abbr].history.length == 0 && historyData.date > lowestDate) {
+      data[abbr].history.push({
+        cases: 0,
+        date: lowestDate,
+      });
     }
     if (data[abbr].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -197,6 +210,21 @@ export async function StatesCasesHistoryResponse(
       cases: historyData.cases,
       date: new Date(historyData.date),
     });
+  }
+  // now fill top dates to Datenstand -1 for each ags
+  for (const abbr of Object.keys(data)) {
+    while (
+      data[abbr].history[data[abbr].history.length - 1].date <
+      AddDaysToDate(statesHistoryData.lastUpdate, -1)
+    ) {
+      data[abbr].history.push({
+        cases: 0,
+        date: AddDaysToDate(
+          data[abbr].history[data[abbr].history.length - 1].date,
+          1
+        ),
+      });
+    }
   }
   return {
     data,
@@ -223,7 +251,7 @@ export async function StatesWeekIncidenceHistoryResponse(
   }
 
   let id = null;
-  if (abbreviation != null) {
+  if (abbreviation) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -251,6 +279,19 @@ export async function StatesWeekIncidenceHistoryResponse(
         history: [],
       };
     }
+    // if days not givven history data should start on 2020-01-01
+    const lowestDate =
+      days &&
+      AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
+        new Date("2020-01-01")
+        ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
+        : new Date("2020-01-01");
+    if (data[abbr].history.length == 0 && historyData.date > lowestDate) {
+      data[abbr].history.push({
+        cases: 0,
+        date: lowestDate,
+      });
+    }
     if (data[abbr].history.length > 0) {
       const nextDate = new Date(historyData.date);
       while (
@@ -272,6 +313,21 @@ export async function StatesWeekIncidenceHistoryResponse(
       cases: historyData.cases,
       date: new Date(historyData.date),
     });
+  }
+  // now fill top dates to Datenstand -1 for each ags
+  for (const abbr of Object.keys(data)) {
+    while (
+      data[abbr].history[data[abbr].history.length - 1].date <
+      AddDaysToDate(statesHistoryData.lastUpdate, -1)
+    ) {
+      data[abbr].history.push({
+        cases: 0,
+        date: AddDaysToDate(
+          data[abbr].history[data[abbr].history.length - 1].date,
+          1
+        ),
+      });
+    }
   }
 
   const incidenceData: StatesWeekIncidenceHistory = {};
@@ -312,14 +368,14 @@ export async function StatesDeathsHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesDeathsHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   let id = null;
-  if (abbreviation != null) {
+  if (abbreviation) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -335,6 +391,19 @@ export async function StatesDeathsHistoryResponse(
         name: historyData.name,
         history: [],
       };
+    }
+    // if days not givven history data should start on 2020-01-01
+    const lowestDate =
+      days &&
+      AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
+        new Date("2020-01-01")
+        ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
+        : new Date("2020-01-01");
+    if (data[abbr].history.length == 0 && historyData.date > lowestDate) {
+      data[abbr].history.push({
+        deaths: 0,
+        date: lowestDate,
+      });
     }
     if (data[abbr].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -358,6 +427,21 @@ export async function StatesDeathsHistoryResponse(
       date: new Date(historyData.date),
     });
   }
+  // now fill top dates to Datenstand -1 for each ags
+  for (const abbr of Object.keys(data)) {
+    while (
+      data[abbr].history[data[abbr].history.length - 1].date <
+      AddDaysToDate(statesHistoryData.lastUpdate, -1)
+    ) {
+      data[abbr].history.push({
+        deaths: 0,
+        date: AddDaysToDate(
+          data[abbr].history[data[abbr].history.length - 1].date,
+          1
+        ),
+      });
+    }
+  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -378,7 +462,7 @@ export async function StatesRecoveredHistoryResponse(
   }
 
   let id = null;
-  if (abbreviation != null) {
+  if (abbreviation) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -394,6 +478,19 @@ export async function StatesRecoveredHistoryResponse(
         name: historyData.name,
         history: [],
       };
+    }
+    // if days not givven history data should start on 2020-01-01
+    const lowestDate =
+      days &&
+      AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
+        new Date("2020-01-01")
+        ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
+        : new Date("2020-01-01");
+    if (data[abbr].history.length == 0 && historyData.date > lowestDate) {
+      data[abbr].history.push({
+        recovered: 0,
+        date: lowestDate,
+      });
     }
     if (data[abbr].history.length > 0) {
       const nextDate = new Date(historyData.date);
@@ -416,6 +513,21 @@ export async function StatesRecoveredHistoryResponse(
       recovered: historyData.recovered,
       date: new Date(historyData.date),
     });
+  }
+  // now fill top dates to Datenstand -1 for each ags
+  for (const abbr of Object.keys(data)) {
+    while (
+      data[abbr].history[data[abbr].history.length - 1].date <
+      AddDaysToDate(statesHistoryData.lastUpdate, -1)
+    ) {
+      data[abbr].history.push({
+        recovered: 0,
+        date: AddDaysToDate(
+          data[abbr].history[data[abbr].history.length - 1].date,
+          1
+        ),
+      });
+    }
   }
   return {
     data,
@@ -454,7 +566,7 @@ export async function StatesHospitalizationHistoryResponse(
   days?: number,
   p_abbreviation?: string
 ): Promise<StatesHospitalizationHistory> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -588,7 +700,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   meta: ResponseMeta;
 }> {
   let id = null;
-  if (abbreviation != null) {
+  if (abbreviation) {
     id = getStateIdByAbbreviation(abbreviation);
   }
   const AgeGroupsData = await getStatesAgeGroups(id);
