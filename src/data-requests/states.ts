@@ -63,7 +63,7 @@ export async function getStatesRecoveredData(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     data = await getDataAlternateSource(url);
   }
   const states = data.features.map((feature) => {
@@ -95,7 +95,7 @@ export async function getNewStateRecovered(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     data = await getDataAlternateSource(url);
   }
   const states = data.features.map((feature) => {
@@ -127,7 +127,7 @@ export async function getNewStateCases(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     data = await getDataAlternateSource(url);
   }
   const states = data.features.map((feature) => {
@@ -159,7 +159,7 @@ export async function getNewStateDeaths(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     data = await getDataAlternateSource(url);
   }
   const states = data.features.map((feature) => {
@@ -205,7 +205,7 @@ export async function getLastStateCasesHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     // if a state id is given get only the data from the specific states table
     if (id) {
       const blId = id.toString().padStart(2, "0").substring(0, 2);
@@ -265,7 +265,7 @@ export async function getLastStateDeathsHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     // if a state id is given get only the data from the specific states table
     if (id) {
       const blId = id.toString().padStart(2, "0").substring(0, 2);
@@ -325,7 +325,7 @@ export async function getLastStateRecoveredHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     // if a state id is given get only the data from the specific states table
     if (id) {
       const blId = id.toString().padStart(2, "0").substring(0, 2);

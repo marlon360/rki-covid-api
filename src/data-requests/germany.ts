@@ -22,7 +22,7 @@ export async function getCases(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( Datenstand - actualDate ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let cases = 0;
     for (const feature of dataTemp.features) {
@@ -53,7 +53,7 @@ export async function getNewCases(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let cases = 0;
     for (const feature of dataTemp.features) {
@@ -94,7 +94,7 @@ export async function getLastCasesHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
@@ -118,6 +118,10 @@ export async function getLastCasesHistory(
       cases: feature.attributes.cases,
       date: new Date(feature.attributes.date),
     };
+  }).sort((a, b) => {
+    const dateA = a.date;
+    const dateB = b.date;
+    return dateA.getTime() - dateB.getTime();
   });
   return {
     history: history,
@@ -150,7 +154,7 @@ export async function getLastDeathsHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
@@ -175,6 +179,10 @@ export async function getLastDeathsHistory(
       deaths: feature.attributes.deaths,
       date: new Date(feature.attributes.date),
     };
+  }).sort((a, b) => {
+    const dateA = a.date;
+    const dateB = b.date;
+    return dateA.getTime() - dateB.getTime();
   });
   return {
     history: history,
@@ -207,7 +215,7 @@ export async function getLastRecoveredHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
@@ -232,6 +240,10 @@ export async function getLastRecoveredHistory(
       recovered: feature.attributes.recovered,
       date: new Date(feature.attributes.date),
     };
+  }).sort((a, b) => {
+    const dateA = a.date;
+    const dateB = b.date;
+    return dateA.getTime() - dateB.getTime();
   });
   return {
     history: history,
@@ -254,7 +266,7 @@ export async function getDeaths(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let deaths = 0;
     for (const feature of dataTemp.features) {
@@ -285,7 +297,7 @@ export async function getNewDeaths(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let deaths = 0;
     for (const feature of dataTemp.features) {
@@ -316,7 +328,7 @@ export async function getRecovered(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let recovered = 0;
     for (const feature of dataTemp.features) {
@@ -347,7 +359,7 @@ export async function getNewRecovered(): Promise<ResponseData<number>> {
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (( actualDate - Datenstand ) > 24 * 60 * 60000 || ( Datenstand != actualDate && nowTime > threeOclock )) {
     const dataTemp = await getDataAlternateSource(url);
     let recovered = 0;
     for (const feature of dataTemp.features) {
