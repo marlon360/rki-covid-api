@@ -66,7 +66,10 @@ export async function getDistrictsRecoveredData(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime();
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     data = await getDataAlternateSource(url);
   }
   const districts = data.features.map((feature) => {
@@ -95,7 +98,10 @@ export async function getNewDistrictCases(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     data = await getDataAlternateSource(url);
   }
   const districts = data.features.map((feature) => {
@@ -124,7 +130,10 @@ export async function getNewDistrictDeaths(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     data = await getDataAlternateSource(url);
   }
   const districts = data.features.map((feature) => {
@@ -156,7 +165,10 @@ export async function getNewDistrictRecovered(): Promise<
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     data = await getDataAlternateSource(url);
   }
   const districts = data.features.map((feature) => {
@@ -209,7 +221,10 @@ export async function getLastDistrictCasesHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     // if a ags is given get only the data from the specific states table
     if (ags) {
       const blId = ags.padStart(2, "0").substring(0, 2);
@@ -276,7 +291,10 @@ export async function getLastDistrictDeathsHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     // if a ags is given get only the data from the specific states table
     if (ags) {
       const blId = ags.padStart(2, "0").substring(0, 2);
@@ -343,7 +361,10 @@ export async function getLastDistrictRecoveredHistory(
   const Datenstand = parseDate(
     data.features[0].attributes.Datenstand
   ).getTime(); // Datenstand im milliseconds
-  if (Datenstand != actualDate && nowTime > threeOclock) {
+  if (
+    actualDate - Datenstand > 24 * 60 * 60000 ||
+    (Datenstand != actualDate && nowTime > threeOclock)
+  ) {
     // if a ags is given get only the data from the specific states table
     if (ags) {
       const blId = ags.padStart(2, "0").substring(0, 2);
