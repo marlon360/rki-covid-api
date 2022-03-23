@@ -190,7 +190,7 @@ export async function GermanyRecoveredHistoryResponse(
   const history = await getLastRecoveredHistory(days);
   return {
     data: history.history,
-    meta: new ResponseMeta(history.lastUddate),
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 

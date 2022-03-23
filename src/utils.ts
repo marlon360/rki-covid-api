@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosPromise, AxiosResponse } from "axios";
 
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
@@ -249,31 +249,141 @@ export function parseDate(dateString: string): Date {
   );
 }
 
-export async function getDataAlternateSource(url: string, blId?: string) {
+export async function getAlternateDataSource(url: string, blId?: string) {
   // If a specific table is given download this state data only
   let stateIdList = [];
   for (let id = 1; id <= 16; id++) {
     stateIdList[id - 1] = id.toString().padStart(2, "0");
   }
   if (blId && stateIdList.includes(blId)) {
-    const urlOne = url.replace("Covid19_hubv", `Covid19_${blId}_hubv`);
-    const response = await axios.get(urlOne);
+    url = url.replace("Covid19_hubv", `Covid19_${blId}_hubv`);
+    const response = await axios.get(url);
     var data = response.data;
   }
   // else download all 16 state data
   else {
-    const urlOne = url.replace("Covid19_hubv", "Covid19_01_hubv");
-    let response = await axios.get(urlOne);
-    var data = response.data;
-    for (let i = 2; i <= 16; i++) {
-      const id = i.toString().padStart(2, "0");
-      const urlX = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
-      response = await axios.get(urlX);
-      // append the data
-      for (const feature of response.data.features) {
-        data.features.push(feature);
+    const blData = []; 
+    [
+      blData[1],
+      blData[2],
+      blData[3],
+      blData[4],
+      blData[5],
+      blData[6],
+      blData[7],
+      blData[8],
+      blData[9],
+      blData[10],
+      blData[11],
+      blData[12],
+      blData[13],
+      blData[14],
+      blData[15],
+      blData[16],
+    ] = await Promise.all([
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_01_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_02_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_03_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_04_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_05_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_06_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_07_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_08_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_09_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_10_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_11_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_12_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_13_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_14_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_15_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+      axios
+        .get(url.replace("Covid19_hubv", `Covid19_16_hubv`))
+        .then((response) => {
+          return response.data;
+        }),
+    ]);
+    for (let i = 1; i <= 16; i++) {
+      if (i == 1) {
+        var data = blData[i];
+      } else {
+        // append the data
+        for (const feature of blData[i].features) {
+          data.features.push(feature);
+        }
       }
     }
   }
   return data;
+}
+
+export function shouldUseAlternateDataSource(datenstand: Date): boolean {
+  const now = new Date();
+  const nowTime = now.getTime();
+  const actualDate = now.setHours(0, 0, 0, 0);
+  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
+  const datenstandMs = datenstand.getTime();
+  return (
+    actualDate - datenstandMs > 24 * 60 * 60000 ||
+    (datenstandMs != actualDate && nowTime > threeOclock)
+  );
 }

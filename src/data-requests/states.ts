@@ -3,8 +3,9 @@ import {
   getDateBefore,
   getStateAbbreviationById,
   RKIError,
-  getDataAlternateSource,
+  getAlternateDataSource,
   parseDate,
+  shouldUseAlternateDataSource,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -55,19 +56,10 @@ export async function getStatesRecoveredData(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const states = data.features.map((feature) => {
     return {
@@ -77,7 +69,7 @@ export async function getStatesRecoveredData(): Promise<
   });
   return {
     data: states,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -90,19 +82,10 @@ export async function getNewStateRecovered(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const states = data.features.map((feature) => {
     return {
@@ -112,7 +95,7 @@ export async function getNewStateRecovered(): Promise<
   });
   return {
     data: states,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -125,19 +108,10 @@ export async function getNewStateCases(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const states = data.features.map((feature) => {
     return {
@@ -147,7 +121,7 @@ export async function getNewStateCases(): Promise<
   });
   return {
     data: states,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -160,19 +134,10 @@ export async function getNewStateDeaths(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const states = data.features.map((feature) => {
     return {
@@ -182,7 +147,7 @@ export async function getNewStateDeaths(): Promise<
   });
   return {
     data: states,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -193,11 +158,11 @@ export async function getLastStateCasesHistory(
   ResponseData<{ id: number; name: string; cases: number; date: Date }[]>
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
@@ -209,25 +174,11 @@ export async function getLastStateCasesHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a state id is given get only the data from the specific states table
-    if (id) {
-      const blId = id.toString().padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     id: number;
@@ -245,7 +196,7 @@ export async function getLastStateCasesHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -256,11 +207,11 @@ export async function getLastStateDeathsHistory(
   ResponseData<{ id: number; name: string; deaths: number; date: Date }[]>
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
@@ -272,25 +223,11 @@ export async function getLastStateDeathsHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a state id is given get only the data from the specific states table
-    if (id) {
-      const blId = id.toString().padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     id: number;
@@ -308,7 +245,7 @@ export async function getLastStateDeathsHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -319,11 +256,11 @@ export async function getLastStateRecoveredHistory(
   ResponseData<{ id: number; name: string; recovered: number; date: Date }[]>
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
-  if (id != null) {
+  if (id) {
     whereParams.push(`IdBundesland = ${id}`);
   }
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
@@ -335,25 +272,11 @@ export async function getLastStateRecoveredHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a state id is given get only the data from the specific states table
-    if (id) {
-      const blId = id.toString().padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     id: number;
@@ -371,7 +294,7 @@ export async function getLastStateRecoveredHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 

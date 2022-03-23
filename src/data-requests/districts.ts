@@ -2,8 +2,9 @@ import axios from "axios";
 import {
   getDateBefore,
   RKIError,
-  getDataAlternateSource,
+  getAlternateDataSource,
   parseDate,
+  shouldUseAlternateDataSource,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -58,19 +59,10 @@ export async function getDistrictsRecoveredData(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const districts = data.features.map((feature) => {
     return {
@@ -80,7 +72,7 @@ export async function getDistrictsRecoveredData(): Promise<
   });
   return {
     data: districts,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -90,19 +82,10 @@ export async function getNewDistrictCases(): Promise<
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
   const response = await axios.get(url);
   let data = response.data;
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const districts = data.features.map((feature) => {
     return {
@@ -112,7 +95,7 @@ export async function getNewDistrictCases(): Promise<
   });
   return {
     data: districts,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -122,19 +105,10 @@ export async function getNewDistrictDeaths(): Promise<
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
   const response = await axios.get(url);
   let data = response.data;
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = data.features[0].attributes.Datenstand;
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = data.features[0].attributes.Datenstand;
   }
   const districts = data.features.map((feature) => {
     return {
@@ -144,7 +118,7 @@ export async function getNewDistrictDeaths(): Promise<
   });
   return {
     data: districts,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -157,19 +131,10 @@ export async function getNewDistrictRecovered(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    data = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    data = await getAlternateDataSource(url);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const districts = data.features.map((feature) => {
     return {
@@ -179,7 +144,7 @@ export async function getNewDistrictRecovered(): Promise<
   });
   return {
     data: districts,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -190,17 +155,17 @@ export async function getLastDistrictCasesHistory(
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 36
-    if (days != null) {
+    if (days) {
       days = Math.min(days, 36);
     } else {
       days = 36;
     }
   }
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -213,25 +178,11 @@ export async function getLastDistrictCasesHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a ags is given get only the data from the specific states table
-    if (ags) {
-      const blId = ags.padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     ags: string;
@@ -249,7 +200,7 @@ export async function getLastDistrictCasesHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -260,17 +211,17 @@ export async function getLastDistrictDeathsHistory(
   ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
-    if (days != null) {
+    if (days) {
       days = Math.min(days, 30);
     } else {
       days = 30;
     }
   }
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -283,25 +234,11 @@ export async function getLastDistrictDeathsHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a ags is given get only the data from the specific states table
-    if (ags) {
-      const blId = ags.padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     ags: string;
@@ -319,7 +256,7 @@ export async function getLastDistrictDeathsHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -330,17 +267,17 @@ export async function getLastDistrictRecoveredHistory(
   ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
-  if (ags != null) {
+  if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
   } else {
     // if ags is not defined restrict days to 30
-    if (days != null) {
+    if (days) {
       days = Math.min(days, 30);
     } else {
       days = 30;
     }
   }
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -353,25 +290,11 @@ export async function getLastDistrictRecoveredHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime(); //now im milliseconds
-  const actualDate = now.setHours(0, 0, 0, 0); // date 0:00 GMT
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime(); // Datenstand im milliseconds
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    // if a ags is given get only the data from the specific states table
-    if (ags) {
-      const blId = ags.padStart(2, "0").substring(0, 2);
-      data = await getDataAlternateSource(url, blId);
-    } else {
-      data = await getDataAlternateSource(url);
-    }
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    data = await getAlternateDataSource(url, blId);
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const history: {
     ags: string;
@@ -389,6 +312,6 @@ export async function getLastDistrictRecoveredHistory(
 
   return {
     data: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }

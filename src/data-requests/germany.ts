@@ -4,7 +4,8 @@ import {
   getDateBefore,
   RKIError,
   parseDate,
-  getDataAlternateSource,
+  getAlternateDataSource,
+  shouldUseAlternateDataSource,
 } from "../utils";
 
 export async function getCases(): Promise<ResponseData<number>> {
@@ -14,19 +15,9 @@ export async function getCases(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    Datenstand - actualDate > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let cases = 0;
     for (const feature of dataTemp.features) {
       cases += feature.attributes.cases;
@@ -34,10 +25,11 @@ export async function getCases(): Promise<ResponseData<number>> {
     data.features[0].attributes.cases = cases;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.cases,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -48,19 +40,9 @@ export async function getNewCases(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let cases = 0;
     for (const feature of dataTemp.features) {
       cases += feature.attributes.cases;
@@ -68,10 +50,11 @@ export async function getNewCases(): Promise<ResponseData<number>> {
     data.features[0].attributes.cases = cases;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.cases,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -79,7 +62,7 @@ export async function getLastCasesHistory(
   days?: number
 ): Promise<{ history: { cases: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuerFall IN(1,0)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -92,19 +75,9 @@ export async function getLastCasesHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
     dataTemp.features.reduce(function (res, feature) {
@@ -121,6 +94,7 @@ export async function getLastCasesHistory(
       res[feature.attributes.date].attributes.cases += feature.attributes.cases;
       return res;
     }, {});
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   const history = data.features
     .map((feature) => {
@@ -136,7 +110,7 @@ export async function getLastCasesHistory(
     });
   return {
     history: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -144,7 +118,7 @@ export async function getLastDeathsHistory(
   days?: number
 ): Promise<{ history: { deaths: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuerTodesfall IN(1,0,-9)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -157,19 +131,9 @@ export async function getLastDeathsHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
     dataTemp.features.reduce(function (res, feature) {
@@ -187,6 +151,7 @@ export async function getLastDeathsHistory(
         feature.attributes.deaths;
       return res;
     }, {});
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   const history = data.features
     .map((feature) => {
@@ -202,15 +167,15 @@ export async function getLastDeathsHistory(
     });
   return {
     history: history,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
 export async function getLastRecoveredHistory(
   days?: number
-): Promise<{ history: { recovered: number; date: Date }[]; lastUddate: Date }> {
+): Promise<{ history: { recovered: number; date: Date }[]; lastUpdate: Date }> {
   const whereParams = ["NeuGenesen IN(1,0,-9)"];
-  if (days != null) {
+  if (days) {
     const dateString = getDateBefore(days);
     whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
   }
@@ -223,19 +188,9 @@ export async function getLastRecoveredHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     // dataTemp must be aggregated and summed
     data.features = [];
     dataTemp.features.reduce(function (res, feature) {
@@ -253,6 +208,7 @@ export async function getLastRecoveredHistory(
         feature.attributes.recovered;
       return res;
     }, {});
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   const history = data.features
     .map((feature) => {
@@ -268,7 +224,7 @@ export async function getLastRecoveredHistory(
     });
   return {
     history: history,
-    lastUddate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -279,19 +235,9 @@ export async function getDeaths(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let deaths = 0;
     for (const feature of dataTemp.features) {
       deaths += feature.attributes.deaths;
@@ -299,10 +245,11 @@ export async function getDeaths(): Promise<ResponseData<number>> {
     data.features[0].attributes.deaths = deaths;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.deaths,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -313,19 +260,9 @@ export async function getNewDeaths(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let deaths = 0;
     for (const feature of dataTemp.features) {
       deaths += feature.attributes.deaths;
@@ -333,10 +270,11 @@ export async function getNewDeaths(): Promise<ResponseData<number>> {
     data.features[0].attributes.deaths = deaths;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.deaths,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -347,19 +285,9 @@ export async function getRecovered(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let recovered = 0;
     for (const feature of dataTemp.features) {
       recovered += feature.attributes.recovered;
@@ -367,10 +295,11 @@ export async function getRecovered(): Promise<ResponseData<number>> {
     data.features[0].attributes.recovered = recovered;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.recovered,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
@@ -381,19 +310,9 @@ export async function getNewRecovered(): Promise<ResponseData<number>> {
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  // check if data is updated, if not try alternate download from separately state tables
-  const now = new Date();
-  const nowTime = now.getTime();
-  const actualDate = now.setHours(0, 0, 0, 0);
-  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
-  const Datenstand = parseDate(
-    data.features[0].attributes.Datenstand
-  ).getTime();
-  if (
-    actualDate - Datenstand > 24 * 60 * 60000 ||
-    (Datenstand != actualDate && nowTime > threeOclock)
-  ) {
-    const dataTemp = await getDataAlternateSource(url);
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (shouldUseAlternateDataSource(datenstand)) {
+    const dataTemp = await getAlternateDataSource(url);
     let recovered = 0;
     for (const feature of dataTemp.features) {
       recovered += feature.attributes.recovered;
@@ -401,10 +320,11 @@ export async function getNewRecovered(): Promise<ResponseData<number>> {
     data.features[0].attributes.recovered = recovered;
     data.features[0].attributes.Datenstand =
       dataTemp.features[0].attributes.Datenstand;
+    datenstand = parseDate(dataTemp.features[0].attributes.Datenstand);
   }
   return {
     data: data.features[0].attributes.recovered,
-    lastUpdate: parseDate(data.features[0].attributes.Datenstand),
+    lastUpdate: datenstand,
   };
 }
 
