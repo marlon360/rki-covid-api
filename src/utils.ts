@@ -262,7 +262,7 @@ export async function getAlternateDataSource(url: string, blId?: string) {
   }
   // else download all 16 state data
   else {
-    const blData = []; 
+    const blData = [];
     [
       blData[1],
       blData[2],
