@@ -180,7 +180,7 @@ export async function getLastDistrictCasesHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
@@ -236,7 +236,7 @@ export async function getLastDistrictDeathsHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
@@ -292,7 +292,7 @@ export async function getLastDistrictRecoveredHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = ags ? ags.padStart(2, "0").substring(0, 2) : null;
+    const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }

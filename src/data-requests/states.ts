@@ -176,7 +176,7 @@ export async function getLastStateCasesHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    const blId = id ? id.toString().padStart(2, "0") : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
@@ -225,7 +225,7 @@ export async function getLastStateDeathsHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    const blId = id ? id.toString().padStart(2, "0") : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
@@ -274,7 +274,7 @@ export async function getLastStateRecoveredHistory(
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0").substring(0, 2) : null;
+    const blId = id ? id.toString().padStart(2, "0") : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
