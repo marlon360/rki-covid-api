@@ -263,53 +263,16 @@ export async function getAlternateDataSource(url: string, blId?: string) {
   }
   // else download all 16 state data
   else {
-    const blPromise = [];
-    const blData = [];
+    const blPromises = [];
     // build Promises
     for (let i = 0; i <= 15; i++) {
-      blPromise[i] = new Promise(async (resolve) => {
-        const id = (i + 1).toString().padStart(2, "0");
-        const blUrl = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
-        axios.get(blUrl).then((response) => {
-          resolve(response.data);
-        });
+      const id = (i + 1).toString().padStart(2, "0");
+      const blUrl = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
+      blPromises[i] = axios.get(blUrl).then((response) => {
+        return response.data;
       });
     }
-    [
-      blData[0],
-      blData[1],
-      blData[2],
-      blData[3],
-      blData[4],
-      blData[5],
-      blData[6],
-      blData[7],
-      blData[8],
-      blData[9],
-      blData[10],
-      blData[11],
-      blData[12],
-      blData[13],
-      blData[14],
-      blData[15],
-    ] = await Promise.all([
-      blPromise[0],
-      blPromise[1],
-      blPromise[2],
-      blPromise[3],
-      blPromise[4],
-      blPromise[5],
-      blPromise[6],
-      blPromise[7],
-      blPromise[8],
-      blPromise[9],
-      blPromise[10],
-      blPromise[11],
-      blPromise[12],
-      blPromise[13],
-      blPromise[14],
-      blPromise[15],
-    ]);
+    const blData = await Promise.all(blPromises);
     var data = blData[0];
     for (let i = 1; i <= 15; i++) {
       // append the data
