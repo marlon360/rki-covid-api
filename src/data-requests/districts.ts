@@ -105,10 +105,10 @@ export async function getNewDistrictDeaths(): Promise<
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
   const response = await axios.get(url);
   let data = response.data;
-  let datenstand = data.features[0].attributes.Datenstand;
+  let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
     data = await getAlternateDataSource(url);
-    datenstand = data.features[0].attributes.Datenstand;
+    datenstand = parseDate(data.features[0].attributes.Datenstand);
   }
   const districts = data.features.map((feature) => {
     return {
