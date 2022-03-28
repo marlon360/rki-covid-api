@@ -1,3 +1,6 @@
+import { rejects } from "assert";
+import axios, { AxiosPromise, AxiosResponse } from "axios";
+
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
     case 1:
@@ -232,4 +235,63 @@ export class RKIError extends Error {
     this.rkiError = error;
     this.url = url;
   }
+}
+
+export function parseDate(dateString: string): Date {
+  const parts = dateString.split(",");
+  const dateParts = parts[0].split(".");
+  const timeParts = parts[1].replace("Uhr", "").split(":");
+  return new Date(
+    parseInt(dateParts[2]),
+    parseInt(dateParts[1]) - 1,
+    parseInt(dateParts[0]),
+    parseInt(timeParts[0]),
+    parseInt(timeParts[1])
+  );
+}
+
+export async function getAlternateDataSource(url: string, blId?: string) {
+  // If a specific table is given download this state data only
+  let stateIdList = [];
+  for (let id = 1; id <= 16; id++) {
+    stateIdList[id - 1] = id.toString().padStart(2, "0");
+  }
+  if (blId && stateIdList.includes(blId)) {
+    url = url.replace("Covid19_hubv", `Covid19_${blId}_hubv`);
+    const response = await axios.get(url);
+    var data = response.data;
+  }
+  // else download all 16 state data
+  else {
+    const blPromises = [];
+    // build Promises
+    for (let i = 0; i <= 15; i++) {
+      const id = (i + 1).toString().padStart(2, "0");
+      const blUrl = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
+      blPromises[i] = axios.get(blUrl).then((response) => {
+        return response.data;
+      });
+    }
+    const blData = await Promise.all(blPromises);
+    var data = blData[0];
+    for (let i = 1; i <= 15; i++) {
+      // append the data
+      for (const feature of blData[i].features) {
+        data.features.push(feature);
+      }
+    }
+  }
+  return data;
+}
+
+export function shouldUseAlternateDataSource(datenstand: Date): boolean {
+  const now = new Date();
+  const nowTime = now.getTime();
+  const actualDate = now.setHours(0, 0, 0, 0);
+  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
+  const datenstandMs = datenstand.getTime();
+  return (
+    actualDate - datenstandMs > 24 * 60 * 60000 ||
+    (datenstandMs != actualDate && nowTime > threeOclock)
+  );
 }

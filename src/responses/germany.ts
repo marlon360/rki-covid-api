@@ -135,8 +135,8 @@ export async function GermanyCasesHistoryResponse(
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
   const history = await getLastCasesHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -156,7 +156,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
-  for (let i = 6; i < history.length; i++) {
+  for (let i = 6; i < history.history.length; i++) {
     const date = history[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
@@ -170,7 +170,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   return {
     data: weekIncidenceHistory,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -179,8 +179,8 @@ export async function GermanyDeathsHistoryResponse(
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
   const history = await getLastDeathsHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -189,8 +189,8 @@ export async function GermanyRecoveredHistoryResponse(
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
   const history = await getLastRecoveredHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
