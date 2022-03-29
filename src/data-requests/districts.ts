@@ -159,13 +159,6 @@ export async function getLastDistrictCasesHistory(
   const whereParams = [`NeuerFall IN(1,0)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 36
-    if (days) {
-      days = Math.min(days, 36);
-    } else {
-      days = 36;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -181,7 +174,7 @@ export async function getLastDistrictCasesHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceedTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
@@ -231,13 +224,6 @@ export async function getLastDistrictDeathsHistory(
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 30
-    if (days) {
-      days = Math.min(days, 30);
-    } else {
-      days = 30;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -253,7 +239,7 @@ export async function getLastDistrictDeathsHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceedTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
@@ -303,13 +289,6 @@ export async function getLastDistrictRecoveredHistory(
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 30
-    if (days) {
-      days = Math.min(days, 30);
-    } else {
-      days = 30;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -325,7 +304,7 @@ export async function getLastDistrictRecoveredHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceedTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);

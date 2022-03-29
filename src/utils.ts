@@ -284,14 +284,77 @@ export async function getAlternateDataSource(url: string, blId?: string) {
   return data;
 }
 
-export function shouldUseAlternateDataSource(datenstand: Date): boolean {
+export function shouldUseAlternateDataSource(datenstand: Date, exceedTransferLimit?: boolean): boolean {
   const now = new Date();
   const nowTime = now.getTime();
   const actualDate = now.setHours(0, 0, 0, 0);
   const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
   const datenstandMs = datenstand.getTime();
   return (
+    exceedTransferLimit ||
     actualDate - datenstandMs > 24 * 60 * 60000 ||
     (datenstandMs != actualDate && nowTime > threeOclock)
   );
+}
+
+export function fill0CasesDays(sourceData: any, lowDate: Date, highDate: Date) {
+  const targetData = {};
+  for (const historyData of sourceData.data) {
+    if (!targetData[historyData.ags]) {
+      targetData[historyData.ags] = {
+        ags: historyData.ags,
+        name: historyData.name,
+        history: [],
+      };
+    }
+    // if history is empty and lowDate is missing and lowDate is set insert lowDate
+    if (
+      lowDate &&
+      historyData.date > lowDate &&
+      targetData[historyData.ags].history.length == 0
+    ) {
+      targetData[historyData.ags].history.push({
+        cases: 0,
+        date: lowDate,
+      });
+    }
+    if (targetData[historyData.ags].history.length > 0) {
+      const nextDate = new Date(historyData.date);
+      while (
+        getDayDifference(
+          nextDate,
+          targetData[historyData.ags].history[
+            targetData[historyData.ags].history.length - 1
+          ].date
+        ) > 1
+      ) {
+        targetData[historyData.ags].history.push({
+          cases: 0,
+          date: AddDaysToDate(
+            targetData[historyData.ags].history[
+              targetData[historyData.ags].history.length - 1
+            ].date,
+            1
+          ),
+        });
+      }
+    }
+    targetData[historyData.ags].history.push({
+      cases: historyData.cases,
+      date: new Date(historyData.date),
+    });
+  }
+  // now fill top dates to highDate (datenstand -1) for each ags
+  for (const ags of Object.keys(targetData)) {
+    while (targetData[ags].history[targetData[ags].history.length - 1].date < highDate) {
+      targetData[ags].history.push({
+        cases: 0,
+        date: AddDaysToDate(
+          targetData[ags].history[targetData[ags].history.length - 1].date,
+          1
+        ),
+      });
+    }
+  }
+  return targetData;
 }
