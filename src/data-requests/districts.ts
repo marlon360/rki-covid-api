@@ -152,7 +152,9 @@ export async function getLastDistrictCasesHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
+  ResponseData<
+    { ags: string; name: string; cases: number; date: Date; dataStatus: Date }[]
+  >
 > {
   const whereParams = [`NeuerFall IN(1,0)`];
   if (ags) {
@@ -189,15 +191,23 @@ export async function getLastDistrictCasesHistory(
     name: string;
     cases: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis.toString().padStart(5, "0"),
       name: feature.attributes.Landkreis,
       cases: feature.attributes.cases,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
     lastUpdate: datenstand,
@@ -208,7 +218,15 @@ export async function getLastDistrictDeathsHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
+  ResponseData<
+    {
+      ags: string;
+      name: string;
+      deaths: number;
+      date: Date;
+      dataStatus: Date;
+    }[]
+  >
 > {
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
   if (ags) {
@@ -245,15 +263,23 @@ export async function getLastDistrictDeathsHistory(
     name: string;
     deaths: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis.toString().padStart(5, "0"),
       name: feature.attributes.Landkreis,
       deaths: feature.attributes.deaths,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
     lastUpdate: datenstand,
@@ -264,7 +290,15 @@ export async function getLastDistrictRecoveredHistory(
   days?: number,
   ags?: string
 ): Promise<
-  ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
+  ResponseData<
+    {
+      ags: string;
+      name: string;
+      recovered: number;
+      date: Date;
+      dataStatus: Date;
+    }[]
+  >
 > {
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
   if (ags) {
@@ -301,15 +335,23 @@ export async function getLastDistrictRecoveredHistory(
     name: string;
     recovered: number;
     date: Date;
+    dataStatus: Date;
   }[] = data.features.map((feature) => {
     return {
       ags: feature.attributes.IdLandkreis.toString().padStart(5, "0"),
       name: feature.attributes.Landkreis,
       recovered: feature.attributes.recovered,
       date: new Date(feature.attributes.MeldeDatum),
+      dataStatus: parseDate(feature.attributes.Datenstand),
     };
   });
-
+  // find the lowest date in dataStatus
+  let lowStatus = history[1].dataStatus;
+  for (const entry of history) {
+    if (entry.dataStatus < lowStatus) {
+      lowStatus = entry.dataStatus;
+    }
+  }
   return {
     data: history,
     lastUpdate: datenstand,
