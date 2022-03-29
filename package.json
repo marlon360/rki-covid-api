@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "npm run build && node dist/server.js",
+    "start": "pm2-runtime start ecosystem.config.yaml --env production",
+    "dev": "node dist/server.js",
     "build": "tsc && npm run docs:build",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs",
@@ -36,5 +37,8 @@
     "prettier": "2.4.1",
     "typescript": "^4.4.4",
     "vuepress": "^1.9.5"
+  },
+  "engines": {
+    "node": ">=16.0.0 <17"
   }
 }
