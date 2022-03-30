@@ -15,6 +15,7 @@ import {
   AddDaysToDate,
   getDayDifference,
   getStateAbbreviationByName,
+  fill0CasesDays,
 } from "../utils";
 import {
   DistrictsFrozenIncidenceData,
@@ -84,7 +85,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     };
   });
 
-  if (ags != null) {
+  if (ags) {
     districts = districts.filter((districts) => {
       return districts.ags == ags;
     });
@@ -117,52 +118,24 @@ export async function DistrictsCasesHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
-
-  const data: DistrictsCasesHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 36
+    days = Math.min(days, 336);
+  } else {
+    days = 336;
   }
+  const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1): new Date("2020-01-01"); // lowest date if days is set
+  const data: DistrictsCasesHistory = fill0CasesDays(districtsHistoryData,lowDate,highDate);
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
@@ -173,18 +146,18 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   // add 6 days to calculate week incidence
-  if (days != null) {
+  if (days) {
     days += 6;
   }
 
-  const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
+  const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
   const districtsData = await getDistrictsData();
 
   function getDistrictByAGS(
@@ -197,42 +170,9 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     return null;
   }
 
-  const data: DistrictsCasesHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
-  }
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
+  const data: DistrictsCasesHistory = fill0CasesDays(districtsHistoryData,lowDate,highDate);
 
   const incidenceData: DistrictsWeekIncidenceHistory = {};
 
@@ -261,7 +201,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
 
   return {
     data: incidenceData,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
@@ -272,52 +212,26 @@ export async function DistrictsDeathsHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
-
-  const data: DistrictsDeathsHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          deaths: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      deaths: historyData.deaths,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 36
+    days = Math.min(days, 330);
+  } else {
+    days = 330;
   }
+  const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
+  
+  const data: DistrictsDeathsHistory = fill0CasesDays(districtsHistoryData, lowDate, highDate);
+  
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
@@ -328,52 +242,26 @@ export async function DistrictsRecoveredHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-
-  const data: DistrictsRecoveredHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          recovered: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      recovered: historyData.recovered,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 330
+    days = Math.min(days, 330);
+  } else {
+    days = 330;
   }
+  const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
+  
+  const data: DistrictsRecoveredHistory = fill0CasesDays(districtsHistoryData, lowDate, highDate);
+  
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
