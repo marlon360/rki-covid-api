@@ -18,8 +18,11 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
-import { getDateBefore, AddDaysToDate, getDayDifference } from "../utils";
+import {
+  getStatesFrozenIncidenceHistory,
+  StatesFrozenIncidenceData,
+} from "../data-requests/frozen-incidence";
+import { getDateBefore } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -130,65 +133,21 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 export async function GermanyCasesHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
-  const germanyHistoryData = await getLastCasesHistory(days);
-
-  const data = { history: [] };
-
-  const lowestDate =
-    days &&
-    AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
-      new Date("2020-01-01")
-      ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
-      : new Date("2020-01-01");
-  for (const historyData of germanyHistoryData.history) {
-    if (data.history.length == 0 && historyData.date > lowestDate) {
-      data.history.push({
-        cases: 0,
-        date: lowestDate,
-      });
-    }
-    if (data.history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(nextDate, data.history[data.history.length - 1].date) >
-        1
-      ) {
-        data.history.push({
-          cases: 0,
-          date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-        });
-      }
-    }
-    data.history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
-  }
-  // now fill top dates to Datenstand -1 for each ags
-  while (
-    data.history[data.history.length - 1].date <
-    AddDaysToDate(germanyHistoryData.lastUpdate, -1)
-  ) {
-    data.history.push({
-      cases: 0,
-      date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-    });
-  }
-
+  const history = await getLastCasesHistory(days);
   return {
-    data: data.history,
-    meta: new ResponseMeta(germanyHistoryData.lastUpdate),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyWeekIncidenceHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
-  const history = await GermanyCasesHistoryResponse(days);
+  const history = await getLastCasesHistory(days);
   const statesData = await getStatesData();
 
   const population = statesData.data
@@ -197,11 +156,11 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
-  for (let i = 6; i < history.data.length; i++) {
-    const date = history.data[i].date;
+  for (let i = 6; i < history.history.length; i++) {
+    const date = history[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-      sum += history.data[dayOffset].cases;
+      sum += history[dayOffset].cases;
     }
     weekIncidenceHistory.push({
       weekIncidence: (sum / population) * 100000,
@@ -211,115 +170,27 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   return {
     data: weekIncidenceHistory,
-    meta: new ResponseMeta(history.meta.lastUpdate),
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyDeathsHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
-  const germanyHistoryData = await getLastDeathsHistory(days);
-
-  const data = { history: [] };
-
-  const lowestDate =
-    days &&
-    AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
-      new Date("2020-01-01")
-      ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
-      : new Date("2020-01-01");
-  for (const historyData of germanyHistoryData.history) {
-    if (data.history.length == 0 && historyData.date > lowestDate) {
-      data.history.push({
-        deaths: 0,
-        date: lowestDate,
-      });
-    }
-    if (data.history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(nextDate, data.history[data.history.length - 1].date) >
-        1
-      ) {
-        data.history.push({
-          deaths: 0,
-          date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-        });
-      }
-    }
-    data.history.push({
-      deaths: historyData.deaths,
-      date: new Date(historyData.date),
-    });
-  }
-  // now fill top dates to Datenstand -1 for each ags
-  while (
-    data.history[data.history.length - 1].date <
-    AddDaysToDate(germanyHistoryData.lastUpdate, -1)
-  ) {
-    data.history.push({
-      deaths: 0,
-      date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-    });
-  }
-
+  const history = await getLastDeathsHistory(days);
   return {
-    data: data.history,
-    meta: new ResponseMeta(germanyHistoryData.lastUpdate),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyRecoveredHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
-  const germanyHistoryData = await getLastRecoveredHistory(days);
-
-  const data = { history: [] };
-
-  const lowestDate =
-    days &&
-    AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days) >
-      new Date("2020-01-01")
-      ? AddDaysToDate(new Date(new Date().setHours(0, 0, 0, 0)), -days)
-      : new Date("2020-01-01");
-  for (const historyData of germanyHistoryData.history) {
-    if (data.history.length == 0 && historyData.date > lowestDate) {
-      data.history.push({
-        recovered: 0,
-        date: lowestDate,
-      });
-    }
-    if (data.history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(nextDate, data.history[data.history.length - 1].date) >
-        1
-      ) {
-        data.history.push({
-          recovered: 0,
-          date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-        });
-      }
-    }
-    data.history.push({
-      recovered: historyData.recovered,
-      date: new Date(historyData.date),
-    });
-  }
-  // now fill top dates to Datenstand -1 for each ags
-  while (
-    data.history[data.history.length - 1].date <
-    AddDaysToDate(germanyHistoryData.lastUpdate, -1)
-  ) {
-    data.history.push({
-      recovered: 0,
-      date: AddDaysToDate(data.history[data.history.length - 1].date, 1),
-    });
-  }
-
+  const history = await getLastRecoveredHistory(days);
   return {
-    data: data.history,
-    meta: new ResponseMeta(germanyHistoryData.lastUpdate),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUddate),
   };
 }
 
@@ -342,7 +213,7 @@ export async function GermanyHospitalizationHistoryResponse(
     adjustedUpperIncidence7Days: number;
   }>
 > {
-  if (days && isNaN(days)) {
+  if (days != null && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -350,7 +221,7 @@ export async function GermanyHospitalizationHistoryResponse(
   const hospitalizationData = await getHospitalizationData();
   const history = [];
   let dateKeys = Object.keys(hospitalizationData.data);
-  if (days) {
+  if (days != undefined) {
     const reference_date = new Date(getDateBefore(days));
     dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
