@@ -13,9 +13,9 @@ import {
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
-  getDayDifference,
   getStateAbbreviationByName,
   fill0CasesDays,
+  RequestType,
 } from "../utils";
 import {
   DistrictsFrozenIncidenceData,
@@ -126,13 +126,20 @@ export async function DistrictsCasesHistoryResponse(
   if (!ags && days) {
     // if ags is not defined restrict days to 36
     days = Math.min(days, 336);
-  } else {
+  } else if (!ags) {
     days = 336;
   }
   const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
   const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1): new Date("2020-01-01"); // lowest date if days is set
-  const data: DistrictsCasesHistory = fill0CasesDays(districtsHistoryData,lowDate,highDate);
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set
+  const data: DistrictsCasesHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RequestType.cases
+  );
   return {
     data,
     meta: new ResponseMeta(districtsHistoryData.lastUpdate),
@@ -157,7 +164,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     days += 6;
   }
 
-  const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
+  const districtsHistoryData = await DistrictsCasesHistoryResponse(days, ags);
   const districtsData = await getDistrictsData();
 
   function getDistrictByAGS(
@@ -170,14 +177,10 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     return null;
   }
 
-  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
-  const data: DistrictsCasesHistory = fill0CasesDays(districtsHistoryData,lowDate,highDate);
-
   const incidenceData: DistrictsWeekIncidenceHistory = {};
 
-  for (const ags of Object.keys(data)) {
-    const districtHistory = data[ags].history;
+  for (const ags of Object.keys(districtsHistoryData.data)) {
+    const districtHistory = districtsHistoryData.data[ags].history;
     const district = getDistrictByAGS(districtsData, ags);
 
     incidenceData[ags] = {
@@ -201,7 +204,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
 
   return {
     data: incidenceData,
-    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
+    meta: districtsHistoryData.meta,
   };
 }
 
@@ -220,15 +223,22 @@ export async function DistrictsDeathsHistoryResponse(
   if (!ags && days) {
     // if ags is not defined restrict days to 36
     days = Math.min(days, 330);
-  } else {
+  } else if (!ags) {
     days = 330;
   }
   const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
   const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
-  
-  const data: DistrictsDeathsHistory = fill0CasesDays(districtsHistoryData, lowDate, highDate);
-  
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set
+
+  const data: DistrictsDeathsHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RequestType.deaths
+  );
+
   return {
     data,
     meta: new ResponseMeta(districtsHistoryData.lastUpdate),
@@ -250,15 +260,22 @@ export async function DistrictsRecoveredHistoryResponse(
   if (!ags && days) {
     // if ags is not defined restrict days to 330
     days = Math.min(days, 330);
-  } else {
+  } else if (!ags) {
     days = 330;
   }
   const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
-  const lowDate = days ? AddDaysToDate(highDate, (days - 1) * -1) : new Date("2020-01-01"); // lowest date if days is set
-  
-  const data: DistrictsRecoveredHistory = fill0CasesDays(districtsHistoryData, lowDate, highDate);
-  
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+
+  const data: DistrictsRecoveredHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RequestType.recovered
+  );
+
   return {
     data,
     meta: new ResponseMeta(districtsHistoryData.lastUpdate),

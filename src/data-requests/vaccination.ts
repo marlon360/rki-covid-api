@@ -675,7 +675,6 @@ export async function getVaccinationHistory(
   const data = response.data;
   const lastModified = response.headers["last-modified"];
   const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
-  const pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
 
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
 

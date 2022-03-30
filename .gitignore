@@ -5,4 +5,3 @@ node_modules
 .serverless
 cache
 dist
-.vscode
