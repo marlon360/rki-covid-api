@@ -157,10 +157,10 @@ export async function GermanyWeekIncidenceHistoryResponse(
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
   for (let i = 6; i < history.history.length; i++) {
-    const date = history[i].date;
+    const date = history.history[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-      sum += history[dayOffset].cases;
+      sum += history.history[dayOffset].cases;
     }
     weekIncidenceHistory.push({
       weekIncidence: (sum / population) * 100000,
