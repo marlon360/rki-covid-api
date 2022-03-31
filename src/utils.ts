@@ -304,17 +304,27 @@ export enum RequestType {
   deaths = "deaths",
 }
 
+export enum RegionType {
+  distrits = "ags",
+  states = "id",
+}
+
 export function fill0CasesDays(
   sourceData: any,
   lowDate: Date,
   highDate: Date,
+  regionType: RegionType,
   requestType: RequestType
 ) {
   const targetData = {};
   for (const historyData of sourceData.data) {
-    if (!targetData[historyData.ags]) {
-      targetData[historyData.ags] = {
-        ags: historyData.ags,
+    const regionKey =
+      regionType == "id"
+        ? getStateAbbreviationById(historyData.id)
+        : historyData.ags;
+    if (!targetData[regionKey]) {
+      targetData[regionKey] = {
+        [regionType]: historyData[regionType],
         name: historyData.name,
         history: [],
       };
@@ -322,49 +332,51 @@ export function fill0CasesDays(
     // if history is empty and lowDate is missing insert lowDate
     if (
       historyData.date > lowDate &&
-      targetData[historyData.ags].history.length == 0
+      targetData[regionKey].history.length == 0
     ) {
-      targetData[historyData.ags].history.push({
+      targetData[regionKey].history.push({
         [requestType]: 0,
         date: lowDate,
       });
     }
-    if (targetData[historyData.ags].history.length > 0) {
+    if (targetData[regionKey].history.length > 0) {
       const nextDate = new Date(historyData.date);
       while (
         getDayDifference(
           nextDate,
-          targetData[historyData.ags].history[
-            targetData[historyData.ags].history.length - 1
+          targetData[regionKey].history[
+            targetData[regionKey].history.length - 1
           ].date
         ) > 1
       ) {
-        targetData[historyData.ags].history.push({
+        targetData[regionKey].history.push({
           [requestType]: 0,
           date: AddDaysToDate(
-            targetData[historyData.ags].history[
-              targetData[historyData.ags].history.length - 1
+            targetData[regionKey].history[
+              targetData[regionKey].history.length - 1
             ].date,
             1
           ),
         });
       }
     }
-    targetData[historyData.ags].history.push({
+    targetData[regionKey].history.push({
       [requestType]: historyData[requestType],
       date: new Date(historyData.date),
     });
   }
   // now fill top dates to highDate (datenstand -1) for each ags
-  for (const ags of Object.keys(targetData)) {
+  for (const regionKey of Object.keys(targetData)) {
     while (
-      targetData[ags].history[targetData[ags].history.length - 1].date <
-      highDate
+      targetData[regionKey].history[targetData[regionKey].history.length - 1]
+        .date < highDate
     ) {
-      targetData[ags].history.push({
+      targetData[regionKey].history.push({
         [requestType]: 0,
         date: AddDaysToDate(
-          targetData[ags].history[targetData[ags].history.length - 1].date,
+          targetData[regionKey].history[
+            targetData[regionKey].history.length - 1
+          ].date,
           1
         ),
       });

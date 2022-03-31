@@ -16,6 +16,7 @@ import {
   getStateAbbreviationByName,
   fill0CasesDays,
   RequestType,
+  RegionType,
 } from "../utils";
 import {
   DistrictsFrozenIncidenceData,
@@ -138,6 +139,7 @@ export async function DistrictsCasesHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
+    RegionType.distrits,
     RequestType.cases
   );
   return {
@@ -236,6 +238,7 @@ export async function DistrictsDeathsHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
+    RegionType.distrits,
     RequestType.deaths
   );
 
@@ -273,6 +276,7 @@ export async function DistrictsRecoveredHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
+    RegionType.distrits,
     RequestType.recovered
   );
 
