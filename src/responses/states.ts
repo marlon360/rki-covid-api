@@ -199,7 +199,10 @@ export async function StatesWeekIncidenceHistoryResponse(
     days += 6;
   }
 
-  const statesHistoryCasesData = await StatesCasesHistoryResponse(days, abbreviation);
+  const statesHistoryCasesData = await StatesCasesHistoryResponse(
+    days,
+    abbreviation
+  );
   const statesData = await getStatesData();
 
   function getStateById(
@@ -211,7 +214,7 @@ export async function StatesWeekIncidenceHistoryResponse(
     }
     return null;
   }
-  
+
   const incidenceData: StatesWeekIncidenceHistory = {};
 
   for (const abbr of Object.keys(statesHistoryCasesData.data)) {
