@@ -14,7 +14,6 @@ import {
 } from "../data-requests/states";
 import {
   AddDaysToDate,
-  getDayDifference,
   getStateAbbreviationById,
   getStateAbbreviationByName,
   getStateIdByAbbreviation,
@@ -200,9 +199,7 @@ export async function StatesWeekIncidenceHistoryResponse(
     days += 6;
   }
 
-  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-
-  const statesHistoryData = await getLastStateCasesHistory(days, id);
+  const statesHistoryCasesData = await StatesCasesHistoryResponse(days, abbreviation);
   const statesData = await getStatesData();
 
   function getStateById(
@@ -214,23 +211,11 @@ export async function StatesWeekIncidenceHistoryResponse(
     }
     return null;
   }
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
-
-  const data: StatesCasesHistory = fill0CasesDays(
-    statesHistoryData,
-    lowDate,
-    highDate,
-    RegionType.states,
-    RequestType.cases
-  );
-
+  
   const incidenceData: StatesWeekIncidenceHistory = {};
 
-  for (const abbr of Object.keys(data)) {
-    const stateHistory = data[abbr].history;
+  for (const abbr of Object.keys(statesHistoryCasesData.data)) {
+    const stateHistory = statesHistoryCasesData.data[abbr].history;
     const state = getStateById(statesData, getStateIdByAbbreviation(abbr));
 
     incidenceData[abbr] = {
@@ -254,7 +239,7 @@ export async function StatesWeekIncidenceHistoryResponse(
 
   return {
     data: incidenceData,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: statesHistoryCasesData.meta,
   };
 }
 

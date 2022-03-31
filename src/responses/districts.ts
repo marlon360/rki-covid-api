@@ -125,7 +125,7 @@ export async function DistrictsCasesHistoryResponse(
     );
   }
   if (!ags && days) {
-    // if ags is not defined restrict days to 36
+    // if ags is not defined restrict days to 336
     days = Math.min(days, 336);
   } else if (!ags) {
     days = 336;
@@ -223,7 +223,7 @@ export async function DistrictsDeathsHistoryResponse(
     );
   }
   if (!ags && days) {
-    // if ags is not defined restrict days to 36
+    // if ags is not defined restrict days to 330
     days = Math.min(days, 330);
   } else if (!ags) {
     days = 330;
