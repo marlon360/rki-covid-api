@@ -340,7 +340,7 @@ export function fill0CasesDays(
       });
     }
     if (targetData[regionKey].history.length > 0) {
-      const nextDate = new Date(historyData.date);
+      const nextDate: Date = historyData.date;
       while (
         getDayDifference(
           nextDate,
@@ -362,7 +362,7 @@ export function fill0CasesDays(
     }
     targetData[regionKey].history.push({
       [requestType]: historyData[requestType],
-      date: new Date(historyData.date),
+      date: historyData.date,
     });
   }
   // now fill top dates to highDate (datenstand -1) for each ags
@@ -381,6 +381,47 @@ export function fill0CasesDays(
         ),
       });
     }
+  }
+  return targetData;
+}
+
+export function fill0CasesDaysGermany(
+  sourceData: any,
+  lowDate: Date,
+  highDate: Date,
+  requestType: RequestType
+) {
+  const targetData = [];
+  for (const historyData of sourceData.history) {
+    // if history is empty and lowDate is missing insert lowDate
+    if (historyData.date > lowDate && targetData.length == 0) {
+      targetData.push({
+        [requestType]: 0,
+        date: lowDate,
+      });
+    }
+    if (targetData.length > 0) {
+      const nextDate = historyData.date;
+      while (
+        getDayDifference(nextDate, targetData[targetData.length - 1].date) > 1
+      ) {
+        targetData.push({
+          [requestType]: 0,
+          date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
+        });
+      }
+    }
+    targetData.push({
+      [requestType]: historyData[requestType],
+      date: historyData.date,
+    });
+  }
+  // now fill top dates to highDate (datenstand -1) for each ags
+  while (targetData[targetData.length - 1].date < highDate) {
+    targetData.push({
+      [requestType]: 0,
+      date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
+    });
   }
   return targetData;
 }
