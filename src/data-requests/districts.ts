@@ -82,6 +82,9 @@ export async function getNewDistrictCases(): Promise<
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
   const response = await axios.get(url);
   let data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
     data = await getAlternateDataSource(url);
@@ -105,6 +108,9 @@ export async function getNewDistrictDeaths(): Promise<
   const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdLandkreis,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdLandkreis&groupByFieldsForStatistics=IdLandkreis,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
   const response = await axios.get(url);
   let data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
     data = await getAlternateDataSource(url);
@@ -157,13 +163,6 @@ export async function getLastDistrictCasesHistory(
   const whereParams = [`NeuerFall IN(1,0)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 36
-    if (days) {
-      days = Math.min(days, 36);
-    } else {
-      days = 36;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -179,7 +178,7 @@ export async function getLastDistrictCasesHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceededTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
@@ -213,13 +212,6 @@ export async function getLastDistrictDeathsHistory(
   const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 30
-    if (days) {
-      days = Math.min(days, 30);
-    } else {
-      days = 30;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -235,7 +227,7 @@ export async function getLastDistrictDeathsHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceededTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
@@ -269,13 +261,6 @@ export async function getLastDistrictRecoveredHistory(
   const whereParams = [`NeuGenesen IN(1,0,-9)`];
   if (ags) {
     whereParams.push(`IdLandkreis = '${parseInt(ags)}'`);
-  } else {
-    // if ags is not defined restrict days to 30
-    if (days) {
-      days = Math.min(days, 30);
-    } else {
-      days = 30;
-    }
   }
   if (days) {
     const dateString = getDateBefore(days);
@@ -291,7 +276,7 @@ export async function getLastDistrictRecoveredHistory(
     throw new RKIError(data.error, response.config.url);
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
+  if (shouldUseAlternateDataSource(datenstand, data.exceededTransferLimit)) {
     const blId = ags ? ags.padStart(5, "0").substring(0, 2) : null;
     data = await getAlternateDataSource(url, blId);
     datenstand = parseDate(data.features[0].attributes.Datenstand);
