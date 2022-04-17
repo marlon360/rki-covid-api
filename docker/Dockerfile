@@ -1,13 +1,12 @@
-FROM node:16-alpine3.12
+FROM node:16-alpine3.14
 
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
 
-ARG VIPS_VERSION=8.11.3
+ARG VIPS_VERSION=8.11.4
 
-# System update, build dependencies, compile vips-8.11.3 and cleanup.
-# Also to npm@6.14.15 is downgraded to prevent warnings and to keep the json-lockfile 
+# System update, build dependencies, compile vips-8.11.x and cleanup.
 RUN set -x -o pipefail \
   && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz | tar xzC /tmp \
   && apk update \
@@ -33,7 +32,6 @@ RUN set -x -o pipefail \
                  --enable-silent-rules \
   && make -s install-strip \
   && cd .. \
-  && npm -g install npm@6.14.15 \
   && rm -rf /tmp/vips-${VIPS_VERSION} \
   && apk del --purge .vips-dependencies \
   && rm -rf /var/cache/apk/*

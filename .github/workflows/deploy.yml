@@ -11,10 +11,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Use Node 12
+      - name: Use Node 17
         uses: actions/setup-node@v1
         with:
-          node-version: 12.x
+          node-version: 17.x
 
       - name: Install Railway
         run: npm i -g @railway/cli

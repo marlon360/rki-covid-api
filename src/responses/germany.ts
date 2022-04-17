@@ -135,8 +135,8 @@ export async function GermanyCasesHistoryResponse(
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
   const history = await getLastCasesHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -156,11 +156,11 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
-  for (let i = 6; i < history.length; i++) {
-    const date = history[i].date;
+  for (let i = 6; i < history.history.length; i++) {
+    const date = history.history[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-      sum += history[dayOffset].cases;
+      sum += history.history[dayOffset].cases;
     }
     weekIncidenceHistory.push({
       weekIncidence: (sum / population) * 100000,
@@ -170,7 +170,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   return {
     data: weekIncidenceHistory,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -179,8 +179,8 @@ export async function GermanyDeathsHistoryResponse(
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
   const history = await getLastDeathsHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
@@ -189,15 +189,29 @@ export async function GermanyRecoveredHistoryResponse(
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
   const history = await getLastRecoveredHistory(days);
   return {
-    data: history,
-    meta: new ResponseMeta(new Date(history[history.length - 1].date)),
+    data: history.history,
+    meta: new ResponseMeta(history.lastUpdate),
   };
 }
 
 export async function GermanyHospitalizationHistoryResponse(
   days?: number
 ): Promise<
-  GermanyHistoryData<{ cases7Days: number; incidence7Days: number; date: Date }>
+  GermanyHistoryData<{
+    cases7Days: number; //legacy
+    incidence7Days: number; //legacy
+    date: Date;
+    fixedCases7Days: number;
+    updatedCases7Days: number;
+    adjustedLowerCases7Days: number;
+    adjustedCases7Days: number;
+    adjustedUpperCases7Days: number;
+    fixedIncidence7Days: number;
+    updatedIncidence7Days: number;
+    adjustedLowerIncidence7Days: number;
+    adjustedIncidence7Days: number;
+    adjustedUpperIncidence7Days: number;
+  }>
 > {
   if (days != null && isNaN(days)) {
     throw new TypeError(
@@ -218,9 +232,26 @@ export async function GermanyHospitalizationHistoryResponse(
   });
   dateKeys.forEach((dateKey) => {
     history.push({
-      cases7Days: hospitalizationData.data[dateKey].cases7Days,
-      incidence7Days: hospitalizationData.data[dateKey].incidence7Days,
+      cases7Days: hospitalizationData.data[dateKey].cases7Days, //legacy
+      incidence7Days: hospitalizationData.data[dateKey].incidence7Days, //legacy
       date: new Date(dateKey),
+      fixedCases7Days: hospitalizationData.data[dateKey].fixedCases7Days,
+      updatedCases7Days: hospitalizationData.data[dateKey].updatedCases7Days,
+      adjustedLowerCases7Days:
+        hospitalizationData.data[dateKey].adjustedLowerCases7Days,
+      adjustedCases7Days: hospitalizationData.data[dateKey].adjustedCases7Days,
+      adjustedUpperCases7Days:
+        hospitalizationData.data[dateKey].adjustedUpperCases7Days,
+      fixedIncidence7Days:
+        hospitalizationData.data[dateKey].fixedIncidence7Days,
+      updatedIncidence7Days:
+        hospitalizationData.data[dateKey].updatedIncidence7Days,
+      adjustedLowerIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedLowerIncidence7Days,
+      adjustedIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedIncidence7Days,
+      adjustedUpperIncidence7Days:
+        hospitalizationData.data[dateKey].adjustedUpperIncidence7Days,
     });
   });
 

@@ -18,6 +18,20 @@ function clearEntry(entry: any) {
   }
 }
 
+interface quotes {
+  total: number;
+  "A05-A17": {
+    total: number;
+    "A05-A11": number;
+    "A12-A17": number;
+  };
+  "A18+": {
+    total: number;
+    "A18-A59": number;
+    "A60+": number;
+  };
+}
+
 export interface VaccinationCoverage {
   administeredVaccinations: number;
   vaccinated: number;
@@ -26,18 +40,22 @@ export interface VaccinationCoverage {
     moderna: number;
     astraZeneca: number;
     janssen: number;
+    novavax: number;
   };
   delta: number;
   quote: number;
+  quotes: quotes;
   secondVaccination: {
     vaccinated: number;
     vaccination: {
       biontech: number;
       moderna: number;
       astraZeneca: number;
+      novavax: number;
     };
     delta: number;
     quote: number;
+    quotes: quotes;
   };
   boosterVaccination: {
     vaccinated: number;
@@ -48,18 +66,7 @@ export interface VaccinationCoverage {
     };
     delta: number;
     quote: number;
-  };
-  indication: {
-    age: number;
-    job: number;
-    medical: number;
-    nursingHome: number;
-    secondVaccination: {
-      age: number;
-      job: number;
-      medical: number;
-      nursingHome: number;
-    };
+    quotes: quotes;
   };
   latestDailyVaccinations: VaccinationHistoryEntry;
   states: {
@@ -72,18 +79,22 @@ export interface VaccinationCoverage {
         moderna: number;
         astraZeneca: number;
         janssen: number;
+        novavax: number;
       };
       delta: number;
       quote: number;
+      quotes: quotes;
       secondVaccination: {
         vaccinated: number;
         vaccination: {
           biontech: number;
           moderna: number;
           astraZeneca: number;
+          novavax: number;
         };
         delta: number;
         quote: number;
+        quotes: quotes;
       };
       boosterVaccination: {
         vaccinated: number;
@@ -94,18 +105,7 @@ export interface VaccinationCoverage {
         };
         delta: number;
         quote: number;
-      };
-      indication: {
-        age: number;
-        job: number;
-        medical: number;
-        nursingHome: number;
-        secondVaccination: {
-          age: number;
-          job: number;
-          medical: number;
-          nursingHome: number;
-        };
+        quotes: quotes;
       };
     };
   };
@@ -135,11 +135,13 @@ export async function getVaccinationCoverage(): Promise<
     firstModerna: number;
     firstAstraZeneca: number;
     firstJanssen: number;
+    firstNovavax: number;
     firstDifference: number;
     fullVaccinated: number;
     fullBiontech: number;
     fullModerna: number;
     fullAstraZeneca: number;
+    fullNovavax: number;
     fullDifference: number;
     boosterVaccination: number;
     boosterBiontech: number;
@@ -155,11 +157,13 @@ export async function getVaccinationCoverage(): Promise<
       "firstModerna",
       "firstAstraZeneca",
       "firstJanssen",
+      "firstNovavax",
       "firstDifference",
       "fullVaccinated",
       "fullBiontech",
       "fullModerna",
       "fullAstraZeneca",
+      "fullNovavax",
       "fullDifference",
       "boosterVaccination",
       "boosterBiontech",
@@ -167,59 +171,65 @@ export async function getVaccinationCoverage(): Promise<
       "boosterJanssen",
       "boosterDifference",
     ],
-    range: "A4:R21",
+    range: "A4:T21",
   });
 
   const quoteSheet = workbook.Sheets[workbook.SheetNames[1]];
   const quoteJson = XLSX.utils.sheet_to_json<{
     ags: number;
     state: string;
-    totalvaccination: number;
-    total1: number;
-    total1_5to11: number;
-    totalfull: number;
-    totalbooster: number;
-    quote1: number;
-    quote1_ls18: number;
-    quote1_18plus_total: number;
-    quote1_18to59: number;
-    quote1_gr60: number;
-    quotefull: number;
-    quotefull_ls18: number;
-    quotefull_18plus_total: number;
-    quotefull_18to59: number;
-    quotefull_gr60: number;
-    quoteboost: number;
-    quoteboost_ls18: number;
-    quoteboost_18plus_total: number;
-    quoteboost_18to59: number;
-    quoteboost_gr60: number;
+    vaccination: number;
+    n1st: number;
+    n2nd: number;
+    n3rd: number;
+    q1st: number;
+    q1stls18: number;
+    q1st5to11: number;
+    q1st12to17: number;
+    q1st18plus: number;
+    q1st18to59: number;
+    q1stgr60: number;
+    q2nd: number;
+    q2ndls18: number;
+    q2nd5to11: number;
+    q2nd12to17: number;
+    q2nd18plus: number;
+    q2nd18to59: number;
+    q2ndgr60: number;
+    q3rd: number;
+    q3rdls18: number;
+    q3rd18plus: number;
+    q3rd18to59: number;
+    q3rdgr60: number;
   }>(quoteSheet, {
     header: [
       "ags",
       "state",
-      "totalvaccination",
-      "total1",
-      "total1_5to11:",
-      "totalfull",
-      "totalbooster",
-      "quote1",
-      "quote1_ls18",
-      "quote1_18plus_total",
-      "quote1_18to59",
-      "quote1_gr60",
-      "quotefull",
-      "quotefull_ls18",
-      "quotefull_18plus_total",
-      "quotefull_18to59",
-      "quotefull_gr60",
-      "quoteboost",
-      "quoteboost_ls18",
-      "quoteboost_18plus_total",
-      "quoteboost_18to59",
-      "quoteboost_gr60",
+      "vaccination",
+      "n1st",
+      "n2nd",
+      "n3rd",
+      "q1st",
+      "q1stls18",
+      "q1st5to11",
+      "q1st12to17",
+      "q1st18plus",
+      "q1st18to59",
+      "q1stgr60",
+      "q2nd",
+      "q2ndls18",
+      "q2nd5to11",
+      "q2nd12to17",
+      "q2nd18plus",
+      "q2nd18to59",
+      "q2ndgr60",
+      "q3rd",
+      "q3rdls18",
+      "q3rd18plus",
+      "q3rd18to59",
+      "q3rdgr60",
     ],
-    range: "A4:V21",
+    range: "A4:Y21",
   });
 
   const coverage: VaccinationCoverage = {
@@ -230,18 +240,46 @@ export async function getVaccinationCoverage(): Promise<
       moderna: 0,
       astraZeneca: 0,
       janssen: 0,
+      novavax: 0,
     },
     delta: 0,
     quote: 0,
+    quotes: {
+      total: 0,
+      "A05-A17": {
+        total: 0,
+        "A05-A11": 0,
+        "A12-A17": 0,
+      },
+      "A18+": {
+        total: 0,
+        "A18-A59": 0,
+        "A60+": 0,
+      },
+    },
     secondVaccination: {
       vaccinated: 0,
       vaccination: {
         biontech: 0,
         moderna: 0,
         astraZeneca: 0,
+        novavax: 0,
       },
       delta: 0,
       quote: 0,
+      quotes: {
+        total: 0,
+        "A05-A17": {
+          total: 0,
+          "A05-A11": 0,
+          "A12-A17": 0,
+        },
+        "A18+": {
+          total: 0,
+          "A18-A59": 0,
+          "A60+": 0,
+        },
+      },
     },
     boosterVaccination: {
       vaccinated: 0,
@@ -252,6 +290,19 @@ export async function getVaccinationCoverage(): Promise<
       },
       delta: 0,
       quote: 0,
+      quotes: {
+        total: 0,
+        "A05-A17": {
+          total: 0,
+          "A05-A11": 0,
+          "A12-A17": 0,
+        },
+        "A18+": {
+          total: 0,
+          "A18-A59": 0,
+          "A60+": 0,
+        },
+      },
     },
     latestDailyVaccinations: {
       date: null,
@@ -260,51 +311,99 @@ export async function getVaccinationCoverage(): Promise<
       boosterVaccination: 0,
       vaccinated: 0,
     },
-    indication: {
-      age: null,
-      job: null,
-      medical: null,
-      nursingHome: null,
-      secondVaccination: {
-        age: null,
-        job: null,
-        medical: null,
-        nursingHome: null,
-      },
-    },
     states: {},
   };
 
   for (let i = 0; i < 18; i++) {
     const entry = json[i];
     clearEntry(entry);
-    const quoteEntry = quoteJson[i];
-    clearEntry(quoteEntry);
+    const quotes = quoteJson[i];
+    clearEntry(quotes);
 
     if (entry.state == "Gesamt") {
-      coverage.administeredVaccinations = quoteEntry.totalvaccination;
-      coverage.vaccinated = quoteEntry.total1;
+      coverage.administeredVaccinations = quotes.vaccination;
+      coverage.vaccinated = quotes.n1st;
       coverage.vaccination = {
         biontech: entry.firstBiontech,
         moderna: entry.firstModerna,
         astraZeneca: entry.firstAstraZeneca,
         janssen: entry.firstJanssen,
+        novavax: entry.firstNovavax == null ? null : entry.firstNovavax,
       };
       coverage.delta = entry.firstDifference;
       coverage.quote =
-        quoteEntry.quote1 === null ? null : quoteEntry.quote1 / 100.0;
+        quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3);
+      coverage.quotes.total =
+        quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3);
+      coverage.quotes["A05-A17"].total =
+        quotes.q1stls18 === null
+          ? null
+          : limitDecimals(quotes.q1stls18 / 100.0, 3);
+      coverage.quotes["A05-A17"]["A05-A11"] =
+        quotes.q1st5to11 === null
+          ? null
+          : limitDecimals(quotes.q1st5to11 / 100.0, 3);
+      coverage.quotes["A05-A17"]["A12-A17"] =
+        quotes.q1st12to17 === null
+          ? null
+          : limitDecimals(quotes.q1st12to17 / 100.0, 3);
+      coverage.quotes["A18+"].total =
+        quotes.q1st18plus === null
+          ? null
+          : limitDecimals(quotes.q1st18plus / 100.0, 3);
+      coverage.quotes["A18+"]["A18-A59"] =
+        quotes.q1st18to59 === null
+          ? null
+          : limitDecimals(quotes.q1st18to59 / 100.0, 3);
+      coverage.quotes["A18+"]["A60+"] =
+        quotes.q1stgr60 === null
+          ? null
+          : limitDecimals(quotes.q1stgr60 / 100.0, 3);
       coverage.secondVaccination = {
-        vaccinated: quoteEntry.totalfull,
+        vaccinated: quotes.n2nd,
         vaccination: {
           biontech: entry.fullBiontech,
           moderna: entry.fullModerna,
           astraZeneca: entry.fullAstraZeneca,
+          novavax: entry.fullNovavax === null ? null : entry.fullNovavax,
         },
         delta: entry.fullDifference,
         quote:
-          quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
+          quotes.q2nd === null ? null : limitDecimals(quotes.q2nd / 100.0, 3),
+        quotes: {
+          total:
+            quotes.q2nd === null ? null : limitDecimals(quotes.q2nd / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q2ndls18 === null
+                ? null
+                : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            "A05-A11":
+              quotes.q2nd5to11 === null
+                ? null
+                : limitDecimals(quotes.q2nd5to11 / 100.0, 3),
+            "A12-A17":
+              quotes.q2nd12to17 === null
+                ? null
+                : limitDecimals(quotes.q2nd12to17 / 100.0, 3),
+          },
+          "A18+": {
+            total:
+              quotes.q2nd18plus === null
+                ? null
+                : limitDecimals(quotes.q2nd18plus / 100.0, 3),
+            "A18-A59":
+              quotes.q2nd18to59 === null
+                ? null
+                : limitDecimals(quotes.q2nd18to59 / 100.0, 3),
+            "A60+":
+              quotes.q2ndgr60 === null
+                ? null
+                : limitDecimals(quotes.q2ndgr60 / 100.0, 3),
+          },
+        },
       };
-      (coverage.boosterVaccination = {
+      coverage.boosterVaccination = {
         vaccinated: entry.boosterVaccination,
         vaccination: {
           biontech: entry.boosterBiontech,
@@ -313,20 +412,37 @@ export async function getVaccinationCoverage(): Promise<
         },
         delta: entry.boosterDifference,
         quote:
-          quoteEntry.quoteboost === null ? null : quoteEntry.quoteboost / 100.0,
-      }),
-        (coverage.indication = {
-          age: null,
-          job: null,
-          medical: null,
-          nursingHome: null,
-          secondVaccination: {
-            age: null,
-            job: null,
-            medical: null,
-            nursingHome: null,
+          quotes.q3rd === null ? null : limitDecimals(quotes.q3rd / 100.0, 3),
+        quotes: {
+          total:
+            quotes.q3rd === null ? null : limitDecimals(quotes.q3rd / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q3rdls18 === null
+                ? null
+                : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+            "A05-A11": null, // not publisched at this time!
+            "A12-A17":
+              quotes.q3rdls18 === null
+                ? null
+                : limitDecimals(quotes.q3rdls18 / 100.0, 3),
           },
-        });
+          "A18+": {
+            total:
+              quotes.q3rd18plus === null
+                ? null
+                : limitDecimals(quotes.q3rd18plus / 100.0, 3),
+            "A18-A59":
+              quotes.q3rd18to59 === null
+                ? null
+                : limitDecimals(quotes.q3rd18to59 / 100.0, 3),
+            "A60+":
+              quotes.q3rdgr60 === null
+                ? null
+                : limitDecimals(quotes.q3rdgr60 / 100.0, 3),
+          },
+        },
+      };
     } else {
       const cleanedStateName = cleanupString(entry.state);
       // cleanedStateName should always be cleaned
@@ -335,26 +451,95 @@ export async function getVaccinationCoverage(): Promise<
         : getStateAbbreviationByName(cleanedStateName);
       coverage.states[abbreviation] = {
         name: cleanedStateName,
-        administeredVaccinations: quoteEntry.totalvaccination,
-        vaccinated: quoteEntry.total1,
+        administeredVaccinations: quotes.vaccination,
+        vaccinated: quotes.n1st,
         vaccination: {
           biontech: entry.firstBiontech,
           moderna: entry.firstModerna,
           astraZeneca: entry.firstAstraZeneca,
           janssen: entry.firstJanssen,
+          novavax: entry.firstNovavax === null ? null : entry.firstNovavax,
         },
         delta: entry.firstDifference,
-        quote: quoteEntry.quote1 === null ? null : quoteEntry.quote1 / 100.0,
+        quote:
+          quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3),
+        quotes: {
+          total:
+            quotes.q1st === null ? null : limitDecimals(quotes.q1st / 100.0, 3),
+          "A05-A17": {
+            total:
+              quotes.q1stls18 === null
+                ? null
+                : limitDecimals(quotes.q1stls18 / 100.0, 3),
+            "A05-A11":
+              quotes.q1st5to11 === null
+                ? null
+                : limitDecimals(quotes.q1st5to11 / 100.0, 3),
+            "A12-A17":
+              quotes.q1st12to17 === null
+                ? null
+                : limitDecimals(quotes.q1st12to17 / 100.0, 3),
+          },
+          "A18+": {
+            total:
+              quotes.q1st18plus === null
+                ? null
+                : limitDecimals(quotes.q1st18plus / 100.0, 3),
+            "A18-A59":
+              quotes.q1st18to59 === null
+                ? null
+                : limitDecimals(quotes.q1st18to59 / 100.0, 3),
+            "A60+":
+              quotes.q1stgr60 === null
+                ? null
+                : limitDecimals(quotes.q1stgr60 / 100.0, 3),
+          },
+        },
         secondVaccination: {
-          vaccinated: quoteEntry.totalfull,
+          vaccinated: quotes.n2nd,
           vaccination: {
             biontech: entry.fullBiontech,
             moderna: entry.fullModerna,
             astraZeneca: entry.fullAstraZeneca,
+            novavax: entry.fullNovavax === null ? null : entry.fullNovavax,
           },
           delta: entry.fullDifference,
           quote:
-            quoteEntry.quotefull === null ? null : quoteEntry.quotefull / 100.0,
+            quotes.q2nd === null ? null : limitDecimals(quotes.q2nd / 100.0, 3),
+          quotes: {
+            total:
+              quotes.q2nd === null
+                ? null
+                : limitDecimals(quotes.q2nd / 100.0, 3),
+            "A05-A17": {
+              total:
+                quotes.q2ndls18 === null
+                  ? null
+                  : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+              "A05-A11":
+                quotes.q2nd5to11 === null
+                  ? null
+                  : limitDecimals(quotes.q2nd5to11 / 100.0, 3),
+              "A12-A17":
+                quotes.q2nd12to17 === null
+                  ? null
+                  : limitDecimals(quotes.q2nd12to17 / 100.0, 3),
+            },
+            "A18+": {
+              total:
+                quotes.q2nd18plus === null
+                  ? null
+                  : limitDecimals(quotes.q2nd18plus / 100.0, 3),
+              "A18-A59":
+                quotes.q2nd18to59 === null
+                  ? null
+                  : limitDecimals(quotes.q2nd18to59 / 100.0, 3),
+              "A60+":
+                quotes.q2ndgr60 === null
+                  ? null
+                  : limitDecimals(quotes.q2ndgr60 / 100.0, 3),
+            },
+          },
         },
         boosterVaccination: {
           vaccinated: entry.boosterVaccination,
@@ -365,20 +550,37 @@ export async function getVaccinationCoverage(): Promise<
           },
           delta: entry.boosterDifference,
           quote:
-            quoteEntry.quoteboost === null
-              ? null
-              : quoteEntry.quoteboost / 100.0,
-        },
-        indication: {
-          age: null,
-          job: null,
-          medical: null,
-          nursingHome: null,
-          secondVaccination: {
-            age: null,
-            job: null,
-            medical: null,
-            nursingHome: null,
+            quotes.q3rd === null ? null : limitDecimals(quotes.q3rd / 100.0, 3),
+          quotes: {
+            total:
+              quotes.q3rd === null
+                ? null
+                : limitDecimals(quotes.q3rd / 100.0, 3),
+            "A05-A17": {
+              total:
+                quotes.q3rdls18 === null
+                  ? null
+                  : limitDecimals(quotes.q3rdls18 / 100.0, 3),
+              "A05-A11": null, // not published at this time!
+              "A12-A17":
+                quotes.q3rdls18 === null
+                  ? null
+                  : limitDecimals(quotes.q2ndls18 / 100.0, 3),
+            },
+            "A18+": {
+              total:
+                quotes.q3rd18plus === null
+                  ? null
+                  : limitDecimals(quotes.q3rd18plus / 100.0, 3),
+              "A18-A59":
+                quotes.q3rd18to59 === null
+                  ? null
+                  : limitDecimals(quotes.q3rd18to59 / 100.0, 3),
+              "A60+":
+                quotes.q3rdgr60 === null
+                  ? null
+                  : limitDecimals(quotes.q3rdgr60 / 100.0, 3),
+            },
           },
         },
       };
@@ -394,6 +596,10 @@ export async function getVaccinationCoverage(): Promise<
     data: coverage,
     lastUpdate: lastUpdate,
   };
+}
+
+function limitDecimals(value: number, decimals: number): number {
+  return parseFloat(value.toFixed(decimals));
 }
 
 export interface VaccinationHistoryEntry {

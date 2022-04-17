@@ -630,51 +630,149 @@ Returns the number of recovered people in germany for the last `:days` days.
 
 ### Response
 
+`cases7Days` updated number of hospitalization cases of the last 7 days.
+
+`incidence7Days` updated 7 day incidence of hospitalization.
+
+`date` publishing date of all values.
+
+Since 2021-03-09 the RKI is publisching adjusted (predicted) values for cases7Days and incidence7Days. If these values ​​are available, they are output below. These values are unavailable bevor 2021-03-09 and for the last 3 days.
+
+`fixedCases7Days` the number of 7 day cases witch is published at `date` first (fixed, that will never change!).
+
+`updatedCases7Days` the today updated number of 7 day cases and the same as `cases7Days`.
+
+`adjustedLowerCases7Days` the 95% lower limit adjusted (predicted) number of 7 day cases.
+
+`adjustedCases7Days` the adjusted (predicted) number of 7 day cases.
+
+`adjustedUpperCases7Days` the 95% upper limit adjusted (predicted) number of 7 day cases.
+
+`fixedIncidence7Days` the 7 day incidence witch is published at `date` first (fixed, that will never change!).
+
+`updatedIncidence7Days` the today updated 7 day incidence and the same as `incidence7Days`.
+
+`adjustedLowerIncidence7Days` the 95% lower limit adjusted (predicted) 7 day incidence.
+
+`adjustedIncidence7Days` the adjusted (predicted) 7 day incidence.
+
+`adjustedUpperIncidence7Days` the 95% upper limit adjusted (predicted) 7 day incidence.
+
 ```json
 {
   "data": [
     {
-      "cases7Days": 6207,
-      "incidence7Days": 7.46,
-      "date": "2021-11-13T00:00:00.000Z"
+      "cases7Days": 7629,
+      "incidence7Days": 9.17,
+      "date": "2022-02-19T00:00:00.000Z",
+      "fixedCases7Days": 5301,
+      "updatedCases7Days": 7629,
+      "adjustedLowerCases7Days": 9606,
+      "adjustedCases7Days": 9840,
+      "adjustedUpperCases7Days": 10024,
+      "fixedIncidence7Days": 6.37,
+      "updatedIncidence7Days": 9.17,
+      "adjustedLowerIncidence7Days": 11.55,
+      "adjustedIncidence7Days": 11.83,
+      "adjustedUpperIncidence7Days": 12.06
     },
     {
-      "cases7Days": 6103,
-      "incidence7Days": 7.34,
-      "date": "2021-11-14T00:00:00.000Z"
+      "cases7Days": 7491,
+      "incidence7Days": 9.01,
+      "date": "2022-02-20T00:00:00.000Z",
+      "fixedCases7Days": 5213,
+      "updatedCases7Days": 7491,
+      "adjustedLowerCases7Days": 9634,
+      "adjustedCases7Days": 9866,
+      "adjustedUpperCases7Days": 10061,
+      "fixedIncidence7Days": 6.27,
+      "updatedIncidence7Days": 9.01,
+      "adjustedLowerIncidence7Days": 11.59,
+      "adjustedIncidence7Days": 11.87,
+      "adjustedUpperIncidence7Days": 12.1
     },
     {
-      "cases7Days": 6060,
-      "incidence7Days": 7.29,
-      "date": "2021-11-15T00:00:00.000Z"
+      "cases7Days": 7415,
+      "incidence7Days": 8.92,
+      "date": "2022-02-21T00:00:00.000Z",
+      "fixedCases7Days": 5040,
+      "updatedCases7Days": 7415,
+      "adjustedLowerCases7Days": 9705,
+      "adjustedCases7Days": 9936,
+      "adjustedUpperCases7Days": 10125,
+      "fixedIncidence7Days": 6.06,
+      "updatedIncidence7Days": 8.92,
+      "adjustedLowerIncidence7Days": 11.67,
+      "adjustedIncidence7Days": 11.95,
+      "adjustedUpperIncidence7Days": 12.18
     },
     {
-      "cases7Days": 5888,
-      "incidence7Days": 7.08,
-      "date": "2021-11-16T00:00:00.000Z"
+      "cases7Days": 7137,
+      "incidence7Days": 8.58,
+      "date": "2022-02-22T00:00:00.000Z",
+      "fixedCases7Days": 5165,
+      "updatedCases7Days": 7137,
+      "adjustedLowerCases7Days": 9764,
+      "adjustedCases7Days": 10003,
+      "adjustedUpperCases7Days": 10249,
+      "fixedIncidence7Days": 6.21,
+      "updatedIncidence7Days": 8.58,
+      "adjustedLowerIncidence7Days": 11.74,
+      "adjustedIncidence7Days": 12.03,
+      "adjustedUpperIncidence7Days": 12.33
     },
     {
-      "cases7Days": 5606,
-      "incidence7Days": 6.74,
-      "date": "2021-11-17T00:00:00.000Z"
+      "cases7Days": 6607,
+      "incidence7Days": 7.95,
+      "date": "2022-02-23T00:00:00.000Z",
+      "fixedCases7Days": 5275,
+      "updatedCases7Days": 6607,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.34,
+      "updatedIncidence7Days": 7.95,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
     },
     {
-      "cases7Days": 5116,
-      "incidence7Days": 6.15,
-      "date": "2021-11-18T00:00:00.000Z"
+      "cases7Days": 6034,
+      "incidence7Days": 7.26,
+      "date": "2022-02-24T00:00:00.000Z",
+      "fixedCases7Days": 5217,
+      "updatedCases7Days": 6034,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.27,
+      "updatedIncidence7Days": 7.26,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
     },
     {
-      "cases7Days": 4437,
-      "incidence7Days": 5.34,
-      "date": "2021-11-19T00:00:00.000Z"
+      "cases7Days": 5221,
+      "incidence7Days": 6.28,
+      "date": "2022-02-25T00:00:00.000Z",
+      "fixedCases7Days": 5221,
+      "updatedCases7Days": 5221,
+      "adjustedLowerCases7Days": null,
+      "adjustedCases7Days": null,
+      "adjustedUpperCases7Days": null,
+      "fixedIncidence7Days": 6.28,
+      "updatedIncidence7Days": 6.28,
+      "adjustedLowerIncidence7Days": null,
+      "adjustedIncidence7Days": null,
+      "adjustedUpperIncidence7Days": null
     }
   ],
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-11-19T03:01:47.000Z",
-    "lastCheckedForUpdate": "2021-11-19T15:34:49.633Z"
+    "lastUpdate": "2022-02-25T04:05:31.000Z",
+    "lastCheckedForUpdate": "2022-02-25T06:41:49.840Z"
   }
 }
 ```

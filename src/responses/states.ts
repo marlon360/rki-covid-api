@@ -430,9 +430,19 @@ interface StatesHospitalizationHistory {
       name: string;
       history: [
         {
-          cases7Days: number;
-          incidence7Days: number;
+          cases7Days: number; //legacy
+          incidence7Days: number; //legacy
           date: Date;
+          fixedCases7Days: number;
+          updatedCases7Days: number;
+          adjustedLowerCases7Days: number;
+          adjustedCases7Days: number;
+          adjustedUpperCases7Days: number;
+          fixedIncidence7Days: number;
+          updatedIncidence7Days: number;
+          adjustedLowerIncidence7Days: number;
+          adjustedIncidence7Days: number;
+          adjustedUpperIncidence7days: number;
         }
       ];
     };
@@ -480,10 +490,39 @@ export async function StatesHospitalizationHistoryResponse(
         }
         historyData[abbreviation].history.push({
           cases7Days:
-            hospitalizationData.data[dateKey].states[stateName].cases7Days,
+            hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
           incidence7Days:
-            hospitalizationData.data[dateKey].states[stateName].incidence7Days,
+            hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
           date: new Date(dateKey),
+          fixedCases7Days:
+            hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
+          updatedCases7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .updatedCases7Days,
+          adjustedLowerCases7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedLowerCases7Days,
+          adjustedCases7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedCases7Days,
+          adjustedUpperCases7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedUpperCases7Days,
+          fixedIncidence7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .fixedIncidence7Days,
+          updatedIncidence7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .updatedIncidence7Days,
+          adjustedLowerIncidence7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedLowerIncidence7Days,
+          adjustedIncidence7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedIncidence7Days,
+          adjustedUpperIncidence7Days:
+            hospitalizationData.data[dateKey].states[stateName]
+              .adjustedUpperIncidence7Days,
         });
       });
     } else if (abbreviationList.includes(p_abbreviation)) {
@@ -498,10 +537,38 @@ export async function StatesHospitalizationHistoryResponse(
       }
       historyData[p_abbreviation].history.push({
         cases7Days:
-          hospitalizationData.data[dateKey].states[stateName].cases7Days,
+          hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
         incidence7Days:
-          hospitalizationData.data[dateKey].states[stateName].incidence7Days,
+          hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
         date: new Date(dateKey),
+        fixedCases7Days:
+          hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
+        updatedCases7Days:
+          hospitalizationData.data[dateKey].states[stateName].updatedCases7Days,
+        adjustedLowerCases7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedLowerCases7Days,
+        adjustedCases7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedCases7Days,
+        adjustedUpperCases7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedUpperCases7Days,
+        fixedIncidence7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .fixedIncidence7Days,
+        updatedIncidence7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .updatedIncidence7Days,
+        adjustedLowerIncidence7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedLowerIncidence7Days,
+        adjustedIncidence7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedIncidence7Days,
+        adjustedUpperIncidence7Days:
+          hospitalizationData.data[dateKey].states[stateName]
+            .adjustedUpperIncidence7Days,
       });
     } else {
       throw new Error(
