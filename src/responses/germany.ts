@@ -18,11 +18,14 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
+import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 import {
-  getStatesFrozenIncidenceHistory,
-  StatesFrozenIncidenceData,
-} from "../data-requests/frozen-incidence";
-import { getDateBefore } from "../utils";
+  getDateBefore,
+  AddDaysToDate,
+  getDayDifference,
+  RequestType,
+  fill0CasesDaysGermany,
+} from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -134,8 +137,18 @@ export async function GermanyCasesHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
   const history = await getLastCasesHistory(days);
+  const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const data = fill0CasesDaysGermany(
+    history,
+    lowDate,
+    highDate,
+    RequestType.cases
+  );
   return {
-    data: history.history,
+    data: data,
     meta: new ResponseMeta(history.lastUpdate),
   };
 }
@@ -147,7 +160,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
     days += 6;
   }
 
-  const history = await getLastCasesHistory(days);
+  const history = await GermanyCasesHistoryResponse(days);
   const statesData = await getStatesData();
 
   const population = statesData.data
@@ -156,11 +169,11 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
-  for (let i = 6; i < history.history.length; i++) {
-    const date = history.history[i].date;
+  for (let i = 6; i < history.data.length; i++) {
+    const date = history.data[i].date;
     let sum = 0;
     for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-      sum += history.history[dayOffset].cases;
+      sum += history.data[dayOffset].cases;
     }
     weekIncidenceHistory.push({
       weekIncidence: (sum / population) * 100000,
@@ -170,7 +183,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
 
   return {
     data: weekIncidenceHistory,
-    meta: new ResponseMeta(history.lastUpdate),
+    meta: history.meta,
   };
 }
 
@@ -178,8 +191,18 @@ export async function GermanyDeathsHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
   const history = await getLastDeathsHistory(days);
+  const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const data = fill0CasesDaysGermany(
+    history,
+    lowDate,
+    highDate,
+    RequestType.deaths
+  );
   return {
-    data: history.history,
+    data: data,
     meta: new ResponseMeta(history.lastUpdate),
   };
 }
@@ -188,8 +211,18 @@ export async function GermanyRecoveredHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
   const history = await getLastRecoveredHistory(days);
+  const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const data = fill0CasesDaysGermany(
+    history,
+    lowDate,
+    highDate,
+    RequestType.recovered
+  );
   return {
-    data: history.history,
+    data: data,
     meta: new ResponseMeta(history.lastUpdate),
   };
 }

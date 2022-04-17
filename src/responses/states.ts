@@ -14,13 +14,15 @@ import {
 } from "../data-requests/states";
 import {
   AddDaysToDate,
-  getDayDifference,
   getStateAbbreviationById,
   getStateAbbreviationByName,
   getStateIdByAbbreviation,
   getStateIdByName,
   getStateNameByAbbreviation,
   getDateBefore,
+  fill0CasesDays,
+  RegionType,
+  RequestType,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -116,13 +118,11 @@ export async function StatesResponse(
     };
   });
 
-  if (abbreviation != null) {
-    const id = getStateIdByAbbreviation(abbreviation);
-    if (id != null) {
-      states = states.filter((state) => {
-        return state.id == id;
-      });
-    }
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
+  if (id) {
+    states = states.filter((state) => {
+      return state.id == id;
+    });
   }
 
   const statesKey = {};
@@ -152,52 +152,29 @@ export async function StatesCasesHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
-  let id = null;
-  if (abbreviation != null) {
-    id = getStateIdByAbbreviation(abbreviation);
-  }
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
 
   const statesHistoryData = await getLastStateCasesHistory(days, id);
 
-  const data: StatesCasesHistory = {};
+  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
 
-  for (const historyData of statesHistoryData.data) {
-    const abbr = getStateAbbreviationById(historyData.id);
-    if (data[abbr] == null) {
-      data[abbr] = {
-        id: historyData.id,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[abbr].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[abbr].history[data[abbr].history.length - 1].date
-        ) > 1
-      ) {
-        data[abbr].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[abbr].history[data[abbr].history.length - 1].date,
-            1
-          ),
-        });
-      }
-    }
-    data[abbr].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
-  }
+  const data: StatesCasesHistory = fill0CasesDays(
+    statesHistoryData,
+    lowDate,
+    highDate,
+    RegionType.states,
+    RequestType.cases
+  );
+
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -211,23 +188,21 @@ export async function StatesWeekIncidenceHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   // add 6 days to calculate week incidence
-  if (days != null) {
+  if (days) {
     days += 6;
   }
 
-  let id = null;
-  if (abbreviation != null) {
-    id = getStateIdByAbbreviation(abbreviation);
-  }
-
-  const statesHistoryData = await getLastStateCasesHistory(days, id);
+  const statesHistoryCasesData = await StatesCasesHistoryResponse(
+    days,
+    abbreviation
+  );
   const statesData = await getStatesData();
 
   function getStateById(
@@ -240,44 +215,10 @@ export async function StatesWeekIncidenceHistoryResponse(
     return null;
   }
 
-  const data: StatesCasesHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    const abbr = getStateAbbreviationById(historyData.id);
-    if (data[abbr] == null) {
-      data[abbr] = {
-        id: historyData.id,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[abbr].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[abbr].history[data[abbr].history.length - 1].date
-        ) > 1
-      ) {
-        data[abbr].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[abbr].history[data[abbr].history.length - 1].date,
-            1
-          ),
-        });
-      }
-    }
-    data[abbr].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
-  }
-
   const incidenceData: StatesWeekIncidenceHistory = {};
 
-  for (const abbr of Object.keys(data)) {
-    const stateHistory = data[abbr].history;
+  for (const abbr of Object.keys(statesHistoryCasesData.data)) {
+    const stateHistory = statesHistoryCasesData.data[abbr].history;
     const state = getStateById(statesData, getStateIdByAbbreviation(abbr));
 
     incidenceData[abbr] = {
@@ -301,7 +242,7 @@ export async function StatesWeekIncidenceHistoryResponse(
 
   return {
     data: incidenceData,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: statesHistoryCasesData.meta,
   };
 }
 
@@ -312,52 +253,28 @@ export async function StatesDeathsHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesDeathsHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
-  let id = null;
-  if (abbreviation != null) {
-    id = getStateIdByAbbreviation(abbreviation);
-  }
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
 
   const statesHistoryData = await getLastStateDeathsHistory(days, id);
+  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
 
-  const data: StatesDeathsHistory = {};
+  const data: StatesDeathsHistory = fill0CasesDays(
+    statesHistoryData,
+    lowDate,
+    highDate,
+    RegionType.states,
+    RequestType.deaths
+  );
 
-  for (const historyData of statesHistoryData.data) {
-    const abbr = getStateAbbreviationById(historyData.id);
-    if (data[abbr] == null) {
-      data[abbr] = {
-        id: historyData.id,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[abbr].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[abbr].history[data[abbr].history.length - 1].date
-        ) > 1
-      ) {
-        data[abbr].history.push({
-          deaths: 0,
-          date: AddDaysToDate(
-            data[abbr].history[data[abbr].history.length - 1].date,
-            1
-          ),
-        });
-      }
-    }
-    data[abbr].history.push({
-      deaths: historyData.deaths,
-      date: new Date(historyData.date),
-    });
-  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -371,52 +288,28 @@ export async function StatesRecoveredHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesRecoveredHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
-  let id = null;
-  if (abbreviation != null) {
-    id = getStateIdByAbbreviation(abbreviation);
-  }
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
 
   const statesHistoryData = await getLastStateRecoveredHistory(days, id);
+  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
 
-  const data: StatesRecoveredHistory = {};
+  const data: StatesRecoveredHistory = fill0CasesDays(
+    statesHistoryData,
+    lowDate,
+    highDate,
+    RegionType.states,
+    RequestType.recovered
+  );
 
-  for (const historyData of statesHistoryData.data) {
-    const abbr = getStateAbbreviationById(historyData.id);
-    if (data[abbr] == null) {
-      data[abbr] = {
-        id: historyData.id,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[abbr].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[abbr].history[data[abbr].history.length - 1].date
-        ) > 1
-      ) {
-        data[abbr].history.push({
-          recovered: 0,
-          date: AddDaysToDate(
-            data[abbr].history[data[abbr].history.length - 1].date,
-            1
-          ),
-        });
-      }
-    }
-    data[abbr].history.push({
-      recovered: historyData.recovered,
-      date: new Date(historyData.date),
-    });
-  }
   return {
     data,
     meta: new ResponseMeta(statesHistoryData.lastUpdate),
@@ -454,7 +347,7 @@ export async function StatesHospitalizationHistoryResponse(
   days?: number,
   p_abbreviation?: string
 ): Promise<StatesHospitalizationHistory> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
@@ -587,10 +480,8 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {
-  let id = null;
-  if (abbreviation != null) {
-    id = getStateIdByAbbreviation(abbreviation);
-  }
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
+
   const AgeGroupsData = await getStatesAgeGroups(id);
   const hospitalizationData = await getHospitalizationData();
 
