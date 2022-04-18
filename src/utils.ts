@@ -322,7 +322,7 @@ export enum RequestType {
 }
 
 export enum RegionType {
-  distrits = "ags",
+  districts = "ags",
   states = "id",
 }
 
@@ -336,9 +336,9 @@ export function fill0CasesDays(
   const targetData = {};
   for (const historyData of sourceData.data) {
     const regionKey =
-      regionType == "id"
-        ? getStateAbbreviationById(historyData.id)
-        : historyData.ags;
+      regionType == RegionType.states
+        ? getStateAbbreviationById(historyData[regionType])
+        : historyData[regionType];
     if (!targetData[regionKey]) {
       targetData[regionKey] = {
         [regionType]: historyData[regionType],
@@ -382,7 +382,7 @@ export function fill0CasesDays(
       date: historyData.date,
     });
   }
-  // now fill top dates to highDate (datenstand -1) for each ags
+  // now fill top dates to highDate (datenstand -1) for each regionKey
   for (const regionKey of Object.keys(targetData)) {
     while (
       targetData[regionKey].history[targetData[regionKey].history.length - 1]

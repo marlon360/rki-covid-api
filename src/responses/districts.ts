@@ -139,7 +139,7 @@ export async function DistrictsCasesHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
-    RegionType.distrits,
+    RegionType.districts,
     RequestType.cases
   );
   return {
@@ -238,7 +238,7 @@ export async function DistrictsDeathsHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
-    RegionType.distrits,
+    RegionType.districts,
     RequestType.deaths
   );
 
@@ -276,7 +276,7 @@ export async function DistrictsRecoveredHistoryResponse(
     districtsHistoryData,
     lowDate,
     highDate,
-    RegionType.distrits,
+    RegionType.districts,
     RequestType.recovered
   );
 

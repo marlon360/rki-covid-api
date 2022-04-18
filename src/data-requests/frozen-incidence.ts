@@ -74,7 +74,8 @@ async function getDistrictsFrozenIncidenceHistoryArchive(): Promise<
 
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
-  ags?: string
+  ags?: string,
+  date?: Date
 ): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
@@ -109,9 +110,15 @@ export async function getDistrictsFrozenIncidenceHistory(
       history.push({ weekIncidence: district[dateKey], date });
     });
 
-    if (days != null) {
-      const reference_date = new Date(getDateBefore(days));
-      history = history.filter((element) => element.date > reference_date);
+    if (days) {
+      const referenceDate = new Date(getDateBefore(days));
+      history = history.filter((element) => element.date > referenceDate);
+    }
+    if (date) {
+      const referenceDate = date.toDateString();
+      history = history.filter(
+        (element) => element.date.toDateString() === referenceDate
+      );
     }
 
     return { ags, name, history };
@@ -131,15 +138,24 @@ export async function getDistrictsFrozenIncidenceHistory(
   if (fetchArchiveData) {
     let archiveData = await getDistrictsFrozenIncidenceHistoryArchive();
     // filter by abbreviation
-    if (ags != null) {
+    if (ags) {
       archiveData = archiveData.filter((district) => district.ags === ags);
     }
     // filter by days
-    if (days != null) {
-      const reference_date = new Date(getDateBefore(days));
+    if (days) {
+      const referenceDate = new Date(getDateBefore(days));
       archiveData = archiveData.map((district) => {
         district.history = district.history.filter(
-          (element) => element.date > reference_date
+          (element) => element.date > referenceDate
+        );
+        return district;
+      });
+    }
+    if (date) {
+      const referenceDate = date.toDateString();
+      archiveData = archiveData.map((district) => {
+        district.history = district.history.filter(
+          (element) => element.date.toDateString() == referenceDate
         );
         return district;
       });
@@ -213,7 +229,7 @@ async function getStatesFrozenIncidenceHistoryArchive(): Promise<
 export async function getStatesFrozenIncidenceHistory(
   days?: number,
   abbreviation?: string,
-  date?: Date,
+  date?: Date
 ): Promise<ResponseData<StatesFrozenIncidenceData[]>> {
   const response = await axios.get(
     "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
@@ -236,7 +252,7 @@ export async function getStatesFrozenIncidenceHistory(
   let states = json.map((states) => {
     const name = states["MeldeLandkreisBundesland"];
     const abbreviation = getStateAbbreviationByName(name);
-    const  id = getStateIdByName(name);
+    const id = getStateIdByName(name);
 
     let history = [];
 
@@ -263,7 +279,7 @@ export async function getStatesFrozenIncidenceHistory(
     return { abbreviation, id, name, history };
   });
 
-  if (abbreviation != null) {
+  if (abbreviation) {
     states = states.filter((states) => states.abbreviation === abbreviation);
   }
 
@@ -278,17 +294,26 @@ export async function getStatesFrozenIncidenceHistory(
     // load all archive data
     let archiveData = await getStatesFrozenIncidenceHistoryArchive();
     // filter by abbreviation
-    if (abbreviation != null) {
+    if (abbreviation) {
       archiveData = archiveData.filter(
         (state) => state.abbreviation === abbreviation
       );
     }
     // filter by days
-    if (days != null) {
-      const reference_date = new Date(getDateBefore(days));
+    if (days) {
+      const referenceDate = new Date(getDateBefore(days));
       archiveData = archiveData.map((state) => {
         state.history = state.history.filter(
-          (element) => element.date > reference_date
+          (element) => element.date > referenceDate
+        );
+        return state;
+      });
+    }
+    if (date) {
+      const referenceDate = date.toDateString();
+      archiveData = archiveData.map((state) => {
+        state.history = state.history.filter(
+          (element) => element.date.toDateString() == referenceDate
         );
         return state;
       });
