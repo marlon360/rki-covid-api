@@ -1,0 +1,17 @@
+name: Purge cache
+on: workflow_dispatch
+jobs:
+  purge_cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install redis
+        run: sudo apt-get install -y redis-tools redis-server
+
+      - name: Flush redis database
+        run: redis-cli -u ${{ secrets.REDIS_URL }} FLUSHDB
+
+      - name: Purge cloudflare cache
+        uses: jakejarvis/cloudflare-purge-action@master
+        env:
+          CLOUDFLARE_ZONE: ${{ secrets.CLOUDFLARE_ZONE }}
+          CLOUDFLARE_TOKEN: ${{ secrets.CLOUDFLARE_TOKEN }}
