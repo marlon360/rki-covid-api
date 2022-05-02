@@ -844,7 +844,7 @@ app.get(
 );
 
 app.get(
-  "/vaccinations/:state",
+  "/vaccinations/states/:state",
   queuedCache(),
   cache.route(),
   async function (req, res) {
