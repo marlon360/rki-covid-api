@@ -590,6 +590,19 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 }
 ```
 
+## `/vaccinations/:state`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/HH`
+[Open](/vaccinations/HH)
+
+**Parameters**
+
+| Parameter | Description                         |
+| --------- | ----------------------------------- |
+| :state    | abbreviation of the requested state |
+
 ## `/vaccinations/history`
 
 ### Request

@@ -14,9 +14,16 @@ export async function VaccinationResponse(
   abbreviation?: string
 ): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
-
+  const vaccinationDataOut = { data: undefined };
+  if (abbreviation) {
+    vaccinationDataOut.data = { [abbreviation]: undefined };
+    vaccinationDataOut.data[abbreviation] =
+      vaccinationData.data.states[abbreviation];
+  } else {
+    vaccinationData.data = vaccinationData.data;
+  }
   return {
-    data: vaccinationData.data,
+    data: vaccinationDataOut.data,
     meta: new ResponseMeta(vaccinationData.lastUpdate),
   };
 }
