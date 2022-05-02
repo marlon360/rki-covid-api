@@ -1213,18 +1213,19 @@ interface VacciantionHistoryDataObject {
     firstBoosterVaccination: number;
     secondBoosterVaccination: number;
     totalVacciantionOfTheDay: number;
-  }
+  };
 }
 
 export interface VaccinationHistoryEntry {
-  date: Date,
+  date: Date;
   vaccinated: number;
   firstVaccination: number;
   secondVaccination: number;
   firstBoosterVaccination: number;
   secondBoosterVaccination: number;
   totalVacciantionOfTheDay: number;
-}[]
+}
+[];
 
 export async function getVaccinationHistory(
   days?: number
@@ -1256,11 +1257,11 @@ export async function getVaccinationHistory(
       parser.on("readable", function () {
         let record;
         while ((record = parser.read())) {
-          let [date,stateId,vaccine,series,count] = record;
-          let total = 0
+          let [date, stateId, vaccine, series, count] = record;
+          let total = 0;
           // read entry for the date
-          let dateEntry = vaccinationHistoryDataObject[date.toISOString()] 
-          
+          let dateEntry = vaccinationHistoryDataObject[date.toISOString()];
+
           // create new object if the entry does not exist
           if (!dateEntry) {
             dateEntry = {
@@ -1313,13 +1314,14 @@ export async function getVaccinationHistory(
   const [vaccinationHistoryObject, lastUpdate] = await Promise.all([
     vaccinationHistoryPromise,
     axios
-      .get("https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/.zenodo.json"
+      .get(
+        "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/.zenodo.json"
       )
       .then((response) => {
         return new Date(response.data.publication_date);
       }),
   ]);
-  let vaccinationHistory: VaccinationHistoryEntry[] = []; 
+  let vaccinationHistory: VaccinationHistoryEntry[] = [];
   for (const entry of Object.keys(vaccinationHistoryObject)) {
     vaccinationHistory.push(vaccinationHistoryObject[entry]);
   }
