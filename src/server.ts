@@ -844,6 +844,16 @@ app.get(
 );
 
 app.get(
+  "/vaccinations/:state",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationResponse(req.params.state);
+    res.json(response);
+  }
+);
+
+app.get(
   "/vaccinations/history",
   queuedCache(),
   cache.route(),
