@@ -20,7 +20,7 @@ export async function VaccinationResponse(
     vaccinationDataOut.data[abbreviation] =
       vaccinationData.data.states[abbreviation];
   } else {
-    vaccinationData.data = vaccinationData.data;
+    vaccinationDataOut.data = vaccinationData.data;
   }
   return {
     data: vaccinationDataOut.data,
