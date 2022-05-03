@@ -320,7 +320,7 @@ const DataPromise = async function (resolve, reject) {
               break;
             case "Novavax":
               stateEntry.full.novavax += count;
-              vaccinationDataObject[0].first.novavax += count;
+              vaccinationDataObject[0].full.novavax += count;
               break;
           }
           break;
