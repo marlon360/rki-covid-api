@@ -37,6 +37,8 @@ import {
 import {
   VaccinationResponse,
   VaccinationHistoryResponse,
+  VaccinationStatesResponse,
+  VaccinationGermanyResponse,
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
@@ -844,11 +846,31 @@ app.get(
 );
 
 app.get(
+  "/vaccinations/germany",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationGermanyResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/states",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationStatesResponse(req.params.state);
+    res.json(response);
+  }
+);
+
+app.get(
   "/vaccinations/states/:state",
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await VaccinationResponse(req.params.state);
+    const response = await VaccinationStatesResponse(req.params.state);
     res.json(response);
   }
 );
