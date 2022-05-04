@@ -5,7 +5,7 @@ import {
   getVaccinationHistory,
   VaccinationHistoryEntry,
 } from "../data-requests/vaccination";
-import { getStateAbbreviationById } from "../utils";
+import { getStateAbbreviationById, } from "../utils";
 
 interface VaccinationData extends IResponseMeta {
   data: VaccinationCoverage;
@@ -28,12 +28,20 @@ export async function VaccinationGermanyResponse(): Promise<VaccinationData> {
   };
 }
 
+function isAbbreviationValid(abbreviation: string) {
+  let abbreviationList = [];
+  for (let id = 1; id <= 16; id++) {
+    abbreviationList[id - 1] = getStateAbbreviationById(id);
+  }
+  return abbreviationList.includes(abbreviation);
+}
+
 export async function VaccinationStatesResponse(
   abbreviation?: string
 ): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
   const vaccinationDataOut = { data: undefined };
-  if (abbreviation) {
+  if (abbreviation && isAbbreviationValid(abbreviation)) {
     const tempData = { data: undefined };
     tempData.data = {
       [abbreviation]: vaccinationData.data.states[abbreviation],
