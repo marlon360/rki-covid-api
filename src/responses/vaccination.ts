@@ -5,7 +5,7 @@ import {
   getVaccinationHistory,
   VaccinationHistoryEntry,
 } from "../data-requests/vaccination";
-import { getStateAbbreviationById, } from "../utils";
+import { getStateAbbreviationById } from "../utils";
 
 interface VaccinationData extends IResponseMeta {
   data: VaccinationCoverage;
