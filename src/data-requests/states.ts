@@ -134,10 +134,33 @@ export async function getNewStateDeaths(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
+  // check if there is a result
+  if (data.features.length == 0) {
+    // This meens there are no new deaths in all states!
+    // if not, we need the field "Datenstand" from the rki Data Base so
+    // lets request the total deaths (there is always a result!)
+    // and "build" one result with "total deaths Datenstand" and "new deaths = 0" and "IdBundesland=1"
+    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+    const response2 = await axios.get(url2);
+    const data2 = response2.data;
+    if (data2.error) {
+      throw new RKIError(data2.error, response2.config.url);
+    }
+    data.features[0] = {
+      attributes: {
+        IdBundesland: 1,
+        deaths: 0,
+        Datenstand: data2.features[0].attributes.Datenstand,
+      },
+    };
+  }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
-    data = await getAlternateDataSource(url);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
+    const data2 = await getAlternateDataSource(url);
+    if (data2.features.length > 0) {
+      data = data2;
+      datenstand = parseDate(data2.features[0].attributes.Datenstand);
+    }
   }
   const states = data.features.map((feature) => {
     return {
