@@ -82,6 +82,25 @@ export async function getNewStateRecovered(): Promise<
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
+  if (data.features.length == 0) {
+    // This meens there are no new recovered in all states!
+    // but we need the field "Datenstand" from the rki Data Base so
+    // lets request the total recovered (there is always a result!)
+    // and "build" a result with "total recovered Datenstand" and "new recovered = 0"
+    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+    const response2 = await axios.get(url2);
+    const data2 = response2.data;
+    if (data2.error) {
+      throw new RKIError(data2.error, response2.config.url);
+    }
+    data.features[0] = {
+      attributes: {
+        IdBundesland: 1,
+        recovered: 0,
+        Datenstand: data2.features[0].attributes.Datenstand,
+      },
+    };
+  }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
     data = await getAlternateDataSource(url);
@@ -107,6 +126,25 @@ export async function getNewStateCases(): Promise<
   let data = response.data;
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
+  }
+  if (data.features.length == 0) {
+    // This meens there are no new cases in all states!
+    // but we need the field "Datenstand" from the rki Data Base so
+    // lets request the total cases (there is always a result!)
+    // and "build" a result with "total cases Datenstand" and "new cases = 0"
+    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerFall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
+    const response2 = await axios.get(url2);
+    const data2 = response2.data;
+    if (data2.error) {
+      throw new RKIError(data2.error, response2.config.url);
+    }
+    data.features[0] = {
+      attributes: {
+        IdBundesland: 1,
+        cases: 0,
+        Datenstand: data2.features[0].attributes.Datenstand,
+      },
+    };
   }
   let datenstand = parseDate(data.features[0].attributes.Datenstand);
   if (shouldUseAlternateDataSource(datenstand)) {
