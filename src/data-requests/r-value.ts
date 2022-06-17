@@ -63,7 +63,7 @@ export async function getRValue() {
   const data = response.data;
   const rData = parseRValue(data);
   const meta = await axios.get(
-    `https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/.zenodo.json`
+    `https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json`
   );
   return {
     data: rData,
