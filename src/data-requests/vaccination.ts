@@ -1182,10 +1182,10 @@ export async function getVaccinationCoverage(): Promise<
                       3
                     ),
               "A60+":
-                quotes.quotes.secondBooster["18to59"] === null
+                quotes.quotes.secondBooster["60plus"] === null
                   ? null
                   : limitDecimals(
-                      quotes.quotes.secondBooster["18to59"] / 100.0,
+                      quotes.quotes.secondBooster["60plus"] / 100.0,
                       3
                     ),
             },
