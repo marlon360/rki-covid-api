@@ -202,114 +202,113 @@ export async function getHospitalizationData(): Promise<
         reject(err.message);
       });
 
-      // now add the adjusted values
-      // Create the adjusted values data parser
-      const adjParser = parse({
-        delimiter: ",",
-        from: 2,
-      });
+      parser.on("end", async function () {
+        // now add the adjusted values
+        // Create the adjusted values data parser
+        const adjParser = parse({
+          delimiter: ",",
+          from: 2,
+        });
 
-      // get adjusted values csv as stream
-      const adjResponse = await axios({
-        method: "get",
-        url: "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_adjustierte-COVID-19-Hospitalisierungen.csv",
-        responseType: "stream",
-      });
+        // get adjusted values csv as stream
+        const adjResponse = await axios({
+          method: "get",
+          url: "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Aktuell_Deutschland_adjustierte-COVID-19-Hospitalisierungen.csv",
+          responseType: "stream",
+        });
 
-      // pipe adjusted values csv stream to adjusted values csv parser
-      adjResponse.data.pipe(adjParser);
+        // pipe adjusted values csv stream to adjusted values csv parser
+        adjResponse.data.pipe(adjParser);
 
-      // read the adjusted values parser stream and add values to hospitalizationDataObject
-      adjParser.on("readable", function () {
-        let record;
-        while ((record = adjParser.read())) {
-          let [
-            date,
-            state,
-            id,
-            ageGroup,
-            fixedCases7Days,
-            updatedCases7Days,
-            adjustedCases7Days,
-            adjustedLowerCases7Days,
-            adjustedUpperCases7Days,
-            population,
-            fixedIncidence7Days,
-            updatedIncidence7Days,
-            adjustedIncidence7Days,
-            adjustedLowerIncidence7Days,
-            adjustedUpperIncidence7Days,
-          ] = record;
+        // read the adjusted values parser stream and add values to hospitalizationDataObject
+        adjParser.on("readable", function () {
+          let record;
+          while ((record = adjParser.read())) {
+            let [
+              date,
+              state,
+              id,
+              ageGroup,
+              fixedCases7Days,
+              updatedCases7Days,
+              adjustedCases7Days,
+              adjustedLowerCases7Days,
+              adjustedUpperCases7Days,
+              population,
+              fixedIncidence7Days,
+              updatedIncidence7Days,
+              adjustedIncidence7Days,
+              adjustedLowerIncidence7Days,
+              adjustedUpperIncidence7Days,
+            ] = record;
 
-          date = new Date(date).toISOString();
+            date = new Date(date).toISOString();
 
-          if (id === "00") {
-            hospitalizationDataObject[date].fixedCases7Days =
-              parseInt(fixedCases7Days);
-            hospitalizationDataObject[date].updatedCases7Days =
-              parseInt(updatedCases7Days);
-            hospitalizationDataObject[date].adjustedLowerCases7Days = parseInt(
-              adjustedLowerCases7Days
-            );
-            hospitalizationDataObject[date].adjustedCases7Days =
-              parseInt(adjustedCases7Days);
-            hospitalizationDataObject[date].adjustedUpperCases7Days = parseInt(
-              adjustedUpperCases7Days
-            );
-            hospitalizationDataObject[date].fixedIncidence7Days =
-              parseFloat(fixedIncidence7Days);
-            hospitalizationDataObject[date].updatedIncidence7Days = parseFloat(
-              updatedIncidence7Days
-            );
-            hospitalizationDataObject[date].adjustedLowerIncidence7Days =
-              parseFloat(adjustedLowerIncidence7Days);
-            hospitalizationDataObject[date].adjustedIncidence7Days = parseFloat(
-              adjustedIncidence7Days
-            );
-            hospitalizationDataObject[date].adjustedUpperIncidence7Days =
-              parseFloat(adjustedUpperIncidence7Days);
-          } else {
-            hospitalizationDataObject[date].states[state].fixedCases7Days =
-              parseInt(fixedCases7Days);
-            hospitalizationDataObject[date].states[state].updatedCases7Days =
-              parseInt(updatedCases7Days);
-            hospitalizationDataObject[date].states[
-              state
-            ].adjustedLowerCases7Days = parseInt(adjustedLowerCases7Days);
-            hospitalizationDataObject[date].states[state].adjustedCases7Days =
-              parseInt(adjustedCases7Days);
-            hospitalizationDataObject[date].states[
-              state
-            ].adjustedUpperCases7Days = parseInt(adjustedUpperCases7Days);
-            hospitalizationDataObject[date].states[state].fixedIncidence7Days =
-              parseFloat(fixedIncidence7Days);
-            hospitalizationDataObject[date].states[
-              state
-            ].updatedIncidence7Days = parseFloat(updatedIncidence7Days);
-            hospitalizationDataObject[date].states[
-              state
-            ].adjustedLowerIncidence7Days = parseFloat(
-              adjustedLowerIncidence7Days
-            );
-            hospitalizationDataObject[date].states[
-              state
-            ].adjustedIncidence7Days = parseFloat(adjustedIncidence7Days);
-            hospitalizationDataObject[date].states[
-              state
-            ].adjustedUpperIncidence7Days = parseFloat(
-              adjustedUpperIncidence7Days
-            );
+            if (id === "00") {
+              hospitalizationDataObject[date].fixedCases7Days =
+                parseInt(fixedCases7Days);
+              hospitalizationDataObject[date].updatedCases7Days =
+                parseInt(updatedCases7Days);
+              hospitalizationDataObject[date].adjustedLowerCases7Days =
+                parseInt(adjustedLowerCases7Days);
+              hospitalizationDataObject[date].adjustedCases7Days =
+                parseInt(adjustedCases7Days);
+              hospitalizationDataObject[date].adjustedUpperCases7Days =
+                parseInt(adjustedUpperCases7Days);
+              hospitalizationDataObject[date].fixedIncidence7Days =
+                parseFloat(fixedIncidence7Days);
+              hospitalizationDataObject[date].updatedIncidence7Days =
+                parseFloat(updatedIncidence7Days);
+              hospitalizationDataObject[date].adjustedLowerIncidence7Days =
+                parseFloat(adjustedLowerIncidence7Days);
+              hospitalizationDataObject[date].adjustedIncidence7Days =
+                parseFloat(adjustedIncidence7Days);
+              hospitalizationDataObject[date].adjustedUpperIncidence7Days =
+                parseFloat(adjustedUpperIncidence7Days);
+            } else {
+              hospitalizationDataObject[date].states[state].fixedCases7Days =
+                parseInt(fixedCases7Days);
+              hospitalizationDataObject[date].states[state].updatedCases7Days =
+                parseInt(updatedCases7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].adjustedLowerCases7Days = parseInt(adjustedLowerCases7Days);
+              hospitalizationDataObject[date].states[state].adjustedCases7Days =
+                parseInt(adjustedCases7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].adjustedUpperCases7Days = parseInt(adjustedUpperCases7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].fixedIncidence7Days = parseFloat(fixedIncidence7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].updatedIncidence7Days = parseFloat(updatedIncidence7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].adjustedLowerIncidence7Days = parseFloat(
+                adjustedLowerIncidence7Days
+              );
+              hospitalizationDataObject[date].states[
+                state
+              ].adjustedIncidence7Days = parseFloat(adjustedIncidence7Days);
+              hospitalizationDataObject[date].states[
+                state
+              ].adjustedUpperIncidence7Days = parseFloat(
+                adjustedUpperIncidence7Days
+              );
+            }
           }
-        }
-      });
-      // Catch any error
-      adjParser.on("error", function (err) {
-        console.error(err.message);
-        reject(err.message);
-      });
-      // When we are done, test that the parsed output matched what expected
-      adjParser.on("end", function () {
-        resolve(hospitalizationDataObject);
+        });
+        // Catch any error
+        adjParser.on("error", function (err) {
+          console.error(err.message);
+          reject(err.message);
+        });
+        // When we are done, test that the parsed output matched what expected
+        adjParser.on("end", function () {
+          resolve(hospitalizationDataObject);
+        });
       });
     }
   );
