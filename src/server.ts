@@ -1015,7 +1015,7 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         message: "An error occurred while fetching external data.",
         url: error.config.url,
         details: error.message,
-        response: error.response,
+        response: error.response.data,
       },
     });
   } else {
