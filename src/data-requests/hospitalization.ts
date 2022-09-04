@@ -317,7 +317,7 @@ export async function getHospitalizationData(): Promise<
     hospitalizationDataPromise,
     axios
       .get(
-        `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/.zenodo.json`
+        `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Metadaten/zenodo.json`
       )
       .then((response) => {
         return new Date(response.data.publication_date);

@@ -524,7 +524,7 @@ export async function getVaccinationCoverage(): Promise<
 
   const lastUpdate = await axios
     .get(
-      `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/.zenodo.json`
+      `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/Metadaten/zenodo.json`
     )
     .then((response) => {
       return new Date(response.data.publication_date);
@@ -1315,7 +1315,7 @@ export async function getVaccinationHistory(
     vaccinationHistoryPromise,
     axios
       .get(
-        "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/.zenodo.json"
+        "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/Metadaten/zenodo.json"
       )
       .then((response) => {
         return new Date(response.data.publication_date);
