@@ -19,33 +19,103 @@ function clearEntry(entry: any) {
   }
 }
 
+// for History
+enum SeriesHistory {
+  S1 = "firstVaccination",
+  S2 = "secondVaccination",
+  S3 = "firstBoosterVaccination",
+  S4 = "secondBoosterVaccination",
+}
+
+// UsedSeries
+enum US {
+  S1 = "first",
+  S2 = "full",
+  S3 = "firstBooster",
+  S4 = "secondBooster",
+}
+
+//seriesName
+enum SN {
+  "first" = "vaccination",
+  "full" = "secondVaccination",
+  "firstBooster" = "boosterVaccination",
+  "secondBooster" = "2ndBoosterVaccination",
+}
+
+//Used Vaccines
+enum UV {
+  V1 = "astraZeneca",
+  V2 = "biontech",
+  V3 = "janssen",
+  V4 = "moderna",
+  V5 = "novavax",
+  V6 = "valneva",
+  V7 = "biontechBivalent",
+  V8 = "modernaBivalent",
+}
+
+// UsedVaccinesDelta
+enum UVD {
+  V1 = "deltaAstraZeneca",
+  V2 = "deltaBiontech",
+  V3 = "deltaJanssen",
+  V4 = "deltaModerna",
+  V5 = "deltaNovavax",
+  V6 = "deltaValneva",
+  V7 = "deltaBiontechBivalent",
+  V8 = "deltaModernaBivalent",
+}
+
+// VaccineNameReverse
+enum VNR {
+  "Vaxzevria" = "astraZeneca",
+  "Comirnaty" = "biontech",
+  "Jcovden" = "janssen",
+  "Spikevax" = "moderna",
+  "Nuvaxovid" = "novavax",
+  "Valneva" = "valneva",
+  "Comirnaty bivalent (Original/Omikron)" = "biontechBivalent",
+  "Spikevax bivalent (Original/Omikron)" = "modernaBivalent",
+}
+
+// UsedAgeGroups
+enum UAG {
+  G0517 = "A05-A17",
+  G0511 = "A05-A11",
+  G1217 = "A12-A17",
+  G18pl = "A18+",
+  G1859 = "A18-A59",
+  G60pl = "A60+",
+}
+
 export interface VaccinationCoverage {
   administeredVaccinations: number;
   vaccinated: number;
   vaccination: CoverageVaccine;
   delta: number;
   quote: number;
-  quotes: CoverageQuotes;
-  secondVaccination: {
+  quotes: CoverageQuotesS1S2;
+  [SN.full]: {
     vaccinated: number;
     vaccination: CoverageVaccine;
     delta: number;
     quote: number;
-    quotes: CoverageQuotes;
+    quotes: CoverageQuotesS1S2;
   };
-  boosterVaccination: {
+  [SN.firstBooster]: {
     vaccinated: number;
     vaccination: CoverageVaccine;
     delta: number;
     quote: number;
-    quotes: CoverageQuotes;
+    quotes: CoverageQuotesS3S4;
   };
-  "2ndBoosterVaccination": {
+  [SN.secondBooster]: {
     vaccinated: number;
     vaccination: CoverageVaccine;
     delta: number;
     quote: number;
-    quotes: CoverageQuotes;
+    quotes: CoverageQuotesS3S4;
   };
   states: {
     [abbreviation: string]: {
@@ -55,73 +125,87 @@ export interface VaccinationCoverage {
       vaccination: CoverageVaccine;
       delta: number;
       quote: number;
-      quotes: CoverageQuotes;
-      secondVaccination: {
+      quotes: CoverageQuotesS1S2;
+      [SN.full]: {
         vaccinated: number;
         vaccination: CoverageVaccine;
         delta: number;
         quote: number;
-        quotes: CoverageQuotes;
+        quotes: CoverageQuotesS1S2;
       };
-      boosterVaccination: {
+      [SN.firstBooster]: {
         vaccinated: number;
         vaccination: CoverageVaccine;
         delta: number;
         quote: number;
-        quotes: CoverageQuotes;
+        quotes: CoverageQuotesS3S4;
       };
-      "2ndBoosterVaccination": {
+      [SN.secondBooster]: {
         vaccinated: number;
         vaccination: CoverageVaccine;
         delta: number;
         quote: number;
-        quotes: CoverageQuotes;
+        quotes: CoverageQuotesS3S4;
       };
     };
   };
 }
 
-interface CoverageQuotes {
+interface CoverageQuotesS1S2 {
   total: number;
-  "A05-A17": {
+  [UAG.G0517]: {
     total: number;
-    "A05-A11": number;
-    "A12-A17": number;
+    [UAG.G0511]: number;
+    [UAG.G1217]: number;
   };
-  "A18+": {
+  [UAG.G18pl]: {
     total: number;
-    "A18-A59": number;
-    "A60+": number;
+    [UAG.G1859]: number;
+    [UAG.G60pl]: number;
   };
 }
 
-interface Vaccine {
+interface CoverageQuotesS3S4 {
   total: number;
-  astraZeneca: number;
-  biontech: number;
-  janssen: number;
-  moderna: number;
-  novavax: number;
+  [UAG.G1217]: number;
+  [UAG.G18pl]: {
+    total: number;
+    [UAG.G1859]: number;
+    [UAG.G60pl]: number;
+  };
 }
 
-interface CoverageVaccine {
-  astraZeneca: number;
-  biontech: number;
-  janssen: number;
-  moderna: number;
-  novavax: number;
-  deltaAstraZeneca: number;
-  deltaBiontech: number;
-  deltaJanssen: number;
-  deltaModerna: number;
-  deltaNovavax: number;
+interface Vaccines {
+  [UV.V1]: number;
+  [UV.V2]: number;
+  [UV.V3]: number;
+  [UV.V4]: number;
+  [UV.V5]: number;
+  [UV.V6]: number;
+  [UV.V7]: number;
+  [UV.V8]: number;
+}
+
+interface Vaccine extends Vaccines {
+  total: number;
+}
+
+interface CoverageVaccine extends Vaccines {
+  [UVD.V1]: number;
+  [UVD.V2]: number;
+  [UVD.V3]: number;
+  [UVD.V4]: number;
+  [UVD.V5]: number;
+  [UVD.V6]: number;
+  [UVD.V7]: number;
+  [UVD.V8]: number;
 }
 
 interface StateEntry {
-  first: Vaccine;
-  full: Vaccine;
-  firstBooster: Vaccine;
-  secondBooster: Vaccine;
+  [US.S1]: Vaccine;
+  [US.S2]: Vaccine;
+  [US.S3]: Vaccine;
+  [US.S4]: Vaccine;
 }
 
 interface VaccineVaccinationData {
@@ -131,20 +215,20 @@ interface VaccineVaccinationData {
 
 interface QuotesRegular {
   total: number;
-  "5to17": number;
-  "5to11": number;
-  "12to17": number;
-  "18plus": number;
-  "18to59": number;
-  "60plus": number;
+  [UAG.G0517]: number;
+  [UAG.G0511]: number;
+  [UAG.G1217]: number;
+  [UAG.G18pl]: number;
+  [UAG.G1859]: number;
+  [UAG.G60pl]: number;
 }
 
 interface QuotesBoost {
   total: number;
-  "12to17": number;
-  "18plus": number;
-  "18to59": number;
-  "60plus": number;
+  [UAG.G1217]: number;
+  [UAG.G18pl]: number;
+  [UAG.G1859]: number;
+  [UAG.G60pl]: number;
 }
 
 interface QuoteVaccinationData {
@@ -152,20 +236,22 @@ interface QuoteVaccinationData {
     name: string;
     vaccination: {
       total: number;
-      first: number;
-      full: number;
-      firstBooster: number;
-      secondBooster: number;
+      [US.S1]: number;
+      [US.S2]: number;
+      [US.S3]: number;
+      [US.S4]: number;
     };
-    quotes: {
-      first: QuotesRegular;
-      second: QuotesRegular;
-      firstBooster: QuotesBoost;
-      secondBooster: QuotesBoost;
-    };
+    [US.S1]: QuotesRegular;
+    [US.S2]: QuotesRegular;
+    [US.S3]: QuotesBoost;
+    [US.S4]: QuotesBoost;
   };
 }
 [];
+
+function clone<T>(a: T): T {
+  return JSON.parse(JSON.stringify(a));
+}
 
 const DataPromise = async function (resolve, reject) {
   const url = this.url;
@@ -186,197 +272,51 @@ const DataPromise = async function (resolve, reject) {
 
   // pipe csv stream to csv parser
   response.data.pipe(parser);
-
-  // empty object, that gets filled including stateId 0 for "Bundesgebiet"
+  
+  // empty vaccine Object
+  const vaccineObject: Vaccine = {
+    total: null,
+    [UV.V1]: null,
+    [UV.V2]: null,
+    [UV.V3]: null,
+    [UV.V4]: null,
+    [UV.V5]: null,
+    [UV.V6]: null,
+    [UV.V7]: null,
+    [UV.V8]: null,
+  }
+  
+  const emptyStateObject: StateEntry = {
+    [US.S1]: clone(vaccineObject),
+    [US.S2]: clone(vaccineObject),
+    [US.S3]: clone(vaccineObject),
+    [US.S4]: clone(vaccineObject),
+  };
+  
+  // empty object, that gets filled
   const vaccinationDataObject: VaccineVaccinationData = {
-    0: {
-      first: {
-        total: null,
-        astraZeneca: null,
-        biontech: null,
-        janssen: null,
-        moderna: null,
-        novavax: null,
-      },
-      full: {
-        total: null,
-        astraZeneca: null,
-        biontech: null,
-        janssen: null,
-        moderna: null,
-        novavax: null,
-      },
-      firstBooster: {
-        total: null,
-        astraZeneca: null,
-        biontech: null,
-        janssen: null,
-        moderna: null,
-        novavax: null,
-      },
-      secondBooster: {
-        total: null,
-        astraZeneca: null,
-        biontech: null,
-        janssen: null,
-        moderna: null,
-        novavax: null,
-      },
-    },
+    0: clone(emptyStateObject),
   };
 
   // read the parser stream and add record to vaccinationDataObj
   parser.on("readable", function () {
     let record;
     while ((record = parser.read())) {
-      let [date, stateId, vaccine, series, count] = record;
+      let [date, stateId, vaccinekey, series, count] = record;
+      const seriesKey = "S" + series.toString();
       // read entry for stateId
       let stateEntry = vaccinationDataObject[stateId];
       // create new object if the entry does not exist
       if (!stateEntry) {
-        stateEntry = {
-          first: {
-            total: null,
-            astraZeneca: null,
-            biontech: null,
-            janssen: null,
-            moderna: null,
-            novavax: null,
-          },
-          full: {
-            total: null,
-            astraZeneca: null,
-            biontech: null,
-            janssen: null,
-            moderna: null,
-            novavax: null,
-          },
-          firstBooster: {
-            total: null,
-            astraZeneca: null,
-            biontech: null,
-            janssen: null,
-            moderna: null,
-            novavax: null,
-          },
-          secondBooster: {
-            total: null,
-            astraZeneca: null,
-            biontech: null,
-            janssen: null,
-            moderna: null,
-            novavax: null,
-          },
-        };
+        stateEntry = clone(emptyStateObject);
       }
-
-      // write data to stateEntry and id 0
-      switch (series) {
-        case 1:
-          stateEntry.first.total += count;
-          vaccinationDataObject[0].first.total += count;
-          switch (vaccine) {
-            case "AstraZeneca":
-              stateEntry.first.astraZeneca += count;
-              vaccinationDataObject[0].first.astraZeneca += count;
-              break;
-            case "Comirnaty":
-              stateEntry.first.biontech += count;
-              vaccinationDataObject[0].first.biontech += count;
-              break;
-            case "Janssen":
-              stateEntry.first.janssen += count;
-              vaccinationDataObject[0].first.janssen += count;
-              break;
-            case "Moderna":
-              stateEntry.first.moderna += count;
-              vaccinationDataObject[0].first.moderna += count;
-              break;
-            case "Novavax":
-              stateEntry.first.novavax += count;
-              vaccinationDataObject[0].first.novavax += count;
-              break;
-          }
-          break;
-        case 2:
-          stateEntry.full.total += count;
-          vaccinationDataObject[0].full.total += count;
-          switch (vaccine) {
-            case "AstraZeneca":
-              stateEntry.full.astraZeneca += count;
-              vaccinationDataObject[0].full.astraZeneca += count;
-              break;
-            case "Comirnaty":
-              stateEntry.full.biontech += count;
-              vaccinationDataObject[0].full.biontech += count;
-              break;
-            case "Janssen":
-              stateEntry.full.janssen += count;
-              vaccinationDataObject[0].full.janssen += count;
-              break;
-            case "Moderna":
-              stateEntry.full.moderna += count;
-              vaccinationDataObject[0].full.moderna += count;
-              break;
-            case "Novavax":
-              stateEntry.full.novavax += count;
-              vaccinationDataObject[0].full.novavax += count;
-              break;
-          }
-          break;
-        case 3:
-          stateEntry.firstBooster.total += count;
-          vaccinationDataObject[0].firstBooster.total += count;
-          switch (vaccine) {
-            case "AstraZeneca":
-              stateEntry.firstBooster.astraZeneca += count;
-              vaccinationDataObject[0].firstBooster.astraZeneca += count;
-              break;
-            case "Comirnaty":
-              stateEntry.firstBooster.biontech += count;
-              vaccinationDataObject[0].firstBooster.biontech += count;
-              break;
-            case "Janssen":
-              stateEntry.firstBooster.janssen += count;
-              vaccinationDataObject[0].firstBooster.janssen += count;
-              break;
-            case "Moderna":
-              stateEntry.firstBooster.moderna += count;
-              vaccinationDataObject[0].firstBooster.moderna += count;
-              break;
-            case "Novavax":
-              stateEntry.firstBooster.novavax += count;
-              vaccinationDataObject[0].firstBooster.novavax += count;
-              break;
-          }
-          break;
-        case 4:
-          stateEntry.secondBooster.total += count;
-          vaccinationDataObject[0].secondBooster.total += count;
-          switch (vaccine) {
-            case "AstraZeneca":
-              stateEntry.secondBooster.astraZeneca += count;
-              vaccinationDataObject[0].secondBooster.astraZeneca += count;
-              break;
-            case "Comirnaty":
-              stateEntry.secondBooster.biontech += count;
-              vaccinationDataObject[0].secondBooster.biontech += count;
-              break;
-            case "Janssen":
-              stateEntry.secondBooster.janssen += count;
-              vaccinationDataObject[0].secondBooster.janssen += count;
-              break;
-            case "Moderna":
-              stateEntry.secondBooster.moderna += count;
-              vaccinationDataObject[0].secondBooster.moderna += count;
-              break;
-            case "Novavax":
-              stateEntry.secondBooster.novavax += count;
-              vaccinationDataObject[0].secondBooster.novavax += count;
-              break;
-          }
-          break;
-      }
+      // write data to id 0
+      vaccinationDataObject[0][US[seriesKey]].total += count;
+      vaccinationDataObject[0][US[seriesKey]][VNR[vaccinekey]] += count;
+      // write data to stateEntry
+      stateEntry[US[seriesKey]].total += count;
+      stateEntry[US[seriesKey]][VNR[vaccinekey]] += count;
+    
       vaccinationDataObject[stateId] = stateEntry;
     }
   });
@@ -464,46 +404,44 @@ export async function getVaccinationCoverage(): Promise<
           ] = record;
           quoteVaccinationDataObject[id] = {
             name: name,
-            vaccination: {
+            vaccination:{
               total: total,
-              first: first,
-              full: full,
-              firstBooster: firstBooster,
-              secondBooster: secondBooster,
+              [US.S1]: first,
+              [US.S2]: full,
+              [US.S3]: firstBooster,
+              [US.S4]: secondBooster
             },
-            quotes: {
-              first: {
-                total: qFirstTotal,
-                "5to17": qFirst05bis17,
-                "5to11": qFirst05bis11,
-                "12to17": qFirst12bis17,
-                "18plus": qFirst18plus,
-                "18to59": qFirst18bis59,
-                "60plus": qFirst60plus,
-              },
-              second: {
-                total: qFullTotal,
-                "5to17": qFull05bis17,
-                "5to11": qFull05bis11,
-                "12to17": qFull12bis17,
-                "18plus": qFull18plus,
-                "18to59": qFull18bis59,
-                "60plus": qFull60plus,
-              },
-              firstBooster: {
-                total: q1BoostTotal,
-                "12to17": q1Boost12bis17,
-                "18plus": q1Boost18plus,
-                "18to59": q1Boost18bis59,
-                "60plus": q1Boost60plus,
-              },
-              secondBooster: {
-                total: q2BoostTotal,
-                "12to17": q2Boost12bis17,
-                "18plus": q2Boost18plus,
-                "18to59": q2Boost18bis59,
-                "60plus": q2Boost60plus,
-              },
+            [US.S1]: {
+              total: qFirstTotal,
+              [UAG.G0517]: qFirst05bis17,
+              [UAG.G0511]: qFirst05bis11,
+              [UAG.G1217]: qFirst12bis17,
+              [UAG.G18pl]: qFirst18plus,
+              [UAG.G1859]: qFirst18bis59,
+              [UAG.G60pl]: qFirst60plus,
+            },
+            [US.S2]: {
+              total: qFullTotal,
+              [UAG.G0517]: qFull05bis17,
+              [UAG.G0511]: qFull05bis11,
+              [UAG.G1217]: qFull12bis17,
+              [UAG.G18pl]: qFull18plus,
+              [UAG.G1859]: qFull18bis59,
+              [UAG.G60pl]: qFull60plus,
+            },
+            [US.S3]: {
+              total: q1BoostTotal,
+              [UAG.G1217]: q1Boost12bis17,
+              [UAG.G18pl]: q1Boost18plus,
+              [UAG.G1859]: q1Boost18bis59,
+              [UAG.G60pl]: q1Boost60plus,
+            },
+            [US.S4]: {
+              total: q2BoostTotal,
+              [UAG.G1217]: q2Boost12bis17,
+              [UAG.G18pl]: q2Boost18plus,
+              [UAG.G1859]: q2Boost18bis59,
+              [UAG.G60pl]: q2Boost60plus,
             },
           };
         }
@@ -548,128 +486,77 @@ export async function getVaccinationCoverage(): Promise<
       archiveDataPromise,
       quoteDataPromise,
     ]);
-
+  
+  // empty CoverageVaccineObject
+  const emptyCoverageVaccineObject: CoverageVaccine = {
+    [UV.V1]: null,
+    [UV.V2]: null,
+    [UV.V3]: null,
+    [UV.V4]: null,
+    [UV.V5]: null,
+    [UV.V6]: null,
+    [UV.V7]: null,
+    [UV.V8]: null,
+    [UVD.V1]: null,
+    [UVD.V2]: null,
+    [UVD.V3]: null,
+    [UVD.V4]: null,
+    [UVD.V5]: null,
+    [UVD.V6]: null,
+    [UVD.V7]: null,
+    [UVD.V8]: null,
+  }
+  const emptyCoverageQuotesS1S2Object: CoverageQuotesS1S2 = {
+    total: null,
+    [UAG.G0517]: {
+      total: null,
+      [UAG.G0511]: null,
+      [UAG.G1217]: null,
+    },
+    [UAG.G18pl]: {
+      total: null,
+      [UAG.G1859]: null,
+      [UAG.G60pl]: null,
+    },
+  }
+  const emptyCoverageQuotesS3S4Object: CoverageQuotesS3S4 = {
+    total: null,
+    [UAG.G1217]: null,
+    [UAG.G18pl]: {
+      total: null,
+      [UAG.G1859]: null,
+      [UAG.G60pl]: null,
+    },
+  }
   // now we have all the stuff we need to fill the coverage
   // init
   const coverage: VaccinationCoverage = {
-    administeredVaccinations: 0,
-    vaccinated: 0,
-    vaccination: {
-      biontech: 0,
-      moderna: 0,
-      astraZeneca: 0,
-      janssen: 0,
-      novavax: 0,
-      deltaBiontech: 0,
-      deltaModerna: 0,
-      deltaAstraZeneca: 0,
-      deltaJanssen: 0,
-      deltaNovavax: 0,
+    administeredVaccinations: null,
+    vaccinated: null,
+    [SN[US.S1]]: clone(emptyCoverageVaccineObject),
+    delta: null,
+    quote: null,
+    quotes: clone(emptyCoverageQuotesS1S2Object),
+    [SN[US.S2]]: {
+      vaccinated: null,
+      vaccination: clone(emptyCoverageVaccineObject),
+      delta: null,
+      quote: null,
+      quotes: clone(emptyCoverageQuotesS1S2Object),
     },
-    delta: 0,
-    quote: 0,
-    quotes: {
-      total: 0,
-      "A05-A17": {
-        total: 0,
-        "A05-A11": 0,
-        "A12-A17": 0,
-      },
-      "A18+": {
-        total: 0,
-        "A18-A59": 0,
-        "A60+": 0,
-      },
+    [SN[US.S3]]: {
+      vaccinated: null,
+      vaccination: clone(emptyCoverageVaccineObject),
+      delta: null,
+      quote: null,
+      quotes: clone(emptyCoverageQuotesS3S4Object),
     },
-    secondVaccination: {
-      vaccinated: 0,
-      vaccination: {
-        biontech: 0,
-        moderna: 0,
-        astraZeneca: 0,
-        janssen: 0,
-        novavax: 0,
-        deltaBiontech: 0,
-        deltaModerna: 0,
-        deltaAstraZeneca: 0,
-        deltaJanssen: 0,
-        deltaNovavax: 0,
-      },
-      delta: 0,
-      quote: 0,
-      quotes: {
-        total: 0,
-        "A05-A17": {
-          total: 0,
-          "A05-A11": 0,
-          "A12-A17": 0,
-        },
-        "A18+": {
-          total: 0,
-          "A18-A59": 0,
-          "A60+": 0,
-        },
-      },
-    },
-    boosterVaccination: {
-      vaccinated: 0,
-      vaccination: {
-        biontech: 0,
-        moderna: 0,
-        astraZeneca: 0,
-        janssen: 0,
-        novavax: 0,
-        deltaBiontech: 0,
-        deltaModerna: 0,
-        deltaAstraZeneca: 0,
-        deltaJanssen: 0,
-        deltaNovavax: 0,
-      },
-      delta: 0,
-      quote: 0,
-      quotes: {
-        total: 0,
-        "A05-A17": {
-          total: 0,
-          "A05-A11": null,
-          "A12-A17": 0,
-        },
-        "A18+": {
-          total: 0,
-          "A18-A59": 0,
-          "A60+": 0,
-        },
-      },
-    },
-    "2ndBoosterVaccination": {
-      vaccinated: 0,
-      vaccination: {
-        biontech: 0,
-        moderna: 0,
-        astraZeneca: 0,
-        janssen: 0,
-        novavax: 0,
-        deltaBiontech: 0,
-        deltaModerna: 0,
-        deltaAstraZeneca: 0,
-        deltaJanssen: 0,
-        deltaNovavax: 0,
-      },
-      delta: 0,
-      quote: 0,
-      quotes: {
-        total: 0,
-        "A05-A17": {
-          total: 0,
-          "A05-A11": null,
-          "A12-A17": 0,
-        },
-        "A18+": {
-          total: 0,
-          "A18-A59": 0,
-          "A60+": 0,
-        },
-      },
+    [SN[US.S4]]: {
+      vaccinated: null,
+      vaccination: clone(emptyCoverageVaccineObject),
+      delta: null,
+      quote: null,
+      quotes: clone(emptyCoverageQuotesS3S4Object),
     },
     states: {},
   };
@@ -681,249 +568,134 @@ export async function getVaccinationCoverage(): Promise<
     clearEntry(quotes);
     const archive = archiveVaccinationData[id];
     clearEntry(archive);
-
+    // prettier-ignore
     if (id == 0) {
       coverage.administeredVaccinations = quotes.vaccination.total;
-      coverage.vaccinated = quotes.vaccination.first;
-      coverage.vaccination = {
-        biontech: actual.first.biontech,
-        moderna: actual.first.moderna,
-        astraZeneca: actual.first.astraZeneca,
-        janssen: actual.first.janssen,
-        novavax: actual.first.novavax == null ? null : actual.first.novavax,
-        deltaBiontech: actual.first.biontech - archive.first.biontech,
-        deltaModerna: actual.first.moderna - archive.first.moderna,
-        deltaAstraZeneca: actual.first.astraZeneca - archive.first.astraZeneca,
-        deltaJanssen: actual.first.janssen - archive.first.janssen,
-        deltaNovavax: actual.first.novavax - archive.first.novavax,
+      coverage.vaccinated = quotes.vaccination[US.S1];
+      coverage[SN[US.S1]] = {
+        [UV.V1]: actual[US.S1][UV.V1],
+        [UV.V2]: actual[US.S1][UV.V2],
+        [UV.V3]: actual[US.S1][UV.V3],
+        [UV.V4]: actual[US.S1][UV.V4],
+        [UV.V5]: actual[US.S1][UV.V5],
+        [UV.V6]: actual[US.S1][UV.V6],
+        [UV.V7]: actual[US.S1][UV.V7],
+        [UV.V8]: actual[US.S1][UV.V8],
+        [UVD.V1]: actual[US.S1][UV.V1] === null && archive[US.S1][UV.V1] === null ? null : actual[US.S1][UV.V1] - archive[US.S1][UV.V1],
+        [UVD.V2]: actual[US.S1][UV.V2] === null && archive[US.S1][UV.V2] === null ? null : actual[US.S1][UV.V2] - archive[US.S1][UV.V2],
+        [UVD.V3]: actual[US.S1][UV.V3] === null && archive[US.S1][UV.V3] === null ? null : actual[US.S1][UV.V3] - archive[US.S1][UV.V3],
+        [UVD.V4]: actual[US.S1][UV.V4] === null && archive[US.S1][UV.V4] === null ? null : actual[US.S1][UV.V4] - archive[US.S1][UV.V4],
+        [UVD.V5]: actual[US.S1][UV.V5] === null && archive[US.S1][UV.V5] === null ? null : actual[US.S1][UV.V5] - archive[US.S1][UV.V5],
+        [UVD.V6]: actual[US.S1][UV.V6] === null && archive[US.S1][UV.V6] === null ? null : actual[US.S1][UV.V6] - archive[US.S1][UV.V6],
+        [UVD.V7]: actual[US.S1][UV.V7] === null && archive[US.S1][UV.V7] === null ? null : actual[US.S1][UV.V7] - archive[US.S1][UV.V7],
+        [UVD.V8]: actual[US.S1][UV.V8] === null && archive[US.S1][UV.V8] === null ? null : actual[US.S1][UV.V8] - archive[US.S1][UV.V8],
       };
-      coverage.delta = actual.first.total - archive.first.total;
-      coverage.quote =
-        quotes.quotes.first.total === null
-          ? null
-          : limitDecimals(quotes.quotes.first.total / 100.0, 3);
-      coverage.quotes.total =
-        quotes.quotes.first.total === null
-          ? null
-          : limitDecimals(quotes.quotes.first.total / 100.0, 3);
-      coverage.quotes["A05-A17"].total =
-        quotes.quotes.first["5to17"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["5to17"] / 100.0, 3);
-      coverage.quotes["A05-A17"]["A05-A11"] =
-        quotes.quotes.first["5to11"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["5to11"] / 100.0, 3);
-      coverage.quotes["A05-A17"]["A12-A17"] =
-        quotes.quotes.first["12to17"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["12to17"] / 100.0, 3);
-      coverage.quotes["A18+"].total =
-        quotes.quotes.first["18plus"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["18plus"] / 100.0, 3);
-      coverage.quotes["A18+"]["A18-A59"] =
-        quotes.quotes.first["18to59"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["18to59"] / 100.0, 3);
-      coverage.quotes["A18+"]["A60+"] =
-        quotes.quotes.first["60plus"] === null
-          ? null
-          : limitDecimals(quotes.quotes.first["60plus"] / 100.0, 3);
-      coverage.secondVaccination = {
-        vaccinated: quotes.vaccination.full,
+      coverage.delta = archive[US.S1].total === null ? null : actual[US.S1].total - archive[US.S1].total;
+      coverage.quote = quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3);
+      coverage.quotes.total = quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3);
+      coverage.quotes[UAG.G0517].total = quotes[US.S1][UAG.G0517] === null ? null : limit(quotes[US.S1][UAG.G0517] / 100.0, 3);
+      coverage.quotes[UAG.G0517][UAG.G0511] = quotes[US.S1][UAG.G0511] === null ? null : limit(quotes[US.S1][UAG.G0511] / 100.0, 3);
+      coverage.quotes[UAG.G0517][UAG.G1217] = quotes[US.S1][UAG.G1217] === null ? null : limit(quotes[US.S1][UAG.G1217] / 100.0, 3);
+      coverage.quotes[UAG.G18pl].total = quotes[US.S1][UAG.G18pl] === null ? null : limit(quotes[US.S1][UAG.G18pl] / 100.0, 3);
+      coverage.quotes[UAG.G18pl][UAG.G1859] = quotes[US.S1][UAG.G1859] === null ? null : limit(quotes[US.S1][UAG.G1859] / 100.0, 3);
+      coverage.quotes[UAG.G18pl][UAG.G60pl] = quotes[US.S1][UAG.G60pl] === null ? null : limit(quotes[US.S1][UAG.G60pl] / 100.0, 3);
+      coverage[SN[US.S2]] = {
+        vaccinated: quotes.vaccination[US.S2],
         vaccination: {
-          biontech: actual.full.biontech,
-          moderna: actual.full.moderna,
-          astraZeneca: actual.full.astraZeneca,
-          janssen: actual.full.janssen,
-          novavax: actual.full.novavax === null ? null : actual.full.novavax,
-          deltaBiontech: actual.full.biontech - archive.full.biontech,
-          deltaModerna: actual.full.moderna - archive.full.moderna,
-          deltaAstraZeneca: actual.full.astraZeneca - archive.full.astraZeneca,
-          deltaJanssen: actual.full.janssen - archive.full.janssen,
-          deltaNovavax: actual.full.novavax - archive.full.novavax,
+          [UV.V1]: actual[US.S2][UV.V1],
+          [UV.V2]: actual[US.S2][UV.V2],
+          [UV.V3]: actual[US.S2][UV.V3],
+          [UV.V4]: actual[US.S2][UV.V4],
+          [UV.V5]: actual[US.S2][UV.V5],
+          [UV.V6]: actual[US.S2][UV.V6],
+          [UV.V7]: actual[US.S2][UV.V7],
+          [UV.V8]: actual[US.S2][UV.V8],
+          [UVD.V1]: actual[US.S2][UV.V1] === null && archive[US.S2][UV.V1] === null ? null : actual[US.S2][UV.V1] - archive[US.S2][UV.V1],
+          [UVD.V2]: actual[US.S2][UV.V2] === null && archive[US.S2][UV.V2] === null ? null : actual[US.S2][UV.V2] - archive[US.S2][UV.V2],
+          [UVD.V3]: actual[US.S2][UV.V3] === null && archive[US.S2][UV.V3] === null ? null : actual[US.S2][UV.V3] - archive[US.S2][UV.V3],
+          [UVD.V4]: actual[US.S2][UV.V4] === null && archive[US.S2][UV.V4] === null ? null : actual[US.S2][UV.V4] - archive[US.S2][UV.V4],
+          [UVD.V5]: actual[US.S2][UV.V5] === null && archive[US.S2][UV.V5] === null ? null : actual[US.S2][UV.V5] - archive[US.S2][UV.V5],
+          [UVD.V6]: actual[US.S2][UV.V6] === null && archive[US.S2][UV.V6] === null ? null : actual[US.S2][UV.V6] - archive[US.S2][UV.V6],
+          [UVD.V7]: actual[US.S2][UV.V7] === null && archive[US.S2][UV.V7] === null ? null : actual[US.S2][UV.V7] - archive[US.S2][UV.V7],
+          [UVD.V8]: actual[US.S2][UV.V8] === null && archive[US.S2][UV.V8] === null ? null : actual[US.S2][UV.V8] - archive[US.S2][UV.V8],
         },
-        delta: actual.full.total - archive.full.total,
-        quote:
-          quotes.quotes.second.total === null
-            ? null
-            : limitDecimals(quotes.quotes.second.total / 100.0, 3),
+        delta: archive[US.S2].total === null ? null : actual[US.S2].total - archive[US.S2].total,
+        quote: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
         quotes: {
-          total:
-            quotes.quotes.second.total === null
-              ? null
-              : limitDecimals(quotes.quotes.second.total / 100.0, 3),
-          "A05-A17": {
-            total:
-              quotes.quotes.second["5to17"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["5to17"] / 100.0, 3),
-            "A05-A11":
-              quotes.quotes.second["5to11"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["5to11"] / 100.0, 3),
-            "A12-A17":
-              quotes.quotes.second["12to17"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["12to17"] / 100.0, 3),
+          total: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
+          [UAG.G0517]: {
+            total: quotes[US.S2][UAG.G0517] === null ? null : limit(quotes[US.S2][UAG.G0517] / 100.0, 3),
+            [UAG.G0511]: quotes[US.S2][UAG.G0511] === null ? null : limit(quotes[US.S2][UAG.G0511] / 100.0, 3),
+            [UAG.G1217]: quotes[US.S2][UAG.G1217] === null ? null : limit(quotes[US.S2][UAG.G1217] / 100.0, 3),
           },
-          "A18+": {
-            total:
-              quotes.quotes.second["18plus"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["18plus"] / 100.0, 3),
-            "A18-A59":
-              quotes.quotes.second["18to59"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["18to59"] / 100.0, 3),
-            "A60+":
-              quotes.quotes.second["60plus"] === null
-                ? null
-                : limitDecimals(quotes.quotes.second["60plus"] / 100.0, 3),
+          [UAG.G18pl]: {
+            total: quotes[US.S2][UAG.G18pl] === null ? null : limit(quotes[US.S2][UAG.G18pl] / 100.0, 3),
+            [UAG.G1859]: quotes[US.S2][UAG.G1859] === null ? null : limit(quotes[US.S2][UAG.G1859] / 100.0, 3),
+            [UAG.G60pl]: quotes[US.S2][UAG.G60pl] === null ? null : limit(quotes[US.S2][UAG.G60pl] / 100.0, 3),
           },
         },
       };
-      coverage.boosterVaccination = {
-        vaccinated: quotes.vaccination.firstBooster,
+      coverage[SN[US.S3]] = {
+        vaccinated: quotes.vaccination[US.S3],
         vaccination: {
-          biontech: actual.firstBooster.biontech,
-          moderna: actual.firstBooster.moderna,
-          astraZeneca: actual.firstBooster.astraZeneca,
-          janssen: actual.firstBooster.janssen,
-          novavax: actual.firstBooster.novavax,
-          deltaBiontech:
-            actual.firstBooster.biontech - archive.firstBooster.biontech,
-          deltaModerna:
-            actual.firstBooster.moderna - archive.firstBooster.moderna,
-          deltaAstraZeneca:
-            actual.firstBooster.astraZeneca - archive.firstBooster.astraZeneca,
-          deltaJanssen:
-            actual.firstBooster.janssen - archive.firstBooster.janssen,
-          deltaNovavax:
-            actual.firstBooster.novavax - archive.firstBooster.novavax,
+          [UV.V1]: actual[US.S3][UV.V1],
+          [UV.V2]: actual[US.S3][UV.V2],
+          [UV.V3]: actual[US.S3][UV.V3],
+          [UV.V4]: actual[US.S3][UV.V4],
+          [UV.V5]: actual[US.S3][UV.V5],
+          [UV.V6]: actual[US.S3][UV.V6],
+          [UV.V7]: actual[US.S3][UV.V7],
+          [UV.V8]: actual[US.S3][UV.V8],
+          [UVD.V1]: actual[US.S3][UV.V1] === null && archive[US.S3][UV.V1] === null ? null : actual[US.S3][UV.V1] - archive[US.S3][UV.V1],
+          [UVD.V2]: actual[US.S3][UV.V2] === null && archive[US.S3][UV.V2] === null ? null : actual[US.S3][UV.V2] - archive[US.S3][UV.V2],
+          [UVD.V3]: actual[US.S3][UV.V3] === null && archive[US.S3][UV.V3] === null ? null : actual[US.S3][UV.V3] - archive[US.S3][UV.V3],
+          [UVD.V4]: actual[US.S3][UV.V4] === null && archive[US.S3][UV.V4] === null ? null : actual[US.S3][UV.V4] - archive[US.S3][UV.V4],
+          [UVD.V5]: actual[US.S3][UV.V5] === null && archive[US.S3][UV.V5] === null ? null : actual[US.S3][UV.V5] - archive[US.S3][UV.V5],
+          [UVD.V6]: actual[US.S3][UV.V6] === null && archive[US.S3][UV.V6] === null ? null : actual[US.S3][UV.V6] - archive[US.S3][UV.V6],
+          [UVD.V7]: actual[US.S3][UV.V7] === null && archive[US.S3][UV.V7] === null ? null : actual[US.S3][UV.V7] - archive[US.S3][UV.V7],
+          [UVD.V8]: actual[US.S3][UV.V8] === null && archive[US.S3][UV.V8] === null ? null : actual[US.S3][UV.V8] - archive[US.S3][UV.V8],
         },
-        delta: actual.firstBooster.total - archive.firstBooster.total,
-        quote:
-          quotes.quotes.firstBooster.total === null
-            ? null
-            : limitDecimals(quotes.quotes.firstBooster.total / 100.0, 3),
+        delta: archive[US.S3].total === null ? null : actual[US.S3].total - archive[US.S3].total,
+        quote: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
         quotes: {
-          total:
-            quotes.quotes.firstBooster.total === null
-              ? null
-              : limitDecimals(quotes.quotes.firstBooster.total / 100.0, 3),
-          "A05-A17": {
-            total:
-              quotes.quotes.firstBooster["12to17"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.firstBooster["12to17"] / 100.0,
-                    3
-                  ),
-            "A05-A11": null, // not publisched at this time!
-            "A12-A17":
-              quotes.quotes.firstBooster["12to17"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.firstBooster["12to17"] / 100.0,
-                    3
-                  ),
-          },
-          "A18+": {
-            total:
-              quotes.quotes.firstBooster["18plus"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.firstBooster["18plus"] / 100.0,
-                    3
-                  ),
-            "A18-A59":
-              quotes.quotes.firstBooster["18to59"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.firstBooster["18to59"] / 100.0,
-                    3
-                  ),
-            "A60+":
-              quotes.quotes.firstBooster["60plus"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.firstBooster["60plus"] / 100.0,
-                    3
-                  ),
+          total: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
+          [UAG.G1217]: quotes[US.S3][UAG.G1217] === null ? null : limit(quotes[US.S3][UAG.G1217] / 100.0, 3),
+          [UAG.G18pl]: {
+            total: quotes[US.S3][UAG.G18pl] === null ? null : limit(quotes[US.S3][UAG.G18pl] / 100.0, 3),
+            [UAG.G1859]: quotes[US.S3][UAG.G1859] === null ? null : limit(quotes[US.S3][UAG.G1859] / 100.0, 3),
+            [UAG.G60pl]: quotes[US.S3][UAG.G60pl] === null ? null : limit(quotes[US.S3][UAG.G60pl] / 100.0, 3),
           },
         },
       };
-      coverage["2ndBoosterVaccination"] = {
-        vaccinated: quotes.vaccination.secondBooster,
+      coverage[SN[US.S4]] = {
+        vaccinated: quotes.vaccination[US.S4],
         vaccination: {
-          biontech: actual.secondBooster.biontech,
-          moderna: actual.secondBooster.moderna,
-          astraZeneca: actual.secondBooster.astraZeneca,
-          janssen: actual.secondBooster.janssen,
-          novavax: actual.secondBooster.novavax,
-          deltaBiontech:
-            actual.secondBooster.biontech - archive.secondBooster.biontech,
-          deltaModerna:
-            actual.secondBooster.moderna - archive.secondBooster.moderna,
-          deltaAstraZeneca:
-            actual.secondBooster.astraZeneca -
-            archive.secondBooster.astraZeneca,
-          deltaJanssen:
-            actual.secondBooster.janssen - archive.secondBooster.janssen,
-          deltaNovavax:
-            actual.secondBooster.novavax - archive.secondBooster.novavax,
+          [UV.V1]: actual[US.S4][UV.V1],
+          [UV.V2]: actual[US.S4][UV.V2],
+          [UV.V3]: actual[US.S4][UV.V3],
+          [UV.V4]: actual[US.S4][UV.V4],
+          [UV.V5]: actual[US.S4][UV.V5],
+          [UV.V6]: actual[US.S4][UV.V6],
+          [UV.V7]: actual[US.S4][UV.V7],
+          [UV.V8]: actual[US.S4][UV.V8],
+          [UVD.V1]: actual[US.S4][UV.V1] === null && archive[US.S4][UV.V1] === null ? null : actual[US.S4][UV.V1] - archive[US.S4][UV.V1],
+          [UVD.V2]: actual[US.S4][UV.V2] === null && archive[US.S4][UV.V2] === null ? null : actual[US.S4][UV.V2] - archive[US.S4][UV.V2],
+          [UVD.V3]: actual[US.S4][UV.V3] === null && archive[US.S4][UV.V3] === null ? null : actual[US.S4][UV.V3] - archive[US.S4][UV.V3],
+          [UVD.V4]: actual[US.S4][UV.V4] === null && archive[US.S4][UV.V4] === null ? null : actual[US.S4][UV.V4] - archive[US.S4][UV.V4],
+          [UVD.V5]: actual[US.S4][UV.V5] === null && archive[US.S4][UV.V5] === null ? null : actual[US.S4][UV.V5] - archive[US.S4][UV.V5],
+          [UVD.V6]: actual[US.S4][UV.V6] === null && archive[US.S4][UV.V6] === null ? null : actual[US.S4][UV.V6] - archive[US.S4][UV.V6],
+          [UVD.V7]: actual[US.S4][UV.V7] === null && archive[US.S4][UV.V7] === null ? null : actual[US.S4][UV.V7] - archive[US.S4][UV.V7],
+          [UVD.V8]: actual[US.S4][UV.V8] === null && archive[US.S4][UV.V8] === null ? null : actual[US.S4][UV.V8] - archive[US.S4][UV.V8],
         },
-        delta: actual.secondBooster.total - archive.secondBooster.total,
-        quote:
-          quotes.quotes.secondBooster.total === null
-            ? null
-            : limitDecimals(quotes.quotes.secondBooster.total / 100.0, 3),
+        delta: archive[US.S4].total === null ? null : actual[US.S4].total - archive[US.S4].total,
+        quote: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
         quotes: {
-          total:
-            quotes.quotes.secondBooster.total === null
-              ? null
-              : limitDecimals(quotes.quotes.secondBooster.total / 100.0, 3),
-          "A05-A17": {
-            total:
-              quotes.quotes.secondBooster["12to17"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.secondBooster["12to17"] / 100.0,
-                    3
-                  ),
-            "A05-A11": null,
-            "A12-A17":
-              quotes.quotes.secondBooster["12to17"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.secondBooster["12to17"] / 100.0,
-                    3
-                  ),
-          },
-          "A18+": {
-            total:
-              quotes.quotes.secondBooster["18plus"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.secondBooster["18plus"] / 100.0,
-                    3
-                  ),
-            "A18-A59":
-              quotes.quotes.secondBooster["18to59"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.secondBooster["18to59"] / 100.0,
-                    3
-                  ),
-            "A60+":
-              quotes.quotes.secondBooster["60plus"] === null
-                ? null
-                : limitDecimals(
-                    quotes.quotes.secondBooster["60plus"] / 100.0,
-                    3
-                  ),
+          total: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
+          [UAG.G1217]: quotes[US.S4][UAG.G1217] === null ? null : limit(quotes[US.S4][UAG.G1217] / 100.0, 3),
+          [UAG.G18pl]: {
+            total: quotes[US.S4][UAG.G18pl] === null ? null : limit(quotes[US.S4][UAG.G18pl] / 100.0, 3),
+            [UAG.G1859]: quotes[US.S4][UAG.G1859] === null ? null : limit(quotes[US.S4][UAG.G1859] / 100.0, 3),
+            [UAG.G60pl]: quotes[US.S4][UAG.G60pl] === null ? null : limit(quotes[US.S4][UAG.G60pl] / 100.0, 3),
           },
         },
       };
@@ -936,258 +708,137 @@ export async function getVaccinationCoverage(): Promise<
       coverage.states[abbreviation] = {
         name: cleanedStateName,
         administeredVaccinations: quotes.vaccination.total,
-        vaccinated: quotes.vaccination.first,
-        vaccination: {
-          biontech: actual.first.biontech,
-          moderna: actual.first.moderna,
-          astraZeneca: actual.first.astraZeneca,
-          janssen: actual.first.janssen,
-          novavax: actual.first.novavax === null ? null : actual.first.novavax,
-          deltaBiontech: actual.first.biontech - archive.first.biontech,
-          deltaModerna: actual.first.moderna - archive.first.moderna,
-          deltaAstraZeneca:
-            actual.first.astraZeneca - archive.first.astraZeneca,
-          deltaJanssen: actual.first.janssen - archive.first.janssen,
-          deltaNovavax: actual.first.novavax - archive.first.novavax,
+        vaccinated: quotes.vaccination[US.S1],
+        [SN[US.S1]]: {
+          [UV.V1]: actual[US.S1][UV.V1],
+          [UV.V2]: actual[US.S1][UV.V2],
+          [UV.V3]: actual[US.S1][UV.V3],
+          [UV.V4]: actual[US.S1][UV.V4],
+          [UV.V5]: actual[US.S1][UV.V5],
+          [UV.V6]: actual[US.S1][UV.V6],
+          [UV.V7]: actual[US.S1][UV.V7],
+          [UV.V8]: actual[US.S1][UV.V8],
+          [UVD.V1]: actual[US.S1][UV.V1] === null && archive[US.S1][UV.V1] === null ? null : actual[US.S1][UV.V1] - archive[US.S1][UV.V1],
+          [UVD.V2]: actual[US.S1][UV.V2] === null && archive[US.S1][UV.V2] === null ? null : actual[US.S1][UV.V2] - archive[US.S1][UV.V2],
+          [UVD.V3]: actual[US.S1][UV.V3] === null && archive[US.S1][UV.V3] === null ? null : actual[US.S1][UV.V3] - archive[US.S1][UV.V3],
+          [UVD.V4]: actual[US.S1][UV.V4] === null && archive[US.S1][UV.V4] === null ? null : actual[US.S1][UV.V4] - archive[US.S1][UV.V4],
+          [UVD.V5]: actual[US.S1][UV.V5] === null && archive[US.S1][UV.V5] === null ? null : actual[US.S1][UV.V5] - archive[US.S1][UV.V5],
+          [UVD.V6]: actual[US.S1][UV.V6] === null && archive[US.S1][UV.V6] === null ? null : actual[US.S1][UV.V6] - archive[US.S1][UV.V6],
+          [UVD.V7]: actual[US.S1][UV.V7] === null && archive[US.S1][UV.V7] === null ? null : actual[US.S1][UV.V7] - archive[US.S1][UV.V7],
+          [UVD.V8]: actual[US.S1][UV.V8] === null && archive[US.S1][UV.V8] === null ? null : actual[US.S1][UV.V8] - archive[US.S1][UV.V8],
         },
-        delta: actual.first.total - archive.first.total,
-        quote:
-          quotes.quotes.first.total === null
-            ? null
-            : limitDecimals(quotes.quotes.first.total / 100.0, 3),
+        delta: archive[US.S1].total === null ? null : actual[US.S1].total - archive[US.S1].total,
+        quote: quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3),
         quotes: {
-          total:
-            quotes.quotes.first.total === null
-              ? null
-              : limitDecimals(quotes.quotes.first.total / 100.0, 3),
-          "A05-A17": {
-            total:
-              quotes.quotes.first["5to17"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["5to17"] / 100.0, 3),
-            "A05-A11":
-              quotes.quotes.first["5to11"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["5to11"] / 100.0, 3),
-            "A12-A17":
-              quotes.quotes.first["12to17"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["12to17"] / 100.0, 3),
+          total: quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3),
+          [UAG.G0517]: {
+            total: quotes[US.S1][UAG.G0517] === null ? null : limit(quotes[US.S1][UAG.G0517] / 100.0, 3),
+            [UAG.G0511]: quotes[US.S1][UAG.G0511] === null ? null : limit(quotes[US.S1][UAG.G0511] / 100.0, 3),
+            [UAG.G1217]: quotes[US.S1][UAG.G1217] === null ? null : limit(quotes[US.S1][UAG.G1217] / 100.0, 3),
           },
-          "A18+": {
-            total:
-              quotes.quotes.first["18plus"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["18plus"] / 100.0, 3),
-            "A18-A59":
-              quotes.quotes.first["18to59"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["18to59"] / 100.0, 3),
-            "A60+":
-              quotes.quotes.first["60plus"] === null
-                ? null
-                : limitDecimals(quotes.quotes.first["60plus"] / 100.0, 3),
+          [UAG.G18pl]: {
+            total: quotes[US.S1][UAG.G18pl] === null ? null : limit(quotes[US.S1][UAG.G18pl] / 100.0, 3),
+            [UAG.G1859]: quotes[US.S1][UAG.G1859] === null ? null : limit(quotes[US.S1][UAG.G1859] / 100.0, 3),
+            [UAG.G60pl]: quotes[US.S1][UAG.G60pl] === null ? null : limit(quotes[US.S1][UAG.G60pl] / 100.0, 3),
           },
         },
-        secondVaccination: {
-          vaccinated: quotes.vaccination.full,
+        [SN[US.S2]]: {
+          vaccinated: quotes.vaccination[US.S2],
           vaccination: {
-            biontech: actual.full.biontech,
-            moderna: actual.full.moderna,
-            astraZeneca: actual.full.astraZeneca,
-            janssen: actual.full.janssen,
-            novavax: actual.full.novavax === null ? null : actual.full.novavax,
-            deltaBiontech: actual.full.biontech - archive.full.biontech,
-            deltaModerna: actual.full.moderna - archive.full.moderna,
-            deltaAstraZeneca:
-              actual.full.astraZeneca - archive.full.astraZeneca,
-            deltaJanssen: actual.full.janssen - archive.full.janssen,
-            deltaNovavax: actual.full.novavax - archive.full.novavax,
+            [UV.V1]: actual[US.S2][UV.V1],
+            [UV.V2]: actual[US.S2][UV.V2],
+            [UV.V3]: actual[US.S2][UV.V3],
+            [UV.V4]: actual[US.S2][UV.V4],
+            [UV.V5]: actual[US.S2][UV.V5],
+            [UV.V6]: actual[US.S2][UV.V6],
+            [UV.V7]: actual[US.S2][UV.V7],
+            [UV.V8]: actual[US.S2][UV.V8],
+            [UVD.V1]: actual[US.S2][UV.V1] === null && archive[US.S2][UV.V1] === null ? null : actual[US.S2][UV.V1] - archive[US.S2][UV.V1],
+            [UVD.V2]: actual[US.S2][UV.V2] === null && archive[US.S2][UV.V2] === null ? null : actual[US.S2][UV.V2] - archive[US.S2][UV.V2],
+            [UVD.V3]: actual[US.S2][UV.V3] === null && archive[US.S2][UV.V3] === null ? null : actual[US.S2][UV.V3] - archive[US.S2][UV.V3],
+            [UVD.V4]: actual[US.S2][UV.V4] === null && archive[US.S2][UV.V4] === null ? null : actual[US.S2][UV.V4] - archive[US.S2][UV.V4],
+            [UVD.V5]: actual[US.S2][UV.V5] === null && archive[US.S2][UV.V5] === null ? null : actual[US.S2][UV.V5] - archive[US.S2][UV.V5],
+            [UVD.V6]: actual[US.S2][UV.V6] === null && archive[US.S2][UV.V6] === null ? null : actual[US.S2][UV.V6] - archive[US.S2][UV.V6],
+            [UVD.V7]: actual[US.S2][UV.V7] === null && archive[US.S2][UV.V7] === null ? null : actual[US.S2][UV.V7] - archive[US.S2][UV.V7],
+            [UVD.V8]: actual[US.S2][UV.V8] === null && archive[US.S2][UV.V8] === null ? null : actual[US.S2][UV.V8] - archive[US.S2][UV.V8],
           },
-          delta: actual.full.total - archive.full.total,
-          quote:
-            quotes.quotes.second.total === null
-              ? null
-              : limitDecimals(quotes.quotes.second.total / 100.0, 3),
+          delta: archive[US.S2].total === null ? null : actual[US.S2].total - archive[US.S2].total,
+          quote: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
           quotes: {
-            total:
-              quotes.quotes.second.total === null
-                ? null
-                : limitDecimals(quotes.quotes.second.total / 100.0, 3),
-            "A05-A17": {
-              total:
-                quotes.quotes.second["5to17"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["5to17"] / 100.0, 3),
-              "A05-A11":
-                quotes.quotes.second["5to11"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["5to11"] / 100.0, 3),
-              "A12-A17":
-                quotes.quotes.second["12to17"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["12to17"] / 100.0, 3),
+            total: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
+            [UAG.G0517]: {
+              total: quotes[US.S2][UAG.G0517] === null ? null : limit(quotes[US.S2][UAG.G0517] / 100.0, 3),
+              [UAG.G0511]: quotes[US.S2][UAG.G0511] === null ? null : limit(quotes[US.S2][UAG.G0511] / 100.0, 3),
+              [UAG.G1217]: quotes[US.S2][UAG.G1217] === null ? null : limit(quotes[US.S2][UAG.G1217] / 100.0, 3),
             },
-            "A18+": {
-              total:
-                quotes.quotes.second["18plus"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["18plus"] / 100.0, 3),
-              "A18-A59":
-                quotes.quotes.second["18to59"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["18to59"] / 100.0, 3),
-              "A60+":
-                quotes.quotes.second["60plus"] === null
-                  ? null
-                  : limitDecimals(quotes.quotes.second["60plus"] / 100.0, 3),
+            [UAG.G18pl]: {
+              total: quotes[US.S2][UAG.G18pl] === null ? null : limit(quotes[US.S2][UAG.G18pl] / 100.0, 3),
+              [UAG.G1859]: quotes[US.S2][UAG.G1859] === null ? null : limit(quotes[US.S2][UAG.G1859] / 100.0, 3),
+              [UAG.G60pl]: quotes[US.S2][UAG.G60pl] === null ? null : limit(quotes[US.S2][UAG.G60pl] / 100.0, 3),
             },
           },
         },
-        boosterVaccination: {
-          vaccinated: quotes.vaccination.firstBooster,
+        [SN[US.S3]]: {
+          vaccinated: quotes.vaccination[US.S3],
           vaccination: {
-            biontech: actual.firstBooster.biontech,
-            moderna: actual.firstBooster.moderna,
-            janssen: actual.firstBooster.janssen,
-            astraZeneca: actual.firstBooster.astraZeneca,
-            novavax:
-              actual.firstBooster.novavax === null
-                ? null
-                : actual.firstBooster.novavax,
-            deltaBiontech:
-              actual.firstBooster.biontech - archive.firstBooster.biontech,
-            deltaModerna:
-              actual.firstBooster.moderna - archive.firstBooster.moderna,
-            deltaAstraZeneca:
-              actual.firstBooster.astraZeneca -
-              archive.firstBooster.astraZeneca,
-            deltaJanssen:
-              actual.firstBooster.janssen - archive.firstBooster.janssen,
-            deltaNovavax:
-              actual.firstBooster.novavax - archive.firstBooster.novavax,
+            [UV.V1]: actual[US.S3][UV.V1],
+            [UV.V2]: actual[US.S3][UV.V2],
+            [UV.V3]: actual[US.S3][UV.V3],
+            [UV.V4]: actual[US.S3][UV.V4],
+            [UV.V5]: actual[US.S3][UV.V5],
+            [UV.V6]: actual[US.S3][UV.V6],
+            [UV.V7]: actual[US.S3][UV.V7],
+            [UV.V8]: actual[US.S3][UV.V8],
+            [UVD.V1]: actual[US.S3][UV.V1] === null && archive[US.S3][UV.V1] === null ? null : actual[US.S3][UV.V1] - archive[US.S3][UV.V1],
+            [UVD.V2]: actual[US.S3][UV.V2] === null && archive[US.S3][UV.V2] === null ? null : actual[US.S3][UV.V2] - archive[US.S3][UV.V2],
+            [UVD.V3]: actual[US.S3][UV.V3] === null && archive[US.S3][UV.V3] === null ? null : actual[US.S3][UV.V3] - archive[US.S3][UV.V3],
+            [UVD.V4]: actual[US.S3][UV.V4] === null && archive[US.S3][UV.V4] === null ? null : actual[US.S3][UV.V4] - archive[US.S3][UV.V4],
+            [UVD.V5]: actual[US.S3][UV.V5] === null && archive[US.S3][UV.V5] === null ? null : actual[US.S3][UV.V5] - archive[US.S3][UV.V5],
+            [UVD.V6]: actual[US.S3][UV.V6] === null && archive[US.S3][UV.V6] === null ? null : actual[US.S3][UV.V6] - archive[US.S3][UV.V6],
+            [UVD.V7]: actual[US.S3][UV.V7] === null && archive[US.S3][UV.V7] === null ? null : actual[US.S3][UV.V7] - archive[US.S3][UV.V7],
+            [UVD.V8]: actual[US.S3][UV.V8] === null && archive[US.S3][UV.V8] === null ? null : actual[US.S3][UV.V8] - archive[US.S3][UV.V8],
           },
-          delta: actual.firstBooster.total - archive.firstBooster.total,
-          quote:
-            quotes.quotes.firstBooster.total === null
-              ? null
-              : limitDecimals(quotes.quotes.firstBooster.total / 100.0, 3),
+          delta: archive[US.S3].total === null ? null : actual[US.S3].total - archive[US.S3].total,
+          quote: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
           quotes: {
-            total:
-              quotes.quotes.firstBooster.total === null
-                ? null
-                : limitDecimals(quotes.quotes.firstBooster.total / 100.0, 3),
-            "A05-A17": {
-              total:
-                quotes.quotes.firstBooster["12to17"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.firstBooster["12to17"] / 100.0,
-                      3
-                    ),
-              "A05-A11": null, // not published at this time!
-              "A12-A17":
-                quotes.quotes.firstBooster["12to17"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.firstBooster["12to17"] / 100.0,
-                      3
-                    ),
-            },
-            "A18+": {
-              total:
-                quotes.quotes.firstBooster["18plus"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.firstBooster["18plus"] / 100.0,
-                      3
-                    ),
-              "A18-A59":
-                quotes.quotes.firstBooster["18to59"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.firstBooster["18to59"] / 100.0,
-                      3
-                    ),
-              "A60+":
-                quotes.quotes.firstBooster["60plus"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.firstBooster["60plus"] / 100.0,
-                      3
-                    ),
+            total: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
+            [UAG.G1217]: quotes[US.S3][UAG.G1217] === null ? null : limit(quotes[US.S3][UAG.G1217] / 100.0, 3),
+            [UAG.G18pl]: {
+              total: quotes[US.S3][UAG.G18pl] === null ? null : limit(quotes[US.S3][UAG.G18pl] / 100.0, 3),
+              [UAG.G1859]: quotes[US.S3][UAG.G1859] === null ? null : limit(quotes[US.S3][UAG.G1859] / 100.0, 3),
+              [UAG.G60pl]: quotes[US.S3][UAG.G60pl] === null ? null : limit(quotes[US.S3][UAG.G60pl] / 100.0, 3),
             },
           },
         },
-        "2ndBoosterVaccination": {
+        [SN[US.S4]]: {
           vaccinated: quotes.vaccination.secondBooster,
           vaccination: {
-            biontech: actual.secondBooster.biontech,
-            moderna: actual.secondBooster.moderna,
-            janssen: actual.secondBooster.janssen,
-            astraZeneca: actual.secondBooster.astraZeneca,
-            novavax: actual.secondBooster.novavax,
-            deltaBiontech:
-              actual.secondBooster.biontech - archive.secondBooster.biontech,
-            deltaModerna:
-              actual.secondBooster.moderna - archive.secondBooster.moderna,
-            deltaAstraZeneca:
-              actual.secondBooster.astraZeneca -
-              archive.secondBooster.astraZeneca,
-            deltaJanssen:
-              actual.secondBooster.janssen - archive.secondBooster.janssen,
-            deltaNovavax:
-              actual.secondBooster.novavax - archive.secondBooster.novavax,
+            [UV.V1]: actual[US.S4][UV.V1],
+            [UV.V2]: actual[US.S4][UV.V2],
+            [UV.V3]: actual[US.S4][UV.V3],
+            [UV.V4]: actual[US.S4][UV.V4],
+            [UV.V5]: actual[US.S4][UV.V5],
+            [UV.V6]: actual[US.S4][UV.V6],
+            [UV.V7]: actual[US.S4][UV.V7],
+            [UV.V8]: actual[US.S4][UV.V8],
+            [UVD.V1]: actual[US.S4][UV.V1] === null && archive[US.S4][UV.V1] === null ? null : actual[US.S4][UV.V1] - archive[US.S4][UV.V1],
+            [UVD.V2]: actual[US.S4][UV.V2] === null && archive[US.S4][UV.V2] === null ? null : actual[US.S4][UV.V2] - archive[US.S4][UV.V2],
+            [UVD.V3]: actual[US.S4][UV.V3] === null && archive[US.S4][UV.V3] === null ? null : actual[US.S4][UV.V3] - archive[US.S4][UV.V3],
+            [UVD.V4]: actual[US.S4][UV.V4] === null && archive[US.S4][UV.V4] === null ? null : actual[US.S4][UV.V4] - archive[US.S4][UV.V4],
+            [UVD.V5]: actual[US.S4][UV.V5] === null && archive[US.S4][UV.V5] === null ? null : actual[US.S4][UV.V5] - archive[US.S4][UV.V5],
+            [UVD.V6]: actual[US.S4][UV.V6] === null && archive[US.S4][UV.V6] === null ? null : actual[US.S4][UV.V6] - archive[US.S4][UV.V6],
+            [UVD.V7]: actual[US.S4][UV.V7] === null && archive[US.S4][UV.V7] === null ? null : actual[US.S4][UV.V7] - archive[US.S4][UV.V7],
+            [UVD.V8]: actual[US.S4][UV.V8] === null && archive[US.S4][UV.V8] === null ? null : actual[US.S4][UV.V8] - archive[US.S4][UV.V8],
           },
-          delta: actual.secondBooster.total - archive.secondBooster.total,
-          quote:
-            quotes.quotes.secondBooster.total === null
-              ? null
-              : limitDecimals(quotes.quotes.secondBooster.total / 100.0, 3),
+          delta: archive[US.S4].total === null ? null : actual[US.S4].total - archive[US.S4].total,
+          quote: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
           quotes: {
-            total:
-              quotes.quotes.secondBooster.total === null
-                ? null
-                : limitDecimals(quotes.quotes.secondBooster.total / 100.0, 3),
-            "A05-A17": {
-              total:
-                quotes.quotes.secondBooster["12to17"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.secondBooster["12to17"] / 100.0,
-                      3
-                    ),
-              "A05-A11": null, // not published at this time!
-              "A12-A17":
-                quotes.quotes.secondBooster["12to17"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.secondBooster["12to17"] / 100.0,
-                      3
-                    ),
-            },
-            "A18+": {
-              total:
-                quotes.quotes.secondBooster["18plus"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.secondBooster["18plus"] / 100.0,
-                      3
-                    ),
-              "A18-A59":
-                quotes.quotes.secondBooster["18to59"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.secondBooster["18to59"] / 100.0,
-                      3
-                    ),
-              "A60+":
-                quotes.quotes.secondBooster["60plus"] === null
-                  ? null
-                  : limitDecimals(
-                      quotes.quotes.secondBooster["60plus"] / 100.0,
-                      3
-                    ),
+            total: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
+            [UAG.G1217]: quotes[US.S4][UAG.G1217] === null ? null : limit(quotes[US.S4][UAG.G1217] / 100.0, 3),
+            [UAG.G18pl]: {
+              total: quotes[US.S4][UAG.G18pl] === null ? null : limit(quotes[US.S4][UAG.G18pl] / 100.0, 3),
+              [UAG.G1859]: quotes[US.S4][UAG.G1859] === null ? null : limit(quotes[US.S4][UAG.G1859] / 100.0, 3),
+              [UAG.G60pl]: quotes[US.S4][UAG.G60pl] === null ? null : limit(quotes[US.S4][UAG.G60pl] / 100.0, 3),
             },
           },
         },
@@ -1195,7 +846,7 @@ export async function getVaccinationCoverage(): Promise<
     }
   }
 
-  function limitDecimals(value: number, decimals: number): number {
+  function limit(value: number, decimals: number): number {
     return parseFloat(value.toFixed(decimals));
   }
   return {
@@ -1205,15 +856,7 @@ export async function getVaccinationCoverage(): Promise<
 }
 
 interface VacciantionHistoryDataObject {
-  [date: string]: {
-    date: Date;
-    vaccinated: number;
-    firstVaccination: number;
-    secondVaccination: number;
-    firstBoosterVaccination: number;
-    secondBoosterVaccination: number;
-    totalVacciantionOfTheDay: number;
-  };
+  [date: string]: VaccinationHistoryEntry;
 }
 
 export interface VaccinationHistoryEntry {
@@ -1258,7 +901,7 @@ export async function getVaccinationHistory(
         let record;
         while ((record = parser.read())) {
           let [date, stateId, vaccine, series, count] = record;
-          let total = 0;
+          const seriesKey = "S" + series.toString();
           // read entry for the date
           let dateEntry = vaccinationHistoryDataObject[date.toISOString()];
 
@@ -1276,23 +919,8 @@ export async function getVaccinationHistory(
           }
 
           dateEntry.totalVacciantionOfTheDay += count;
-          switch (series) {
-            case 1:
-              dateEntry.firstVaccination += count;
-              dateEntry.vaccinated += count; // legacy Entry
-              break;
-            case 2:
-              dateEntry.secondVaccination += count;
-              break;
-            case 3:
-              dateEntry.firstBoosterVaccination += count;
-              break;
-            case 4:
-              dateEntry.secondBoosterVaccination += count;
-              break;
-            default:
-              break;
-          }
+          dateEntry[SeriesHistory[seriesKey]] += count;
+          if (series == 1) dateEntry.vaccinated += count; // legacy Entry
 
           // write data to object
           vaccinationHistoryDataObject[date.toISOString()] = dateEntry;
