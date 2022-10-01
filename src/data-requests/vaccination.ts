@@ -272,7 +272,7 @@ const DataPromise = async function (resolve, reject) {
 
   // pipe csv stream to csv parser
   response.data.pipe(parser);
-  
+
   // empty vaccine Object
   const vaccineObject: Vaccine = {
     total: null,
@@ -284,15 +284,15 @@ const DataPromise = async function (resolve, reject) {
     [UV.V6]: null,
     [UV.V7]: null,
     [UV.V8]: null,
-  }
-  
+  };
+
   const emptyStateObject: StateEntry = {
     [US.S1]: clone(vaccineObject),
     [US.S2]: clone(vaccineObject),
     [US.S3]: clone(vaccineObject),
     [US.S4]: clone(vaccineObject),
   };
-  
+
   // empty object, that gets filled
   const vaccinationDataObject: VaccineVaccinationData = {
     0: clone(emptyStateObject),
@@ -316,7 +316,7 @@ const DataPromise = async function (resolve, reject) {
       // write data to stateEntry
       stateEntry[US[seriesKey]].total += count;
       stateEntry[US[seriesKey]][VNR[vaccinekey]] += count;
-    
+
       vaccinationDataObject[stateId] = stateEntry;
     }
   });
@@ -404,12 +404,12 @@ export async function getVaccinationCoverage(): Promise<
           ] = record;
           quoteVaccinationDataObject[id] = {
             name: name,
-            vaccination:{
+            vaccination: {
               total: total,
               [US.S1]: first,
               [US.S2]: full,
               [US.S3]: firstBooster,
-              [US.S4]: secondBooster
+              [US.S4]: secondBooster,
             },
             [US.S1]: {
               total: qFirstTotal,
@@ -486,7 +486,7 @@ export async function getVaccinationCoverage(): Promise<
       archiveDataPromise,
       quoteDataPromise,
     ]);
-  
+
   // empty CoverageVaccineObject
   const emptyCoverageVaccineObject: CoverageVaccine = {
     [UV.V1]: null,
@@ -505,7 +505,7 @@ export async function getVaccinationCoverage(): Promise<
     [UVD.V6]: null,
     [UVD.V7]: null,
     [UVD.V8]: null,
-  }
+  };
   const emptyCoverageQuotesS1S2Object: CoverageQuotesS1S2 = {
     total: null,
     [UAG.G0517]: {
@@ -518,7 +518,7 @@ export async function getVaccinationCoverage(): Promise<
       [UAG.G1859]: null,
       [UAG.G60pl]: null,
     },
-  }
+  };
   const emptyCoverageQuotesS3S4Object: CoverageQuotesS3S4 = {
     total: null,
     [UAG.G1217]: null,
@@ -527,7 +527,7 @@ export async function getVaccinationCoverage(): Promise<
       [UAG.G1859]: null,
       [UAG.G60pl]: null,
     },
-  }
+  };
   // now we have all the stuff we need to fill the coverage
   // init
   const coverage: VaccinationCoverage = {
