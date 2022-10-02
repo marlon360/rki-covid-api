@@ -248,6 +248,67 @@ interface QuoteVaccinationData {
   };
 }
 [];
+// empty objects for later use
+// emptyVaccinesObject
+const emptyVaccinesObject: Vaccines = {
+  [UV.V1]: null,
+  [UV.V2]: null,
+  [UV.V3]: null,
+  [UV.V4]: null,
+  [UV.V5]: null,
+  [UV.V6]: null,
+  [UV.V7]: null,
+  [UV.V8]: null,
+};
+// empty CoverageVaccineObject
+const emptyCoverageVaccineObject: CoverageVaccine = {
+  ...clone(emptyVaccinesObject),
+  [UVD.V1]: null,
+  [UVD.V2]: null,
+  [UVD.V3]: null,
+  [UVD.V4]: null,
+  [UVD.V5]: null,
+  [UVD.V6]: null,
+  [UVD.V7]: null,
+  [UVD.V8]: null,
+};
+// empty CoverageQuotesS1S2Object
+const emptyCoverageQuotesS1S2Object: CoverageQuotesS1S2 = {
+  total: null,
+  [UAG.G0517]: {
+    total: null,
+    [UAG.G0511]: null,
+    [UAG.G1217]: null,
+  },
+  [UAG.G18pl]: {
+    total: null,
+    [UAG.G1859]: null,
+    [UAG.G60pl]: null,
+  },
+};
+// empty CoverageQuotesS3S4Object
+const emptyCoverageQuotesS3S4Object: CoverageQuotesS3S4 = {
+  total: null,
+  [UAG.G1217]: null,
+  [UAG.G18pl]: {
+    total: null,
+    [UAG.G1859]: null,
+    [UAG.G60pl]: null,
+  },
+};
+
+// empty vaccine Object
+const vaccineObject: Vaccine = {
+  total: null,
+  ...clone(emptyVaccinesObject),
+};
+
+const emptyStateObject: StateEntry = {
+  [US.S1]: clone(vaccineObject),
+  [US.S2]: clone(vaccineObject),
+  [US.S3]: clone(vaccineObject),
+  [US.S4]: clone(vaccineObject),
+};
 
 function clone<T>(a: T): T {
   return JSON.parse(JSON.stringify(a));
@@ -272,26 +333,6 @@ const DataPromise = async function (resolve, reject) {
 
   // pipe csv stream to csv parser
   response.data.pipe(parser);
-
-  // empty vaccine Object
-  const vaccineObject: Vaccine = {
-    total: null,
-    [UV.V1]: null,
-    [UV.V2]: null,
-    [UV.V3]: null,
-    [UV.V4]: null,
-    [UV.V5]: null,
-    [UV.V6]: null,
-    [UV.V7]: null,
-    [UV.V8]: null,
-  };
-
-  const emptyStateObject: StateEntry = {
-    [US.S1]: clone(vaccineObject),
-    [US.S2]: clone(vaccineObject),
-    [US.S3]: clone(vaccineObject),
-    [US.S4]: clone(vaccineObject),
-  };
 
   // empty object, that gets filled
   const vaccinationDataObject: VaccineVaccinationData = {
@@ -487,47 +528,6 @@ export async function getVaccinationCoverage(): Promise<
       quoteDataPromise,
     ]);
 
-  // empty CoverageVaccineObject
-  const emptyCoverageVaccineObject: CoverageVaccine = {
-    [UV.V1]: null,
-    [UV.V2]: null,
-    [UV.V3]: null,
-    [UV.V4]: null,
-    [UV.V5]: null,
-    [UV.V6]: null,
-    [UV.V7]: null,
-    [UV.V8]: null,
-    [UVD.V1]: null,
-    [UVD.V2]: null,
-    [UVD.V3]: null,
-    [UVD.V4]: null,
-    [UVD.V5]: null,
-    [UVD.V6]: null,
-    [UVD.V7]: null,
-    [UVD.V8]: null,
-  };
-  const emptyCoverageQuotesS1S2Object: CoverageQuotesS1S2 = {
-    total: null,
-    [UAG.G0517]: {
-      total: null,
-      [UAG.G0511]: null,
-      [UAG.G1217]: null,
-    },
-    [UAG.G18pl]: {
-      total: null,
-      [UAG.G1859]: null,
-      [UAG.G60pl]: null,
-    },
-  };
-  const emptyCoverageQuotesS3S4Object: CoverageQuotesS3S4 = {
-    total: null,
-    [UAG.G1217]: null,
-    [UAG.G18pl]: {
-      total: null,
-      [UAG.G1859]: null,
-      [UAG.G60pl]: null,
-    },
-  };
   // now we have all the stuff we need to fill the coverage
   // init
   const coverage: VaccinationCoverage = {

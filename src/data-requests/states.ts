@@ -7,6 +7,7 @@ import {
   parseDate,
   shouldUseAlternateDataSource,
 } from "../utils";
+import { AgeGroupData } from "./germany";
 import { ResponseData } from "./response-data";
 
 export interface IStateData {
@@ -357,17 +358,6 @@ export async function getLastStateRecoveredHistory(
     data: history,
     lastUpdate: datenstand,
   };
-}
-
-export interface AgeGroupData {
-  casesMale: string;
-  casesFemale: string;
-  deathsMale: string;
-  deathsFemale: string;
-  casesMalePer100k: string;
-  casesFemalePer100k: string;
-  deathsMalePer100k: string;
-  deathsFemalePer100k: string;
 }
 
 export interface AgeGroupsData {
