@@ -10,6 +10,7 @@ import {
   getLastDistrictRecoveredHistory,
   getDistrictsRecoveredData,
   getNewDistrictRecovered,
+  getDistrictsAgeGroups,
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
@@ -22,6 +23,7 @@ import {
   DistrictsFrozenIncidenceData,
   getDistrictsFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
+import { AgeGroupsData } from "../data-requests/states";
 
 interface DistrictData extends IDistrictData {
   stateAbbreviation: string;
@@ -309,5 +311,29 @@ export async function FrozenIncidenceHistoryResponse(
   return {
     data: data,
     meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
+  };
+}
+
+export async function DistrictsAgeGroupsResponse(ags?: string): Promise<{
+  data: AgeGroupsData;
+  meta: ResponseMeta;
+}> {
+  const AgeGroupsData = await getDistrictsAgeGroups(ags);
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((ags) => {
+    data[ags] = {
+      ...AgeGroupsData.data[ags],
+    };
+    Object.keys(AgeGroupsData.data[ags]).forEach((ageGroup) => {
+      data[ags][ageGroup] = {
+        ...AgeGroupsData.data[ags][ageGroup],
+      };
+    });
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }

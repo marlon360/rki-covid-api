@@ -33,6 +33,7 @@ import {
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
   FrozenIncidenceHistoryResponse,
+  DistrictsAgeGroupsResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -692,6 +693,16 @@ app.get(
 );
 
 app.get(
+  "/districts/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse();
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/:district",
   queuedCache(),
   cache.route(),
@@ -831,6 +842,16 @@ app.get(
       parseInt(req.params.days),
       req.params.district
     );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:district/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse(req.params.district);
     res.json(response);
   }
 );

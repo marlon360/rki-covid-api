@@ -78,6 +78,112 @@
 }
 ```
 
+## `/districts/age-groups`
+
+### Request
+
+`GET https://api.corona-zahlen.org/districts/age-groups`
+[Open](/districts/age-groups)
+
+### Response
+
+```json
+{
+  "data": {
+    "10041": {
+      "A00-A04": {
+        "casesMale": 1881,
+        "casesFemale": 1815,
+        "deathsMale": 0,
+        "deathsFemale": 0,
+        "casesMalePer100k": 25003.3,
+        "casesFemalePer100k": 25599.4,
+        "deathsMalePer100k": 0,
+        "deathsFemalePer100k": 0
+      },
+      "A05-A14": {
+        "casesMale": 8077,
+        "casesFemale": 7593,
+        "deathsMale": 0,
+        "deathsFemale": 0,
+        "casesMalePer100k": 57887.2,
+        "casesFemalePer100k": 58479.7,
+        "deathsMalePer100k": 0,
+        "deathsFemalePer100k": 0
+      },
+      "A15-A34": {
+        "casesMale": 19697,
+        "casesFemale": 21265,
+        "deathsMale": 1,
+        "deathsFemale": 3,
+        "casesMalePer100k": 48635.8,
+        "casesFemalePer100k": 57507.2,
+        "deathsMalePer100k": 2.5,
+        "deathsFemalePer100k": 8.1
+      },
+      "A35-A59": {
+        //...
+      },
+      "A60-A79": {
+        //...
+      },
+      "A80+": {
+        //...
+      }
+    },
+    ...
+    "09780": {
+      "A00-A04": {
+        //...
+      },
+      "A05-A14": {
+        //...
+      },
+      "A15-A34": {
+        //...
+      },
+      "A35-A59": {
+        "casesMale": 12817,
+        "casesFemale": 14198,
+        "deathsMale": 14,
+        "deathsFemale": 3,
+        "casesMalePer100k": 48164.3,
+        "casesFemalePer100k": 52032.1,
+        "deathsMalePer100k": 52.6,
+        "deathsFemalePer100k": 11
+      },
+      "A60-A79": {
+        "casesMale": 4540,
+        "casesFemale": 4672,
+        "deathsMale": 46,
+        "deathsFemale": 17,
+        "casesMalePer100k": 26084.5,
+        "casesFemalePer100k": 24713,
+        "deathsMalePer100k": 264.3,
+        "deathsFemalePer100k": 89.9
+      },
+      "A80+": {
+        "casesMale": 1009,
+        "casesFemale": 1305,
+        "deathsMale": 57,
+        "deathsFemale": 60,
+        "casesMalePer100k": 20379.7,
+        "casesFemalePer100k": 18650.9,
+        "deathsMalePer100k": 1151.3,
+        "deathsFemalePer100k": 857.5
+      }
+    }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-10-01T01:11:26.000Z",
+    "lastCheckedForUpdate": "2022-10-01T23:32:50.616Z"
+  }
+}
+```
+
 ## `/districts/:ags`
 
 Returns the data for a single district identified by `:ags` AGS (Allgemeiner Gemeinde Schlüssel).
@@ -159,6 +265,8 @@ Redirects to `/districts/history/cases`
 ## `/districts/history/recovered`
 
 ## `/districts/history/recovered/:days`
+
+## `/districts/:ags/age-groups`
 
 ## `/districts/:ags/history/cases`
 
