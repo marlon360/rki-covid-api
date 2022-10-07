@@ -40,11 +40,23 @@ export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
       deathsPerWeek: feature.attributes.death7_bl,
     };
   });
+  // data.features[0].attributes.Aktualisierung is a
+  // millisecond value witch is GMT!
+  // lets always convert this to GMT date and time 00:00:00
+  // regardless of whether it is summer or standart time in Germany
+  // (add 2 hours in summertime or 1 hour in standarttime)
+  // e.g. Aktualisierung is 1665093600000 = "Thu Oct 06 2022 22:00:00 GMT+0000"
+  // ->wrong date for lastUpdate!
+  // first convert this to german Time = "7.10.2022, 00:00:00"
+  const germanDate = new Date(
+    data.features[0].attributes.Aktualisierung
+  ).toLocaleString("de-DE", { timeZone: "Europe/Berlin" });
+  // now parse this string and set lastUpdate to "Fri Oct 07 2022 00:00:00 GMT+0000"
+  // -> right date for lastUpdate!
+  const lastUpdate = parseDate(germanDate);
   return {
     data: states,
-    lastUpdate: new Date(
-      data.features[0].attributes.Aktualisierung + 60 * 60 * 1000
-    ),
+    lastUpdate: lastUpdate,
   };
 }
 
