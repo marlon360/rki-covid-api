@@ -535,7 +535,7 @@ export async function StatesFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation != null) {
+    if (historyData.abbreviation != "Bund") {
       data[historyData.abbreviation] = historyData;
     }
   });

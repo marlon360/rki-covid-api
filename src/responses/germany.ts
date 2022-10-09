@@ -348,9 +348,7 @@ export async function GermanyFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation == null) {
-      historyData.abbreviation = "Bund";
-      historyData.name = "Bundesgebiet";
+    if (historyData.abbreviation == "Bund") {
       data = historyData;
     }
   });
