@@ -259,11 +259,20 @@ export async function getDistrictsFrozenIncidenceHistory(
       });
     });
   }
+  
+  // merge archive data with current data
+  actual.data = actual.data.map((district) => {
+    district.history.unshift(
+      ...archive.data.find((element) => element.ags === district.ags).history
+    );
+    return district;
+  });
+
   // filter by ags
   if (ags) {
     actual.data = actual.data.filter((district) => district.ags === ags);
-    archive.data = archive.data.filter((district) => district.ags === ags);
   }
+  
   // filter by days
   if (days) {
     const reference_date = new Date(getDateBefore(days));
@@ -273,21 +282,8 @@ export async function getDistrictsFrozenIncidenceHistory(
       );
       return district;
     });
-    archive.data = archive.data.map((district) => {
-      district.history = district.history.filter(
-        (element) => element.date > reference_date
-      );
-      return district;
-    });
   }
-  // merge archive data with current data
-  actual.data = actual.data.map((district) => {
-    district.history.unshift(
-      ...archive.data.find((element) => element.ags === district.ags).history
-    );
-    return district;
-  });
-
+  
   return {
     data: actual.data,
     lastUpdate: lastUpdate,
@@ -392,31 +388,7 @@ export async function getStatesFrozenIncidenceHistory(
       });
     });
   }
-  // filter by ags
-  if (abbreviation) {
-    actual.data = actual.data.filter(
-      (state) => state.abbreviation === abbreviation
-    );
-    archive.data = archive.data.filter(
-      (state) => state.abbreviation === abbreviation
-    );
-  }
-  // filter by days
-  if (days) {
-    const reference_date = new Date(getDateBefore(days));
-    actual.data = actual.data.map((state) => {
-      state.history = state.history.filter(
-        (element) => element.date > reference_date
-      );
-      return state;
-    });
-    archive.data = archive.data.map((state) => {
-      state.history = state.history.filter(
-        (element) => element.date > reference_date
-      );
-      return state;
-    });
-  }
+  
   // merge archive data with current data
   actual.data = actual.data.map((state) => {
     state.history.unshift(
@@ -426,7 +398,25 @@ export async function getStatesFrozenIncidenceHistory(
     );
     return state;
   });
-
+  
+  // filter by ags
+  if (abbreviation) {
+    actual.data = actual.data.filter(
+      (state) => state.abbreviation === abbreviation
+    );
+  }
+  
+  // filter by days
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
+    actual.data = actual.data.map((state) => {
+      state.history = state.history.filter(
+        (element) => element.date > reference_date
+      );
+      return state;
+    });
+  }
+  
   return {
     data: actual.data,
     lastUpdate: lastUpdate,
