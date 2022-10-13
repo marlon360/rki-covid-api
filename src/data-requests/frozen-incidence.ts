@@ -1,7 +1,7 @@
 import axios from "axios";
 import XLSX from "xlsx";
 import zlib from "zlib";
-import fs from "fs"
+import fs from "fs";
 
 import {
   AddDaysToDate,
@@ -57,7 +57,7 @@ const ActualDistricts: RequestTypeParameter = {
   startColumn: 2,
   key: "ags",
   githubFileName: "_LK.json.gz",
-  localFileName: "dataStore/actualDistricts.json.gz"
+  localFileName: "dataStore/actualDistricts.json.gz",
 };
 
 const ArchiveDistricts: RequestTypeParameter = {
@@ -69,7 +69,7 @@ const ArchiveDistricts: RequestTypeParameter = {
   startColumn: 3,
   key: "ags",
   githubFileName: "",
-  localFileName: "dataStore/archiveDistricts.json.gz"
+  localFileName: "dataStore/archiveDistricts.json.gz",
 };
 
 const ActualStates: RequestTypeParameter = {
@@ -81,7 +81,7 @@ const ActualStates: RequestTypeParameter = {
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "_BL.json.gz",
-  localFileName: "dataStore/actualStates.json.gz"
+  localFileName: "dataStore/actualStates.json.gz",
 };
 
 const ArchiveStates: RequestTypeParameter = {
@@ -93,7 +93,7 @@ const ArchiveStates: RequestTypeParameter = {
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "",
-  localFileName: "dataStore/archiveStates.json.gz"
+  localFileName: "dataStore/archiveStates.json.gz",
 };
 
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
@@ -113,21 +113,21 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     reject(new RKIError(rdata.error, response.config.url));
     throw new RKIError(rdata.error, response.config.url);
   }
-  var localData
+  var localData;
   if (fs.existsSync(localFileName)) {
     const localDataZipped: Buffer = await new Promise((resolve) =>
-      fs.readFile(localFileName, (_,filedata) => resolve(filedata))
+      fs.readFile(localFileName, (_, filedata) => resolve(filedata))
     );
     const localDataunzipped = await new Promise((resolve) =>
       zlib.gunzip(localDataZipped, (_, result) => resolve(result))
     );
-    localData = JSON.parse(localDataunzipped.toString())
+    localData = JSON.parse(localDataunzipped.toString());
   } else {
-    localData = {lastUpdate: new Date(1970,0,1)}
+    localData = { lastUpdate: new Date(1970, 0, 1) };
   }
   var lastUpdate = new Date(response.headers["last-modified"]);
-    
-  if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()){
+
+  if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()) {
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[SheetName];
     // table starts in row 5 (parameter is zero indexed)
@@ -169,18 +169,22 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
           dataSource: WorkBook,
         });
       });
-      return { [key]: regionKey , name: name, history: history };
+      return { [key]: regionKey, name: name, history: history };
     });
-    const JsonData = JSON.stringify({lastUpdate, data});
-    const JsonDataZipped =  Buffer.from(await new Promise((resolve) => zlib.gzip(JsonData, (_, result) => resolve(result))));
-    fs.writeFile(localFileName, JsonDataZipped , function(err) {
+    const JsonData = JSON.stringify({ lastUpdate, data });
+    const JsonDataZipped = Buffer.from(
+      await new Promise((resolve) =>
+        zlib.gzip(JsonData, (_, result) => resolve(result))
+      )
+    );
+    fs.writeFile(localFileName, JsonDataZipped, function (err) {
       if (err) {
         console.log(err);
       }
     });
   } else {
-    data = localData.data
-    lastUpdate = new Date(localData.lastUpdate)
+    data = localData.data;
+    lastUpdate = new Date(localData.lastUpdate);
   }
   resolve({ lastUpdate, data });
 };
@@ -207,7 +211,6 @@ export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
 ): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
-    
   const actualDataPromise = new Promise<
     ResponseData<DistrictsFrozenIncidenceData[]>
   >(
@@ -241,7 +244,9 @@ export async function getDistrictsFrozenIncidenceHistory(
   const lastDate =
     actual.data[0].history.length == 0
       ? lastUpdate000
-      : new Date(actual.data[0].history[actual.data[0].history.length - 1].date);
+      : new Date(
+          actual.data[0].history[actual.data[0].history.length - 1].date
+        );
   const today: Date = new Date(new Date().setHours(0, 0, 0));
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
   if (
@@ -289,7 +294,7 @@ export async function getDistrictsFrozenIncidenceHistory(
       });
     });
   }
-  
+
   // merge archive data with current data
   actual.data = actual.data.map((district) => {
     district.history.unshift(
@@ -302,7 +307,7 @@ export async function getDistrictsFrozenIncidenceHistory(
   if (ags) {
     actual.data = actual.data.filter((district) => district.ags === ags);
   }
-  
+
   // filter by days
   if (days) {
     const reference_date = new Date(getDateBefore(days));
@@ -313,7 +318,7 @@ export async function getDistrictsFrozenIncidenceHistory(
       return district;
     });
   }
-  
+
   return {
     data: actual.data,
     lastUpdate: lastUpdate,
@@ -360,14 +365,16 @@ export async function getStatesFrozenIncidenceHistory(
       }),
   ]);
   let lastUpdate = actual.lastUpdate;
-  
+
   // The Excel sheet with fixed incidence data is only updated on mondays
   // check witch date is the last date in history
   const lastUpdate000 = new Date(new Date(actual.lastUpdate).setHours(0, 0, 0));
   const lastDate =
     actual.data[0].history.length == 0
       ? lastUpdate000
-      : new Date(actual.data[0].history[actual.data[0].history.length - 1].date);
+      : new Date(
+          actual.data[0].history[actual.data[0].history.length - 1].date
+        );
   const today: Date = new Date(new Date().setHours(0, 0, 0));
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
   if (
@@ -418,7 +425,7 @@ export async function getStatesFrozenIncidenceHistory(
       });
     });
   }
-  
+
   // merge archive data with current data
   actual.data = actual.data.map((state) => {
     state.history.unshift(
@@ -428,14 +435,14 @@ export async function getStatesFrozenIncidenceHistory(
     );
     return state;
   });
-  
+
   // filter by ags
   if (abbreviation) {
     actual.data = actual.data.filter(
       (state) => state.abbreviation === abbreviation
     );
   }
-  
+
   // filter by days
   if (days) {
     const reference_date = new Date(getDateBefore(days));
@@ -446,7 +453,7 @@ export async function getStatesFrozenIncidenceHistory(
       return state;
     });
   }
-  
+
   return {
     data: actual.data,
     lastUpdate: lastUpdate,
