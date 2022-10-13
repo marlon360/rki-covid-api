@@ -113,13 +113,18 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     reject(new RKIError(rdata.error, response.config.url));
     throw new RKIError(rdata.error, response.config.url);
   }
-  const localDataZipped: Buffer = await new Promise((resolve) =>
-    fs.readFile(localFileName, (_,filedata) => resolve(filedata))
-  );
-  const localDataunzipped = await new Promise((resolve) =>
-    zlib.gunzip(localDataZipped, (_, result) => resolve(result))
-  );
-  var localData = JSON.parse(localDataunzipped.toString())
+  var localData
+  if (fs.existsSync(localFileName)) {
+    const localDataZipped: Buffer = await new Promise((resolve) =>
+      fs.readFile(localFileName, (_,filedata) => resolve(filedata))
+    );
+    const localDataunzipped = await new Promise((resolve) =>
+      zlib.gunzip(localDataZipped, (_, result) => resolve(result))
+    );
+    localData = JSON.parse(localDataunzipped.toString())
+  } else {
+    localData = {lastUpdate: new Date(1970,0,1)}
+  }
   var lastUpdate = new Date(response.headers["last-modified"]);
     
   if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()){
