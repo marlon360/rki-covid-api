@@ -1,6 +1,7 @@
 import axios from "axios";
 import XLSX from "xlsx";
 import zlib from "zlib";
+import fs from "fs"
 
 import {
   AddDaysToDate,
@@ -45,49 +46,54 @@ interface RequestTypeParameter {
   startColumn: number;
   key: string;
   githubFileName: string;
+  localFileName: string;
 }
 const ActualDistricts: RequestTypeParameter = {
   type: "ActualDistricts",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-  WorkBook: "Fallzahlen_Kum_Tab_aktuell.xlsx",
+  WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
   SheetName: "LK_7-Tage-Inzidenz (fixiert)",
   startRow: 4,
   startColumn: 2,
   key: "ags",
   githubFileName: "_LK.json.gz",
+  localFileName: "dataStore/actualDistricts.json.gz"
 };
 
 const ArchiveDistricts: RequestTypeParameter = {
   type: "ArchiveDistricts",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-  WorkBook: "Fallzahlen_Kum_Tab_Archiv.xlsx",
+  WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
   SheetName: "LK_7-Tage-Inzidenz (fixiert)",
   startRow: 4,
   startColumn: 3,
   key: "ags",
   githubFileName: "",
+  localFileName: "dataStore/archiveDistricts.json.gz"
 };
 
 const ActualStates: RequestTypeParameter = {
   type: "ActualStates",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-  WorkBook: "Fallzahlen_Kum_Tab_aktuell.xlsx",
+  WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
   SheetName: "BL_7-Tage-Inzidenz (fixiert)",
   startRow: 4,
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "_BL.json.gz",
+  localFileName: "dataStore/actualStates.json.gz"
 };
 
 const ArchiveStates: RequestTypeParameter = {
   type: "ArchiveStates",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-  WorkBook: "Fallzahlen_Kum_Tab_Archiv.xlsx",
+  WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
   SheetName: "BL_7-Tage-Inzidenz (fixiert)",
   startRow: 4,
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "",
+  localFileName: "dataStore/archiveStates.json.gz"
 };
 
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
@@ -99,6 +105,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const startRow = requestType.startRow;
   const startColumn = requestType.startColumn;
   const key = requestType.key;
+  const localFileName = requestType.localFileName;
 
   const response = await axios.get(url, { responseType: "arraybuffer" });
   const rdata = response.data;
@@ -106,53 +113,70 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     reject(new RKIError(rdata.error, response.config.url));
     throw new RKIError(rdata.error, response.config.url);
   }
+  const localDataZipped: Buffer = await new Promise((resolve) =>
+    fs.readFile(localFileName, (_,filedata) => resolve(filedata))
+  );
+  const localDataunzipped = await new Promise((resolve) =>
+    zlib.gunzip(localDataZipped, (_, result) => resolve(result))
+  );
+  var localData = JSON.parse(localDataunzipped.toString())
+  var lastUpdate = new Date(response.headers["last-modified"]);
+    
+  if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()){
+    const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
+    const sheet = workbook.Sheets[SheetName];
+    // table starts in row 5 (parameter is zero indexed)
+    let json = XLSX.utils.sheet_to_json(sheet, { range: startRow });
 
-  const lastUpdate = new Date(response.headers["last-modified"]);
-
-  const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
-  const sheet = workbook.Sheets[SheetName];
-  // table starts in row 5 (parameter is zero indexed)
-  let json = XLSX.utils.sheet_to_json(sheet, { range: startRow });
-
-  if (type == ArchiveDistricts.type) {
-    json = json.filter((entry) => !!entry["NR"]);
-  }
-  const data = json.map((entry) => {
-    const name =
-      key == "abbreviation"
-        ? type == ActualStates.type
-          ? entry["MeldeLandkreisBundesland"] == "Gesamt"
+    if (type == ArchiveDistricts.type) {
+      json = json.filter((entry) => !!entry["NR"]);
+    }
+    var data = json.map((entry) => {
+      const name =
+        key == "abbreviation"
+          ? type == ActualStates.type
+            ? entry["MeldeLandkreisBundesland"] == "Gesamt"
+              ? "Bundesgebiet"
+              : entry["MeldeLandkreisBundesland"]
+            : entry["__EMPTY"] == "Gesamt"
             ? "Bundesgebiet"
-            : entry["MeldeLandkreisBundesland"]
-          : entry["__EMPTY"] == "Gesamt"
-          ? "Bundesgebiet"
-          : entry["__EMPTY"]
-        : entry["LK"];
-    const regionKey =
-      key == "abbreviation"
-        ? getStateAbbreviationByName(name) == null
-          ? "Bund"
-          : getStateAbbreviationByName(name)
-        : entry["LKNR"].toString().padStart(5, "0");
+            : entry["__EMPTY"]
+          : entry["LK"];
+      const regionKey =
+        key == "abbreviation"
+          ? getStateAbbreviationByName(name) == null
+            ? "Bund"
+            : getStateAbbreviationByName(name)
+          : entry["LKNR"].toString().padStart(5, "0");
 
-    let history = [];
+      const history = [];
 
-    // get all date keys
-    const dateKeys = Object.keys(entry);
+      // get all date keys
+      const dateKeys = Object.keys(entry);
 
-    // ignore the first startColumn elements (rowNumber, LK, LKNR)
-    dateKeys.splice(0, startColumn);
-    dateKeys.forEach((dateKey) => {
-      const date = getDateFromString(dateKey.toString());
-      history.push({
-        weekIncidence: entry[dateKey],
-        date: date,
-        dataSource: WorkBook,
+      // ignore the first startColumn elements (rowNumber, LK, LKNR)
+      dateKeys.splice(0, startColumn);
+      dateKeys.forEach((dateKey) => {
+        const date = getDateFromString(dateKey.toString());
+        history.push({
+          weekIncidence: entry[dateKey],
+          date: date,
+          dataSource: WorkBook,
+        });
       });
+      return { [key]: regionKey , name: name, history: history };
     });
-
-    return { [key]: regionKey, name: name, history: history };
-  });
+    const JsonData = JSON.stringify({lastUpdate, data});
+    const JsonDataZipped =  Buffer.from(await new Promise((resolve) => zlib.gzip(JsonData, (_, result) => resolve(result))));
+    fs.writeFile(localFileName, JsonDataZipped , function(err) {
+      if (err) {
+        console.log(err);
+      }
+    });
+  } else {
+    data = localData.data
+    lastUpdate = new Date(localData.lastUpdate)
+  }
   resolve({ lastUpdate, data });
 };
 
@@ -178,6 +202,7 @@ export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
 ): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
+    
   const actualDataPromise = new Promise<
     ResponseData<DistrictsFrozenIncidenceData[]>
   >(
@@ -192,7 +217,7 @@ export async function getDistrictsFrozenIncidenceHistory(
       requestType: ArchiveDistricts,
     })
   );
-  let [actual, archive, lastFileDate] = await Promise.all([
+  let [actual, archive, metaLastFileDate] = await Promise.all([
     actualDataPromise,
     archiveDataPromise,
     axios
@@ -211,17 +236,17 @@ export async function getDistrictsFrozenIncidenceHistory(
   const lastDate =
     actual.data[0].history.length == 0
       ? lastUpdate000
-      : actual.data[0].history[actual.data[0].history.length - 1].date;
+      : new Date(actual.data[0].history[actual.data[0].history.length - 1].date);
   const today: Date = new Date(new Date().setHours(0, 0, 0));
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
   if (
     lastDate.getTime() < today.getTime() &&
-    lastDate.getTime() <= lastFileDate.getTime()
+    lastDate.getTime() <= metaLastFileDate.getTime()
   ) {
-    lastUpdate = lastFileDate;
+    lastUpdate = metaLastFileDate;
     const maxNumberOfDays = Math.min(
       getDayDifference(today, lastDate) - 1,
-      getDayDifference(lastFileDate, lastDate) - 1
+      getDayDifference(metaLastFileDate, lastDate) - 1
     );
     // add the missing date(s) to districts
     const startDay = days
@@ -252,7 +277,7 @@ export async function getDistrictsFrozenIncidenceHistory(
           district.history.push({
             weekIncidence: result[district.ags].incidence_7d,
             date: new Date(result[district.ags].Datenstand),
-            dataSource: "calculated from daily RKI Dump",
+            dataSource: "Unofficial, calculated from daily RKI Dump",
           });
         }
         return district;
@@ -278,7 +303,7 @@ export async function getDistrictsFrozenIncidenceHistory(
     const reference_date = new Date(getDateBefore(days));
     actual.data = actual.data.map((district) => {
       district.history = district.history.filter(
-        (element) => element.date > reference_date
+        (element) => new Date(element.date) > reference_date
       );
       return district;
     });
@@ -318,7 +343,7 @@ export async function getStatesFrozenIncidenceHistory(
       requestType: ArchiveStates,
     })
   );
-  let [actual, archive, lastFileDate] = await Promise.all([
+  let [actual, archive, metaLastFileDate] = await Promise.all([
     actualDataPromise,
     archiveDataPromise,
     axios
@@ -330,24 +355,24 @@ export async function getStatesFrozenIncidenceHistory(
       }),
   ]);
   let lastUpdate = actual.lastUpdate;
-
+  
   // The Excel sheet with fixed incidence data is only updated on mondays
   // check witch date is the last date in history
   const lastUpdate000 = new Date(new Date(actual.lastUpdate).setHours(0, 0, 0));
   const lastDate =
     actual.data[0].history.length == 0
       ? lastUpdate000
-      : actual.data[0].history[actual.data[0].history.length - 1].date;
+      : new Date(actual.data[0].history[actual.data[0].history.length - 1].date);
   const today: Date = new Date(new Date().setHours(0, 0, 0));
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
   if (
     lastDate.getTime() < today.getTime() &&
-    lastDate.getTime() <= lastFileDate.getTime()
+    lastDate.getTime() <= metaLastFileDate.getTime()
   ) {
-    lastUpdate = lastFileDate;
+    lastUpdate = metaLastFileDate;
     const maxNumberOfDays = Math.min(
       getDayDifference(today, lastDate) - 1,
-      getDayDifference(lastFileDate, lastDate) - 1
+      getDayDifference(metaLastFileDate, lastDate) - 1
     );
     // add the missing date(s) to districts
     const startDay = days
@@ -381,7 +406,7 @@ export async function getStatesFrozenIncidenceHistory(
           state.history.push({
             weekIncidence: result[stateId].incidence_7d,
             date: new Date(result[stateId].Datenstand),
-            dataSource: "calculated from daily RKI Dump",
+            dataSource: "Unofficial, calculated from daily RKI Dump",
           });
         }
         return state;
@@ -411,7 +436,7 @@ export async function getStatesFrozenIncidenceHistory(
     const reference_date = new Date(getDateBefore(days));
     actual.data = actual.data.map((state) => {
       state.history = state.history.filter(
-        (element) => element.date > reference_date
+        (element) => new Date(element.date) > reference_date
       );
       return state;
     });
