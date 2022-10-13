@@ -2,6 +2,7 @@ import axios from "axios";
 import XLSX from "xlsx";
 import zlib from "zlib";
 import fs from "fs";
+import { createClient } from "redis";
 
 import {
   AddDaysToDate,
@@ -37,6 +38,13 @@ export interface DistrictsFrozenIncidenceData {
   }[];
 }
 
+interface data {
+  [x: string]: any;
+  name: any;
+  history: any[];
+}
+[];
+
 interface RequestTypeParameter {
   type: string;
   url: string;
@@ -46,7 +54,7 @@ interface RequestTypeParameter {
   startColumn: number;
   key: string;
   githubFileName: string;
-  localFileName: string;
+  redisKey: string;
 }
 const ActualDistricts: RequestTypeParameter = {
   type: "ActualDistricts",
@@ -57,7 +65,7 @@ const ActualDistricts: RequestTypeParameter = {
   startColumn: 2,
   key: "ags",
   githubFileName: "_LK.json.gz",
-  localFileName: "dataStore/actualDistricts.json.gz",
+  redisKey: "redisActualDistricts",
 };
 
 const ArchiveDistricts: RequestTypeParameter = {
@@ -69,7 +77,7 @@ const ArchiveDistricts: RequestTypeParameter = {
   startColumn: 3,
   key: "ags",
   githubFileName: "",
-  localFileName: "dataStore/archiveDistricts.json.gz",
+  redisKey: "redisArchiveDistricts",
 };
 
 const ActualStates: RequestTypeParameter = {
@@ -81,7 +89,7 @@ const ActualStates: RequestTypeParameter = {
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "_BL.json.gz",
-  localFileName: "dataStore/actualStates.json.gz",
+  redisKey: "redisActualStates",
 };
 
 const ArchiveStates: RequestTypeParameter = {
@@ -93,9 +101,45 @@ const ArchiveStates: RequestTypeParameter = {
   startColumn: 1,
   key: "abbreviation",
   githubFileName: "",
-  localFileName: "dataStore/archiveStates.json.gz",
+  redisKey: "redisArchiveStates",
 };
 
+const redisClient = createClient({
+  socket: {
+    host: process.env.REDISHOST || process.env.REDIS_URL,
+    port: process.env.REDISPORT,
+    auth_pass: process.env.REDISPASSWORD,
+  },
+  password: process.env.REDIS_PW,
+});
+
+redisClient.on("error", (err) => console.error(err));
+
+const addJsonDataToRedis = function (redisKey, JsonData) {
+  return new Promise((resolve, reject) => {
+    redisClient.set(redisKey, JsonData, (err, reply) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(reply);
+      }
+    });
+  });
+};
+
+const getJsonDataFromRedis = function (redisKey) {
+  return new Promise<string>((resolve, reject) => {
+    redisClient.get(redisKey, (err, objectString) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(objectString);
+      }
+    });
+  });
+};
+// this will be the promise to prepare the districts AND states data from the excel sheets
+// and store this to redis (if not exists!) they will not expire
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const type = requestType.type;
@@ -105,7 +149,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const startRow = requestType.startRow;
   const startColumn = requestType.startColumn;
   const key = requestType.key;
-  const localFileName = requestType.localFileName;
+  const redisKey = requestType.redisKey;
 
   const response = await axios.get(url, { responseType: "arraybuffer" });
   const rdata = response.data;
@@ -113,20 +157,16 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     reject(new RKIError(rdata.error, response.config.url));
     throw new RKIError(rdata.error, response.config.url);
   }
+  var lastUpdate = new Date(response.headers["last-modified"]);
+  // check if a redis entry exists, if yes use it
   var localData;
-  if (fs.existsSync(localFileName)) {
-    const localDataZipped: Buffer = await new Promise((resolve) =>
-      fs.readFile(localFileName, (_, filedata) => resolve(filedata))
-    );
-    const localDataunzipped = await new Promise((resolve) =>
-      zlib.gunzip(localDataZipped, (_, result) => resolve(result))
-    );
-    localData = JSON.parse(localDataunzipped.toString());
+  if (await getJsonDataFromRedis(redisKey)) {
+    localData = JSON.parse(await getJsonDataFromRedis(redisKey));
   } else {
+    // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
     localData = { lastUpdate: new Date(1970, 0, 1) };
   }
-  var lastUpdate = new Date(response.headers["last-modified"]);
-
+  // also recalculate if the excelfile is newer as redis data
   if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()) {
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[SheetName];
@@ -171,24 +211,16 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       });
       return { [key]: regionKey, name: name, history: history };
     });
+    //store the sheet as stringifyed Json to redis
     const JsonData = JSON.stringify({ lastUpdate, data });
-    const JsonDataZipped = Buffer.from(
-      await new Promise((resolve) =>
-        zlib.gzip(JsonData, (_, result) => resolve(result))
-      )
-    );
-    fs.writeFile(localFileName, JsonDataZipped, function (err) {
-      if (err) {
-        console.log(err);
-      }
-    });
+    await addJsonDataToRedis(redisKey, JsonData, );
   } else {
     data = localData.data;
     lastUpdate = new Date(localData.lastUpdate);
   }
   resolve({ lastUpdate, data });
 };
-
+// this is the Promise to download the files for the missing frozen-incidence dates
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
