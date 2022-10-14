@@ -335,7 +335,7 @@ export async function getDistrictsFrozenIncidenceHistory(
         .split("T")
         .shift();
       MissingDateDataPromises.push(
-        new Promise(
+        new Promise<redisEntry>(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: ActualDistricts,
@@ -463,7 +463,7 @@ export async function getStatesFrozenIncidenceHistory(
         .split("T")
         .shift();
       MissingDateDataPromises.push(
-        new Promise(
+        new Promise<redisEntry>(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: ActualStates,
