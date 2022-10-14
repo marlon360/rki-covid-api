@@ -1,8 +1,7 @@
 import axios from "axios";
 import XLSX from "xlsx";
 import zlib from "zlib";
-import fs from "fs";
-import { createClient } from "redis";
+import { cache } from "./../server"
 
 import {
   AddDaysToDate,
@@ -38,12 +37,14 @@ export interface DistrictsFrozenIncidenceData {
   }[];
 }
 
-interface data {
-  [x: string]: any;
-  name: any;
-  history: any[];
-}
-[];
+interface redisEntry {
+  body: string;
+  touched: Number;
+  expire:  Number;
+  type: string
+};
+
+
 
 interface RequestTypeParameter {
   type: string;
@@ -104,20 +105,9 @@ const ArchiveStates: RequestTypeParameter = {
   redisKey: "redisArchiveStates",
 };
 
-const redisClient = createClient({
-  socket: {
-    host: process.env.REDISHOST || process.env.REDIS_URL,
-    port: process.env.REDISPORT,
-    auth_pass: process.env.REDISPASSWORD,
-  },
-  password: process.env.REDIS_PW,
-});
-
-redisClient.on("error", (err) => console.error(err));
-
 const addJsonDataToRedis = function (redisKey, JsonData) {
   return new Promise((resolve, reject) => {
-    redisClient.set(redisKey, JsonData, (err, reply) => {
+    cache.add(redisKey, JsonData, { expire: -1, type: 'json' }, (err, reply) => {
       if (err) {
         reject(err);
       } else {
@@ -128,8 +118,8 @@ const addJsonDataToRedis = function (redisKey, JsonData) {
 };
 
 const getJsonDataFromRedis = function (redisKey) {
-  return new Promise<string>((resolve, reject) => {
-    redisClient.get(redisKey, (err, objectString) => {
+  return new Promise<redisEntry[]>((resolve, reject) => {
+    cache.get(redisKey, (err, objectString) => {
       if (err) {
         reject(err);
       } else {
@@ -138,7 +128,24 @@ const getJsonDataFromRedis = function (redisKey) {
     });
   });
 };
-// this will be the promise to prepare the districts AND states data from the excel sheets
+
+const delJsonDataFromRedis = function (redisKey) {
+  return new Promise<void>((resolve, reject) => {
+    cache.del(redisKey, (err, numberDeletions) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (numberDeletions = 1) {
+          console.log(`Redis key ${redisKey} successfully deleted.`);
+        } else {
+          console.log(`Something went wrong while deleting the redis key ${redisKey}. The key is not available!`)
+        }
+      }
+    });
+  });
+};
+
+// this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
@@ -157,17 +164,19 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     reject(new RKIError(rdata.error, response.config.url));
     throw new RKIError(rdata.error, response.config.url);
   }
-  var lastUpdate = new Date(response.headers["last-modified"]);
+  let lastUpdate = new Date(response.headers["last-modified"]);
+  let data = [];
   // check if a redis entry exists, if yes use it
-  var localData;
-  if (await getJsonDataFromRedis(redisKey)) {
-    localData = JSON.parse(await getJsonDataFromRedis(redisKey));
-  } else {
-    // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
-    localData = { lastUpdate: new Date(1970, 0, 1) };
-  }
+  // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
+  const temp = await getJsonDataFromRedis(redisKey);
+  const localData = temp.length
+    ? JSON.parse(temp[0].body)
+    : { lastUpdate: new Date(1970, 0, 1), data}
+  
   // also recalculate if the excelfile is newer as redis data
   if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()) {
+    // if redisKey exists in redis delete it
+    if (temp.length) await delJsonDataFromRedis(redisKey);
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[SheetName];
     // table starts in row 5 (parameter is zero indexed)
@@ -176,7 +185,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     if (type == ArchiveDistricts.type) {
       json = json.filter((entry) => !!entry["NR"]);
     }
-    var data = json.map((entry) => {
+    data = json.map((entry) => {
       const name =
         key == "abbreviation"
           ? type == ActualStates.type
@@ -220,7 +229,9 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   }
   resolve({ lastUpdate, data });
 };
+
 // this is the Promise to download the files for the missing frozen-incidence dates
+// to do: store these in redis to
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
