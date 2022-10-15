@@ -1,7 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
 import zlib from "zlib";
-import { cache } from "./../server";
 
 import {
   AddDaysToDate,
@@ -103,13 +102,20 @@ const ArchiveStates: RequestTypeParameter = {
   redisKey: "redisArchiveStates",
 };
 
+const fiJsonCache = require("express-redis-cache")({
+  prefix: "fiJson",
+  host: process.env.REDISHOST || process.env.REDIS_URL,
+  port: process.env.REDISPORT,
+  auth_pass: process.env.REDISPASSWORD,
+});
+
 const addJsonDataToRedis = function (
   redisKey: string,
   JsonData: string,
   validFor: number
 ) {
   return new Promise((resolve, reject) => {
-    cache.add(
+    fiJsonCache.add(
       redisKey,
       JsonData,
       { expire: validFor, type: "json" },
@@ -126,7 +132,7 @@ const addJsonDataToRedis = function (
 
 const getJsonDataFromRedis = function (redisKey: string) {
   return new Promise<redisEntry[]>((resolve, reject) => {
-    cache.get(redisKey, (err, objectString) => {
+    fiJsonCache.get(redisKey, (err, objectString) => {
       if (err) {
         reject(err);
       } else {
@@ -138,7 +144,7 @@ const getJsonDataFromRedis = function (redisKey: string) {
 
 const delJsonDataFromRedis = function (redisKey: string) {
   return new Promise<void>((resolve, reject) => {
-    cache.del(redisKey, (err, numberDeletions) => {
+    fiJsonCache.del(redisKey, (err, numberDeletions) => {
       if (err) {
         reject(err);
       } else {
@@ -243,7 +249,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
-  const redisKey = date + requestType.redisKey;
+  const redisKey = date + "_" + requestType.redisKey;
   const githubFileName = requestType.githubFileName;
   const temp = await getJsonDataFromRedis(redisKey);
   let missingDateData;
@@ -264,7 +270,7 @@ const MissingDateDataPromise = async function (resolve, reject) {
     await addJsonDataToRedis(
       redisKey,
       unzipped.toString(),
-      14 * 24 * 60 * 60
+      14 * 24 * 60 * 60,
     );
     missingDateData = JSON.parse(unzipped.toString());
   }  
