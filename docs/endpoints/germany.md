@@ -574,32 +574,39 @@ Returns the number of recovered people in germany for the last `:days` days.
     "name": "Bundesgebiet",
     "history": [
       {
-        "weekIncidence": 213.65875024446805,
-        "date": "2021-11-09T00:00:00.000Z"
+        "weekIncidence": 611.204442863739,
+        "date": "2022-10-09T00:00:00.000Z",
+        "dataSource": "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx"
       },
       {
-        "weekIncidence": 232.1218544191271,
-        "date": "2021-11-10T00:00:00.000Z"
+        "weekIncidence": 598.102116070228,
+        "date": "2022-10-10T00:00:00.000Z",
+        "dataSource": "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx"
       },
       {
-        "weekIncidence": 249.11060402346553,
-        "date": "2021-11-11T00:00:00.000Z"
+        "weekIncidence": 787.5055846475,
+        "date": "2022-10-11T00:00:00.000Z",
+        "dataSource": "Unofficial, calculated from daily RKI Dump"
       },
       {
-        "weekIncidence": 263.69059979064883,
-        "date": "2021-11-12T00:00:00.000Z"
+        "weekIncidence": 799.8810722965,
+        "date": "2022-10-12T00:00:00.000Z",
+        "dataSource": "Unofficial, calculated from daily RKI Dump"
       },
       {
-        "weekIncidence": 277.35784260606,
-        "date": "2021-11-13T00:00:00.000Z"
+        "weekIncidence": 793.8368942204,
+        "date": "2022-10-13T00:00:00.000Z",
+        "dataSource": "Unofficial, calculated from daily RKI Dump"
       },
       {
-        "weekIncidence": 288.962672625304,
-        "date": "2021-11-14T00:00:00.000Z"
+        "weekIncidence": 760.1343842683,
+        "date": "2022-10-14T00:00:00.000Z",
+        "dataSource": "Unofficial, calculated from daily RKI Dump"
       },
       {
-        "weekIncidence": 302.97505390864444,
-        "date": "2021-11-15T00:00:00.000Z"
+        "weekIncidence": 731.8585394661,
+        "date": "2022-10-15T00:00:00.000Z",
+        "dataSource": "Unofficial, calculated from daily RKI Dump"
       }
     ]
   },
@@ -607,8 +614,8 @@ Returns the number of recovered people in germany for the last `:days` days.
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-11-15T07:26:37.000Z",
-    "lastCheckedForUpdate": "2021-11-15T21:12:27.928Z"
+    "lastUpdate": "2022-10-15T01:05:53.000Z",
+    "lastCheckedForUpdate": "2022-10-15T08:29:17.917Z"
   }
 }
 ```

@@ -254,7 +254,7 @@ const MissingDateDataPromise = async function (resolve, reject) {
   const temp = await getJsonDataFromRedis(redisKey);
   let missingDateData;
   if (temp.length) {
-    missingDateData = JSON.parse(temp[0].body)
+    missingDateData = JSON.parse(temp[0].body);
   } else {
     const url = `https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_${date}${githubFileName}`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
@@ -267,13 +267,9 @@ const MissingDateDataPromise = async function (resolve, reject) {
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // add to redis valid for 14 days
-    await addJsonDataToRedis(
-      redisKey,
-      unzipped.toString(),
-      14 * 24 * 60 * 60,
-    );
+    await addJsonDataToRedis(redisKey, unzipped.toString(), 14 * 24 * 60 * 60);
     missingDateData = JSON.parse(unzipped.toString());
-  }  
+  }
   resolve(missingDateData);
 };
 
