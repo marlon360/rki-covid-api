@@ -22,7 +22,6 @@ import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-inciden
 import {
   getDateBefore,
   AddDaysToDate,
-  getDayDifference,
   RequestType,
   fill0CasesDaysGermany,
 } from "../utils";

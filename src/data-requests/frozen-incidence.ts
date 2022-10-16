@@ -26,8 +26,8 @@ function getDateFromString(dateString: string): Date {
   }
 }
 
-export interface DistrictsFrozenIncidenceData {
-  ags: string;
+export interface FrozenIncidenceData {
+  [key: string]: any;
   name: string;
   history: {
     date: Date;
@@ -54,6 +54,16 @@ interface RequestTypeParameter {
   githubFileName: string;
   redisKey: string;
 }
+
+interface fi_file {
+  [key: string]: {
+    Bundesland: string;
+    Datenstand: string;
+    AnzahlFall_7d: number;
+    incidence_7d: number;
+  };
+}
+
 const ActualDistricts: RequestTypeParameter = {
   type: "ActualDistricts",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
@@ -251,10 +261,10 @@ const MissingDateDataPromise = async function (resolve, reject) {
   const date = this.date;
   const redisKey = date + "_" + requestType.redisKey;
   const githubFileName = requestType.githubFileName;
-  const temp = await getJsonDataFromRedis(redisKey);
-  let missingDateData;
-  if (temp.length) {
-    missingDateData = JSON.parse(temp[0].body);
+  const redisEntry = await getJsonDataFromRedis(redisKey);
+  let missingDateData: fi_file;
+  if (redisEntry.length == 1) {
+    missingDateData = JSON.parse(redisEntry[0].body);
   } else {
     const url = `https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_${date}${githubFileName}`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
@@ -273,20 +283,122 @@ const MissingDateDataPromise = async function (resolve, reject) {
   resolve(missingDateData);
 };
 
+async function finalizeData(
+  actualData: { lastUpdate: Date; data: FrozenIncidenceData[] },
+  archiveData: { lastUpdate: Date; data: FrozenIncidenceData[] },
+  metaLastFileDate: Date,
+  paramDays: number,
+  paramKey: string,
+  requestType: RequestTypeParameter
+) {
+  // The Excel sheet with fixed incidence data is only updated on mondays
+  // check witch date is the last date in history
+  const lastUpdate000 = new Date(
+    new Date(actualData.lastUpdate).setHours(0, 0, 0)
+  );
+  const lastDate =
+    actualData.data[0].history.length == 0
+      ? lastUpdate000
+      : new Date(
+          actualData.data[0].history[actualData.data[0].history.length - 1].date
+        );
+  const today: Date = new Date(new Date().setHours(0, 0, 0));
+  let lastUpdate: Date;
+  // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
+  if (
+    lastDate.getTime() < today.getTime() &&
+    lastDate.getTime() <= metaLastFileDate.getTime()
+  ) {
+    lastUpdate = metaLastFileDate;
+    const maxNumberOfDays = Math.min(
+      getDayDifference(today, lastDate) - 1,
+      getDayDifference(metaLastFileDate, lastDate) - 1
+    );
+    // add the missing date(s) to districts
+    const startDay = paramDays
+      ? paramDays <= maxNumberOfDays
+        ? maxNumberOfDays - paramDays + 1
+        : 1
+      : 1;
+    const MissingDateDataPromises = [];
+    for (let day = startDay; day <= maxNumberOfDays; day++) {
+      const missingDate = new Date(AddDaysToDate(lastDate, day))
+        .toISOString()
+        .split("T")
+        .shift();
+      MissingDateDataPromises.push(
+        new Promise<fi_file>(
+          MissingDateDataPromise.bind({
+            date: missingDate,
+            requestType: requestType,
+          })
+        )
+      );
+    }
+    const MissingDateDataResults: fi_file[] = await Promise.all(
+      MissingDateDataPromises
+    );
+
+    MissingDateDataResults.forEach((result) => {
+      actualData.data = actualData.data.map((entry) => {
+        const key: string =
+          requestType == ActualStates
+            ? getStateIdByAbbreviation(entry[requestType.key])
+                .toString()
+                .padStart(2, "0")
+            : entry[requestType.key];
+        if (result[key]) {
+          entry.history.push({
+            weekIncidence: result[key].incidence_7d,
+            date: new Date(result[key].Datenstand),
+            dataSource: "Unofficial, calculated from daily RKI Dump",
+          });
+        }
+        return entry;
+      });
+    });
+  }
+
+  // merge archive data with current data
+  actualData.data = actualData.data.map((entry) => {
+    entry.history.unshift(
+      ...archiveData.data.find(
+        (element) => element[requestType.key] === entry[requestType.key]
+      ).history
+    );
+    return entry;
+  });
+
+  // filter by requestType.key (ags or abbreviation)
+  if (paramKey) {
+    actualData.data = actualData.data.filter(
+      (entry) => entry[requestType.key] === paramKey
+    );
+  }
+
+  // filter by days
+  if (paramDays) {
+    const reference_date = new Date(getDateBefore(paramDays));
+    actualData.data = actualData.data.map((entry) => {
+      entry.history = entry.history.filter(
+        (element) => new Date(element.date) > reference_date
+      );
+      return entry;
+    });
+  }
+  return { data: actualData.data, lastUpdate: lastUpdate };
+}
+
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
-): Promise<ResponseData<DistrictsFrozenIncidenceData[]>> {
-  const actualDataPromise = new Promise<
-    ResponseData<DistrictsFrozenIncidenceData[]>
-  >(
+): Promise<ResponseData<FrozenIncidenceData[]>> {
+  const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
       requestType: ActualDistricts,
     })
   );
-  const archiveDataPromise = new Promise<
-    ResponseData<DistrictsFrozenIncidenceData[]>
-  >(
+  const archiveDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
       requestType: ArchiveDistricts,
     })
@@ -302,119 +414,32 @@ export async function getDistrictsFrozenIncidenceHistory(
         return new Date(response.data.modified);
       }),
   ]);
-  let lastUpdate = actual.lastUpdate;
 
-  // The Excel sheet with fixed incidence data is only updated on mondays
-  // check witch date is the last date in history
-  const lastUpdate000 = new Date(new Date(actual.lastUpdate).setHours(0, 0, 0));
-  const lastDate =
-    actual.data[0].history.length == 0
-      ? lastUpdate000
-      : new Date(
-          actual.data[0].history[actual.data[0].history.length - 1].date
-        );
-  const today: Date = new Date(new Date().setHours(0, 0, 0));
-  // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
-  if (
-    lastDate.getTime() < today.getTime() &&
-    lastDate.getTime() <= metaLastFileDate.getTime()
-  ) {
-    lastUpdate = metaLastFileDate;
-    const maxNumberOfDays = Math.min(
-      getDayDifference(today, lastDate) - 1,
-      getDayDifference(metaLastFileDate, lastDate) - 1
-    );
-    // add the missing date(s) to districts
-    const startDay = days
-      ? days <= maxNumberOfDays
-        ? maxNumberOfDays - days + 1
-        : 1
-      : 1;
-    const MissingDateDataPromises = [];
-    for (let day = startDay; day <= maxNumberOfDays; day++) {
-      const missingDate = new Date(AddDaysToDate(lastDate, day))
-        .toISOString()
-        .split("T")
-        .shift();
-      MissingDateDataPromises.push(
-        new Promise<redisEntry>(
-          MissingDateDataPromise.bind({
-            date: missingDate,
-            requestType: ActualDistricts,
-          })
-        )
-      );
-    }
-    const MissingDateDataResults = await Promise.all(MissingDateDataPromises);
-
-    MissingDateDataResults.forEach((result) => {
-      actual.data = actual.data.map((district) => {
-        if (result[district.ags]) {
-          district.history.push({
-            weekIncidence: result[district.ags].incidence_7d,
-            date: new Date(result[district.ags].Datenstand),
-            dataSource: "Unofficial, calculated from daily RKI Dump",
-          });
-        }
-        return district;
-      });
-    });
-  }
-
-  // merge archive data with current data
-  actual.data = actual.data.map((district) => {
-    district.history.unshift(
-      ...archive.data.find((element) => element.ags === district.ags).history
-    );
-    return district;
-  });
-
-  // filter by ags
-  if (ags) {
-    actual.data = actual.data.filter((district) => district.ags === ags);
-  }
-
-  // filter by days
-  if (days) {
-    const reference_date = new Date(getDateBefore(days));
-    actual.data = actual.data.map((district) => {
-      district.history = district.history.filter(
-        (element) => new Date(element.date) > reference_date
-      );
-      return district;
-    });
-  }
+  const actualFinal = await finalizeData(
+    actual,
+    archive,
+    metaLastFileDate,
+    days,
+    ags,
+    ActualDistricts
+  );
 
   return {
-    data: actual.data,
-    lastUpdate: lastUpdate,
+    data: actualFinal.data,
+    lastUpdate: actualFinal.lastUpdate,
   };
-}
-
-export interface StatesFrozenIncidenceData {
-  abbreviation: string;
-  name: string;
-  history: {
-    date: Date;
-    weekIncidence: number;
-    dataSource: string;
-  }[];
 }
 
 export async function getStatesFrozenIncidenceHistory(
   days?: number,
   abbreviation?: string
-): Promise<ResponseData<StatesFrozenIncidenceData[]>> {
-  const actualDataPromise = new Promise<
-    ResponseData<StatesFrozenIncidenceData[]>
-  >(
+): Promise<ResponseData<FrozenIncidenceData[]>> {
+  const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
       requestType: ActualStates,
     })
   );
-  const archiveDataPromise = new Promise<
-    ResponseData<StatesFrozenIncidenceData[]>
-  >(
+  const archiveDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
       requestType: ArchiveStates,
     })
@@ -430,98 +455,18 @@ export async function getStatesFrozenIncidenceHistory(
         return new Date(response.data.modified);
       }),
   ]);
-  let lastUpdate = actual.lastUpdate;
 
-  // The Excel sheet with fixed incidence data is only updated on mondays
-  // check witch date is the last date in history
-  const lastUpdate000 = new Date(new Date(actual.lastUpdate).setHours(0, 0, 0));
-  const lastDate =
-    actual.data[0].history.length == 0
-      ? lastUpdate000
-      : new Date(
-          actual.data[0].history[actual.data[0].history.length - 1].date
-        );
-  const today: Date = new Date(new Date().setHours(0, 0, 0));
-  // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
-  if (
-    lastDate.getTime() < today.getTime() &&
-    lastDate.getTime() <= metaLastFileDate.getTime()
-  ) {
-    lastUpdate = metaLastFileDate;
-    const maxNumberOfDays = Math.min(
-      getDayDifference(today, lastDate) - 1,
-      getDayDifference(metaLastFileDate, lastDate) - 1
-    );
-    // add the missing date(s) to districts
-    const startDay = days
-      ? days <= maxNumberOfDays
-        ? maxNumberOfDays - days + 1
-        : 1
-      : 1;
-    const MissingDateDataPromises = [];
-    for (let day = startDay; day <= maxNumberOfDays; day++) {
-      const missingDate = new Date(AddDaysToDate(lastDate, day))
-        .toISOString()
-        .split("T")
-        .shift();
-      MissingDateDataPromises.push(
-        new Promise<redisEntry>(
-          MissingDateDataPromise.bind({
-            date: missingDate,
-            requestType: ActualStates,
-          })
-        )
-      );
-    }
-    const MissingDateDataResults = await Promise.all(MissingDateDataPromises);
-
-    MissingDateDataResults.forEach((result) => {
-      actual.data = actual.data.map((state) => {
-        const stateId = getStateIdByAbbreviation(state.abbreviation)
-          .toString()
-          .padStart(2, "0");
-        if (result[stateId]) {
-          state.history.push({
-            weekIncidence: result[stateId].incidence_7d,
-            date: new Date(result[stateId].Datenstand),
-            dataSource: "Unofficial, calculated from daily RKI Dump",
-          });
-        }
-        return state;
-      });
-    });
-  }
-
-  // merge archive data with current data
-  actual.data = actual.data.map((state) => {
-    state.history.unshift(
-      ...archive.data.find(
-        (element) => element.abbreviation === state.abbreviation
-      ).history
-    );
-    return state;
-  });
-
-  // filter by ags
-  if (abbreviation) {
-    actual.data = actual.data.filter(
-      (state) => state.abbreviation === abbreviation
-    );
-  }
-
-  // filter by days
-  if (days) {
-    const reference_date = new Date(getDateBefore(days));
-    actual.data = actual.data.map((state) => {
-      state.history = state.history.filter(
-        (element) => new Date(element.date) > reference_date
-      );
-      return state;
-    });
-  }
+  const actualFinal = await finalizeData(
+    actual,
+    archive,
+    metaLastFileDate,
+    days,
+    abbreviation,
+    ActualStates
+  );
 
   return {
-    data: actual.data,
-    lastUpdate: lastUpdate,
+    data: actualFinal.data,
+    lastUpdate: actualFinal.lastUpdate,
   };
 }

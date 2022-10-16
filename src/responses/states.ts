@@ -31,7 +31,7 @@ import {
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
 import {
-  StatesFrozenIncidenceData,
+  FrozenIncidenceData,
   getStatesFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
 
@@ -520,7 +520,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
 
 interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: StatesFrozenIncidenceData;
+    [key: string]: FrozenIncidenceData;
   };
 }
 
