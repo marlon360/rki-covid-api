@@ -53,7 +53,7 @@ import {
 } from "./responses/map";
 import { RKIError } from "./utils";
 
-export const cache = require("express-redis-cache")({
+const cache = require("express-redis-cache")({
   expire: 1800,
   host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,

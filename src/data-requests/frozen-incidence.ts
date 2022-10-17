@@ -51,11 +51,12 @@ interface RequestTypeParameter {
   startRow: number;
   startColumn: number;
   key: string;
-  githubFileName: string;
+  githubUrlPre: string;
+  githubUrlPost: string;
   redisKey: string;
 }
 
-interface fi_file {
+interface FrozenIncidenceDayFile {
   [key: string]: {
     Bundesland: string;
     Datenstand: string;
@@ -72,8 +73,9 @@ const ActualDistricts: RequestTypeParameter = {
   startRow: 4,
   startColumn: 2,
   key: "ags",
-  githubFileName: "_LK.json.gz",
-  redisKey: "redisActualDistricts",
+  githubUrlPre: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
+  githubUrlPost: "_LK.json.gz",
+  redisKey: "ActualDistricts",
 };
 
 const ArchiveDistricts: RequestTypeParameter = {
@@ -84,8 +86,9 @@ const ArchiveDistricts: RequestTypeParameter = {
   startRow: 4,
   startColumn: 3,
   key: "ags",
-  githubFileName: "",
-  redisKey: "redisArchiveDistricts",
+  githubUrlPre: "",
+  githubUrlPost: "",
+  redisKey: "ArchiveDistricts",
 };
 
 const ActualStates: RequestTypeParameter = {
@@ -96,8 +99,9 @@ const ActualStates: RequestTypeParameter = {
   startRow: 4,
   startColumn: 1,
   key: "abbreviation",
-  githubFileName: "_BL.json.gz",
-  redisKey: "redisActualStates",
+  githubUrlPre: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
+  githubUrlPost: "_BL.json.gz",
+  redisKey: "ActualStates",
 };
 
 const ArchiveStates: RequestTypeParameter = {
@@ -108,8 +112,9 @@ const ArchiveStates: RequestTypeParameter = {
   startRow: 4,
   startColumn: 1,
   key: "abbreviation",
-  githubFileName: "",
-  redisKey: "redisArchiveStates",
+  githubUrlPre: "",
+  githubUrlPost: "",
+  redisKey: "ArchiveStates",
 };
 
 const fiJsonCache = require("express-redis-cache")({
@@ -153,18 +158,12 @@ const getJsonDataFromRedis = function (redisKey: string) {
 };
 
 const delJsonDataFromRedis = function (redisKey: string) {
-  return new Promise<void>((resolve, reject) => {
-    fiJsonCache.del(redisKey, (err, numberDeletions) => {
+  return new Promise<number>((resolve, reject) => {
+    fiJsonCache.del(redisKey, (err, deletions) => {
       if (err) {
         reject(err);
       } else {
-        if ((numberDeletions = 1)) {
-          console.log(`Redis key ${redisKey} successfully deleted.`);
-        } else {
-          console.log(
-            `Something went wrong while deleting the redis key ${redisKey}. The key is not available!`
-          );
-        }
+        resolve(deletions);
       }
     });
   });
@@ -193,15 +192,13 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   let data = [];
   // check if a redis entry exists, if yes use it
   // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
-  const temp = await getJsonDataFromRedis(redisKey);
-  const localData = temp.length
-    ? JSON.parse(temp[0].body)
+  const redisEntry = await getJsonDataFromRedis(redisKey);
+  let redisData = redisEntry.length
+    ? JSON.parse(redisEntry[0].body)
     : { lastUpdate: new Date(1970, 0, 1), data };
 
   // also recalculate if the excelfile is newer as redis data
-  if (lastUpdate.getTime() > new Date(localData.lastUpdate).getTime()) {
-    // if redisKey exists in redis delete it
-    if (temp.length) await delJsonDataFromRedis(redisKey);
+  if (lastUpdate.getTime() > new Date(redisData.lastUpdate).getTime()) {
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[SheetName];
     // table starts in row 5 (parameter is zero indexed)
@@ -245,12 +242,12 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       });
       return { [key]: regionKey, name: name, history: history };
     });
-    //store the sheet as stringifyed Json to redis
+    //create or update redis entry for the excelsheet 
     const JsonData = JSON.stringify({ lastUpdate, data });
     await addJsonDataToRedis(redisKey, JsonData, -1);
   } else {
-    data = localData.data;
-    lastUpdate = new Date(localData.lastUpdate);
+    data = redisData.data;
+    lastUpdate = new Date(redisData.lastUpdate);
   }
   resolve({ lastUpdate, data });
 };
@@ -259,14 +256,16 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
-  const redisKey = date + "_" + requestType.redisKey;
-  const githubFileName = requestType.githubFileName;
+  const redisKey = `${requestType.redisKey}_${date}`;
+  const githubUrlPre = requestType.githubUrlPre;
+  const githubUrlPost= requestType.githubUrlPost;
+  
   const redisEntry = await getJsonDataFromRedis(redisKey);
-  let missingDateData: fi_file;
+  let missingDateData: FrozenIncidenceDayFile;
   if (redisEntry.length == 1) {
     missingDateData = JSON.parse(redisEntry[0].body);
   } else {
-    const url = `https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_${date}${githubFileName}`;
+    const url = `${githubUrlPre}${date}${githubUrlPost}`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
@@ -276,8 +275,8 @@ const MissingDateDataPromise = async function (resolve, reject) {
     const unzipped = await new Promise((resolve) =>
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
-    // add to redis valid for 14 days
-    await addJsonDataToRedis(redisKey, unzipped.toString(), 14 * 24 * 60 * 60);
+    // add to redis
+    await addJsonDataToRedis(redisKey, unzipped.toString(), -1);
     missingDateData = JSON.parse(unzipped.toString());
   }
   resolve(missingDateData);
@@ -327,7 +326,7 @@ async function finalizeData(
         .split("T")
         .shift();
       MissingDateDataPromises.push(
-        new Promise<fi_file>(
+        new Promise<FrozenIncidenceDayFile>(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: requestType,
@@ -335,7 +334,7 @@ async function finalizeData(
         )
       );
     }
-    const MissingDateDataResults: fi_file[] = await Promise.all(
+    const MissingDateDataResults: FrozenIncidenceDayFile[] = await Promise.all(
       MissingDateDataPromises
     );
 
@@ -389,6 +388,20 @@ async function finalizeData(
   return { data: actualData.data, lastUpdate: lastUpdate };
 }
 
+// function to cleanup the daily missing data entry in redis 
+async function CleanupRedisCache(lastUpdateExcelAktuell: Date, requestType: RequestTypeParameter) {
+  const date  = new Date(lastUpdateExcelAktuell);
+  date.setHours(0, 0, 0, 0);
+  for (let i = 14; i = 0; i--) {
+    const dateStr = AddDaysToDate(date, i).toISOString().split("T").shift()
+    const redisKey = `${dateStr}_${requestType.redisKey}`;
+    const numberOfDeletions = await delJsonDataFromRedis(redisKey);
+    if (numberOfDeletions) { 
+      console.log(`Rediskey ${redisKey} deleted. Number of deletions: ${numberOfDeletions}`)
+    }
+  } 
+}
+
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string
@@ -423,6 +436,8 @@ export async function getDistrictsFrozenIncidenceHistory(
     ags,
     ActualDistricts
   );
+  
+  await CleanupRedisCache(actual.lastUpdate,ActualDistricts);
 
   return {
     data: actualFinal.data,
@@ -464,6 +479,8 @@ export async function getStatesFrozenIncidenceHistory(
     abbreviation,
     ActualStates
   );
+  
+  await CleanupRedisCache(actual.lastUpdate, ActualStates);
 
   return {
     data: actualFinal.data,
