@@ -73,7 +73,8 @@ const ActualDistricts: RequestTypeParameter = {
   startRow: 4,
   startColumn: 2,
   key: "ags",
-  githubUrlPre: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
+  githubUrlPre:
+    "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
   githubUrlPost: "_LK.json.gz",
   redisKey: "ActualDistricts",
 };
@@ -99,7 +100,8 @@ const ActualStates: RequestTypeParameter = {
   startRow: 4,
   startColumn: 1,
   key: "abbreviation",
-  githubUrlPre: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
+  githubUrlPre:
+    "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
   githubUrlPost: "_BL.json.gz",
   redisKey: "ActualStates",
 };
@@ -242,7 +244,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       });
       return { [key]: regionKey, name: name, history: history };
     });
-    //create or update redis entry for the excelsheet 
+    //create or update redis entry for the excelsheet
     const JsonData = JSON.stringify({ lastUpdate, data });
     await addJsonDataToRedis(redisKey, JsonData, -1);
   } else {
@@ -258,8 +260,8 @@ const MissingDateDataPromise = async function (resolve, reject) {
   const date = this.date;
   const redisKey = `${requestType.redisKey}_${date}`;
   const githubUrlPre = requestType.githubUrlPre;
-  const githubUrlPost= requestType.githubUrlPost;
-  
+  const githubUrlPost = requestType.githubUrlPost;
+
   const redisEntry = await getJsonDataFromRedis(redisKey);
   let missingDateData: FrozenIncidenceDayFile;
   if (redisEntry.length == 1) {
@@ -388,18 +390,23 @@ async function finalizeData(
   return { data: actualData.data, lastUpdate: lastUpdate };
 }
 
-// function to cleanup the daily missing data entry in redis 
-async function CleanupRedisCache(lastUpdateExcelAktuell: Date, requestType: RequestTypeParameter) {
-  const date  = new Date(lastUpdateExcelAktuell);
+// function to cleanup the daily missing data entry in redis
+async function CleanupRedisCache(
+  lastUpdateExcelAktuell: Date,
+  requestType: RequestTypeParameter
+) {
+  const date = new Date(lastUpdateExcelAktuell);
   date.setHours(0, 0, 0, 0);
-  for (let i = 14; i = 0; i--) {
-    const dateStr = AddDaysToDate(date, i).toISOString().split("T").shift()
+  for (let i = 14; i >= 0; i--) {
+    const dateStr = AddDaysToDate(date, i).toISOString().split("T").shift();
     const redisKey = `${dateStr}_${requestType.redisKey}`;
     const numberOfDeletions = await delJsonDataFromRedis(redisKey);
-    if (numberOfDeletions) { 
-      console.log(`Rediskey ${redisKey} deleted. Number of deletions: ${numberOfDeletions}`)
+    if (numberOfDeletions) {
+      console.log(
+        `Rediskey ${redisKey} deleted. Number of deletions: ${numberOfDeletions}`
+      );
     }
-  } 
+  }
 }
 
 export async function getDistrictsFrozenIncidenceHistory(
@@ -436,8 +443,8 @@ export async function getDistrictsFrozenIncidenceHistory(
     ags,
     ActualDistricts
   );
-  
-  await CleanupRedisCache(actual.lastUpdate,ActualDistricts);
+
+  await CleanupRedisCache(actual.lastUpdate, ActualDistricts);
 
   return {
     data: actualFinal.data,
@@ -479,7 +486,7 @@ export async function getStatesFrozenIncidenceHistory(
     abbreviation,
     ActualStates
   );
-  
+
   await CleanupRedisCache(actual.lastUpdate, ActualStates);
 
   return {
