@@ -20,7 +20,7 @@ import {
   RegionType,
 } from "../utils";
 import {
-  DistrictsFrozenIncidenceData,
+  FrozenIncidenceData,
   getDistrictsFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
 import { AgeGroupsData } from "../data-requests/states";
@@ -290,7 +290,7 @@ export async function DistrictsRecoveredHistoryResponse(
 
 interface FrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: DistrictsFrozenIncidenceData;
+    [key: string]: FrozenIncidenceData;
   };
 }
 

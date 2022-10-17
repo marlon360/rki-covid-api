@@ -22,7 +22,6 @@ import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-inciden
 import {
   getDateBefore,
   AddDaysToDate,
-  getDayDifference,
   RequestType,
   fill0CasesDaysGermany,
 } from "../utils";
@@ -348,9 +347,7 @@ export async function GermanyFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation == null) {
-      historyData.abbreviation = "Bund";
-      historyData.name = "Bundesgebiet";
+    if (historyData.abbreviation == "Bund") {
       data = historyData;
     }
   });
