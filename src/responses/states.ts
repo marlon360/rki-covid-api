@@ -43,6 +43,7 @@ interface StateData extends IStateData {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
   hospitalization: {
     cases7Days: number;
@@ -70,6 +71,7 @@ export async function StatesResponse(
     statesNewDeathsData,
     statesNewRecoveredData,
     hospitalizationData,
+    statesFixIncidence,
   ] = await Promise.all([
     getStatesData(),
     getStatesRecoveredData(),
@@ -77,6 +79,7 @@ export async function StatesResponse(
     getNewStateDeaths(),
     getNewStateRecovered(),
     getHospitalizationData(),
+    getStatesFrozenIncidenceHistory(2),
   ]);
 
   function getStateById(data: ResponseData<any[]>, id: number): any | null {
@@ -90,7 +93,16 @@ export async function StatesResponse(
     hospitalizationData.data
   );
 
+  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1));
+
   let states = statesData.data.map((state) => {
+    const stateAbbreviation = getStateAbbreviationById(state.id);
+    const stateFixHistory = statesFixIncidence.data.find(
+      (fixEntry) => fixEntry.abbreviation == stateAbbreviation
+    ).history;
+    const yesterdayIncidence = stateFixHistory.find(
+      (entry) => new Date(entry.date).getTime() == yesterdayDate.getTime()
+    ).weekIncidence;
     return {
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
@@ -102,6 +114,8 @@ export async function StatesResponse(
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
         recovered:
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
+        weekIncidence:
+          (state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,
       },
       hospitalization: {
         cases7Days:
