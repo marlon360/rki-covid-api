@@ -101,7 +101,7 @@ export async function StatesResponse(
       (fixEntry) => fixEntry.abbreviation == stateAbbreviation
     ).history;
     const yesterdayIncidence = stateFixHistory.find(
-      (entry) => new Date(entry.date).getTime() == yesterdayDate.getTime()
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
     ).weekIncidence;
     return {
       ...state,

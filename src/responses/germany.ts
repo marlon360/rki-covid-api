@@ -97,7 +97,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
   const casesPer100k = (casesData.data / population) * 100000;
   const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1));
   const yesterdayIncidence = germanFixIncidence.data[0].history.find(
-    (entry) => new Date(entry.date).getTime() == yesterdayDate.getTime()
+    (entry) => entry.date.getTime() == yesterdayDate.getTime()
   ).weekIncidence;
 
   return {

@@ -171,6 +171,14 @@ const delJsonDataFromRedis = function (redisKey: string) {
   });
 };
 
+// this is a reviver for JSON.parse to convert all key including "date" to Date type
+const dateReviver = function (objKey: string, objValue: string | number | Date) {
+  if (objKey.includes("date")) {
+    return new Date(objValue);
+  }
+  return objValue;
+}
+
 // this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
@@ -196,7 +204,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
   const redisEntry = await getJsonDataFromRedis(redisKey);
   let redisData = redisEntry.length
-    ? JSON.parse(redisEntry[0].body)
+    ? JSON.parse(redisEntry[0].body, dateReviver)
     : { lastUpdate: new Date(1970, 0, 1), data };
 
   // also recalculate if the excelfile is newer as redis data
@@ -265,7 +273,7 @@ const MissingDateDataPromise = async function (resolve, reject) {
   const redisEntry = await getJsonDataFromRedis(redisKey);
   let missingDateData: FrozenIncidenceDayFile;
   if (redisEntry.length == 1) {
-    missingDateData = JSON.parse(redisEntry[0].body);
+    missingDateData = JSON.parse(redisEntry[0].body, dateReviver);
   } else {
     const url = `${githubUrlPre}${date}${githubUrlPost}`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
@@ -279,7 +287,7 @@ const MissingDateDataPromise = async function (resolve, reject) {
     );
     // add to redis
     await addJsonDataToRedis(redisKey, unzipped.toString(), -1);
-    missingDateData = JSON.parse(unzipped.toString());
+    missingDateData = JSON.parse(unzipped.toString(), dateReviver);
   }
   resolve(missingDateData);
 };

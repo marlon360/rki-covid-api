@@ -79,7 +79,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       (fixEntry) => fixEntry.ags == district.ags
     ).history;
     const yesterdayIncidence = districtFixHistory.find(
-      (entry) => new Date(entry.date).getTime() == yesterdayDate.getTime()
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
     ).weekIncidence;
     return {
       ...district,
