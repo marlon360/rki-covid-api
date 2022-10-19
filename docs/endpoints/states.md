@@ -11,87 +11,90 @@
 
 ```json
 {
-  "data": {
-    "SH": {
-      "id": 1,
-      "name": "Schleswig-Holstein",
-      "population": 2910875,
-      "cases": 79941,
-      "deaths": 1712,
-      "casesPerWeek": 1678,
-      "deathsPerWeek": 1,
-      "recovered": 76035,
-      "abbreviation": "SH",
-      "weekIncidence": 57.64589685232104,
-      "casesPer100k": 2746.287628290462,
-      "delta": {
-        "cases": 74,
-        "deaths": 0,
-        "recovered": 136
+  "data":{
+    "SH":{
+      "id":1,
+      "name":"Schleswig-Holstein",
+      "population":2922005,
+      "cases":1058847,
+      "deaths":2961,
+      "casesPerWeek":15586,
+      "deathsPerWeek":12,
+      "recovered":1005476,
+      "abbreviation":"SH",
+      "weekIncidence":533.4008668705221,
+      "casesPer100k":36237.00164784112,
+      "delta":{
+        "cases":4757,
+        "deaths":12,
+        "recovered":2131,
+        "weekIncidence":28.54204561593815
       },
-      "hospitalization": {
-        "cases7Days": 51,
-        "incidence7Days": 1.75,
-        "date": "2021-10-25T00:00:00.000Z",
-        "lastUpdate": "2021-10-25T02:01:53.000Z"
+      "hospitalization":{
+        "cases7Days":336,
+        "incidence7Days":11.5,
+        "date":"2022-10-18T00:00:00.000Z",
+        "lastUpdate":"2022-10-18T03:05:26.000Z"
       }
     },
-    "HH": {
-      "id": 2,
-      "name": "Hamburg",
-      "population": 1852478,
-      "cases": 96556,
-      "deaths": 1793,
-      "casesPerWeek": 1862,
-      "deathsPerWeek": 1,
-      "recovered": 90301,
-      "abbreviation": "HH",
-      "weekIncidence": 100.51401420151818,
-      "casesPer100k": 5212.2616300976315,
-      "delta": {
-        "cases": 280,
-        "deaths": 6,
-        "recovered": 174
+    "HH":{
+      "id":2,
+      "name":"Hamburg",
+      "population":1853935,
+      "cases":744396,
+      "deaths":3101,
+      "casesPerWeek":5194,
+      "deathsPerWeek":5,
+      "recovered":729702,
+      "abbreviation":"HH",
+      "weekIncidence":280.1608470631387,
+      "casesPer100k":40152.2167713539,
+      "delta":{
+        "cases":2263,
+        "deaths":4,
+        "recovered":942,
+        "weekIncidence":58.362348194515704
       },
-      "hospitalization": {
-        "cases7Days": 29,
-        "incidence7Days": 1.57,
-        "date": "2021-10-25T00:00:00.000Z",
-        "lastUpdate": "2021-10-25T02:01:53.000Z"
+      "hospitalization":{
+        "cases7Days":73,
+        "incidence7Days":3.94,
+        "date":"2022-10-18T00:00:00.000Z",
+        "lastUpdate":"2022-10-18T03:05:26.000Z"
       }
     },
-    // ...
-    "TH": {
-      "id": 16,
-      "name": "Thüringen",
-      "population": 2120237,
-      "cases": 146156,
-      "deaths": 4462,
-      "casesPerWeek": 4755,
-      "deathsPerWeek": 5,
-      "recovered": 134169,
-      "abbreviation": "TH",
-      "weekIncidence": 224.26738142952888,
-      "casesPer100k": 6893.380315502464,
-      "delta": {
-        "cases": 252,
-        "deaths": 1,
-        "recovered": 368
+    ...
+    "TH":{
+      "id":16,
+      "name":"Thüringen",
+      "population":2108863,
+      "cases":833050,
+      "deaths":7719,
+      "casesPerWeek":11450,
+      "deathsPerWeek":9,
+      "recovered":797979,
+      "abbreviation":"TH",
+      "weekIncidence":542.9466020315213,
+      "casesPer100k":39502.32898011867,
+      "delta":{
+        "cases":2497,
+        "deaths":14,
+        "recovered":1596,
+        "weekIncidence":-11.001188792254766
       },
-      "hospitalization": {
-        "cases7Days": 164,
-        "incidence7Days": 7.73,
-        "date": "2021-10-25T00:00:00.000Z",
-        "lastUpdate": "2021-10-25T02:01:53.000Z"
+      "hospitalization":{
+        "cases7Days":416,
+        "incidence7Days":19.73,
+        "date":"2022-10-18T00:00:00.000Z",
+        "lastUpdate":"2022-10-18T03:05:26.000Z"
       }
     }
   },
-  "meta": {
-    "source": "Robert Koch-Institut",
-    "contact": "Marlon Lueckert (m.lueckert@me.com)",
-    "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-10-24T23:00:00.000Z",
-    "lastCheckedForUpdate": "2021-10-25T11:09:21.355Z"
+  "meta":{
+    "source":"Robert Koch-Institut",
+    "contact":"Marlon Lueckert (m.lueckert@me.com)",
+    "info":"https://github.com/marlon360/rki-covid-api",
+    "lastUpdate":"2022-10-18T00:00:00.000Z",
+    "lastCheckedForUpdate":"2022-10-18T20:15:38.041Z"
   }
 }
 ```

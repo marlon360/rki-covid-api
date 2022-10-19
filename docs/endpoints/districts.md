@@ -11,69 +11,78 @@
 
 ```json
 {
-  "data": {
-    "10041": {
-      "ags": "10041",
-      "name": "Regionalverband Saarbrücken",
-      "county": "LK Stadtverband Saarbrücken",
-      "population": 328714,
-      "cases": 7716,
-      "deaths": 240,
-      "casesPerWeek": 149,
-      "deathsPerWeek": 2,
-      "recovered": 6669,
-      "weekIncidence": 45.328157608133516,
-      "casesPer100k": 2347.329289290995,
-      "delta": {
-        "cases": 0,
-        "deaths": 0,
-        "recovered": 159
+  "data":{
+    "10041":{
+      "ags":"10041",
+      "name":"Regionalverband Saarbrücken",
+      "county":"LK Stadtverband Saarbrücken",
+      "state":"Saarland",
+      "population":327284,
+      "cases":139468,
+      "deaths":821,
+      "casesPerWeek":3086,
+      "deathsPerWeek":1,
+      "stateAbbreviation":"SL",
+      "recovered":128600,
+      "weekIncidence":942.9119663656029,
+      "casesPer100k":42613.754415125695,
+      "delta":{
+        "cases":699,
+        "deaths":2,
+        "recovered":329,
+        "weekIncidence":-61.41455127656707
       }
     },
-    "10042": {
-      "ags": "10042",
-      "name": "Merzig-Wadern",
-      "county": "LK Merzig-Wadern",
-      "population": 103243,
-      "cases": 1850,
-      "deaths": 27,
-      "casesPerWeek": 118,
-      "deathsPerWeek": 0,
-      "recovered": 1603,
-      "weekIncidence": 114.29346299506987,
-      "casesPer100k": 1791.889038482028,
-      "delta": {
-        "cases": 4,
-        "deaths": 0,
-        "recovered": 6
+    "10042":{
+      "ags":"10042",
+      "name":"Merzig-Wadern",
+      "county":"LK Merzig-Wadern",
+      "state":"Saarland",
+      "population":103426,
+      "cases":49074,
+      "deaths":162,
+      "casesPerWeek":1652,
+      "deathsPerWeek":1,
+      "stateAbbreviation":"SL",
+      "recovered":45290,
+      "weekIncidence":1597.2772803743737,
+      "casesPer100k":47448.41722584263,
+      "delta":{
+        "cases":416,
+        "deaths":1,
+        "recovered":399,
+        "weekIncidence":-141.16373058998624
       }
     },
-    // ...
-    "09780": {
-      "ags": "09780",
-      "name": "Oberallgäu",
-      "county": "LK Oberallgäu",
-      "population": 156008,
-      "cases": 2846,
-      "deaths": 30,
-      "casesPerWeek": 96,
-      "deathsPerWeek": 0,
-      "recovered": 2007,
-      "weekIncidence": 61.53530588174966,
-      "casesPer100k": 1824.2654222860367,
-      "delta": {
-        "cases": 0,
-        "deaths": 0,
-        "recovered": 14
+    ...
+    "09780":{
+      "ags":"09780",
+      "name":"Oberallgäu",
+      "county":"LK Oberallgäu",
+      "state":"Bayern",
+      "population":157202,
+      "cases":74002,
+      "deaths":201,
+      "casesPerWeek":1155,
+      "deathsPerWeek":0,
+      "stateAbbreviation":"BY",
+      "recovered":69157,
+      "weekIncidence":734.7234768005496,
+      "casesPer100k":47074.4647014669,
+      "delta":{
+        "cases":248,
+        "deaths":0,
+        "recovered":153,
+        "weekIncidence":-36.89520489561232
       }
     }
   },
-  "meta": {
-    "source": "Robert Koch-Institut",
-    "contact": "Marlon Lueckert (m.lueckert@me.com)",
-    "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-01-04T00:00:00.000Z",
-    "lastCheckedForUpdate": "2021-01-04T13:56:27.430Z"
+  "meta":{
+    "source":"Robert Koch-Institut",
+    "contact":"Marlon Lueckert (m.lueckert@me.com)",
+    "info":"https://github.com/marlon360/rki-covid-api",
+    "lastUpdate":"2022-10-18T00:00:00.000Z",
+    "lastCheckedForUpdate":"2022-10-18T20:01:37.368Z"
   }
 }
 ```

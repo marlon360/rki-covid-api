@@ -34,6 +34,7 @@ interface DistrictData extends IDistrictData {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
 }
 
@@ -51,12 +52,14 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     districtNewCasesData,
     districtNewDeathsData,
     districtNewRecoveredData,
+    districtsFixIncidence,
   ] = await Promise.all([
     getDistrictsData(),
     getDistrictsRecoveredData(),
     getNewDistrictCases(),
     getNewDistrictDeaths(),
     getNewDistrictRecovered(),
+    getDistrictsFrozenIncidenceHistory(2),
   ]);
 
   function getDistrictByAgs(
@@ -69,7 +72,15 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return null;
   }
 
+  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1));
+
   let districts = districtsData.data.map((district) => {
+    const districtFixHistory = districtsFixIncidence.data.find(
+      (fixEntry) => fixEntry.ags == district.ags
+    ).history;
+    const yesterdayIncidence = districtFixHistory.find(
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
+    ).weekIncidence;
     return {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
@@ -84,6 +95,9 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
         recovered:
           getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
           0,
+        weekIncidence:
+          (district.casesPerWeek / district.population) * 100000 -
+          yesterdayIncidence,
       },
     };
   });

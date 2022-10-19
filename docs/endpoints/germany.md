@@ -11,41 +11,36 @@
 
 ```json
 {
-  "cases": 4472730,
-  "deaths": 95117,
-  "recovered": 4215170,
-  "weekIncidence": 110.06189150479662,
-  "casesPer100k": 5378.7845981321325,
-  "casesPerWeek": 91522,
+  "cases": 34758889,
+  "deaths": 151629,
+  "recovered": 33017819,
+  "weekIncidence": 687.4708933960765,
+  "casesPer100k": 41758.877925671724,
+  "casesPerWeek": 572231,
   "delta": {
-    "cases": 6573,
-    "deaths": 17,
-    "recovered": 8811
+    "cases": 150052,
+    "deaths": 209,
+    "recovered": 81111,
+    "weekIncidence": 6.611232747541408
   },
   "r": {
-    "value": 1.18,
-    "rValue4Days": {
-      "value": 1.18,
-      "date": "2021-10-21T00:00:00.000Z"
-    },
-    "rValue7Days": {
-      "value": 1.17,
-      "date": "2021-10-20T00:00:00.000Z"
-    },
-    "lastUpdate": "2021-10-24T23:48:33.000Z"
+    "value": 0.82,
+    "rValue4Days": { "value": 0.82, "date": "2022-10-14T00:00:00.000Z" },
+    "rValue7Days": { "value": 0.85, "date": "2022-10-13T00:00:00.000Z" },
+    "lastUpdate": "2022-10-18T02:22:19.000Z"
   },
   "hospitalization": {
-    "cases7Days": 2303,
-    "incidence7Days": 2.77,
-    "date": "2021-10-25T00:00:00.000Z",
-    "lastUpdate": "2021-10-25T02:01:53.000Z"
+    "cases7Days": 9921,
+    "incidence7Days": 11.92,
+    "date": "2022-10-18T00:00:00.000Z",
+    "lastUpdate": "2022-10-18T03:05:26.000Z"
   },
   "meta": {
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-10-24T23:00:00.000Z",
-    "lastCheckedForUpdate": "2021-10-25T11:06:58.517Z"
+    "lastUpdate": "2022-10-18T00:00:00.000Z",
+    "lastCheckedForUpdate": "2022-10-18T20:23:10.902Z"
   }
 }
 ```
