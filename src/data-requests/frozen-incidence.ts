@@ -172,12 +172,15 @@ const delJsonDataFromRedis = function (redisKey: string) {
 };
 
 // this is a reviver for JSON.parse to convert all key including "date" to Date type
-const dateReviver = function (objKey: string, objValue: string | number | Date) {
+const dateReviver = function (
+  objKey: string,
+  objValue: string | number | Date
+) {
   if (objKey.includes("date")) {
     return new Date(objValue);
   }
   return objValue;
-}
+};
 
 // this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
