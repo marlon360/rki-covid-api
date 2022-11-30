@@ -351,6 +351,10 @@ const DataPromise = async function (resolve, reject) {
       if (!stateEntry) {
         stateEntry = clone(emptyStateObject);
       }
+      // continue if series not available
+      if (US[seriesKey] == null) {
+        continue;
+      }
       // write data to id 0
       vaccinationDataObject[0][US[seriesKey]].total += count;
       vaccinationDataObject[0][US[seriesKey]][VNR[vaccinekey]] += count;
