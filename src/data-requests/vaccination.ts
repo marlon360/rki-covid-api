@@ -51,7 +51,7 @@ enum UV {
   V6 = "valneva",
   V7 = "biontechBivalent",
   V8 = "modernaBivalent",
-  V9 = "biontechInfant"
+  V9 = "biontechInfant",
 }
 
 // UsedVaccinesDelta
@@ -64,7 +64,7 @@ enum UVD {
   V6 = "deltaValneva",
   V7 = "deltaBiontechBivalent",
   V8 = "deltaModernaBivalent",
-  V9 = "deltaBiontechInfant"
+  V9 = "deltaBiontechInfant",
 }
 
 // VaccineNameReverse
@@ -77,7 +77,7 @@ enum VNR {
   "Valneva" = "valneva",
   "Comirnaty bivalent (Original/Omikron)" = "biontechBivalent",
   "Spikevax bivalent (Original/Omikron)" = "modernaBivalent",
-  "Comirnaty-Kleinkinder" = "biontechInfant"
+  "Comirnaty-Kleinkinder" = "biontechInfant",
 }
 
 // UsedAgeGroups
@@ -470,43 +470,43 @@ export async function getVaccinationCoverage(): Promise<
         let record;
         while ((record = parser.read())) {
           let [
-        // VariableName       csv header name (2022-12-03)    
-            date,             // Datum,
-            name,             // Bundesland,
-            id,               // BundeslandId_Impfort,
-            total,            // Impfungen_gesamt,
-            first,            // Impfungen_gesamt_min1,
-            firstInfant,      // Impfungen_gesamt_00bis04_min1,
-            full,             // Impfungen_gesamt_gi,
-            fullInfant,       // Impfungen_gesamt_00bis04_gi,
-            firstBooster,     // Impfungen_gesamt_boost1,
-            secondBooster,    // Impfungen_gesamt_boost2,
-            thirdBooster,     // Impfungen_gesamt_boost3,
-            fourthBooster,    // Impfungen_gesamt_boost4,
-            qFirstTotal,      // Impfquote_gesamt_min1,
-            qFirst05bis17,    // Impfquote_05bis17_min1,
-            qFirst05bis11,    // Impfquote_05bis11_min1,
-            qFirst12bis17,    // Impfquote_12bis17_min1,
-            qFirst18plus,     // Impfquote_18plus_min1,
-            qFirst18bis59,    // Impfquote_18bis59_min1,
-            qFirst60plus,     // Impfquote_60plus_min1,
-            qFullTotal,       // Impfquote_gesamt_gi,
-            qFull05bis17,     // Impfquote_05bis17_gi,
-            qFull05bis11,     // Impfquote_05bis11_gi,
-            qFull12bis17,     // Impfquote_12bis17_gi,
-            qFull18plus,      // Impfquote_18plus_gi,
-            qFull18bis59,     // Impfquote_18bis59_gi,
-            qFull60plus,      // Impfquote_60plus_gi,
-            q1BoostTotal,     // Impfquote_gesamt_boost1,
-            q1Boost12bis17,   // Impfquote_12bis17_boost1,
-            q1Boost18plus,    // Impfquote_18plus_boost1,
-            q1Boost18bis59,   // Impfquote_18bis59_boost1,
-            q1Boost60plus,    // Impfquote_60plus_boost1,
-            q2BoostTotal,     // Impfquote_gesamt_boost2,
-            q2Boost12bis17,   // Impfquote_12bis17_boost2,
-            q2Boost18plus,    // Impfquote_18plus_boost2,
-            q2Boost18bis59,   // Impfquote_18bis59_boost2,
-            q2Boost60plus,    // Impfquote_60plus_boost2,
+            // VariableName       csv header name (2022-12-03)
+            date, // Datum,
+            name, // Bundesland,
+            id, // BundeslandId_Impfort,
+            total, // Impfungen_gesamt,
+            first, // Impfungen_gesamt_min1,
+            firstInfant, // Impfungen_gesamt_00bis04_min1,
+            full, // Impfungen_gesamt_gi,
+            fullInfant, // Impfungen_gesamt_00bis04_gi,
+            firstBooster, // Impfungen_gesamt_boost1,
+            secondBooster, // Impfungen_gesamt_boost2,
+            thirdBooster, // Impfungen_gesamt_boost3,
+            fourthBooster, // Impfungen_gesamt_boost4,
+            qFirstTotal, // Impfquote_gesamt_min1,
+            qFirst05bis17, // Impfquote_05bis17_min1,
+            qFirst05bis11, // Impfquote_05bis11_min1,
+            qFirst12bis17, // Impfquote_12bis17_min1,
+            qFirst18plus, // Impfquote_18plus_min1,
+            qFirst18bis59, // Impfquote_18bis59_min1,
+            qFirst60plus, // Impfquote_60plus_min1,
+            qFullTotal, // Impfquote_gesamt_gi,
+            qFull05bis17, // Impfquote_05bis17_gi,
+            qFull05bis11, // Impfquote_05bis11_gi,
+            qFull12bis17, // Impfquote_12bis17_gi,
+            qFull18plus, // Impfquote_18plus_gi,
+            qFull18bis59, // Impfquote_18bis59_gi,
+            qFull60plus, // Impfquote_60plus_gi,
+            q1BoostTotal, // Impfquote_gesamt_boost1,
+            q1Boost12bis17, // Impfquote_12bis17_boost1,
+            q1Boost18plus, // Impfquote_18plus_boost1,
+            q1Boost18bis59, // Impfquote_18bis59_boost1,
+            q1Boost60plus, // Impfquote_60plus_boost1,
+            q2BoostTotal, // Impfquote_gesamt_boost2,
+            q2Boost12bis17, // Impfquote_12bis17_boost2,
+            q2Boost18plus, // Impfquote_18plus_boost2,
+            q2Boost18bis59, // Impfquote_18bis59_boost2,
+            q2Boost60plus, // Impfquote_60plus_boost2,
             // no quotes for third and fourth booster are privided !
           ] = record;
           quoteVaccinationDataObject[id] = {
