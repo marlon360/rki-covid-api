@@ -18,6 +18,7 @@ import {
   fill0CasesDays,
   RequestType,
   RegionType,
+  limit,
 } from "../utils";
 import {
   FrozenIncidenceData,
@@ -59,7 +60,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     getNewDistrictCases(),
     getNewDistrictDeaths(),
     getNewDistrictRecovered(),
-    getDistrictsFrozenIncidenceHistory(2),
+    getDistrictsFrozenIncidenceHistory(3),
   ]);
 
   function getDistrictByAgs(
@@ -96,8 +97,8 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
           getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
           0,
         weekIncidence:
-          (district.casesPerWeek / district.population) * 100000 -
-          yesterdayIncidence,
+          limit((district.casesPerWeek / district.population) * 100000 -
+          yesterdayIncidence,12),
       },
     };
   });

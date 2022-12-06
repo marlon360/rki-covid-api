@@ -24,6 +24,7 @@ import {
   AddDaysToDate,
   RequestType,
   fill0CasesDaysGermany,
+  limit,
 } from "../utils";
 
 interface GermanyData extends IResponseMeta {
@@ -32,6 +33,7 @@ interface GermanyData extends IResponseMeta {
   recovered: number;
   weekIncidence: number;
   casesPerWeek: number;
+  deathsPerWeek: number;
   casesPer100k: number;
   r: {
     value: number;
@@ -82,15 +84,17 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getStatesData(),
     getRValue(),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(2, "Bund"),
+    getStatesFrozenIncidenceHistory(3, "Bund"),
   ]);
 
   // calculate week incidence
   let population = 0;
   let casesPerWeek = 0;
+  let deathsPerWeek = 0;
   for (const state of statesData.data) {
     population += state.population;
     casesPerWeek += state.casesPerWeek;
+    deathsPerWeek += state.deathsPerWeek;
   }
 
   const weekIncidence = (casesPerWeek / population) * 100000;
@@ -107,11 +111,12 @@ export async function GermanyResponse(): Promise<GermanyData> {
     weekIncidence,
     casesPer100k,
     casesPerWeek,
+    deathsPerWeek,
     delta: {
       cases: newCasesData.data,
       deaths: newDeathsData.data,
       recovered: newRecoveredData.data,
-      weekIncidence: weekIncidence - yesterdayIncidence,
+      weekIncidence: limit(weekIncidence - yesterdayIncidence,12),
     },
     r: {
       value: rData.data.rValue4Days.value, // legacy

@@ -23,6 +23,7 @@ import {
   fill0CasesDays,
   RegionType,
   RequestType,
+  limit,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -79,7 +80,7 @@ export async function StatesResponse(
     getNewStateDeaths(),
     getNewStateRecovered(),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(2),
+    getStatesFrozenIncidenceHistory(3),
   ]);
 
   function getStateById(data: ResponseData<any[]>, id: number): any | null {
@@ -115,7 +116,7 @@ export async function StatesResponse(
         recovered:
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
         weekIncidence:
-          (state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,
+          limit((state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,12),
       },
       hospitalization: {
         cases7Days:

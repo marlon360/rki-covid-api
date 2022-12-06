@@ -435,3 +435,7 @@ export function fill0CasesDaysGermany(
   }
   return targetData;
 }
+
+export function limit(value: number, decimals: number): number {
+  return parseFloat(value.toFixed(decimals));
+}
