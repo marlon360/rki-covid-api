@@ -6,6 +6,7 @@ import {
   getStateAbbreviationByName,
   getDateBefore,
   AddDaysToDate,
+  limit,
 } from "../utils";
 
 function clearEntry(entry: any) {
@@ -1102,9 +1103,6 @@ export async function getVaccinationCoverage(): Promise<
     }
   }
 
-  function limit(value: number, decimals: number): number {
-    return parseFloat(value.toFixed(decimals));
-  }
   return {
     data: coverage,
     lastUpdate: lastUpdate,
