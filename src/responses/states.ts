@@ -115,8 +115,10 @@ export async function StatesResponse(
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
         recovered:
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
-        weekIncidence:
-          limit((state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,12),
+        weekIncidence: limit(
+          (state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,
+          12
+        ),
       },
       hospitalization: {
         cases7Days:

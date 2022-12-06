@@ -96,9 +96,11 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
         recovered:
           getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
           0,
-        weekIncidence:
-          limit((district.casesPerWeek / district.population) * 100000 -
-          yesterdayIncidence,12),
+        weekIncidence: limit(
+          (district.casesPerWeek / district.population) * 100000 -
+            yesterdayIncidence,
+          12
+        ),
       },
     };
   });

@@ -116,7 +116,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
       cases: newCasesData.data,
       deaths: newDeathsData.data,
       recovered: newRecoveredData.data,
-      weekIncidence: limit(weekIncidence - yesterdayIncidence,12),
+      weekIncidence: limit(weekIncidence - yesterdayIncidence, 12),
     },
     r: {
       value: rData.data.rValue4Days.value, // legacy
