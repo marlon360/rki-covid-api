@@ -257,10 +257,10 @@ function getMapBackground(
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+        <text id="7-Tage-Inzidenz-der" font-family="Arial" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+        <text id="Stand:-22.11.2021" font-family="Arial" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
         <g id="Legend" transform="translate(${border}, -${border})">
@@ -270,7 +270,7 @@ function getMapBackground(
             <rect fill="${
               range.color
             }" x="0" y="0" width="30" height="30"></rect>
-            <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+            <text x="48" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="#010501">
               <tspan>${range.toString()}</tspan>
             </text>
           </g>
@@ -278,14 +278,14 @@ function getMapBackground(
         })}
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
-        <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
+        <text id="Quelle:-Robert-Koch-" font-family="Arial" font-size="10" font-weight="normal" fill="#010501">
           <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
         </text>
-        <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="normal" fill="#243645">
           <tspan x="15" y="189">Grafik von</tspan>
-          <tspan font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
+          <tspan font-family="Arial-Bold, Arial" font-weight="bold"> Marlon Lückert</tspan>
         </text>
-        <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="bold" fill="#243645">
           <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
         </text>
       </g>
