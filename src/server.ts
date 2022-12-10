@@ -33,10 +33,13 @@ import {
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
   FrozenIncidenceHistoryResponse,
+  DistrictsAgeGroupsResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
   VaccinationHistoryResponse,
+  VaccinationStatesResponse,
+  VaccinationGermanyResponse,
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
@@ -694,6 +697,16 @@ app.get(
 );
 
 app.get(
+  "/districts/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse();
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/:district",
   queuedCache(),
   cache.route(),
@@ -838,11 +851,51 @@ app.get(
 );
 
 app.get(
+  "/districts/:district/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse(req.params.district);
+    res.json(response);
+  }
+);
+
+app.get(
   "/vaccinations",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     const response = await VaccinationResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/germany",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationGermanyResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/states",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationStatesResponse(req.params.state);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/states/:state",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationStatesResponse(req.params.state);
     res.json(response);
   }
 );
@@ -1077,7 +1130,7 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         message: "An error occurred while fetching external data.",
         url: error.config.url,
         details: error.message,
-        stack: error.stack,
+        response: error.response.data,
       },
     });
   } else {

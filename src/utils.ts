@@ -2,6 +2,8 @@ import axios from "axios";
 
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
+    case 0:
+      return "Bund";
     case 1:
       return "SH";
     case 2:
@@ -41,6 +43,8 @@ export function getStateAbbreviationById(id: number): string | null {
 
 export function getStateIdByAbbreviation(abbreviation: string): number | null {
   switch (abbreviation) {
+    case "Bund":
+      return 0;
     case "SH":
       return 1;
     case "HH":
@@ -112,6 +116,8 @@ export function getStateAbbreviationByName(name: string): string | null {
       return "SH";
     case "Thüringen":
       return "TH";
+    case "Bundesgebiet":
+      return "Bund";
     default:
       return null;
   }
@@ -153,6 +159,8 @@ export function getStateNameByAbbreviation(
       return "Schleswig-Holstein";
     case "TH":
       return "Thüringen";
+    case "Bund":
+      return "Bundesgebiet";
     default:
       return null;
   }
@@ -192,6 +200,8 @@ export function getStateIdByName(name: string): number | null {
       return 1;
     case "Thüringen":
       return 16;
+    case "Bundesgebiet":
+      return 0;
     default:
       return null;
   }
@@ -441,4 +451,8 @@ export function fill0CasesDaysGermany(
     });
   }
   return targetData;
+}
+
+export function limit(value: number, decimals: number): number {
+  return parseFloat(value.toFixed(decimals));
 }

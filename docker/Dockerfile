@@ -4,7 +4,7 @@ FROM node:16-alpine3.14
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
 
-ARG VIPS_VERSION=8.11.4
+ARG VIPS_VERSION=8.12.2
 
 # System update, build dependencies, compile vips-8.11.x and cleanup.
 RUN set -x -o pipefail \
@@ -30,7 +30,7 @@ RUN set -x -o pipefail \
                  --disable-static \
                  --disable-dependency-tracking \
                  --enable-silent-rules \
-  && make -s install-strip \
+  && make -sj4 install-strip \
   && cd .. \
   && rm -rf /tmp/vips-${VIPS_VERSION} \
   && apk del --purge .vips-dependencies \
@@ -57,7 +57,7 @@ RUN apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2
 # If you are building your code for production
 # RUN npm ci --only=production
 
-RUN npm install pm2 -g
+RUN npm install pm2 --location=global
 
 # Bundle app source
 COPY . .

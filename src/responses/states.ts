@@ -23,6 +23,7 @@ import {
   fill0CasesDays,
   RegionType,
   RequestType,
+  limit,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -31,7 +32,7 @@ import {
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
 import {
-  StatesFrozenIncidenceData,
+  FrozenIncidenceData,
   getStatesFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
 
@@ -43,6 +44,7 @@ interface StateData extends IStateData {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
   hospitalization: {
     cases7Days: number;
@@ -70,6 +72,7 @@ export async function StatesResponse(
     statesNewDeathsData,
     statesNewRecoveredData,
     hospitalizationData,
+    statesFixIncidence,
   ] = await Promise.all([
     getStatesData(),
     getStatesRecoveredData(),
@@ -77,6 +80,7 @@ export async function StatesResponse(
     getNewStateDeaths(),
     getNewStateRecovered(),
     getHospitalizationData(),
+    getStatesFrozenIncidenceHistory(3),
   ]);
 
   function getStateById(data: ResponseData<any[]>, id: number): any | null {
@@ -90,7 +94,16 @@ export async function StatesResponse(
     hospitalizationData.data
   );
 
+  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1));
+
   let states = statesData.data.map((state) => {
+    const stateAbbreviation = getStateAbbreviationById(state.id);
+    const stateFixHistory = statesFixIncidence.data.find(
+      (fixEntry) => fixEntry.abbreviation == stateAbbreviation
+    ).history;
+    const yesterdayIncidence = stateFixHistory.find(
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
+    ).weekIncidence;
     return {
       ...state,
       recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
@@ -102,6 +115,10 @@ export async function StatesResponse(
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
         recovered:
           getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
+        weekIncidence: limit(
+          (state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,
+          12
+        ),
       },
       hospitalization: {
         cases7Days:
@@ -520,7 +537,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
 
 interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: StatesFrozenIncidenceData;
+    [key: string]: FrozenIncidenceData;
   };
 }
 
@@ -535,7 +552,7 @@ export async function StatesFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation != null) {
+    if (historyData.abbreviation != "Bund") {
       data[historyData.abbreviation] = historyData;
     }
   });

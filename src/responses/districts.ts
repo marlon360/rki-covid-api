@@ -10,6 +10,7 @@ import {
   getLastDistrictRecoveredHistory,
   getDistrictsRecoveredData,
   getNewDistrictRecovered,
+  getDistrictsAgeGroups,
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
@@ -17,11 +18,13 @@ import {
   fill0CasesDays,
   RequestType,
   RegionType,
+  limit,
 } from "../utils";
 import {
-  DistrictsFrozenIncidenceData,
+  FrozenIncidenceData,
   getDistrictsFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
+import { AgeGroupsData } from "../data-requests/states";
 
 interface DistrictData extends IDistrictData {
   stateAbbreviation: string;
@@ -32,6 +35,7 @@ interface DistrictData extends IDistrictData {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
 }
 
@@ -49,12 +53,14 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     districtNewCasesData,
     districtNewDeathsData,
     districtNewRecoveredData,
+    districtsFixIncidence,
   ] = await Promise.all([
     getDistrictsData(),
     getDistrictsRecoveredData(),
     getNewDistrictCases(),
     getNewDistrictDeaths(),
     getNewDistrictRecovered(),
+    getDistrictsFrozenIncidenceHistory(3),
   ]);
 
   function getDistrictByAgs(
@@ -67,7 +73,15 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return null;
   }
 
+  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1));
+
   let districts = districtsData.data.map((district) => {
+    const districtFixHistory = districtsFixIncidence.data.find(
+      (fixEntry) => fixEntry.ags == district.ags
+    ).history;
+    const yesterdayIncidence = districtFixHistory.find(
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
+    ).weekIncidence;
     return {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
@@ -82,6 +96,11 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
         recovered:
           getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
           0,
+        weekIncidence: limit(
+          (district.casesPerWeek / district.population) * 100000 -
+            yesterdayIncidence,
+          12
+        ),
       },
     };
   });
@@ -288,7 +307,7 @@ export async function DistrictsRecoveredHistoryResponse(
 
 interface FrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: DistrictsFrozenIncidenceData;
+    [key: string]: FrozenIncidenceData;
   };
 }
 
@@ -309,5 +328,29 @@ export async function FrozenIncidenceHistoryResponse(
   return {
     data: data,
     meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
+  };
+}
+
+export async function DistrictsAgeGroupsResponse(ags?: string): Promise<{
+  data: AgeGroupsData;
+  meta: ResponseMeta;
+}> {
+  const AgeGroupsData = await getDistrictsAgeGroups(ags);
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((ags) => {
+    data[ags] = {
+      ...AgeGroupsData.data[ags],
+    };
+    Object.keys(AgeGroupsData.data[ags]).forEach((ageGroup) => {
+      data[ags][ageGroup] = {
+        ...AgeGroupsData.data[ags][ageGroup],
+      };
+    });
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }

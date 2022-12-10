@@ -70,7 +70,9 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 
 **Vaccination data**
 
-[https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?\_\_blob=publicationFile](https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Impfquotenmonitoring.xlsx?__blob=publicationFile)
+[https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Bundeslaender_COVID-19-Impfungen.csv](https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Bundeslaender_COVID-19-Impfungen.csv) for actual vaccination data
+[https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Impfquoten_COVID-19.csv](https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Impfquoten_COVID-19.csv) for vaccination quotes
+[https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Archiv/](https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Archiv/) for archive data (both, vaccination data and quotes)
 
 **R value**
 
@@ -174,6 +176,7 @@ Now you can access the server at `http://localhost:8080`.
 - DiscordCoronaBot, Zahlen, Tägliche Updates und Vorhersagen zu Covid-19 [https://github.com/GlaubeKeinemDev/DiscordCoronaBot](https://github.com/GlaubeKeinemDev/DiscordCoronaBot)
 - Statistik für Baden-Württemberg mit Differenz zum Vortag [https://corona-in-bw.de](https://corona-in-bw.de)
 - Covid 19 Statistics Germany [https://covid19ger.netlify.app/](https://covid19ger.netlify.app/)
+- Covid-19 Analysis and Visualisation [http://mb.cmbt.de](http://mb.cmbt.de), github: [https://github.com/1c3t3a/Covid-19-analysis](https://github.com/1c3t3a/Covid-19-analysis)
 
 ## License
 

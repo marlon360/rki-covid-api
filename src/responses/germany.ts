@@ -22,9 +22,9 @@ import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-inciden
 import {
   getDateBefore,
   AddDaysToDate,
-  getDayDifference,
   RequestType,
   fill0CasesDaysGermany,
+  limit,
 } from "../utils";
 
 interface GermanyData extends IResponseMeta {
@@ -33,6 +33,7 @@ interface GermanyData extends IResponseMeta {
   recovered: number;
   weekIncidence: number;
   casesPerWeek: number;
+  deathsPerWeek: number;
   casesPer100k: number;
   r: {
     value: number;
@@ -50,6 +51,7 @@ interface GermanyData extends IResponseMeta {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
   hospitalization: {
     date: Date;
@@ -71,6 +73,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     statesData,
     rData,
     hospitalizationData,
+    germanFixIncidence,
   ] = await Promise.all([
     getCases(),
     getDeaths(),
@@ -81,18 +84,25 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getStatesData(),
     getRValue(),
     getHospitalizationData(),
+    getStatesFrozenIncidenceHistory(3, "Bund"),
   ]);
 
   // calculate week incidence
   let population = 0;
   let casesPerWeek = 0;
+  let deathsPerWeek = 0;
   for (const state of statesData.data) {
     population += state.population;
     casesPerWeek += state.casesPerWeek;
+    deathsPerWeek += state.deathsPerWeek;
   }
 
   const weekIncidence = (casesPerWeek / population) * 100000;
   const casesPer100k = (casesData.data / population) * 100000;
+  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1));
+  const yesterdayIncidence = germanFixIncidence.data[0].history.find(
+    (entry) => entry.date.getTime() == yesterdayDate.getTime()
+  ).weekIncidence;
 
   return {
     cases: casesData.data,
@@ -101,10 +111,12 @@ export async function GermanyResponse(): Promise<GermanyData> {
     weekIncidence,
     casesPer100k,
     casesPerWeek,
+    deathsPerWeek,
     delta: {
       cases: newCasesData.data,
       deaths: newDeathsData.data,
       recovered: newRecoveredData.data,
+      weekIncidence: limit(weekIncidence - yesterdayIncidence, 12),
     },
     r: {
       value: rData.data.rValue4Days.value, // legacy
@@ -348,9 +360,7 @@ export async function GermanyFrozenIncidenceHistoryResponse(
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
-    if (historyData.abbreviation == null) {
-      historyData.abbreviation = "Bund";
-      historyData.name = "Bundesgebiet";
+    if (historyData.abbreviation == "Bund") {
       data = historyData;
     }
   });
