@@ -17,7 +17,11 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import { getStateAbbreviationById, getStateNameByAbbreviation, getStateIdByName } from "../utils";
+import {
+  getStateAbbreviationById,
+  getStateNameByAbbreviation,
+  getStateIdByName,
+} from "../utils";
 
 export enum mapTypes {
   map,

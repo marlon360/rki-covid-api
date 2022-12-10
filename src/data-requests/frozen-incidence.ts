@@ -303,7 +303,7 @@ async function finalizeData(
   requestType: RequestTypeParameter,
   paramKey: string,
   paramDays?: number,
-  paramDate?: Date,
+  paramDate?: Date
 ) {
   // The Excel sheet with fixed incidence data is only updated on mondays
   // check witch date is the last date in history
@@ -392,7 +392,9 @@ async function finalizeData(
 
   // filter by days || date
   if (paramDays || paramDate) {
-    const reference_date = paramDays ? new Date(getDateBefore(paramDays)) : new Date(paramDate);
+    const reference_date = paramDays
+      ? new Date(getDateBefore(paramDays))
+      : new Date(paramDate);
     actualData.data = actualData.data.map((entry) => {
       if (paramDays) {
         entry.history = entry.history.filter(
@@ -400,7 +402,8 @@ async function finalizeData(
         );
       } else {
         entry.history = entry.history.filter(
-          (element) => new Date(element.date).getTime() == reference_date.getTime()
+          (element) =>
+            new Date(element.date).getTime() == reference_date.getTime()
         );
       }
       return entry;
