@@ -43,14 +43,11 @@ import {
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
-  DistrictsLegendMapResponse,
   DistrictsMapResponse,
   DistrictsHistoryMapResponse,
   IncidenceColorsResponse,
-  StatesHospitalizationLegendMapResponse,
   StatesHospitalizationMapResponse,
   StatesHospitalizationHistoryMapResponse,
-  StatesLegendMapResponse,
   StatesMapResponse,
   StatesHistoryMapResponse,
   mapTypes,
@@ -957,7 +954,7 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const response = await DistrictsLegendMapResponse();
+    const response = await DistrictsMapResponse(mapTypes.legendMap);
     res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
@@ -1014,7 +1011,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse();
+    const response = await StatesMapResponse(mapTypes.legendMap);
     res.send(response);
   }
 );
@@ -1049,7 +1046,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationLegendMapResponse();
+    const response = await StatesHospitalizationMapResponse(mapTypes.legendMap);
     res.send(response);
   }
 );

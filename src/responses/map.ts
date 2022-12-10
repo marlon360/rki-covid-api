@@ -17,7 +17,7 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
+import { getStateAbbreviationById, getStateNameByAbbreviation, getStateIdByName } from "../utils";
 
 export enum mapTypes {
   map,
@@ -130,7 +130,7 @@ export async function DistrictsHistoryMapResponse(
   });
   if (check == districtsIncidenceHistory.data.length) {
     throw new Error(
-      `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden wöchentlich Montags aktualisiert. Letzte Aktualisierung: ${districtsIncidenceHistory.lastUpdate}`
+      `Das Datum ${dateString} ist zu weit in der Vergangenheit!`
     );
   }
 
@@ -194,14 +194,14 @@ export async function StatesHistoryMapResponse(
   });
   if (check == statesIncidenceHistory.data.length) {
     throw new Error(
-      `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Incidence Daten des RKI werden wöchentlich Montags aktualisiert. Letzte Aktualisierung: ${statesIncidenceHistory.lastUpdate}`
+      `Das Datum ${dateString} ist zu weit in der Vergangenheit!`
     );
   }
 
   // create hashmap for faster access
   const statesIncidenceHistoryDataHashMap = statesIncidenceHistory.data.reduce(
     function (map, obj) {
-      map[obj.id] = obj;
+      map[getStateIdByName(obj.name)] = obj;
       return map;
     },
     {}

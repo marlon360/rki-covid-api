@@ -300,9 +300,10 @@ async function finalizeData(
   actualData: { lastUpdate: Date; data: FrozenIncidenceData[] },
   archiveData: { lastUpdate: Date; data: FrozenIncidenceData[] },
   metaLastFileDate: Date,
-  paramDays: number,
+  requestType: RequestTypeParameter,
   paramKey: string,
-  requestType: RequestTypeParameter
+  paramDays?: number,
+  paramDate?: Date,
 ) {
   // The Excel sheet with fixed incidence data is only updated on mondays
   // check witch date is the last date in history
@@ -389,13 +390,19 @@ async function finalizeData(
     );
   }
 
-  // filter by days
-  if (paramDays) {
-    const reference_date = new Date(getDateBefore(paramDays));
+  // filter by days || date
+  if (paramDays || paramDate) {
+    const reference_date = paramDays ? new Date(getDateBefore(paramDays)) : new Date(paramDate);
     actualData.data = actualData.data.map((entry) => {
-      entry.history = entry.history.filter(
-        (element) => new Date(element.date) > reference_date
-      );
+      if (paramDays) {
+        entry.history = entry.history.filter(
+          (element) => new Date(element.date) > reference_date
+        );
+      } else {
+        entry.history = entry.history.filter(
+          (element) => new Date(element.date).getTime() == reference_date.getTime()
+        );
+      }
       return entry;
     });
   }
@@ -423,7 +430,8 @@ async function CleanupRedisCache(
 
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
-  ags?: string
+  ags?: string,
+  date?: Date
 ): Promise<ResponseData<FrozenIncidenceData[]>> {
   const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
@@ -451,9 +459,10 @@ export async function getDistrictsFrozenIncidenceHistory(
     actual,
     archive,
     metaLastFileDate,
-    days,
+    ActualDistricts,
     ags,
-    ActualDistricts
+    days,
+    date
   );
 
   await CleanupRedisCache(actual.lastUpdate, ActualDistricts);
@@ -466,7 +475,8 @@ export async function getDistrictsFrozenIncidenceHistory(
 
 export async function getStatesFrozenIncidenceHistory(
   days?: number,
-  abbreviation?: string
+  abbreviation?: string,
+  date?: Date
 ): Promise<ResponseData<FrozenIncidenceData[]>> {
   const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
     RkiFrozenIncidenceHistoryPromise.bind({
@@ -494,9 +504,10 @@ export async function getStatesFrozenIncidenceHistory(
     actual,
     archive,
     metaLastFileDate,
-    days,
+    ActualStates,
     abbreviation,
-    ActualStates
+    days,
+    date
   );
 
   await CleanupRedisCache(actual.lastUpdate, ActualStates);
