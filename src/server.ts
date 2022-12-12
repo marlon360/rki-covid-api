@@ -43,15 +43,16 @@ import {
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
-  DistrictsLegendMapResponse,
   DistrictsMapResponse,
+  DistrictsHistoryMapResponse,
   IncidenceColorsResponse,
-  StatesHospitalizationLegendMapResponse,
   StatesHospitalizationMapResponse,
-  StatesLegendMapResponse,
+  StatesHospitalizationHistoryMapResponse,
   StatesMapResponse,
+  StatesHistoryMapResponse,
+  mapTypes,
 } from "./responses/map";
-import { RKIError } from "./utils";
+import { RKIError, checkDateParameterForMaps } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: 1800,
@@ -934,12 +935,42 @@ app.get(
 );
 
 app.get(
+  "/map/districts/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await DistrictsHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/districts-legend",
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const response = await DistrictsMapResponse(mapTypes.legendMap);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/districts-legend/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await DistrictsHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
@@ -960,12 +991,42 @@ app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
 });
 
 app.get(
+  "/map/states/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/states-legend",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse();
+    const response = await StatesMapResponse(mapTypes.legendMap);
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states-legend/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
@@ -985,7 +1046,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationLegendMapResponse();
+    const response = await StatesHospitalizationMapResponse(mapTypes.legendMap);
     res.send(response);
   }
 );
@@ -997,6 +1058,36 @@ app.get(
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
     const response = await StatesHospitalizationMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states-legend/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHospitalizationHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHospitalizationHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );

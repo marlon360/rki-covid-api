@@ -30,6 +30,46 @@ Returns a Heatmap (PNG) of week incidences for districts with a legend and headl
 
 <img alt="districts legend map" src="https://api.corona-zahlen.org/map/districts-legend" width="300">
 
+## `/map/districts/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for districts for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/districts/history/2021-11-01`
+[Open](/map/districts/history/2021-11-01)
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
+### Response
+
+<img alt="districts history map" src="https://api.corona-zahlen.org/map/districts/history/2021-11-01" width="300">
+
+## `/map/districts-legend/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for districts with a legend and headline for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/districts-legend/history/30`
+[Open](/map/districts-legend/history/30)
+
+### Response
+
+<img alt="districts legend history map" src="https://api.corona-zahlen.org/map/districts-legend/history/30" width="300">
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
 ## `/map/districts/legend`
 
 Returns the incident ranges for the colors.
@@ -129,6 +169,46 @@ Returns a Heatmap (PNG) of week incidences for states with a legend and headline
 
 <img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend" width="300">
 
+## `/map/districts/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for states for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states/history/2021-11-01`
+[Open](/map/states/history/2021-11-01)
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
+### Response
+
+<img alt="states history map" src="https://api.corona-zahlen.org/map/states/history/2021-11-01" width="300">
+
+## `/map/states-legend/history/:date`
+
+Returns a Heatmap (PNG) of week incidences for states with a legend and headline for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states-legend/history/30`
+[Open](/map/states-legend/history/30)
+
+### Response
+
+<img alt="states history legend map" src="https://api.corona-zahlen.org/map/states-legend/history/30" width="300">
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
 ## `/map/states/legend`
 
 Returns the incident ranges for the colors.
@@ -213,7 +293,7 @@ Returns a Heatmap (PNG) of hospitalization incidences for states.
 
 ### Response
 
-<img alt="states legend map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
+<img alt="states hospitalization map" src="https://api.corona-zahlen.org/map/states/hospitalization" width="300">
 
 ## `/map/states-legend/hospitalization`
 
@@ -226,4 +306,44 @@ Returns a Heatmap (PNG) of hospitalization incidences for states with a legend a
 
 ### Response
 
-<img alt="states legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">
+<img alt="states legend hospitalization map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization" width="300">
+
+## `/map/states/hospitalization/history/:date`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states/hospitalization/history/2021-11-01`
+[Open](/map/states/hospitalization/history/2021-11-01)
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |
+
+### Response
+
+<img alt="states hospitalization history map" src="https://api.corona-zahlen.org/map/states/hospitalization/history/2021-11-01" width="300">
+
+## `/map/states-legend/hospitalization/history/:date`
+
+Returns a Heatmap (PNG) of hospitalization incidences for states with a legend and headline for a specific date or x days in the past.
+
+### Request
+
+`GET https://api.corona-zahlen.org/map/states-legend/hospitalization/history/30`
+[Open](/map/states-legend/hospitalization/history/30)
+
+### Response
+
+<img alt="states hospitalization history legend map" src="https://api.corona-zahlen.org/map/states-legend/hospitalization/history/30" width="300">
+
+**Parameters**
+
+| Parameter | Description                              |
+| --------- | ---------------------------------------- |
+| :date     | a date in the past format: YYYY-MM-DD or |
+| :date     | Number of days in the past from today    |

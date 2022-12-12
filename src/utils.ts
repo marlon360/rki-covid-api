@@ -246,6 +246,23 @@ export class RKIError extends Error {
   }
 }
 
+export function checkDateParameterForMaps(parmsDate: string) {
+  let dateString: string;
+  // Parametercheck
+  if (
+    parmsDate.match(/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/) &&
+    !(new Date(parmsDate).getTime() > new Date().getTime())
+  ) {
+    dateString = parmsDate;
+  } else if (parmsDate.match(/^[0-9]+$/) && !isNaN(parseInt(parmsDate))) {
+    dateString = getDateBefore(parseInt(parmsDate));
+  } else {
+    throw new Error(
+      `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${parmsDate} überprüfen.`
+    );
+  }
+  return dateString;
+}
 export function parseDate(dateString: string): Date {
   const parts = dateString.split(",");
   const dateParts = parts[0].split(".");
@@ -315,7 +332,7 @@ export enum RequestType {
 }
 
 export enum RegionType {
-  distrits = "ags",
+  districts = "ags",
   states = "id",
 }
 
@@ -329,9 +346,9 @@ export function fill0CasesDays(
   const targetData = {};
   for (const historyData of sourceData.data) {
     const regionKey =
-      regionType == "id"
-        ? getStateAbbreviationById(historyData.id)
-        : historyData.ags;
+      regionType == RegionType.states
+        ? getStateAbbreviationById(historyData[regionType])
+        : historyData[regionType];
     if (!targetData[regionKey]) {
       targetData[regionKey] = {
         [regionType]: historyData[regionType],
@@ -375,7 +392,7 @@ export function fill0CasesDays(
       date: historyData.date,
     });
   }
-  // now fill top dates to highDate (datenstand -1) for each ags
+  // now fill top dates to highDate (datenstand -1) for each regionKey
   for (const regionKey of Object.keys(targetData)) {
     while (
       targetData[regionKey].history[targetData[regionKey].history.length - 1]
