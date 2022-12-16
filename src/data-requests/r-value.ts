@@ -9,9 +9,15 @@ export interface RValueHistoryEntry {
   date: Date;
 }
 
-function sumInterval (data: unknown[], startRow: number, intervalStart:number, intervalEnd: number, fieldName: string): number {
+function sumInterval(
+  data: unknown[],
+  startRow: number,
+  intervalStart: number,
+  intervalEnd: number,
+  fieldName: string
+): number {
   let sum = 0;
-  for (let offset = intervalStart; offset <= intervalEnd; offset++){
+  for (let offset = intervalStart; offset <= intervalEnd; offset++) {
     sum += data[startRow - offset][fieldName];
   }
   return sum;
@@ -22,7 +28,7 @@ const rValueDataUrl =
 
 const rValueMetaUrl =
   "https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json";
-  
+
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {
     value: number;
@@ -42,7 +48,7 @@ function parseRValue(data: ArrayBuffer): {
   // since 2021-07-17 the RKI no longer provide the 4-day-r-value
   // so that the value has to be calculated
   // R_Wert[t] <- sum(data$NeuErkr[t-0:3]) / sum(data$NeuErkr[t-4:7])
-  
+
   // sum of the daily cases in the last 4 days
   const numerator = sumInterval(json, latestIndex, 0, 3, "PS_COVID_Faelle");
   // sum of four daily cases 4 days ago
@@ -50,7 +56,7 @@ function parseRValue(data: ArrayBuffer): {
   const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
   // the 7-day r-value is always one day before the 4-day r-value!
-  const rValue7DaysDate = new Date(json[latestIndex -1]["Datum"]);
+  const rValue7DaysDate = new Date(json[latestIndex - 1]["Datum"]);
   const rValue7Days = json[latestIndex - 1]["PS_7_Tage_R_Wert"];
 
   return {
@@ -66,7 +72,9 @@ function parseRValue(data: ArrayBuffer): {
 }
 
 export async function getRValue() {
-  const response = await axios.get(rValueDataUrl, {responseType: "arraybuffer"});
+  const response = await axios.get(rValueDataUrl, {
+    responseType: "arraybuffer",
+  });
   const data = response.data;
   const rData = parseRValue(data);
   const meta = await axios.get(rValueMetaUrl);
@@ -102,7 +110,8 @@ export async function getRValueHistory(
     const numerator = sumInterval(json, index, 0, 3, "PS_COVID_Faelle");
     // sum of four daily cases 4 days ago
     const denominator = sumInterval(json, index, 4, 7, "PS_COVID_Faelle");
-    json[index]["rValue4Days"] = Math.round((numerator / denominator) * 100) / 100;
+    json[index]["rValue4Days"] =
+      Math.round((numerator / denominator) * 100) / 100;
   }
   let history: RValueHistoryEntry[] = json.map((row) => {
     return {
@@ -114,7 +123,7 @@ export async function getRValueHistory(
   // the first 4 entries are always null
   history = history.slice(4);
 
-  if (days != null) {
+  if (days) {
     const reference_date = new Date(getDateBefore(days));
     history = history.filter((element) => element.date > reference_date);
   }
