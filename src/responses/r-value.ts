@@ -1,8 +1,8 @@
 import { IResponseMeta, ResponseMeta } from "./meta";
-import { getRValueHistory, RValueEntry } from "../data-requests/r-value";
+import { getRValueHistory, RValueHistoryEntry } from "../data-requests/r-value";
 
 interface RValueHistoryData extends IResponseMeta {
-  data: RValueEntry[];
+  data: RValueHistoryEntry[];
 }
 
 export async function RValueHistoryHistoryResponse(

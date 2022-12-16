@@ -3,16 +3,18 @@ import XLSX from "xlsx";
 import { getDateBefore, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
-export interface RValueEntry {
+export interface RValueHistoryEntry {
   rValue4Days: number;
   rValue7Days: number;
   date: Date;
 }
 
-export interface RowRValueEntry {
-  cases: number;
-  rValue7Days: number;
-  date: Date;
+function sumInterval (data: unknown[], startRow: number, intervalStart:number, intervalEnd: number, fieldName: string): number {
+  let sum = 0;
+  for (let offset = intervalStart; offset <= intervalEnd; offset++){
+    sum += data[startRow - offset][fieldName];
+  }
+  return sum;
 }
 
 const rValueDataUrl =
@@ -30,36 +32,26 @@ function parseRValue(data: ArrayBuffer): {
     value: number;
     date: Date;
   };
-} | RValueEntry {
-  var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
+} | null {
+  const workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const json = XLSX.utils.sheet_to_json(sheet);
 
-  const latestEntry = json[json.length - 1];
-  const rValue4DaysDateString = latestEntry["Datum"];
+  const latestIndex = json.length - 1;
+  const rValue4DaysDate = new Date(json[latestIndex]["Datum"]);
   // since 2021-07-17 the RKI no longer provide the 4-day-r-value
   // so that the value has to be calculated
-
+  // R_Wert[t] <- sum(data$NeuErkr[t-0:3]) / sum(data$NeuErkr[t-4:7])
+  
   // sum of the daily cases in the last 4 days
-  let numerator = 0;
-  for (let offset = 1; offset < 5; offset++) {
-    numerator += json[json.length - offset]["PS_COVID_Faelle"];
-  }
-
+  const numerator = sumInterval(json, latestIndex, 0, 3, "PS_COVID_Faelle");
   // sum of four daily cases 4 days ago
-  let denominator = 0;
-  for (let offset = 5; offset < 9; offset++) {
-    denominator += json[json.length - offset]["PS_COVID_Faelle"];
-  }
+  const denominator = sumInterval(json, latestIndex, 4, 7, "PS_COVID_Faelle");
   const rValue4Days = Math.round((numerator / denominator) * 100) / 100;
 
   // the 7-day r-value is always one day before the 4-day r-value!
-  const entry = json[json.length - 2];
-  const rValue7DaysDateString = entry["Datum"];
-  const rValue7Days = entry["PS_7_Tage_R_Wert"];
-
-  const rValue4DaysDate = new Date(rValue4DaysDateString);
-  const rValue7DaysDate = new Date(rValue7DaysDateString);
+  const rValue7DaysDate = new Date(json[latestIndex -1]["Datum"]);
+  const rValue7Days = json[latestIndex - 1]["PS_7_Tage_R_Wert"];
 
   return {
     rValue4Days: {
@@ -84,17 +76,9 @@ export async function getRValue() {
   };
 }
 
-function parseRValueRow(row: unknown): RowRValueEntry | null {
-  return {
-    cases: row["PS_COVID_Faelle"],
-    rValue7Days: row["PS_7_Tage_R_Wert"],
-    date: new Date(row["Datum"]),
-  };
-}
-
 export async function getRValueHistory(
   days?: number
-): Promise<ResponseData<RValueEntry[]>> {
+): Promise<ResponseData<RValueHistoryEntry[]>> {
   const response = await axios.get(rValueDataUrl, {
     responseType: "arraybuffer",
   });
@@ -105,8 +89,28 @@ export async function getRValueHistory(
   const meta = await axios.get(rValueMetaUrl);
   const lastUpdate = new Date(meta.data.publication_date);
 
-  let history: RValueEntry[] = data.map((row) => parseRValueRow(row));
+  const workbook = XLSX.read(data, { type: "buffer", cellDates: true });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  let json = XLSX.utils.sheet_to_json(sheet);
 
+  // since 2021-07-17 the RKI no longer provide the 4-day-r-value
+  // so that the value has to be calculated
+  // R_Wert[t] <- sum(data$NeuErkr[t-0:3]) / sum(data$NeuErkr[t-4:7])
+
+  for (let index = json.length - 1; index >= 7; index--) {
+    // sum of the daily cases in the last 4 days
+    const numerator = sumInterval(json, index, 0, 3, "PS_COVID_Faelle");
+    // sum of four daily cases 4 days ago
+    const denominator = sumInterval(json, index, 4, 7, "PS_COVID_Faelle");
+    json[index]["rValue4Days"] = Math.round((numerator / denominator) * 100) / 100;
+  }
+  let history: RValueHistoryEntry[] = json.map((row) => {
+    return {
+      rValue7Days: row["PS_7_Tage_R_Wert"],
+      rValue4Days: row["rValue4Days"],
+      date: new Date(row["Datum"]),
+    };
+  });
   // the first 4 entries are always null
   history = history.slice(4);
 
