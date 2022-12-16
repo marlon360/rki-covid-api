@@ -1,6 +1,26 @@
 import axios from "axios";
 import XLSX from "xlsx";
+import { getDateBefore, RKIError } from "../utils";
+import { ResponseData } from "./response-data";
 
+export interface RValueEntry {
+  rValue4Days: number;
+  rValue7Days: number;
+  date: Date;
+}
+
+export interface RowRValueEntry {
+  cases: number;
+  rValue7Days: number;
+  date: Date;
+}
+
+const rValueDataUrl =
+  "https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv";
+
+const rValueMetaUrl =
+  "https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json";
+  
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {
     value: number;
@@ -10,7 +30,7 @@ function parseRValue(data: ArrayBuffer): {
     value: number;
     date: Date;
   };
-} | null {
+} | RValueEntry {
   var workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];
   const json = XLSX.utils.sheet_to_json(sheet);
@@ -54,19 +74,49 @@ function parseRValue(data: ArrayBuffer): {
 }
 
 export async function getRValue() {
-  const response = await axios.get(
-    `https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv`,
-    {
-      responseType: "arraybuffer",
-    }
-  );
+  const response = await axios.get(rValueDataUrl, {responseType: "arraybuffer"});
   const data = response.data;
   const rData = parseRValue(data);
-  const meta = await axios.get(
-    `https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json`
-  );
+  const meta = await axios.get(rValueMetaUrl);
   return {
     data: rData,
     lastUpdate: new Date(meta.data.publication_date),
+  };
+}
+
+function parseRValueRow(row: unknown): RowRValueEntry | null {
+  return {
+    cases: row["PS_COVID_Faelle"],
+    rValue7Days: row["PS_7_Tage_R_Wert"],
+    date: new Date(row["Datum"]),
+  };
+}
+
+export async function getRValueHistory(
+  days?: number
+): Promise<ResponseData<RValueEntry[]>> {
+  const response = await axios.get(rValueDataUrl, {
+    responseType: "arraybuffer",
+  });
+  const data = response.data;
+  if (data.error) {
+    throw new RKIError(data.error, response.config.url);
+  }
+  const meta = await axios.get(rValueMetaUrl);
+  const lastUpdate = new Date(meta.data.publication_date);
+
+  let history: RValueEntry[] = data.map((row) => parseRValueRow(row));
+
+  // the first 4 entries are always null
+  history = history.slice(4);
+
+  if (days != null) {
+    const reference_date = new Date(getDateBefore(days));
+    history = history.filter((element) => element.date > reference_date);
+  }
+
+  return {
+    data: history,
+    lastUpdate: lastUpdate,
   };
 }
