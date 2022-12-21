@@ -231,7 +231,7 @@ export async function StatesHistoryMapResponse(
   if (mapType == mapTypes.legendMap) {
     return sharp(
       getMapBackground(
-        "7-Tage-Inzidenz der Landkreise",
+        "7-Tage-Inzidenz der Bundesländer",
         date,
         weekIncidenceColorRanges
       )
