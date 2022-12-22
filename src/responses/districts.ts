@@ -15,7 +15,6 @@ import {
   AddDaysToDate,
   getDayDifference,
   getStateAbbreviationByName,
-  ParamError,
 } from "../utils";
 import {
   DistrictsFrozenIncidenceData,
@@ -85,7 +84,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     };
   });
 
-  if (ags) {
+  if (ags != null) {
     districts = districts.filter((districts) => {
       return districts.ags == ags;
     });
@@ -118,6 +117,11 @@ export async function DistrictsCasesHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
 
   const data: DistrictsCasesHistory = {};
@@ -169,8 +173,14 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+
   // add 6 days to calculate week incidence
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
@@ -262,6 +272,11 @@ export async function DistrictsDeathsHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
 
   const data: DistrictsDeathsHistory = {};
@@ -313,6 +328,11 @@ export async function DistrictsRecoveredHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
 
   const data: DistrictsRecoveredHistory = {};
