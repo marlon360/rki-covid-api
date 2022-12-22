@@ -1,5 +1,9 @@
+import axios from "axios";
+
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
+    case 0:
+      return "Bund";
     case 1:
       return "SH";
     case 2:
@@ -39,6 +43,8 @@ export function getStateAbbreviationById(id: number): string | null {
 
 export function getStateIdByAbbreviation(abbreviation: string): number | null {
   switch (abbreviation) {
+    case "Bund":
+      return 0;
     case "SH":
       return 1;
     case "HH":
@@ -110,6 +116,8 @@ export function getStateAbbreviationByName(name: string): string | null {
       return "SH";
     case "Thüringen":
       return "TH";
+    case "Bundesgebiet":
+      return "Bund";
     default:
       return null;
   }
@@ -151,6 +159,8 @@ export function getStateNameByAbbreviation(
       return "Schleswig-Holstein";
     case "TH":
       return "Thüringen";
+    case "Bund":
+      return "Bundesgebiet";
     default:
       return null;
   }
@@ -190,6 +200,8 @@ export function getStateIdByName(name: string): number | null {
       return 1;
     case "Thüringen":
       return 16;
+    case "Bundesgebiet":
+      return 0;
     default:
       return null;
   }
@@ -232,4 +244,215 @@ export class RKIError extends Error {
     this.rkiError = error;
     this.url = url;
   }
+}
+
+export function checkDateParameterForMaps(parmsDate: string) {
+  let dateString: string;
+  // Parametercheck
+  if (
+    parmsDate.match(/^\d{4}\-(0[1-9]|1[012])\-(0[1-9]|[12][0-9]|3[01])$/) &&
+    !(new Date(parmsDate).getTime() > new Date().getTime())
+  ) {
+    dateString = parmsDate;
+  } else if (parmsDate.match(/^[0-9]+$/) && !isNaN(parseInt(parmsDate))) {
+    dateString = getDateBefore(parseInt(parmsDate));
+  } else {
+    throw new Error(
+      `Parameter bitte in der Form "JJJJ-MM-TT" wobei "JJJJ-MM-TT" < heute, oder als Ganzzahl Tage in die Vergangenheit angeben. ${parmsDate} überprüfen.`
+    );
+  }
+  return dateString;
+}
+export function parseDate(dateString: string): Date {
+  const parts = dateString.split(",");
+  const dateParts = parts[0].split(".");
+  const timeParts = parts[1].replace("Uhr", "").split(":");
+  return new Date(
+    parseInt(dateParts[2]),
+    parseInt(dateParts[1]) - 1,
+    parseInt(dateParts[0]),
+    parseInt(timeParts[0]),
+    parseInt(timeParts[1])
+  );
+}
+
+export async function getAlternateDataSource(url: string, blId?: string) {
+  // If a specific table is given download this state data only
+  let stateIdList = [];
+  for (let id = 1; id <= 16; id++) {
+    stateIdList[id - 1] = id.toString().padStart(2, "0");
+  }
+  if (blId && stateIdList.includes(blId)) {
+    url = url.replace("Covid19_hubv", `Covid19_${blId}_hubv`);
+    const response = await axios.get(url);
+    var data = response.data;
+  }
+  // else download all 16 state data
+  else {
+    const blPromises = [];
+    // build Promises
+    for (let i = 0; i <= 15; i++) {
+      const id = (i + 1).toString().padStart(2, "0");
+      const blUrl = url.replace("Covid19_hubv", `Covid19_${id}_hubv`);
+      blPromises[i] = axios.get(blUrl).then((response) => {
+        return response.data;
+      });
+    }
+    const blData = await Promise.all(blPromises);
+    var data = blData[0];
+    for (let i = 1; i <= 15; i++) {
+      // append the data
+      // 3 times faster than the for loop
+      data.features.push.apply(data.features, blData[i].features);
+    }
+  }
+  return data;
+}
+
+export function shouldUseAlternateDataSource(
+  datenstand: Date,
+  exceededTransferLimit = false
+): boolean {
+  const now = new Date();
+  const nowTime = now.getTime();
+  const actualDate = now.setHours(0, 0, 0, 0);
+  const threeOclock = now.setHours(3, 30, 0, 0); // after 3:30 GMT the RKI data update should be done
+  const datenstandMs = datenstand.getTime();
+  return (
+    exceededTransferLimit ||
+    actualDate - datenstandMs > 24 * 60 * 60000 ||
+    (datenstandMs != actualDate && nowTime > threeOclock)
+  );
+}
+
+export enum RequestType {
+  cases = "cases",
+  recovered = "recovered",
+  deaths = "deaths",
+}
+
+export enum RegionType {
+  districts = "ags",
+  states = "id",
+}
+
+export function fill0CasesDays(
+  sourceData: any,
+  lowDate: Date,
+  highDate: Date,
+  regionType: RegionType,
+  requestType: RequestType
+) {
+  const targetData = {};
+  for (const historyData of sourceData.data) {
+    const regionKey =
+      regionType == RegionType.states
+        ? getStateAbbreviationById(historyData[regionType])
+        : historyData[regionType];
+    if (!targetData[regionKey]) {
+      targetData[regionKey] = {
+        [regionType]: historyData[regionType],
+        name: historyData.name,
+        history: [],
+      };
+    }
+    // if history is empty and lowDate is missing insert lowDate
+    if (
+      historyData.date > lowDate &&
+      targetData[regionKey].history.length == 0
+    ) {
+      targetData[regionKey].history.push({
+        [requestType]: 0,
+        date: lowDate,
+      });
+    }
+    if (targetData[regionKey].history.length > 0) {
+      const nextDate: Date = historyData.date;
+      while (
+        getDayDifference(
+          nextDate,
+          targetData[regionKey].history[
+            targetData[regionKey].history.length - 1
+          ].date
+        ) > 1
+      ) {
+        targetData[regionKey].history.push({
+          [requestType]: 0,
+          date: AddDaysToDate(
+            targetData[regionKey].history[
+              targetData[regionKey].history.length - 1
+            ].date,
+            1
+          ),
+        });
+      }
+    }
+    targetData[regionKey].history.push({
+      [requestType]: historyData[requestType],
+      date: historyData.date,
+    });
+  }
+  // now fill top dates to highDate (datenstand -1) for each regionKey
+  for (const regionKey of Object.keys(targetData)) {
+    while (
+      targetData[regionKey].history[targetData[regionKey].history.length - 1]
+        .date < highDate
+    ) {
+      targetData[regionKey].history.push({
+        [requestType]: 0,
+        date: AddDaysToDate(
+          targetData[regionKey].history[
+            targetData[regionKey].history.length - 1
+          ].date,
+          1
+        ),
+      });
+    }
+  }
+  return targetData;
+}
+
+export function fill0CasesDaysGermany(
+  sourceData: any,
+  lowDate: Date,
+  highDate: Date,
+  requestType: RequestType
+) {
+  const targetData = [];
+  for (const historyData of sourceData.history) {
+    // if history is empty and lowDate is missing insert lowDate
+    if (historyData.date > lowDate && targetData.length == 0) {
+      targetData.push({
+        [requestType]: 0,
+        date: lowDate,
+      });
+    }
+    if (targetData.length > 0) {
+      const nextDate = historyData.date;
+      while (
+        getDayDifference(nextDate, targetData[targetData.length - 1].date) > 1
+      ) {
+        targetData.push({
+          [requestType]: 0,
+          date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
+        });
+      }
+    }
+    targetData.push({
+      [requestType]: historyData[requestType],
+      date: historyData.date,
+    });
+  }
+  // now fill top dates to highDate (datenstand -1) for each ags
+  while (targetData[targetData.length - 1].date < highDate) {
+    targetData.push({
+      [requestType]: 0,
+      date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
+    });
+  }
+  return targetData;
+}
+
+export function limit(value: number, decimals: number): number {
+  return parseFloat(value.toFixed(decimals));
 }

@@ -1,13 +1,12 @@
-FROM node:16-alpine3.12
+FROM node:16-alpine3.16
 
 # common build flags
 ENV CFLAGS=-O3
 ENV CXXFLAGS=-O3
 
-ARG VIPS_VERSION=8.11.3
+ARG VIPS_VERSION=8.12.2
 
-# System update, build dependencies, compile vips-8.11.3 and cleanup.
-# Also to npm@6.14.15 is downgraded to prevent warnings and to keep the json-lockfile 
+# System update, build dependencies, compile vips-8.11.x and cleanup.
 RUN set -x -o pipefail \
   && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.gz | tar xzC /tmp \
   && apk update \
@@ -31,9 +30,8 @@ RUN set -x -o pipefail \
                  --disable-static \
                  --disable-dependency-tracking \
                  --enable-silent-rules \
-  && make -s install-strip \
+  && make -sj4 install-strip \
   && cd .. \
-  && npm -g install npm@6.14.15 \
   && rm -rf /tmp/vips-${VIPS_VERSION} \
   && apk del --purge .vips-dependencies \
   && rm -rf /var/cache/apk/*
@@ -59,7 +57,7 @@ RUN apk add --no-cache --virtual .vips-deps build-base binutils zlib-dev libxml2
 # If you are building your code for production
 # RUN npm ci --only=production
 
-RUN npm install pm2 -g
+RUN npm install pm2 --location=global
 
 # Bundle app source
 COPY . .

@@ -26,6 +26,7 @@ import {
   GermanyFrozenIncidenceHistoryResponse,
   GermanyHospitalizationHistoryResponse,
 } from "./responses/germany";
+import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import {
   DistrictsCasesHistoryResponse,
   DistrictsDeathsHistoryResponse,
@@ -33,22 +34,26 @@ import {
   DistrictsResponse,
   DistrictsWeekIncidenceHistoryResponse,
   FrozenIncidenceHistoryResponse,
+  DistrictsAgeGroupsResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
   VaccinationHistoryResponse,
+  VaccinationStatesResponse,
+  VaccinationGermanyResponse,
 } from "./responses/vaccination";
 import { TestingHistoryResponse } from "./responses/testing";
 import {
-  DistrictsLegendMapResponse,
   DistrictsMapResponse,
+  DistrictsHistoryMapResponse,
   IncidenceColorsResponse,
-  StatesHospitalizationLegendMapResponse,
   StatesHospitalizationMapResponse,
-  StatesLegendMapResponse,
+  StatesHospitalizationHistoryMapResponse,
   StatesMapResponse,
+  StatesHistoryMapResponse,
+  mapTypes,
 } from "./responses/map";
-import { RKIError } from "./utils";
+import { RKIError, checkDateParameterForMaps } from "./utils";
 
 const cache = require("express-redis-cache")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
@@ -224,11 +229,33 @@ app.get(
 );
 
 app.get(
+  "/germany/history/rValue",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await RValueHistoryHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
   "/germany/history/hospitalization/:days",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     const response = await GermanyHospitalizationHistoryResponse(
+      parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/rValue/:days",
+  queuedCache(),
+  cache.route(),
+  async (req, res) => {
+    const response = await RValueHistoryHistoryResponse(
       parseInt(req.params.days)
     );
     res.json(response);
@@ -690,6 +717,16 @@ app.get(
 );
 
 app.get(
+  "/districts/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse();
+    res.json(response);
+  }
+);
+
+app.get(
   "/districts/:district",
   queuedCache(),
   cache.route(),
@@ -834,11 +871,51 @@ app.get(
 );
 
 app.get(
+  "/districts/:district/age-groups",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsAgeGroupsResponse(req.params.district);
+    res.json(response);
+  }
+);
+
+app.get(
   "/vaccinations",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     const response = await VaccinationResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/germany",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationGermanyResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/states",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationStatesResponse(req.params.state);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/vaccinations/states/:state",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await VaccinationStatesResponse(req.params.state);
     res.json(response);
   }
 );
@@ -881,12 +958,42 @@ app.get(
 );
 
 app.get(
+  "/map/districts/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await DistrictsHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/districts-legend",
   queuedCache(),
   cache.route(),
   async function (req, res) {
+    const response = await DistrictsMapResponse(mapTypes.legendMap);
     res.setHeader("Content-Type", "image/png");
-    const response = await DistrictsLegendMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/districts-legend/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await DistrictsHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
@@ -907,12 +1014,42 @@ app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
 });
 
 app.get(
+  "/map/states/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
   "/map/states-legend",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesLegendMapResponse();
+    const response = await StatesMapResponse(mapTypes.legendMap);
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states-legend/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
@@ -932,7 +1069,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
-    const response = await StatesHospitalizationLegendMapResponse();
+    const response = await StatesHospitalizationMapResponse(mapTypes.legendMap);
     res.send(response);
   }
 );
@@ -944,6 +1081,36 @@ app.get(
   async function (req, res) {
     res.setHeader("Content-Type", "image/png");
     const response = await StatesHospitalizationMapResponse();
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states-legend/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHospitalizationHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
+    res.send(response);
+  }
+);
+
+app.get(
+  "/map/states/hospitalization/history/:date",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await StatesHospitalizationHistoryMapResponse(
+      mapTypes.map,
+      checkedDateString
+    );
+    res.setHeader("Content-Type", "image/png");
     res.send(response);
   }
 );
@@ -983,7 +1150,7 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
         message: "An error occurred while fetching external data.",
         url: error.config.url,
         details: error.message,
-        stack: error.stack,
+        response: error.response.data,
       },
     });
   } else {

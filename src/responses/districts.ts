@@ -10,16 +10,21 @@ import {
   getLastDistrictRecoveredHistory,
   getDistrictsRecoveredData,
   getNewDistrictRecovered,
+  getDistrictsAgeGroups,
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
-  getDayDifference,
   getStateAbbreviationByName,
+  fill0CasesDays,
+  RequestType,
+  RegionType,
+  limit,
 } from "../utils";
 import {
-  DistrictsFrozenIncidenceData,
+  FrozenIncidenceData,
   getDistrictsFrozenIncidenceHistory,
 } from "../data-requests/frozen-incidence";
+import { AgeGroupsData } from "../data-requests/states";
 
 interface DistrictData extends IDistrictData {
   stateAbbreviation: string;
@@ -30,6 +35,7 @@ interface DistrictData extends IDistrictData {
     cases: number;
     deaths: number;
     recovered: number;
+    weekIncidence: number;
   };
 }
 
@@ -47,12 +53,14 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     districtNewCasesData,
     districtNewDeathsData,
     districtNewRecoveredData,
+    districtsFixIncidence,
   ] = await Promise.all([
     getDistrictsData(),
     getDistrictsRecoveredData(),
     getNewDistrictCases(),
     getNewDistrictDeaths(),
     getNewDistrictRecovered(),
+    getDistrictsFrozenIncidenceHistory(3),
   ]);
 
   function getDistrictByAgs(
@@ -65,7 +73,15 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return null;
   }
 
+  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1));
+
   let districts = districtsData.data.map((district) => {
+    const districtFixHistory = districtsFixIncidence.data.find(
+      (fixEntry) => fixEntry.ags == district.ags
+    ).history;
+    const yesterdayIncidence = districtFixHistory.find(
+      (entry) => entry.date.getTime() == yesterdayDate.getTime()
+    ).weekIncidence;
     return {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
@@ -80,11 +96,16 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
         recovered:
           getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
           0,
+        weekIncidence: limit(
+          (district.casesPerWeek / district.population) * 100000 -
+            yesterdayIncidence,
+          12
+        ),
       },
     };
   });
 
-  if (ags != null) {
+  if (ags) {
     districts = districts.filter((districts) => {
       return districts.ags == ags;
     });
@@ -117,52 +138,32 @@ export async function DistrictsCasesHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
-
-  const data: DistrictsCasesHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 336
+    days = Math.min(days, 336);
+  } else if (!ags) {
+    days = 336;
   }
+  const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set
+  const data: DistrictsCasesHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RegionType.districts,
+    RequestType.cases
+  );
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
@@ -173,18 +174,18 @@ export async function DistrictsWeekIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
 
   // add 6 days to calculate week incidence
-  if (days != null) {
+  if (days) {
     days += 6;
   }
 
-  const statesHistoryData = await getLastDistrictCasesHistory(days, ags);
+  const districtsHistoryData = await DistrictsCasesHistoryResponse(days, ags);
   const districtsData = await getDistrictsData();
 
   function getDistrictByAGS(
@@ -197,47 +198,10 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     return null;
   }
 
-  const data: DistrictsCasesHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          cases: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      cases: historyData.cases,
-      date: new Date(historyData.date),
-    });
-  }
-
   const incidenceData: DistrictsWeekIncidenceHistory = {};
 
-  for (const ags of Object.keys(data)) {
-    const districtHistory = data[ags].history;
+  for (const ags of Object.keys(districtsHistoryData.data)) {
+    const districtHistory = districtsHistoryData.data[ags].history;
     const district = getDistrictByAGS(districtsData, ags);
 
     incidenceData[ags] = {
@@ -261,7 +225,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
 
   return {
     data: incidenceData,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: districtsHistoryData.meta,
   };
 }
 
@@ -272,52 +236,34 @@ export async function DistrictsDeathsHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictDeathsHistory(days, ags);
-
-  const data: DistrictsDeathsHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          deaths: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      deaths: historyData.deaths,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 330
+    days = Math.min(days, 330);
+  } else if (!ags) {
+    days = 330;
   }
+  const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set
+
+  const data: DistrictsDeathsHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RegionType.districts,
+    RequestType.deaths
+  );
+
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
@@ -328,58 +274,40 @@ export async function DistrictsRecoveredHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
-  if (days != null && isNaN(days)) {
+  if (days && isNaN(days)) {
     throw new TypeError(
       "Wrong format for ':days' parameter! This is not a number."
     );
   }
-  const statesHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-
-  const data: DistrictsRecoveredHistory = {};
-
-  for (const historyData of statesHistoryData.data) {
-    if (data[historyData.ags] == null) {
-      data[historyData.ags] = {
-        ags: historyData.ags,
-        name: historyData.name,
-        history: [],
-      };
-    }
-    if (data[historyData.ags].history.length > 0) {
-      const nextDate = new Date(historyData.date);
-      while (
-        getDayDifference(
-          nextDate,
-          data[historyData.ags].history[
-            data[historyData.ags].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        data[historyData.ags].history.push({
-          recovered: 0,
-          date: AddDaysToDate(
-            data[historyData.ags].history[
-              data[historyData.ags].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    data[historyData.ags].history.push({
-      recovered: historyData.recovered,
-      date: new Date(historyData.date),
-    });
+  if (!ags && days) {
+    // if ags is not defined restrict days to 330
+    days = Math.min(days, 330);
+  } else if (!ags) {
+    days = 330;
   }
+  const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
+  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const lowDate = days
+    ? AddDaysToDate(highDate, (days - 1) * -1)
+    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+
+  const data: DistrictsRecoveredHistory = fill0CasesDays(
+    districtsHistoryData,
+    lowDate,
+    highDate,
+    RegionType.districts,
+    RequestType.recovered
+  );
+
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
   };
 }
 
 interface FrozenIncidenceHistoryData extends IResponseMeta {
   data: {
-    [key: string]: DistrictsFrozenIncidenceData;
+    [key: string]: FrozenIncidenceData;
   };
 }
 
@@ -400,5 +328,29 @@ export async function FrozenIncidenceHistoryResponse(
   return {
     data: data,
     meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
+  };
+}
+
+export async function DistrictsAgeGroupsResponse(ags?: string): Promise<{
+  data: AgeGroupsData;
+  meta: ResponseMeta;
+}> {
+  const AgeGroupsData = await getDistrictsAgeGroups(ags);
+
+  const data = {};
+  Object.keys(AgeGroupsData.data).forEach((ags) => {
+    data[ags] = {
+      ...AgeGroupsData.data[ags],
+    };
+    Object.keys(AgeGroupsData.data[ags]).forEach((ageGroup) => {
+      data[ags][ageGroup] = {
+        ...AgeGroupsData.data[ags][ageGroup],
+      };
+    });
+  });
+
+  return {
+    data: data,
+    meta: new ResponseMeta(AgeGroupsData.lastUpdate),
   };
 }

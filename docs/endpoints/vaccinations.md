@@ -9,22 +9,43 @@
 
 ### Response
 
-`administeredVaccinations` The total number of administered vaccine doses (sum of first and second vaccination)
+`administeredVaccinations` The total number of administered vaccine doses (sum of first, second, 1st booster and 2nd booster vaccination)
 
-`latestDailyVaccinations` The most recent entry of the history endpoint. Here, Janssen is counted only as first vaccination.
-Hence, you may use this object to calculate the number of vaccinations on the last report day (see remark!)
+`vaccinated` Number of people who got the first vaccination.
 
-`vaccinated` Number of people who got the first of two vaccinations.
+`vaccination.biontech` Number of people who were vaccinated with BioNTech, trade name: `Comirnaty - BioNTech/Pfizer`
 
-`vaccination.biontech` Number of people who were vaccinated with BioNTech
+`vaccination.moderna` Number of people who were vaccinated with Moderna, trade name: `Spikevax - Moderna`
 
-`vaccination.moderna` Number of people who were vaccinated with Moderna
+`vaccination.astraZeneca` Number of people who were vaccinated with AstraZeneca, trade name: `Vaxzevria - AstraZeneca`
 
-`vaccination.astraZeneca` Number of people who were vaccinated with AstraZeneca
+`vaccination.janssen` Number of people who were vaccinated with Janssen, trade name: `Jcovden - Janssen‑Cilag/Johnson & Johnson`
 
-`vaccination.janssen` Number of people who were vaccinated with Janssen
+`vaccination.novavax` Number of people who were vaccinated with Novavax, trade name: `Nuvaxovid - Novavax`
 
-`delta` New first vaccination compared to yesterday
+`vaccination.valneva` Number of people who were vaccinated with Valneva, trade name: `Valneva - Valneva`
+
+`vaccination.biontechBivalent` Number of people who are vaccinated with biontechBivalent, trade name: `Comirnaty bivalent (Original/Omikron) - BioNTech/Pfizer`
+
+`vacciantion.modernaBivalent` Number of people who are vaccinated with modernaBivalent, trade name: `Spikevax bivalent (Original/Omikron) - Moderna`
+
+`vaccination.deltaBiontech` New first vaccination with biontech vaccine compared to last reporting day
+
+`vaccination.deltaModerna` New first vaccination with moderna vaccine compared to last reporting day
+
+`vaccination.deltaAstraZeneca` New first vaccination with astra zeneca vaccine compared to last reporting day
+
+`vaccination.deltaJanssen` New first vaccination with janssen vaccine compared to last reporting day
+
+`vaccination.deltaNovavax` New first vaccination with novavax vaccine compared to last reporting day
+
+`vaccination.deltaValneva` New first vaccination with valneva vaccine compared to last reporting day
+
+`vaccination.deltaBiontechBivalent` New first vaccination with biontechBivalent vaccine compared to last reporting day
+
+`vacciantion.deltaModernaBivalent` New first vaccination with modernaBivalent vaccine compared to last reporting day
+
+`delta` New first vaccination compared to last reporting day
 
 `quote` Quote of first vaccinated people (legacy)
 
@@ -32,9 +53,15 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `quotes.total` Quote of first vaccinated people (same as `quote`)
 
-`quotes.A12-A17` Quote of first vaccinated people with age >=12 to <=17 years
+`quotes.A05-A17` Quote of first vaccinated people in age-group < 18 years
 
-`quotes.A18+` Quote of first vaccinated people with agegroup >= 18 years
+`quotes.A05-A17.total` Quote of first vaccinated people with age < 18 years
+
+`quotes.A05-A17.A05-A11` Quote of first vaccinated people with age >=5 to <=11 years
+
+`quotes.A05-A17.A12-A17` Quote of first vaccinated people with age >=12 to <=17 years
+
+`quotes.A18+` Quote of first vaccinated people in agegroup >= 18 years
 
 `quotes.A18+.total` Quote of first vaccinated people with age >= 18 years
 
@@ -42,294 +69,408 @@ Hence, you may use this object to calculate the number of vaccinations on the la
 
 `quotes.A18+.A60+` Quote of first vaccinated people with age >= 60 years
 
-`secondVaccination.vaccinated` Number of people who got the second vaccination
+`secondVaccination` as described above
 
-`secondVaccination.delta` New second vaccinations compared to yesterday
+`boostervaccination` as described above
 
-`secondVaccination.quote` Quote of full vaccinated people (legacy)
-
-`secondVaccination.quotes` Quotes of full vaccinated people by agegroups
-
-`secondVaccination.quotes.total` Quote of full vaccinated people (same as `secondVaccination.quote`)
-
-`secondVaccination.quotes.A12-A17` Quote of full vaccinated people with age >=12 to <=17 years
-
-`secondVaccination.quotes.A18+` Quote of full vaccinated people with agegroup >= 18 years
-
-`secondVaccination.quotes.A18+.total` Quote of full vaccinated people with age >= 18 years
-
-`secondVaccination.quotes.A18+.A18-A59` Quote of full vaccinated people with age >= 18 to <= 59 years
-
-`secondVaccination.quotes.A18+.A60+` Quote of full vaccinated people with age >= 60 years
-
-`secondVaccination.vaccination.biontech` Number of people who received their second dose of BioNTech
-
-`secondVaccination.vaccination.moderna` Number of people who received their second dose of Moderna
-
-`secondVaccination.vaccination.astraZeneca` Number of people who received their second dose of AstraZeneca
-
-`boosterVaccination.vaccination.biontech` Number of people who received their booster dose of BioNTech
-
-`boosterVaccination.vaccination.moderna` Number of people who received their booster dose of Moderna
-
-`boosterVaccination.vaccination.janssen` Number of people who received their booster dose of Janssen
-
-`boosterVaccination.delta` New booster vaccinations compared to yesterday
-
-`boosterVaccination.quote` Quote of boostered people (legacy)
-
-`boosterVaccination.quotes` Quotes of boostered people by agegroups
-
-`boosterVaccination.quotes.total` Quote of boostered people (same as `boosterVaccination.quote`)
-
-`boosterVaccination.quotes.A12-A17` Quote of boostered people with age >=12 to <=17 years
-
-`boosterVaccination.quotes.A18+` Quote of boostered people with agegroup >= 18 years
-
-`boosterVaccination.quotes.A18+.total` Quote of boostered people with age >= 18 years
-
-`boosterVaccination.quotes.A18+.A18-A59` Quote of boostered people with age >= 18 to <= 59 years
-
-`boosterVaccination.quotes.A18+.A60+` Quote of boostered people with age >= 60 years
-
-_ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
+`2ndBoosterVaccination` as described above
 
 ```json
 {
-  "data":
-  {
-    "administeredVaccinations":152496126,
-    "vaccinated":61930498,
-    "vaccination":
-    {
-      "biontech":44139701,
-      "moderna":4942335,
-      "astraZeneca":9269166,
-      "janssen":3579296
+  "data": {
+    "administeredVaccinations": 185782727,
+    "vaccinated": 64785920,
+    "vaccination": {
+      "astraZeneca": 9274063,
+      "biontech": 46584833,
+      "janssen": 3711950,
+      "moderna": 5143735,
+      "novavax": 70764,
+      "valneva": 362,
+      "biontechBivalent": 189,
+      "modernaBivalent": 24,
+      "deltaAstraZeneca": 0,
+      "deltaBiontech": 478,
+      "deltaJanssen": 0,
+      "deltaModerna": 36,
+      "deltaNovavax": 43,
+      "deltaValneva": 29,
+      "deltaBiontechBivalent": 11,
+      "deltaModernaBivalent": 0
     },
-    "delta":43404,
-    "quote":0.745,
-    "quotes":
-    {
-      "total":0.745,
-      "A12-A17":0.606,
-      "A18+":
-      {
-        "total":0.846,
-        "A18-A59":0.778,
-        "A60+":0.883
-      }
+    "delta": 597,
+    "quote": 0.778,
+    "quotes": {
+      "total": 0.778,
+      "A05-A17": { "total": 0.46, "A05-A11": 0.222, "A12-A17": 0.744 },
+      "A18+": { "total": 0.868, "A18-A59": 0.847, "A60+": 0.908 }
     },
-    "secondVaccination":
-    {
-      "vaccinated":59574879,
-      "vaccination":
-      {
-        "biontech":46842638,
-        "moderna":5681616,
-        "astraZeneca":3471329
-      },
-      "delta":81268,
-      "quote":0.716,
-      "quotes":
-      {
-        "total":0.716,
-        "A12-A17":0.539,
-        "A18+":
-        {
-          "total":0.823,
-          "A18-A59":0.796,
-          "A60+":0.874
-        }
-      }
+    "secondVaccination": {
+      //...
     },
-    "boosterVaccination":
-    {
-      "vaccinated":34570045,
-      "vaccination":
-      {
-        "biontech":21575727,
-        "moderna":12986294,
-        "janssen":4067
-      },
-      "delta":470517,
-      "quote":0.416,
-      "quotes":
-      {
-        "total":0.416,
-        "A12-A17":0.079,
-        "A18+":
-        {
-          "total":0.493,
-          "A18-A59":0.411,
-          "A60+":0.646
-        }
-      }
+    "boosterVaccination": {
+      //...
     },
-    "latestDailyVaccinations":
-    {
-      "date":"2022-01-06T00:00:00.000Z",
-      "vaccinated":43404,
-      "firstVaccination":43404,
-      "secondVaccination":81268,
-      "boosterVaccination":470517
+    "2ndBoosterVaccination": {
+      //...
     },
-    "states":
-    {
-      "BW":
-      {
-        "name":"Baden-Württemberg",
-        "administeredVaccinations":20047413,
-        "vaccinated":8000730,
-        "vaccination":
-        {
-          "biontech":5728206,
-          "moderna":617589,
-          "astraZeneca":1179235,
-          "janssen":475700
+    "states": {
+      "SH": {
+        "name": "Schleswig-Holstein",
+        "administeredVaccinations": 7173116,
+        "vaccinated": 2355346,
+        "vaccination": {
+          "astraZeneca": 361982,
+          "biontech": 1666077,
+          "janssen": 134445,
+          "moderna": 190472,
+          "novavax": 2356,
+          "valneva": 4,
+          "biontechBivalent": 10,
+          "modernaBivalent": null,
+          "deltaAstraZeneca": 0,
+          "deltaBiontech": 4,
+          "deltaJanssen": 0,
+          "deltaModerna": 0,
+          "deltaNovavax": 2,
+          "deltaValneva": 0,
+          "deltaBiontechBivalent": 0,
+          "deltaModernaBivalent": null
         },
-        "delta":4041,
-        "quote":0.721,
-        "quotes":
-        {
-          "total":0.721,
-          "A12-A17":0.575,
-          "A18+":
-          {
-            "total":0.821,
-            "A18-A59":0.757,
-            "A60+":0.871
-          }
+        "delta": 6,
+        "quote": 0.806,
+        "quotes": {
+          "total": 0.806,
+          "A05-A17": { "total": 0.605, "A05-A11": 0.307, "A12-A17": 0.941 },
+          "A18+": { "total": 0.877, "A18-A59": 0.851, "A60+": 0.923 }
         },
-        "secondVaccination":
-        {
-          "vaccinated":7771045,
-          "vaccination":
-          {
-            "biontech":6176357,
-            "moderna":719509,
-            "astraZeneca":399479
-          },
-          "delta":4035,
-          "quote":0.7,
-          "quotes":
-          {
-            "total":0.7,
-            "A12-A17":0.502,
-            "A18+":
-            {
-              "total":0.808,
-              "A18-A59":0.783,
-              "A60+":0.86
-            }
-          }
+        "secondVaccination": {
+          //...
         },
-        "boosterVaccination":
-        {
-          "vaccinated":4751338,
-          "vaccination":
-          {
-            "biontech":2911520,
-            "moderna":1838534,
-            "janssen":86
-          },
-          "delta":34809,
-          "quote":0.428,
-          "quotes":
-          {
-            "total":0.428,
-            "A12-A17":0.502,
-            "A18+":
-            {
-              "total":0.507,
-              "A18-A59":0.442,
-              "A60+":0.641
-            }
-          }
-        }
+        "boosterVaccination": {
+          //...
+        },
+        "2ndBoosterVaccination": {
+          //...
       },
       ...
-      "Bund":
-      {
-        "name":"Bundesressorts",
-        "administeredVaccinations":484493,
-        "vaccinated":200288,
-        "vaccination":
-        {
-          "biontech":88672,
-          "moderna":83224,
-          "astraZeneca":20255,
-          "janssen":8137
+      "TH": {
+        "name": "Thüringen",
+        "administeredVaccinations": 4177743,
+        "vaccinated": 1507818,
+        "vaccination": {
+          "astraZeneca": 171180,
+          "biontech": 1096432,
+          "janssen": 95976,
+          "moderna": 141261,
+          "novavax": 2967,
+          "valneva": 2,
+          "biontechBivalent": null,
+          "modernaBivalent": null,
+          "deltaAstraZeneca": 0,
+          "deltaBiontech": 3,
+          "deltaJanssen": 0,
+          "deltaModerna": 0,
+          "deltaNovavax": 0,
+          "deltaValneva": 0,
+          "deltaBiontechBivalent": null,
+          "deltaModernaBivalent": null
         },
-        "delta":45,
-        "quote":null,
-        "quotes":
-        {
-          "total":null,
-          "A12-A17":null,
-          "A18+":
-          {
-            "total":null,
-            "A18-A59":null,
-            "A60+":null
-          }
+        "delta": 3,
+        "quote": 0.715,
+        "quotes": {
+          "total": 0.715,
+          "A05-A17": { "total": 0.306, "A05-A11": 0.114, "A12-A17": 0.542 },
+          "A18+": { "total": 0.804, "A18-A59": 0.752, "A60+": 0.876 }
         },
-        "secondVaccination":
-        {
-          "vaccinated":190434,
-          "vaccination":
-          {
-            "biontech":85832,
-            "moderna":86628,
-            "astraZeneca":9837
-          },
-          "delta":145,
-          "quote":null,
-          "quotes":
-          {
-            "total":null,
-            "A12-A17":null,
-            "A18+":
-            {
-              "total":null,
-              "A18-A59":null,
-              "A60+":null
-            }
-          }
+        "secondVaccination": {
+          //...
         },
-        "boosterVaccination":
-        {
-          "vaccinated":101908,
-          "vaccination":
-          {
-            "biontech":74195,
-            "moderna":27695,
-            "janssen":2
-          },
-          "delta":1135,
-          "quote":null,
-          "quotes":
-          {
-            "total":null,
-            "A12-A17":null,
-            "A18+":
-            {
-              "total":null,
-              "A18-A59":null,
-              "A60+":null
-            }
-          }
-        }
+        "boosterVaccination": {
+          //...
+        },
+        "2ndBoosterVaccination": {
+          //...
+      },
+      "Bund": {
+        "name": "Bundesressorts",
+        "administeredVaccinations": 537244,
+        "vaccinated": 202070,
+        "vaccination": {
+          "astraZeneca": 20400,
+          "biontech": 90216,
+          "janssen": 8126,
+          "moderna": 83293,
+          "novavax": 35,
+          "valneva": null,
+          "biontechBivalent": null,
+          "modernaBivalent": null,
+          "deltaAstraZeneca": 0,
+          "deltaBiontech": 0,
+          "deltaJanssen": 0,
+          "deltaModerna": 0,
+          "deltaNovavax": 0,
+          "deltaValneva": null,
+          "deltaBiontechBivalent": null,
+          "deltaModernaBivalent": null
+        },
+        "delta": 0,
+        "quote": null,
+        "quotes": {
+          "total": null,
+          "A05-A17": { "total": null, "A05-A11": null, "A12-A17": null },
+          "A18+": { "total": null, "A18-A59": null, "A60+": null }
+        },
+        "secondVaccination": {
+          //...
+        },
+        "boosterVaccination": {
+          //...
+        },
+        "2ndBoosterVaccination": {
+          //...
       }
     }
   },
-  "meta":
-  {
-    "source":"Robert Koch-Institut",
-    "contact":"Marlon Lueckert (m.lueckert@me.com)",
-    "info":"https://github.com/marlon360/rki-covid-api",
-    "lastUpdate":"2022-01-07T07:58:27.000Z",
-    "lastCheckedForUpdate":"2022-01-08T13:00:46.855Z"
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-10-01T06:51:38.000Z",
+    "lastCheckedForUpdate": "2022-10-01T21:11:50.401Z"
+  }
+}
+```
+
+## `/vaccinations/states`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/states`
+[Open](/vaccinations/states)
+
+### Response
+
+This responses only the states data (but not all of Germany)
+
+```json
+{
+  "data": {
+    "SH": {
+      "name": "Schleswig-Holstein",
+      "administeredVaccinations": 7173116,
+      "vaccinated": 2355346,
+      "vaccination": {
+        "astraZeneca": 361982,
+        "biontech": 1666077,
+        "janssen": 134445,
+        "moderna": 190472,
+        "novavax": 2356,
+        "valneva": 4,
+        "biontechBivalent": 10,
+        "modernaBivalent": null,
+        "deltaAstraZeneca": 0,
+        "deltaBiontech": 4,
+        "deltaJanssen": 0,
+        "deltaModerna": 0,
+        "deltaNovavax": 2,
+        "deltaValneva": 0,
+        "deltaBiontechBivalent": 0,
+        "deltaModernaBivalent": null
+      },
+      "delta": 6,
+      "quote": 0.806,
+      "quotes": {
+        "total": 0.806,
+        "A05-A17": { "total": 0.605, "A05-A11": 0.307, "A12-A17": 0.941 },
+        "A18+": { "total": 0.877, "A18-A59": 0.851, "A60+": 0.923 }
+      },
+      "secondVaccination": {
+        //...
+      },
+      "boosterVaccination": {
+        //...
+      },
+      "2ndBoosterVaccination": {
+        //...
+      }
+    },
+    ...
+    "TH": {
+      "name": "Thüringen",
+      "administeredVaccinations": 4177743,
+      "vaccinated": 1507818,
+      "vaccination": {
+        "astraZeneca": 171180,
+        "biontech": 1096432,
+        "janssen": 95976,
+        "moderna": 141261,
+        "novavax": 2967,
+        "valneva": 2,
+        "biontechBivalent": null,
+        "modernaBivalent": null,
+        "deltaAstraZeneca": 0,
+        "deltaBiontech": 3,
+        "deltaJanssen": 0,
+        "deltaModerna": 0,
+        "deltaNovavax": 0,
+        "deltaValneva": 0,
+        "deltaBiontechBivalent": null,
+        "deltaModernaBivalent": null
+      },
+      "delta": 3,
+      "quote": 0.715,
+      "quotes": {
+        "total": 0.715,
+        "A05-A17": { "total": 0.306, "A05-A11": 0.114, "A12-A17": 0.542 },
+        "A18+": { "total": 0.804, "A18-A59": 0.752, "A60+": 0.876 }
+      },
+      "secondVaccination": {
+        //...
+      },
+      "boosterVaccination": {
+        //...
+      },
+      "2ndBoosterVaccination": {
+        //...
+      }
+    }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-10-01T06:51:38.000Z",
+    "lastCheckedForUpdate": "2022-10-01T23:58:51.226Z"
+  }
+}
+```
+
+## `/vaccinations/states/:state`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/states/HH`
+[Open](/vaccinations/states/HH)
+
+### Response
+
+```json
+{
+  "data": {
+    "HH": {
+      "name": "Hamburg",
+      "administeredVaccinations": 4536210,
+      "vaccinated": 1605625,
+      "vaccination": {
+        "astraZeneca": 198265,
+        "biontech": 1159209,
+        "janssen": 115600,
+        "moderna": 131133,
+        "novavax": 1406,
+        "valneva": null,
+        "biontechBivalent": 11,
+        "modernaBivalent": 1,
+        "deltaAstraZeneca": 0,
+        "deltaBiontech": 5,
+        "deltaJanssen": 0,
+        "deltaModerna": 0,
+        "deltaNovavax": 0,
+        "deltaValneva": null,
+        "deltaBiontechBivalent": 1,
+        "deltaModernaBivalent": 0
+      },
+      "delta": 6,
+      "quote": 0.866,
+      "quotes": {
+        "total": 0.866,
+        "A05-A17": { "total": 0.522, "A05-A11": 0.295, "A12-A17": 0.8 },
+        "A18+": { "total": 0.97, "A18-A59": 0.966, "A60+": 0.979 }
+      },
+      "secondVaccination": {
+        //...
+      },
+      "boosterVaccination": {
+        //...
+      },
+      "2ndBoosterVaccination": {
+        //...
+      }
+    }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-10-01T06:51:38.000Z",
+    "lastCheckedForUpdate": "2022-10-02T00:02:49.754Z"
+  }
+}
+```
+
+**Parameters**
+
+| Parameter | Description                         |
+| --------- | ----------------------------------- |
+| :state    | abbreviation of the requested state |
+
+## `/vaccinations/germany`
+
+### Request
+
+`GET https://api.corona-zahlen.org/vaccinations/germany`
+[Open](/vaccinations/germany)
+
+### Response
+
+This responses only the germany data
+
+```json
+{
+  "data": {
+    "administeredVaccinations": 185782727,
+    "vaccinated": 64785920,
+    "vaccination": {
+      "astraZeneca": 9274063,
+      "biontech": 46584833,
+      "janssen": 3711950,
+      "moderna": 5143735,
+      "novavax": 70764,
+      "valneva": 362,
+      "biontechBivalent": 189,
+      "modernaBivalent": 24,
+      "deltaAstraZeneca": 0,
+      "deltaBiontech": 478,
+      "deltaJanssen": 0,
+      "deltaModerna": 36,
+      "deltaNovavax": 43,
+      "deltaValneva": 29,
+      "deltaBiontechBivalent": 11,
+      "deltaModernaBivalent": 0
+    },
+    "delta": 597,
+    "quote": 0.778,
+    "quotes": {
+      "total": 0.778,
+      "A05-A17": { "total": 0.46, "A05-A11": 0.222, "A12-A17": 0.744 },
+      "A18+": { "total": 0.868, "A18-A59": 0.847, "A60+": 0.908 }
+    },
+    "secondVaccination": {
+      //...
+    },
+    "boosterVaccination": {
+      //...
+    },
+    "2ndBoosterVaccination": {
+      //...
+    }
+  },
+  "meta": {
+    "source": "Robert Koch-Institut",
+    "contact": "Marlon Lueckert (m.lueckert@me.com)",
+    "info": "https://github.com/marlon360/rki-covid-api",
+    "lastUpdate": "2022-10-01T06:51:38.000Z",
+    "lastCheckedForUpdate": "2022-10-02T00:11:47.619Z"
   }
 }
 ```
@@ -343,46 +484,70 @@ _ATTENTION_ since 2021-04-08 the RKI dropped the indication information!
 
 ### Response
 
+`date` the Date of the following values
+
+`vaccinated` for legacy resons, this is the same as `firstVaccination`
+
+`firstVaccination` First vaccinations of the day
+
+`secondVaccination` Second vaccinations of the day
+
+`firstBoosterVacciation` First booster vaccinations of the day
+
+`secondBoosterVaccination` Second booster vaccinations of the day
+
+`totalVaccinationOfTheDay` Total vaccinations of the day
+
 ```json
-{"data": {
-  "history": [
-    {
-      "date":"2020-12-27T00:00:00.000Z",
-      "vaccinated":24343,
-      "firstVaccination":24343,
-      "secondVaccination":0,
-      "boosterVaccination":0
-    },
-    {
-      "date":"2020-12-28T00:00:00.000Z",
-      "vaccinated":18035,
-      "firstVaccination":18035,
-      "secondVaccination":0,
-      "boosterVaccination":0
-    },
-    // ...
-    {
-      "date":"2021-09-08T00:00:00.000Z",
-      "vaccinated":101815,
-      "firstVaccination":101815,
-      "secondVaccination":127310,
-      "boosterVaccination":26017
-    },
-    {
-      "date":"2021-09-09T00:00:00.000Z",
-      "vaccinated":97944,
-      "firstVaccination":97944,
-      "secondVaccination":118952,
-      "boosterVaccination":26896
-    }
-  ]
-},
-"meta": {
-  "source":"Robert Koch-Institut",
-  "contact":"Marlon Lueckert (m.lueckert@me.com)",
-  "info":"https://github.com/marlon360/rki-covid-api",
-  "lastUpdate":"2021-09-10T08:05:30.000Z",
-  "lastCheckedForUpdate":"2021-09-12T19:11:29.601Z"
+{
+  "data": {
+    "history": [
+      {
+        "date":"2020-12-27T00:00:00.000Z",
+        "vaccinated":24421,
+        "firstVaccination":24421,
+        "secondVaccination":null,
+        "firstBoosterVaccination":null,
+        "secondBoosterVaccination":null,
+        "totalVacciantionOfTheDay":24421
+      },
+      {
+        "date":"2020-12-28T00:00:00.000Z",
+        "vaccinated":18007,
+        "firstVaccination":18007,
+        "secondVaccination":null,
+        "firstBoosterVaccination":null,
+        "secondBoosterVaccination":null,
+        "totalVacciantionOfTheDay":18007
+      },
+      {
+        "date":"2020-12-29T00:00:00.000Z",
+        "vaccinated":50055,
+        "firstVaccination":50055,
+        "secondVaccination":null,
+        "firstBoosterVaccination":null,
+        "secondBoosterVaccination":null,
+        "totalVacciantionOfTheDay":50055
+      },
+      ...
+      {
+        "date":"2022-05-01T00:00:00.000Z",
+        "vaccinated":241,
+        "firstVaccination":241,
+        "secondVaccination":318,
+        "firstBoosterVaccination":991,
+        "secondBoosterVaccination":2550,
+        "totalVacciantionOfTheDay":4100
+      }
+    ]
+  },
+  "meta": {
+    "source":"Robert Koch-Institut",
+    "contact":"Marlon Lueckert (m.lueckert@me.com)",
+    "info":"https://github.com/marlon360/rki-covid-api",
+    "lastUpdate":"2022-05-02T06:53:48.000Z",
+    "lastCheckedForUpdate":"2022-05-02T15:30:22.447Z"
+  }
 }
 ```
 

@@ -4,6 +4,10 @@ import StatesMap from "../maps/states.json";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
 import {
+  getDistrictsFrozenIncidenceHistory,
+  getStatesFrozenIncidenceHistory,
+} from "../data-requests/frozen-incidence";
+import {
   ColorRange,
   hospitalizationIncidenceColorRanges,
   weekIncidenceColorRanges,
@@ -13,9 +17,19 @@ import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
-import { getStateAbbreviationById, getStateNameByAbbreviation } from "../utils";
+import {
+  getStateAbbreviationById,
+  getStateNameByAbbreviation,
+  getStateIdByName,
+} from "../utils";
 
-export async function DistrictsMapResponse() {
+export enum mapTypes {
+  map,
+  legendMap,
+}
+
+// Begin normal map responses
+export async function DistrictsMapResponse(mapType: mapTypes = mapTypes.map) {
   const mapData = DistrictsMap;
 
   const districtsData = await getDistrictsData();
@@ -41,27 +55,105 @@ export async function DistrictsMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Landkreise",
+        districtsData.lastUpdate,
+        weekIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
 }
 
-export async function DistrictsLegendMapResponse() {
-  const mapData = DistrictsMap;
+export async function StatesMapResponse(mapType: mapTypes = mapTypes.map) {
+  const mapData = StatesMap;
 
-  const districtsData = await getDistrictsData();
+  const statesData = await getStatesData();
 
   // create hashmap for faster access
-  const districtsDataHashMap = districtsData.data.reduce(function (map, obj) {
-    map[obj.ags] = obj;
+  const statesDataHashMap = statesData.data.reduce(function (map, obj) {
+    map[obj.id] = obj;
     return map;
   }, {});
+
+  // add fill color to every statess
+  for (const statePathElement of mapData.children) {
+    const idAttribute = statePathElement.attributes.id;
+    const id = idAttribute.split("-")[1];
+    const state = statesDataHashMap[id];
+    const weekIncidence = (state.casesPerWeek / state.population) * 100000;
+    statePathElement.attributes["fill"] = getColorForValue(
+      weekIncidence,
+      weekIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Bundesländer",
+        statesData.lastUpdate,
+        weekIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
+}
+
+// Begin history map respones
+export async function DistrictsHistoryMapResponse(
+  mapType: mapTypes = mapTypes.map,
+  dateString: string
+) {
+  const date = new Date(dateString);
+  const mapData = DistrictsMap;
+
+  const districtsIncidenceHistory = await getDistrictsFrozenIncidenceHistory(
+    null,
+    null,
+    date
+  );
+
+  // check if ALL historys are empty witch meens that this date isn`t available
+  let check = 0;
+  districtsIncidenceHistory.data.forEach((entry) => {
+    check += entry.history.length == 0 ? 1 : 0;
+  });
+  if (check == districtsIncidenceHistory.data.length) {
+    throw new Error(
+      `Das Datum ${dateString} ist zu weit in der Vergangenheit!`
+    );
+  }
+
+  // create hashmap for faster access
+  const districtsIncidenceDataHashMap = districtsIncidenceHistory.data.reduce(
+    function (map, obj) {
+      map[obj.ags] = obj;
+      return map;
+    },
+    {}
+  );
 
   // add fill color to every districts
   for (const districtPathElement of mapData.children) {
     const idAttribute = districtPathElement.attributes.id;
     let id = idAttribute.split("-")[1];
-    const district = districtsDataHashMap[id];
+    const district = districtsIncidenceDataHashMap[id];
     const weekIncidence =
-      (district.casesPerWeek / district.population) * 100000;
+      district.history.length == 0 ? 0 : district.history[0].weekIncidence;
     districtPathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
       weekIncidenceColorRanges
@@ -70,36 +162,62 @@ export async function DistrictsLegendMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(
-    getMapBackground(
-      "7-Tage-Inzidenz der Landkreise",
-      districtsData.lastUpdate,
-      weekIncidenceColorRanges
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Landkreise",
+        date,
+        weekIncidenceColorRanges
+      )
     )
-  )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
-    .png({ quality: 75 })
-    .toBuffer();
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
 }
 
-export async function StatesMapResponse() {
+export async function StatesHistoryMapResponse(
+  mapType: mapTypes = mapTypes.map,
+  dateString: string
+) {
+  const date = new Date(dateString);
   const mapData = StatesMap;
 
-  const statesData = await getStatesData();
+  const statesIncidenceHistory = await getStatesFrozenIncidenceHistory(
+    null,
+    null,
+    date
+  );
+
+  // check if ALL historys are empty witch meens that this date isn`t available
+  let check = 0;
+  statesIncidenceHistory.data.forEach((entry) => {
+    check += entry.history.length == 0 ? 1 : 0;
+  });
+  if (check == statesIncidenceHistory.data.length) {
+    throw new Error(
+      `Das Datum ${dateString} ist zu weit in der Vergangenheit!`
+    );
+  }
 
   // create hashmap for faster access
-  const statesDataHashMap = statesData.data.reduce(function (map, obj) {
-    map[obj.id] = obj;
-    return map;
-  }, {});
+  const statesIncidenceHistoryDataHashMap = statesIncidenceHistory.data.reduce(
+    function (map, obj) {
+      map[getStateIdByName(obj.name)] = obj;
+      return map;
+    },
+    {}
+  );
 
-  // add fill color to every districts
+  // add fill color to every states
   for (const statePathElement of mapData.children) {
     const idAttribute = statePathElement.attributes.id;
     const id = idAttribute.split("-")[1];
-    const district = statesDataHashMap[id];
+    const state = statesIncidenceHistoryDataHashMap[id];
     const weekIncidence =
-      (district.casesPerWeek / district.population) * 100000;
+      state.history.length == 0 ? 0 : state.history[0].weekIncidence;
     statePathElement.attributes["fill"] = getColorForValue(
       weekIncidence,
       weekIncidenceColorRanges
@@ -110,50 +228,26 @@ export async function StatesMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-}
-
-export async function StatesLegendMapResponse() {
-  const mapData = StatesMap;
-
-  const statesData = await getStatesData();
-
-  // create hashmap for faster access
-  const statesDataHashMap = statesData.data.reduce(function (map, obj) {
-    map[obj.id] = obj;
-    return map;
-  }, {});
-
-  // add fill color to every districts
-  for (const statePathElement of mapData.children) {
-    const idAttribute = statePathElement.attributes.id;
-    const id = idAttribute.split("-")[1];
-    const district = statesDataHashMap[id];
-    const weekIncidence =
-      (district.casesPerWeek / district.population) * 100000;
-    statePathElement.attributes["fill"] = getColorForValue(
-      weekIncidence,
-      weekIncidenceColorRanges
-    );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
-  }
-
-  const svgBuffer = Buffer.from(stringify(mapData));
-
-  return sharp(
-    getMapBackground(
-      "7-Tage-Inzidenz der Bundesländer",
-      statesData.lastUpdate,
-      weekIncidenceColorRanges
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "7-Tage-Inzidenz der Bundesländer",
+        date,
+        weekIncidenceColorRanges
+      )
     )
-  )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
-    .png({ quality: 75 })
-    .toBuffer();
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
 }
 
-export async function StatesHospitalizationMapResponse() {
+//Begin hospitalisation map resonses
+export async function StatesHospitalizationMapResponse(
+  mapType: mapTypes = mapTypes.map
+) {
   const mapData = StatesMap;
 
   const hospitalizationData = await getHospitalizationData();
@@ -162,7 +256,7 @@ export async function StatesHospitalizationMapResponse() {
       getLatestHospitalizationDataKey(hospitalizationData.data)
     ];
 
-  // // add fill color to every districts
+  // // add fill color to every states
   for (const statePathElement of mapData.children) {
     const idAttribute = statePathElement.attributes.id;
     const id = idAttribute.split("-")[1];
@@ -181,53 +275,73 @@ export async function StatesHospitalizationMapResponse() {
 
   const svgBuffer = Buffer.from(stringify(mapData));
 
-  return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
-}
-
-export async function StatesHospitalizationLegendMapResponse() {
-  const mapData = StatesMap;
-
-  const hospitalizationData = await getHospitalizationData();
-  const latestHospitalizationData =
-    hospitalizationData.data[
-      getLatestHospitalizationDataKey(hospitalizationData.data)
-    ];
-
-  // // add fill color to every districts
-  for (const statePathElement of mapData.children) {
-    const idAttribute = statePathElement.attributes.id;
-    const id = idAttribute.split("-")[1];
-    const state =
-      latestHospitalizationData.states[
-        getStateNameByAbbreviation(getStateAbbreviationById(parseInt(id)))
-      ];
-
-    statePathElement.attributes["fill"] = getColorForValue(
-      state.incidence7Days,
-      hospitalizationIncidenceColorRanges
-    );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
-  }
-
-  const svgBuffer = Buffer.from(stringify(mapData));
-
-  return sharp(
-    getMapBackground(
-      "Hospitalisierungsinzidenz",
-      hospitalizationData.lastUpdate,
-      hospitalizationIncidenceColorRanges
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "Hospitalisierungsinzidenz",
+        hospitalizationData.lastUpdate,
+        hospitalizationIncidenceColorRanges
+      )
     )
-  )
-    .composite([{ input: svgBuffer, top: 100, left: 180 }])
-    .png({ quality: 75 })
-    .toBuffer();
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
 }
 
 export function IncidenceColorsResponse() {
   return {
     incidentRanges: weekIncidenceColorRanges,
   };
+}
+
+// Begin history hospitalisation maps
+export async function StatesHospitalizationHistoryMapResponse(
+  mapType: mapTypes = mapTypes.map,
+  dateString: string
+) {
+  const date = new Date(dateString).toISOString();
+  const mapData = StatesMap;
+
+  const hospitalizationData = await getHospitalizationData();
+  if (!hospitalizationData.data[date]) {
+    throw new Error(
+      `Das Datum ${dateString} ist nicht (zu weit in der Vergangenheit), oder noch nicht vorhanden. Die Hospitalisierungs Daten des RKI werden täglich meist zwischen 3 und 5 Uhr aktualisiert. Letzte Aktualisierung: ${hospitalizationData.lastUpdate}`
+    );
+  }
+  const hospitalizationDataDayStates = hospitalizationData.data[date].states;
+
+  // // add fill color to every districts
+  for (const statePathElement of mapData.children) {
+    const stateName = statePathElement.attributes.name;
+    const state = hospitalizationDataDayStates[stateName];
+
+    statePathElement.attributes["fill"] = getColorForValue(
+      state.incidence7Days,
+      hospitalizationIncidenceColorRanges
+    );
+    statePathElement.attributes["stroke"] = "#DBDBDB";
+    statePathElement.attributes["stroke-width"] = "0.9";
+  }
+
+  const svgBuffer = Buffer.from(stringify(mapData));
+
+  if (mapType == mapTypes.legendMap) {
+    return sharp(
+      getMapBackground(
+        "Hospitalisierungsinzidenz",
+        new Date(date),
+        hospitalizationIncidenceColorRanges
+      )
+    )
+      .composite([{ input: svgBuffer, top: 100, left: 180 }])
+      .png({ quality: 75 })
+      .toBuffer();
+  } else {
+    return sharp(svgBuffer).png({ quality: 75 }).toBuffer();
+  }
 }
 
 function getColorForValue(value: number, ranges: ColorRange[]): string {
@@ -257,10 +371,10 @@ function getMapBackground(
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="#F4F8FB" x="0" y="0" width="850" height="1000"></rect>
-        <text id="7-Tage-Inzidenz-der" font-family="Helvetica-Bold, Helvetica" font-size="42" font-weight="bold" fill="#010501">
+        <text id="7-Tage-Inzidenz-der" font-family="Arial" font-size="42" font-weight="bold" fill="#010501">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Stand:-22.11.2021" font-family="Helvetica" font-size="22" font-weight="normal" fill="#010501">
+        <text id="Stand:-22.11.2021" font-family="Arial" font-size="22" font-weight="normal" fill="#010501">
           <tspan x="41" y="103">Stand: ${lastUpdateLocaleString}</tspan>
         </text>
         <g id="Legend" transform="translate(${border}, -${border})">
@@ -270,7 +384,7 @@ function getMapBackground(
             <rect fill="${
               range.color
             }" x="0" y="0" width="30" height="30"></rect>
-            <text x="48" y="20" font-family="Helvetica" font-size="16" font-weight="normal" fill="#010501">
+            <text x="48" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="#010501">
               <tspan>${range.toString()}</tspan>
             </text>
           </g>
@@ -278,14 +392,14 @@ function getMapBackground(
         })}
         </g>
         <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
-        <text id="Quelle:-Robert-Koch-" font-family="Helvetica" font-size="10" font-weight="normal" fill="#010501">
+        <text id="Quelle:-Robert-Koch-" font-family="Arial" font-size="10" font-weight="normal" fill="#010501">
           <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
         </text>
-        <text font-family="Helvetica" font-size="16" font-weight="normal" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="normal" fill="#243645">
           <tspan x="15" y="189">Grafik von</tspan>
-          <tspan font-family="Helvetica-Bold, Helvetica" font-weight="bold"> Marlon Lückert</tspan>
+          <tspan font-family="Arial-Bold, Arial" font-weight="bold"> Marlon Lückert</tspan>
         </text>
-        <text font-family="Helvetica-Bold, Helvetica" font-size="16" font-weight="bold" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="bold" fill="#243645">
           <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
         </text>
       </g>
