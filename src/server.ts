@@ -1145,14 +1145,23 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
       },
     });
   } else if (axios.isAxiosError(error)) {
-    res.status(503).json({
-      error: {
-        message: "An error occurred while fetching external data.",
-        url: error.config.url,
-        details: error.message,
-        response: error.response.data,
-      },
-    });
+    if (error.response) {
+      res.status(error.response.status).json({
+        error: {
+          message: "An error occurred while fetching external data.",
+          url: error.config.url,
+          details: error.message,
+          response: error.response.data,
+        },
+      });
+    } else if (error.request) {
+      res.status(400).json({
+        error: {
+          message: "An error occurred while request external data.",
+          request: error.request,
+        },
+      });
+    }
   } else {
     const baseError = error as Error;
     res.status(400).json({
