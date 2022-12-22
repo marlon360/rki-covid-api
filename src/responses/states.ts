@@ -116,9 +116,9 @@ export async function StatesResponse(
     };
   });
 
-  if (abbreviation) {
+  if (abbreviation != null) {
     const id = getStateIdByAbbreviation(abbreviation);
-    if (id) {
+    if (id != null) {
       states = states.filter((state) => {
         return state.id == id;
       });
@@ -152,8 +152,14 @@ export async function StatesCasesHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -205,13 +211,19 @@ export async function StatesWeekIncidenceHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+
   // add 6 days to calculate week incidence
-  if (days) {
+  if (days != null) {
     days += 6;
   }
 
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -300,8 +312,14 @@ export async function StatesDeathsHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesDeathsHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -353,8 +371,14 @@ export async function StatesRecoveredHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesHistoryData<StatesRecoveredHistory>> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
 
@@ -418,8 +442,13 @@ interface StatesHospitalizationHistory {
 
 export async function StatesHospitalizationHistoryResponse(
   days?: number,
-  pAbbreviation?: string
+  p_abbreviation?: string
 ): Promise<StatesHospitalizationHistory> {
+  if (days != null && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const hospitalizationData = await getHospitalizationData();
   let dateKeys = Object.keys(hospitalizationData.data);
   if (days) {
@@ -432,9 +461,13 @@ export async function StatesHospitalizationHistoryResponse(
     return dateA.getTime() - dateB.getTime();
   });
   const historyData = {};
+  let abbreviationList = [];
+  for (let id = 1; id <= 16; id++) {
+    abbreviationList[id - 1] = getStateAbbreviationById(id);
+  }
   dateKeys.forEach((dateKey) => {
     const stateNameKeys = Object.keys(hospitalizationData.data[dateKey].states);
-    if (!pAbbreviation) {
+    if (!p_abbreviation) {
       stateNameKeys.forEach((stateName) => {
         const id = getStateIdByName(stateName);
         const abbreviation = getStateAbbreviationByName(stateName);
@@ -453,23 +486,27 @@ export async function StatesHospitalizationHistoryResponse(
           date: new Date(dateKey),
         });
       });
-    } else {
-      const id = getStateIdByAbbreviation(pAbbreviation);
-      const stateName = getStateNameByAbbreviation(pAbbreviation);
-      if (!historyData[pAbbreviation]) {
-        historyData[pAbbreviation] = {
+    } else if (abbreviationList.includes(p_abbreviation)) {
+      const id = getStateIdByAbbreviation(p_abbreviation);
+      const stateName = getStateNameByAbbreviation(p_abbreviation);
+      if (!historyData[p_abbreviation]) {
+        historyData[p_abbreviation] = {
           id: id,
           name: stateName,
           history: [],
         };
       }
-      historyData[pAbbreviation].history.push({
+      historyData[p_abbreviation].history.push({
         cases7Days:
           hospitalizationData.data[dateKey].states[stateName].cases7Days,
         incidence7Days:
           hospitalizationData.data[dateKey].states[stateName].incidence7Days,
         date: new Date(dateKey),
       });
+    } else {
+      throw new Error(
+        `Abbreviation ${p_abbreviation} is not allowed. Please choose one of: ${abbreviationList}`
+      );
     }
   });
 
@@ -484,7 +521,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   meta: ResponseMeta;
 }> {
   let id = null;
-  if (abbreviation) {
+  if (abbreviation != null) {
     id = getStateIdByAbbreviation(abbreviation);
   }
   const AgeGroupsData = await getStatesAgeGroups(id);
