@@ -315,6 +315,11 @@ export async function FrozenIncidenceHistoryResponse(
   days?: number,
   ags?: string
 ): Promise<FrozenIncidenceHistoryData> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(
     days,
     ags

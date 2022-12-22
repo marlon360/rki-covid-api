@@ -8,6 +8,11 @@ interface RValueHistoryData extends IResponseMeta {
 export async function RValueHistoryHistoryResponse(
   days?: number
 ): Promise<RValueHistoryData> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const rValueHistory = await getRValueHistory(days);
   return {
     data: rValueHistory.data,

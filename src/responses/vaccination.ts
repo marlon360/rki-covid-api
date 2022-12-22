@@ -75,6 +75,11 @@ interface VaccinationHistoryData extends IResponseMeta {
 export async function VaccinationHistoryResponse(
   days?: number
 ): Promise<VaccinationHistoryData> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const vaccinationData = await getVaccinationHistory(days);
 
   return {

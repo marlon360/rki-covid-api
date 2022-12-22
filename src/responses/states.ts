@@ -545,6 +545,11 @@ export async function StatesFrozenIncidenceHistoryResponse(
   days?: number,
   abbreviation?: string
 ): Promise<StatesFrozenIncidenceHistoryData> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
     days,
     abbreviation

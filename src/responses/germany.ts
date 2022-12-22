@@ -148,6 +148,11 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 export async function GermanyCasesHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const history = await getLastCasesHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
   const lowDate = days
@@ -168,7 +173,12 @@ export async function GermanyCasesHistoryResponse(
 export async function GermanyWeekIncidenceHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
-  if (days != null) {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
+  if (days) {
     days += 6;
   }
 
@@ -202,6 +212,11 @@ export async function GermanyWeekIncidenceHistoryResponse(
 export async function GermanyDeathsHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const history = await getLastDeathsHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
   const lowDate = days
@@ -222,6 +237,11 @@ export async function GermanyDeathsHistoryResponse(
 export async function GermanyRecoveredHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const history = await getLastRecoveredHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
   const lowDate = days
@@ -354,6 +374,11 @@ interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
 export async function GermanyFrozenIncidenceHistoryResponse(
   days?: number
 ): Promise<StatesFrozenIncidenceHistoryData> {
+  if (days && isNaN(days)) {
+    throw new TypeError(
+      "Wrong format for ':days' parameter! This is not a number."
+    );
+  }
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
     days
   );
