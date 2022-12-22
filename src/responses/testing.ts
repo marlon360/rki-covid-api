@@ -10,10 +10,10 @@ interface TestingHistoryData extends IResponseMeta {
   };
 }
 
-export async function TestingHistoryResponse(parameter: {
-  weeks: number;
-}): Promise<TestingHistoryData> {
-  const TestingData = await getTestingHistory(parameter.weeks);
+export async function TestingHistoryResponse(
+  weeks?: number
+): Promise<TestingHistoryData> {
+  const TestingData = await getTestingHistory(weeks);
 
   return {
     data: {

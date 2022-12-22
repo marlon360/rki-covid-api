@@ -57,9 +57,9 @@ interface StatesData extends IResponseMeta {
   };
 }
 
-export async function StatesResponse(parameter: {
-  abbreviation: string;
-}): Promise<StatesData> {
+export async function StatesResponse(
+  abbreviation?: string
+): Promise<StatesData> {
   // make all requests
   const [
     statesData,
@@ -116,8 +116,8 @@ export async function StatesResponse(parameter: {
     };
   });
 
-  if (parameter.abbreviation) {
-    const id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    const id = getStateIdByAbbreviation(abbreviation);
     if (id) {
       states = states.filter((state) => {
         return state.id == id;
@@ -148,16 +148,16 @@ interface StatesHistoryData<T> extends IResponseMeta {
 interface StatesCasesHistory {
   [key: string]: StateHistory<{ cases: number; date: Date }>;
 }
-export async function StatesCasesHistoryResponse(parameter: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesHistoryData<StatesCasesHistory>> {
+export async function StatesCasesHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesHistoryData<StatesCasesHistory>> {
   let id = null;
-  if (parameter.abbreviation) {
-    id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    id = getStateIdByAbbreviation(abbreviation);
   }
 
-  const statesHistoryData = await getLastStateCasesHistory(parameter.days, id);
+  const statesHistoryData = await getLastStateCasesHistory(days, id);
 
   const data: StatesCasesHistory = {};
 
@@ -201,21 +201,21 @@ export async function StatesCasesHistoryResponse(parameter: {
 interface StatesWeekIncidenceHistory {
   [key: string]: StateHistory<{ weekIncidence: number; date: Date }>;
 }
-export async function StatesWeekIncidenceHistoryResponse(parameter: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
+export async function StatesWeekIncidenceHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
   // add 6 days to calculate week incidence
-  if (parameter.days) {
-    parameter.days += 6;
+  if (days) {
+    days += 6;
   }
 
   let id = null;
-  if (parameter.abbreviation) {
-    id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    id = getStateIdByAbbreviation(abbreviation);
   }
 
-  const statesHistoryData = await getLastStateCasesHistory(parameter.days, id);
+  const statesHistoryData = await getLastStateCasesHistory(days, id);
   const statesData = await getStatesData();
 
   function getStateById(
@@ -296,16 +296,16 @@ export async function StatesWeekIncidenceHistoryResponse(parameter: {
 interface StatesDeathsHistory {
   [key: string]: StateHistory<{ deaths: number; date: Date }>;
 }
-export async function StatesDeathsHistoryResponse(parameter: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesHistoryData<StatesDeathsHistory>> {
+export async function StatesDeathsHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesHistoryData<StatesDeathsHistory>> {
   let id = null;
-  if (parameter.abbreviation) {
-    id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    id = getStateIdByAbbreviation(abbreviation);
   }
 
-  const statesHistoryData = await getLastStateDeathsHistory(parameter.days, id);
+  const statesHistoryData = await getLastStateDeathsHistory(days, id);
 
   const data: StatesDeathsHistory = {};
 
@@ -349,19 +349,16 @@ export async function StatesDeathsHistoryResponse(parameter: {
 interface StatesRecoveredHistory {
   [key: string]: StateHistory<{ recovered: number; date: Date }>;
 }
-export async function StatesRecoveredHistoryResponse(parameter: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesHistoryData<StatesRecoveredHistory>> {
+export async function StatesRecoveredHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesHistoryData<StatesRecoveredHistory>> {
   let id = null;
-  if (parameter.abbreviation) {
-    id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    id = getStateIdByAbbreviation(abbreviation);
   }
 
-  const statesHistoryData = await getLastStateRecoveredHistory(
-    parameter.days,
-    id
-  );
+  const statesHistoryData = await getLastStateRecoveredHistory(days, id);
 
   const data: StatesRecoveredHistory = {};
 
@@ -419,14 +416,14 @@ interface StatesHospitalizationHistory {
   meta: ResponseMeta;
 }
 
-export async function StatesHospitalizationHistoryResponse(parameter: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesHospitalizationHistory> {
+export async function StatesHospitalizationHistoryResponse(
+  days?: number,
+  pAbbreviation?: string
+): Promise<StatesHospitalizationHistory> {
   const hospitalizationData = await getHospitalizationData();
   let dateKeys = Object.keys(hospitalizationData.data);
-  if (parameter.days) {
-    const reference_date = new Date(getDateBefore(parameter.days));
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
     dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
   dateKeys.sort((a, b) => {
@@ -437,7 +434,7 @@ export async function StatesHospitalizationHistoryResponse(parameter: {
   const historyData = {};
   dateKeys.forEach((dateKey) => {
     const stateNameKeys = Object.keys(hospitalizationData.data[dateKey].states);
-    if (!parameter.abbreviation) {
+    if (!pAbbreviation) {
       stateNameKeys.forEach((stateName) => {
         const id = getStateIdByName(stateName);
         const abbreviation = getStateAbbreviationByName(stateName);
@@ -457,16 +454,16 @@ export async function StatesHospitalizationHistoryResponse(parameter: {
         });
       });
     } else {
-      const id = getStateIdByAbbreviation(parameter.abbreviation);
-      const stateName = getStateNameByAbbreviation(parameter.abbreviation);
-      if (!historyData[parameter.abbreviation]) {
-        historyData[parameter.abbreviation] = {
+      const id = getStateIdByAbbreviation(pAbbreviation);
+      const stateName = getStateNameByAbbreviation(pAbbreviation);
+      if (!historyData[pAbbreviation]) {
+        historyData[pAbbreviation] = {
           id: id,
           name: stateName,
           history: [],
         };
       }
-      historyData[parameter.abbreviation].history.push({
+      historyData[pAbbreviation].history.push({
         cases7Days:
           hospitalizationData.data[dateKey].states[stateName].cases7Days,
         incidence7Days:
@@ -482,15 +479,13 @@ export async function StatesHospitalizationHistoryResponse(parameter: {
   };
 }
 
-export async function StatesAgeGroupsResponse(parameter: {
-  abbreviation: string;
-}): Promise<{
+export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {
   let id = null;
-  if (parameter.abbreviation) {
-    id = getStateIdByAbbreviation(parameter.abbreviation);
+  if (abbreviation) {
+    id = getStateIdByAbbreviation(abbreviation);
   }
   const AgeGroupsData = await getStatesAgeGroups(id);
   const hospitalizationData = await getHospitalizationData();
@@ -534,13 +529,13 @@ interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
   };
 }
 
-export async function StatesFrozenIncidenceHistoryResponse(parameter?: {
-  days: number;
-  abbreviation: string;
-}): Promise<StatesFrozenIncidenceHistoryData> {
+export async function StatesFrozenIncidenceHistoryResponse(
+  days?: number,
+  abbreviation?: string
+): Promise<StatesFrozenIncidenceHistoryData> {
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
-    parameter.days,
-    parameter.abbreviation
+    days,
+    abbreviation
   );
 
   let data = {};
