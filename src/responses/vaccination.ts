@@ -12,7 +12,6 @@ interface VaccinationData extends IResponseMeta {
 
 export async function VaccinationResponse(
   abbreviation?: string
-  // filter for state is missing!
 ): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
 
