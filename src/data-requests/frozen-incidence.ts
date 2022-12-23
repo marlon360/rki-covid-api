@@ -258,10 +258,11 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
+  const lastUpdateRKI: Date = this.lastUpdateRKI;
   const redisKey = `${requestType.redisKey}_${date}`;
   const githubUrlPre = requestType.githubUrlPre;
   const githubUrlPost = requestType.githubUrlPost;
-  
+
   let missingDateData: FrozenIncidenceDayFile;
   const redisEntry = await getJsonDataFromRedis(redisKey);
   if (redisEntry.length == 1) {
@@ -279,9 +280,15 @@ const MissingDateDataPromise = async function (resolve, reject) {
     );
     // prepare data for redis
     const redisData = unzipped.toString();
-    const validFor = (AddDaysToDate(date, 14).getTime() - new Date().getTime()) / 1000;
+    const validTo = AddDaysToDate(new Date(lastUpdateRKI), 10).setHours(
+      23,
+      59,
+      59,
+      0
+    );
+    const validForSec = Math.ceil((validTo - new Date().getTime()) / 1000);
     // add to redis
-    await addJsonDataToRedis(redisKey, redisData, validFor);
+    await addJsonDataToRedis(redisKey, redisData, validForSec);
     missingDateData = JSON.parse(redisData, dateReviver);
   }
   resolve(missingDateData);
@@ -336,6 +343,7 @@ async function finalizeData(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: requestType,
+            lastUpdateRKI: actualData.lastUpdate,
           })
         )
       );
@@ -439,7 +447,7 @@ export async function getDistrictsFrozenIncidenceHistory(
     days,
     date
   );
-  
+
   return {
     data: actualFinal.data,
     lastUpdate: actualFinal.lastUpdate,
