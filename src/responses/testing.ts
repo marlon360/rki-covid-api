@@ -13,10 +13,14 @@ interface TestingHistoryData extends IResponseMeta {
 export async function TestingHistoryResponse(
   weeks?: number
 ): Promise<TestingHistoryData> {
-  if (weeks && isNaN(weeks)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (weeks != null) {
+    if (isNaN(weeks)) {
+      throw new TypeError(
+        "Wrong format for ':weeks' parameter! This is not a number."
+      );
+    } else if (weeks <= 0) {
+      throw new TypeError("':weeks' parameter must be > '0'");
+    }
   }
   const TestingData = await getTestingHistory(weeks);
 

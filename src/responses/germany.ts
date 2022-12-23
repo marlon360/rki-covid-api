@@ -148,10 +148,14 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 export async function GermanyCasesHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
   }
   const history = await getLastCasesHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
@@ -173,13 +177,16 @@ export async function GermanyCasesHistoryResponse(
 export async function GermanyWeekIncidenceHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ weekIncidence: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
-  }
-  if (days) {
-    days += 6;
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    } else {
+      days += 6;
+    }
   }
 
   const history = await GermanyCasesHistoryResponse(days);
@@ -212,10 +219,14 @@ export async function GermanyWeekIncidenceHistoryResponse(
 export async function GermanyDeathsHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ deaths: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
   }
   const history = await getLastDeathsHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
@@ -237,10 +248,14 @@ export async function GermanyDeathsHistoryResponse(
 export async function GermanyRecoveredHistoryResponse(
   days?: number
 ): Promise<GermanyHistoryData<{ recovered: number; date: Date }>> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
   }
   const history = await getLastRecoveredHistory(days);
   const highDate = AddDaysToDate(history.lastUpdate, -1); //highest date, witch is "datenstand" -1
@@ -278,15 +293,19 @@ export async function GermanyHospitalizationHistoryResponse(
     adjustedUpperIncidence7Days: number;
   }>
 > {
-  if (days != null && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
   }
   const hospitalizationData = await getHospitalizationData();
   const history = [];
   let dateKeys = Object.keys(hospitalizationData.data);
-  if (days != undefined) {
+  if (days) {
     const reference_date = new Date(getDateBefore(days));
     dateKeys = dateKeys.filter((date) => new Date(date) > reference_date);
   }
@@ -374,10 +393,14 @@ interface StatesFrozenIncidenceHistoryData extends IResponseMeta {
 export async function GermanyFrozenIncidenceHistoryResponse(
   days?: number
 ): Promise<StatesFrozenIncidenceHistoryData> {
-  if (days && isNaN(days)) {
-    throw new TypeError(
-      "Wrong format for ':days' parameter! This is not a number."
-    );
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
   }
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
     days
