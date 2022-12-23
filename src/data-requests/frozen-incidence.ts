@@ -7,8 +7,8 @@ import {
   getDateBefore,
   getDayDifference,
   getStateAbbreviationByName,
-  getStateIdByAbbreviation,
   RKIError,
+  getStateIdByAbbreviation,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -159,18 +159,6 @@ const getJsonDataFromRedis = function (redisKey: string) {
   });
 };
 
-const delJsonDataFromRedis = function (redisKey: string) {
-  return new Promise<number>((resolve, reject) => {
-    fiJsonCache.del(redisKey, (err, deletions) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(deletions);
-      }
-    });
-  });
-};
-
 // this is a reviver for JSON.parse to convert all key including "date" to Date type
 const dateReviver = function (
   objKey: string,
@@ -266,16 +254,17 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   resolve({ lastUpdate, data });
 };
 
-// this is the Promise to download the files for the missing frozen-incidence dates
+// this is the Promise to download the files or get it from redis for the missing frozen-incidence dates
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
+  const lastUpdateRKI: Date = this.lastUpdateRKI;
   const redisKey = `${requestType.redisKey}_${date}`;
   const githubUrlPre = requestType.githubUrlPre;
   const githubUrlPost = requestType.githubUrlPost;
 
-  const redisEntry = await getJsonDataFromRedis(redisKey);
   let missingDateData: FrozenIncidenceDayFile;
+  const redisEntry = await getJsonDataFromRedis(redisKey);
   if (redisEntry.length == 1) {
     missingDateData = JSON.parse(redisEntry[0].body, dateReviver);
   } else {
@@ -289,9 +278,18 @@ const MissingDateDataPromise = async function (resolve, reject) {
     const unzipped = await new Promise((resolve) =>
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
+    // prepare data for redis
+    const redisData = unzipped.toString();
+    const validTo = AddDaysToDate(new Date(lastUpdateRKI), 10).setHours(
+      23,
+      59,
+      59,
+      0
+    );
+    const validForSec = Math.ceil((validTo - new Date().getTime()) / 1000);
     // add to redis
-    await addJsonDataToRedis(redisKey, unzipped.toString(), -1);
-    missingDateData = JSON.parse(unzipped.toString(), dateReviver);
+    await addJsonDataToRedis(redisKey, redisData, validForSec);
+    missingDateData = JSON.parse(redisData, dateReviver);
   }
   resolve(missingDateData);
 };
@@ -345,6 +343,7 @@ async function finalizeData(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: requestType,
+            lastUpdateRKI: actualData.lastUpdate,
           })
         )
       );
@@ -412,25 +411,6 @@ async function finalizeData(
   return { data: actualData.data, lastUpdate: lastUpdate };
 }
 
-// function to cleanup the daily missing data entry in redis
-async function CleanupRedisCache(
-  lastUpdateExcelAktuell: Date,
-  requestType: RequestTypeParameter
-) {
-  const date = new Date(lastUpdateExcelAktuell);
-  date.setHours(0, 0, 0, 0);
-  for (let i = 14; i >= 0; i--) {
-    const dateStr = AddDaysToDate(date, i).toISOString().split("T").shift();
-    const redisKey = `${dateStr}_${requestType.redisKey}`;
-    const numberOfDeletions = await delJsonDataFromRedis(redisKey);
-    if (numberOfDeletions) {
-      console.log(
-        `Rediskey ${redisKey} deleted. Number of deletions: ${numberOfDeletions}`
-      );
-    }
-  }
-}
-
 export async function getDistrictsFrozenIncidenceHistory(
   days?: number,
   ags?: string,
@@ -467,8 +447,6 @@ export async function getDistrictsFrozenIncidenceHistory(
     days,
     date
   );
-
-  await CleanupRedisCache(actual.lastUpdate, ActualDistricts);
 
   return {
     data: actualFinal.data,
@@ -512,8 +490,6 @@ export async function getStatesFrozenIncidenceHistory(
     days,
     date
   );
-
-  await CleanupRedisCache(actual.lastUpdate, ActualStates);
 
   return {
     data: actualFinal.data,
