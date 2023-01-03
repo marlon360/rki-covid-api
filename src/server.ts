@@ -56,7 +56,7 @@ import {
 import { RKIError, checkDateParameterForMaps } from "./utils";
 
 const cache = require("express-redis-cache")({
-  expire: 1800,
+  expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
   host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
@@ -1137,7 +1137,7 @@ app.get(
 
 app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
   if (error instanceof RKIError) {
-    res.json({
+    res.status(error.rkiError.code).json({
       error: {
         message: "There is a problem with the official RKI API.",
         rkiError: error.rkiError,
@@ -1145,17 +1145,26 @@ app.use(function (error: any, req: Request, res: Response, next: NextFunction) {
       },
     });
   } else if (axios.isAxiosError(error)) {
-    res.json({
-      error: {
-        message: "An error occurred while fetching external data.",
-        url: error.config.url,
-        details: error.message,
-        response: error.response.data,
-      },
-    });
+    if (error.response) {
+      res.status(error.response.status).json({
+        error: {
+          message: "An error occurred while fetching external data.",
+          url: error.config.url,
+          details: error.message,
+          response: error.response.data,
+        },
+      });
+    } else if (error.request) {
+      res.status(400).json({
+        error: {
+          message: "An error occurred while request external data.",
+          request: error.request,
+        },
+      });
+    }
   } else {
     const baseError = error as Error;
-    res.json({
+    res.status(400).json({
       error: {
         message: "An error occurred.",
         details: baseError.message,
