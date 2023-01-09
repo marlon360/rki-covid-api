@@ -2,6 +2,15 @@ import axios from "axios";
 import { ResponseData } from "./response-data";
 import parse from "csv-parse";
 
+enum AgeGroup {
+  "00-04" = "A00-A04",
+  "05-14" = "A05-A14",
+  "15-34" = "A15-A34",
+  "35-59" = "A35-A59",
+  "60-79" = "A60-A79",
+  "80+" = "A80+",
+}
+
 export interface AgeGroups {
   "A00-A04": AgeGroupData;
   "A05-A14": AgeGroupData;
@@ -144,43 +153,11 @@ export async function getHospitalizationData(): Promise<
               hospitalizationDataEntry.incidence7Days =
                 parseFloat(incidence7days);
               break;
-            case "00-04":
-              hospitalizationDataEntry.ageGroups["A00-A04"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
-            case "05-14":
-              hospitalizationDataEntry.ageGroups["A05-A14"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
-            case "15-34":
-              hospitalizationDataEntry.ageGroups["A15-A34"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
-            case "35-59":
-              hospitalizationDataEntry.ageGroups["A35-A59"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
-            case "60-79":
-              hospitalizationDataEntry.ageGroups["A60-A79"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
-            case "80+":
-              hospitalizationDataEntry.ageGroups["A80+"] = {
-                cases7Days: parseInt(cases7days),
-                incidence7Days: parseFloat(incidence7days),
-              };
-              break;
             default:
+              hospitalizationDataEntry.ageGroups[AgeGroup[ageGroup]] = {
+                cases7Days: parseInt(cases7days),
+                incidence7Days: parseFloat(incidence7days),
+              };
               break;
           }
 
