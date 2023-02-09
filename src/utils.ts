@@ -456,3 +456,67 @@ export function fill0CasesDaysGermany(
 export function limit(value: number, decimals: number): number {
   return parseFloat(value.toFixed(decimals));
 }
+
+// create a new redis client with spezific prefix
+export function CreateRedisClient(prefix: string) {
+  // create redis client
+  const client = require("express-redis-cache-next")({
+    prefix: prefix,
+    host: process.env.REDISHOST || process.env.REDIS_URL,
+    port: process.env.REDISPORT,
+    auth_pass: process.env.REDISPASSWORD,
+  });
+  return client;
+}
+
+// function to add entry to redis
+export async function AddRedisEntry(
+  redisClient: any,
+  redisKey: string,
+  JsonData: string,
+  validFor: number,
+  mime: string
+) {
+  return new Promise((resolve, reject) => {
+    redisClient.add(
+      redisKey,
+      JsonData,
+      { expire: validFor, type: mime },
+      (err, reply) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(reply);
+        }
+      }
+    );
+  });
+}
+
+export interface redisEntry {
+  body: string;
+  touched: Number;
+  expire: Number;
+  type: string;
+}
+
+// function to get entry from redis
+export async function GetRedisEntry(redisClient: any, redisKey: string) {
+  return new Promise<redisEntry[]>((resolve, reject) => {
+    redisClient.get(redisKey, (err, objectString) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(objectString);
+      }
+    });
+  });
+}
+
+// this is a reviver for JSON.parse to convert all key including "date" to Date type
+export function dateReviver(objKey: string, objValue: string | number | Date) {
+  if (objKey.includes("date")) {
+    return new Date(objValue);
+  }
+  return objValue;
+}

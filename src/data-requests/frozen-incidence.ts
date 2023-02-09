@@ -5,10 +5,13 @@ import zlib from "zlib";
 import {
   AddDaysToDate,
   getDateBefore,
-  getDayDifference,
   getStateAbbreviationByName,
   RKIError,
   getStateIdByAbbreviation,
+  CreateRedisClient,
+  AddRedisEntry,
+  GetRedisEntry,
+  dateReviver,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -65,6 +68,9 @@ interface FrozenIncidenceDayFile {
   };
 }
 
+// value for redis entry for never expire
+const neverExpire = -1;
+
 const ActualDistricts: RequestTypeParameter = {
   type: "ActualDistricts",
   url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
@@ -119,56 +125,28 @@ const ArchiveStates: RequestTypeParameter = {
   redisKey: "ArchiveStates",
 };
 
-const fiJsonCache = require("express-redis-cache")({
-  prefix: "fiJson",
-  host: process.env.REDISHOST || process.env.REDIS_URL,
-  port: process.env.REDISPORT,
-  auth_pass: process.env.REDISPASSWORD,
-});
+// create redis client for frozen-incidence Excel- and Date-Data
+const redisClientFix = CreateRedisClient("fix:");
 
-const addJsonDataToRedis = function (
-  redisKey: string,
-  JsonData: string,
-  validFor: number
-) {
-  return new Promise((resolve, reject) => {
-    fiJsonCache.add(
-      redisKey,
-      JsonData,
-      { expire: validFor, type: "json" },
-      (err, reply) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(reply);
-        }
-      }
-    );
-  });
-};
+function GetNextMonday(date = new Date()) {
+  const dateCopy = new Date(date.getTime());
+  const nextMonday = new Date(
+    dateCopy.setUTCDate(
+      dateCopy.getUTCDate() + ((7 - dateCopy.getUTCDay() + 1) % 7 || 7)
+    )
+  );
+  return nextMonday;
+}
 
-const getJsonDataFromRedis = function (redisKey: string) {
-  return new Promise<redisEntry[]>((resolve, reject) => {
-    fiJsonCache.get(redisKey, (err, objectString) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(objectString);
-      }
-    });
-  });
-};
-
-// this is a reviver for JSON.parse to convert all key including "date" to Date type
-const dateReviver = function (
-  objKey: string,
-  objValue: string | number | Date
-) {
-  if (objKey.includes("date")) {
-    return new Date(objValue);
-  }
-  return objValue;
-};
+function GetLastMonday(date = new Date()) {
+  const dateCopy = new Date(date.getTime());
+  const lastMonday = new Date(
+    dateCopy.setUTCDate(
+      dateCopy.getUTCDate() - ((dateCopy.getUTCDay() + 6) % 7 || 7)
+    )
+  );
+  return lastMonday;
+}
 
 // this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
@@ -183,30 +161,39 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const key = requestType.key;
   const redisKey = requestType.redisKey;
 
-  const response = await axios.get(url, { responseType: "arraybuffer" });
-  const rdata = response.data;
-  if (rdata.error) {
-    reject(new RKIError(rdata.error, response.config.url));
-    throw new RKIError(rdata.error, response.config.url);
-  }
-  let lastUpdate = new Date(response.headers["last-modified"]);
   let data = [];
+  let lastUpdate: Date;
+
   // check if a redis entry exists, if yes use it
+  const redisEntry = await GetRedisEntry(redisClientFix, redisKey);
+
   // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
-  const redisEntry = await getJsonDataFromRedis(redisKey);
-  let redisData = redisEntry.length
+  const redisData = redisEntry.length
     ? JSON.parse(redisEntry[0].body, dateReviver)
     : { lastUpdate: new Date(1970, 0, 1), data };
 
-  // also recalculate if the excelfile is newer as redis data
-  if (lastUpdate.getTime() > new Date(redisData.lastUpdate).getTime()) {
+  // build data from excel and store to redis
+  if (
+    new Date(redisData.lastUpdate).getTime() == new Date(1970, 0, 1).getTime()
+  ) {
+    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const rdata = response.data;
+    if (rdata.error) {
+      reject(new RKIError(rdata.error, response.config.url));
+      throw new RKIError(rdata.error, response.config.url);
+    }
+    lastUpdate = new Date(response.headers["last-modified"]);
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[SheetName];
-    // table starts in row 5 (parameter is zero indexed)
-    let json = XLSX.utils.sheet_to_json(sheet, { range: startRow });
-
+    // table starts in row "startRow" (parameter is zero indexed)
+    // if type == Districts.Archive.type filter out rows with "NR"
+    let json = [];
     if (type == ArchiveDistricts.type) {
-      json = json.filter((entry) => !!entry["NR"]);
+      json = XLSX.utils
+        .sheet_to_json(sheet, { range: startRow })
+        .filter((entry) => !!entry["NR"]);
+    } else {
+      json = XLSX.utils.sheet_to_json(sheet, { range: startRow });
     }
     data = json.map((entry) => {
       const name =
@@ -244,9 +231,43 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       return { [key]: regionKey, name: name, history: history };
     });
 
-    //create or update redis entry for the excelsheet
+    //prepare data for redis entry for the excelsheet
     const JsonData = JSON.stringify({ lastUpdate, data });
-    await addJsonDataToRedis(redisKey, JsonData, -1);
+
+    let validForSec: number;
+
+    // if archive data, set validToMs to neverExpire = -1
+    // (archive data excel sheet should never change)
+    if (type == ArchiveDistricts.type || type == ArchiveStates.type) {
+      validForSec = neverExpire;
+    } else {
+      // get next monday
+      const nextMonday = GetNextMonday();
+
+      // get lastMonday
+      const lastMonday = GetLastMonday();
+
+      // set validToMs to nextMonday 8 o`clock in milliseconds (RKI update should be done then)
+      let validToMs = new Date(nextMonday).setUTCHours(8, 0, 0, 0);
+
+      // if lastUpdate < last monday 0 o`clock maybe today is public holiday
+      // and the data will be updated tomorrow!
+      // set validToMs to tomorrow 8 o`clock (new try tomorrow)
+      if (new Date(lastUpdate).getTime() < lastMonday.setUTCHours(0, 0, 0, 0)) {
+        validToMs = AddDaysToDate(new Date(), 1).setHours(8, 0, 0, 0);
+      }
+      // calculate the seconds from now to validTo or set to -1 if validTo is set to -1
+      validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    }
+
+    // add to redis
+    await AddRedisEntry(
+      redisClientFix,
+      redisKey,
+      JsonData,
+      validForSec,
+      "json"
+    );
   } else {
     data = redisData.data;
     lastUpdate = new Date(redisData.lastUpdate);
@@ -255,6 +276,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 };
 
 // this is the Promise to download the files or get it from redis for the missing frozen-incidence dates
+// dateData parameter, witch date is requested and the date when the RKI excel file is last updated must be bind
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
@@ -264,7 +286,7 @@ const MissingDateDataPromise = async function (resolve, reject) {
   const githubUrlPost = requestType.githubUrlPost;
 
   let missingDateData: FrozenIncidenceDayFile;
-  const redisEntry = await getJsonDataFromRedis(redisKey);
+  const redisEntry = await GetRedisEntry(redisClientFix, redisKey);
   if (redisEntry.length == 1) {
     missingDateData = JSON.parse(redisEntry[0].body, dateReviver);
   } else {
@@ -280,20 +302,44 @@ const MissingDateDataPromise = async function (resolve, reject) {
     );
     // prepare data for redis
     const redisData = unzipped.toString();
-    const validTo = AddDaysToDate(new Date(lastUpdateRKI), 10).setHours(
-      23,
-      59,
-      59,
-      0
-    );
-    const validForSec = Math.ceil((validTo - new Date().getTime()) / 1000);
+
+    // get next monday
+    const nextMonday = GetNextMonday();
+
+    //get last monday
+    const lastMonday = GetLastMonday();
+
+    // set validToMs to nextMonday 8 o`clock in milliseconds (RKI Update should be done then)
+    let validToMs = new Date(nextMonday).setUTCHours(8, 0, 0, 0);
+
+    // if lastUpdate < last monday 0 o`clock, maybe today is public holiday
+    // or the RKI is late and the data will updated later or tomorrow!
+    // set validToMs to tomorrow 8 o`clock (new try tomorrow)
+    if (
+      new Date(lastUpdateRKI).getTime() < lastMonday.setUTCHours(0, 0, 0, 0)
+    ) {
+      validToMs = AddDaysToDate(new Date(), 1).setHours(8, 0, 0, 0);
+    }
+
+    // calculate the seconds from now to validTo
+    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+
     // add to redis
-    await addJsonDataToRedis(redisKey, redisData, validForSec);
+    await AddRedisEntry(
+      redisClientFix,
+      redisKey,
+      redisData,
+      validForSec,
+      "json"
+    );
     missingDateData = JSON.parse(redisData, dateReviver);
   }
   resolve(missingDateData);
 };
 
+// function to finalize the request
+// request missing dates, merge all data (actual, archive, missing dates)
+// an apply filter if regionkey (ags or abbreviation) and/or days are given
 async function finalizeData(
   actualData: { lastUpdate: Date; data: FrozenIncidenceData[] },
   archiveData: { lastUpdate: Date; data: FrozenIncidenceData[] },
@@ -302,39 +348,26 @@ async function finalizeData(
   paramKey: string,
   paramDays?: number,
   paramDate?: Date
-) {
-  // The Excel sheet with fixed incidence data is only updated on mondays
-  // check witch date is the last date in history
-  const lastUpdate000 = new Date(
-    new Date(actualData.lastUpdate).setHours(0, 0, 0)
-  );
-  const lastDate =
-    actualData.data[0].history.length == 0
-      ? lastUpdate000
-      : new Date(
-          actualData.data[0].history[actualData.data[0].history.length - 1].date
-        );
-  const today: Date = new Date(new Date().setHours(0, 0, 0));
+): Promise<{ data: FrozenIncidenceData[]; lastUpdate: Date }> {
+  // lastUpdate from actual data is date of last entry
+  const lastDate = new Date(actualData.lastUpdate).setHours(0, 0, 0);
+  const today = new Date().setHours(0, 0, 0);
   let lastUpdate: Date;
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
-  if (
-    lastDate.getTime() < today.getTime() &&
-    lastDate.getTime() <= metaLastFileDate.getTime()
-  ) {
-    lastUpdate = metaLastFileDate;
-    const maxNumberOfDays = Math.min(
-      getDayDifference(today, lastDate) - 1,
-      getDayDifference(metaLastFileDate, lastDate) - 1
-    );
-    // add the missing date(s) to districts
+  if (lastDate < today && lastDate <= metaLastFileDate.getTime()) {
+    lastUpdate = new Date(metaLastFileDate);
+    const maxNumberOfDays =
+      (metaLastFileDate.setHours(0, 0, 0, 0) - lastDate) / 86400000;
     const startDay = paramDays
       ? paramDays <= maxNumberOfDays
         ? maxNumberOfDays - paramDays + 1
         : 1
       : 1;
     const MissingDateDataPromises = [];
+
+    // create a Promise for each missing Date
     for (let day = startDay; day <= maxNumberOfDays; day++) {
-      const missingDate = new Date(AddDaysToDate(lastDate, day))
+      const missingDate = new Date(AddDaysToDate(new Date(lastDate), day))
         .toISOString()
         .split("T")
         .shift();
@@ -348,10 +381,13 @@ async function finalizeData(
         )
       );
     }
+
+    // pull the data
     const MissingDateDataResults: FrozenIncidenceDayFile[] = await Promise.all(
       MissingDateDataPromises
     );
 
+    // add the missing dates data to actual data
     MissingDateDataResults.forEach((result) => {
       actualData.data = actualData.data.map((entry) => {
         const key: string =
@@ -370,6 +406,8 @@ async function finalizeData(
         return entry;
       });
     });
+  } else {
+    lastUpdate = new Date(actualData.lastUpdate);
   }
 
   // merge archive data with current data
@@ -438,7 +476,7 @@ export async function getDistrictsFrozenIncidenceHistory(
       }),
   ]);
 
-  const actualFinal = await finalizeData(
+  const districtsFinal = await finalizeData(
     actual,
     archive,
     metaLastFileDate,
@@ -449,8 +487,8 @@ export async function getDistrictsFrozenIncidenceHistory(
   );
 
   return {
-    data: actualFinal.data,
-    lastUpdate: actualFinal.lastUpdate,
+    data: districtsFinal.data,
+    lastUpdate: districtsFinal.lastUpdate,
   };
 }
 
@@ -481,7 +519,7 @@ export async function getStatesFrozenIncidenceHistory(
       }),
   ]);
 
-  const actualFinal = await finalizeData(
+  const statesFinal = await finalizeData(
     actual,
     archive,
     metaLastFileDate,
@@ -492,7 +530,7 @@ export async function getStatesFrozenIncidenceHistory(
   );
 
   return {
-    data: actualFinal.data,
-    lastUpdate: actualFinal.lastUpdate,
+    data: statesFinal.data,
+    lastUpdate: statesFinal.lastUpdate,
   };
 }
