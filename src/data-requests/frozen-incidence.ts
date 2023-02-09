@@ -236,7 +236,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 
     let validForSec: number;
 
-    // if archive data, set validToMs to neverExpire = -1
+    // if archive data, set validForSec to neverExpire = -1
     // (archive data excel sheet should never change)
     if (type == ArchiveDistricts.type || type == ArchiveStates.type) {
       validForSec = neverExpire;
