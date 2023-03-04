@@ -53,7 +53,7 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import { RKIError, checkDateParameterForMaps } from "./utils";
+import { RKIError, checkDateParameterForMaps, CreateRedisClient, } from "./utils";
 
 const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
@@ -61,6 +61,9 @@ const cache = require("express-redis-cache-next")({
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
 });
+
+// create redis client for base data
+export const redisClientBas = CreateRedisClient("bas:");
 
 Date.prototype.toJSON = function () {
   return this.toISOString();

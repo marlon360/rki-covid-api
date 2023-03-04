@@ -39,13 +39,6 @@ export interface FrozenIncidenceData {
   }[];
 }
 
-interface redisEntry {
-  body: string;
-  touched: Number;
-  expire: Number;
-  type: string;
-}
-
 interface RequestTypeParameter {
   type: string;
   url: string;
@@ -297,11 +290,11 @@ const MissingDateDataPromise = async function (resolve, reject) {
       reject(new RKIError(rdata.error, response.config.url));
       throw new RKIError(rdata.error, response.config.url);
     }
-    const unzipped = await new Promise((resolve) =>
+    const unziped = await new Promise((resolve) =>
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisData = unzipped.toString();
+    const redisData = unziped.toString();
 
     // get next monday
     const nextMonday = GetNextMonday();
