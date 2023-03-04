@@ -6,7 +6,7 @@ import {
 } from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
-import LK_Names from "../configuration/LK_Names.json"
+import LK_Names from "../configuration/LK_Names.json";
 
 export interface IDistrictData {
   ags: string;
@@ -24,7 +24,7 @@ export async function getDistrictsData(): Promise<
   ResponseData<IDistrictData[]>
 > {
   const data = await getCasesDistrictsJson();
-  
+
   const districts = data.data.map((district) => {
     return {
       ags: district.IdLandkreis,
@@ -64,7 +64,7 @@ export async function getNewDistrictCases(): Promise<
   ResponseData<{ ags: string; cases: number }[]>
 > {
   let data = await getCasesDistrictsJson();
-  
+
   const districts = data.data.map((district) => {
     return {
       ags: district.IdLandkreis,
@@ -81,7 +81,7 @@ export async function getNewDistrictDeaths(): Promise<
   ResponseData<{ ags: string; deaths: number }[]>
 > {
   let data = await getCasesDistrictsJson();
-  
+
   const districts = data.data.map((district) => {
     return {
       ags: district.IdLandkreis,
@@ -98,7 +98,7 @@ export async function getNewDistrictRecovered(): Promise<
   ResponseData<{ ags: string; recovered: number }[]>
 > {
   let data = await getCasesDistrictsJson();
-  
+
   const districts = data.data.map((district) => {
     return {
       ags: district.IdLandkreis,
@@ -118,7 +118,7 @@ export async function getLastDistrictCasesHistory(
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
   let data = await getCasesHistoryDistrictsJson();
-  
+
   let history: {
     ags: string;
     name: string;
@@ -134,11 +134,11 @@ export async function getLastDistrictCasesHistory(
   });
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    history = history.filter((entry) => new Date(entry.date) > reference_date);  
+    history = history.filter((entry) => new Date(entry.date) > reference_date);
   }
   if (ags) {
     ags = ags.padStart(5, "0");
-    history = history.filter((entry) => entry.ags == ags)
+    history = history.filter((entry) => entry.ags == ags);
   }
   return {
     data: history,
@@ -153,7 +153,7 @@ export async function getLastDistrictDeathsHistory(
   ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
 > {
   let data = await getCasesHistoryDistrictsJson();
-  
+
   let history: {
     ags: string;
     name: string;
@@ -170,11 +170,11 @@ export async function getLastDistrictDeathsHistory(
 
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    history = history.filter((entry) => new Date(entry.date) > reference_date);  
+    history = history.filter((entry) => new Date(entry.date) > reference_date);
   }
   if (ags) {
     ags = ags.padStart(5, "0");
-    history = history.filter((entry) => entry.ags == ags)
+    history = history.filter((entry) => entry.ags == ags);
   }
 
   return {
@@ -190,7 +190,7 @@ export async function getLastDistrictRecoveredHistory(
   ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
 > {
   let data = await getCasesHistoryDistrictsJson();
-  
+
   let history: {
     ags: string;
     name: string;
@@ -207,11 +207,11 @@ export async function getLastDistrictRecoveredHistory(
 
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    history = history.filter((entry) => new Date(entry.date) > reference_date);  
+    history = history.filter((entry) => new Date(entry.date) > reference_date);
   }
   if (ags) {
     ags = ags.padStart(5, "0");
-    history = history.filter((entry) => entry.ags == ags)
+    history = history.filter((entry) => entry.ags == ags);
   }
 
   return {
@@ -229,7 +229,7 @@ export async function getDistrictsAgeGroups(
   const districts: AgeGroupsData = {};
   data.data.forEach((entry) => {
     const ags = entry.IdLandkreis;
-    if(paramAgs && paramAgs != ags) return;
+    if (paramAgs && paramAgs != ags) return;
     if (!districts[ags]) districts[ags] = {};
     districts[ags][entry.Altersgruppe] = {
       casesMale: entry.casesMale,

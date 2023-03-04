@@ -73,7 +73,9 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return null;
   }
 
-  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1).setHours(0,0,0,0));
+  const yesterdayDate = new Date(
+    AddDaysToDate(districtsData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
 
   let districts = districtsData.data.map((district) => {
     const districtFixHistory = districtsFixIncidence.data.find(
@@ -148,7 +150,9 @@ export async function DistrictsCasesHistoryResponse(
     }
   }
   const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
-  const highDate = new Date(AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0,0,0,0));
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set
@@ -246,7 +250,9 @@ export async function DistrictsDeathsHistoryResponse(
     }
   }
   const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
-  const highDate = new Date(AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0,0,0,0));
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set
@@ -282,7 +288,9 @@ export async function DistrictsRecoveredHistoryResponse(
     }
   }
   const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-  const highDate = new Date(AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0,0,0,0)); //highest date, witch is "datenstand" -1
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  ); //highest date, witch is "datenstand" -1
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01

@@ -94,7 +94,9 @@ export async function GermanyResponse(): Promise<GermanyData> {
   const weekIncidence = (casesPerWeek / population) * 100000;
   const casesPer100k = (casesData.data / population) * 100000;
 
-  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1).setHours(0,0,0,0));
+  const yesterdayDate = new Date(
+    AddDaysToDate(statesData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const yesterdayIncidence = germanFixIncidence.data[0].history.find(
     (entry) => entry.date.getTime() == yesterdayDate.getTime()
   ).weekIncidence;
@@ -153,7 +155,9 @@ export async function GermanyCasesHistoryResponse(
     }
   }
   const history = await getLastCasesHistory(days);
-  const highDate = new Date(AddDaysToDate(history.lastUpdate, -1).setHours(0,0,0,0));
+  const highDate = new Date(
+    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
@@ -224,7 +228,9 @@ export async function GermanyDeathsHistoryResponse(
     }
   }
   const history = await getLastDeathsHistory(days);
-  const highDate = new Date(AddDaysToDate(history.lastUpdate, -1).setHours(0,0,0,0));
+  const highDate = new Date(
+    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
@@ -253,7 +259,9 @@ export async function GermanyRecoveredHistoryResponse(
     }
   }
   const history = await getLastRecoveredHistory(days);
-  const highDate = new Date(AddDaysToDate(history.lastUpdate, -1).setHours(0,0,0,0));
+  const highDate = new Date(
+    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01

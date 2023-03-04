@@ -111,13 +111,17 @@ export async function getLastStateCasesHistory(
   const data = await getCasesHistoryStatesJson();
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    historyData = data.data.filter((state) => parseInt(state.IdBundesland) == id);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
   } else {
     historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    historyData = historyData.filter((dates) => dates.Meldedatum >= reference_date);
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
@@ -148,13 +152,17 @@ export async function getLastStateDeathsHistory(
   const data = await getCasesHistoryStatesJson();
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    historyData = data.data.filter((state) => parseInt(state.IdBundesland) == id);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
   } else {
     historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    historyData = historyData.filter((dates) => dates.Meldedatum >= reference_date);
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
@@ -185,13 +193,17 @@ export async function getLastStateRecoveredHistory(
   const data = await getCasesHistoryStatesJson();
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    historyData = data.data.filter((state) => parseInt(state.IdBundesland) == id);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
   } else {
     historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
   if (days) {
     const reference_date = new Date(getDateBefore(days));
-    historyData = historyData.filter((dates) => dates.Meldedatum >= reference_date);
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
@@ -229,9 +241,7 @@ export async function getStatesAgeGroups(
   data.data.forEach((entry) => {
     if (!parseInt(entry.IdBundesland)) return;
     if (id && parseInt(entry.IdBundesland) != id) return;
-    const abbreviation = getStateAbbreviationById(
-      parseInt(entry.IdBundesland)
-    );
+    const abbreviation = getStateAbbreviationById(parseInt(entry.IdBundesland));
     if (!states[abbreviation]) states[abbreviation] = {};
     states[abbreviation][entry.Altersgruppe] = {
       casesMale: entry.casesMale,

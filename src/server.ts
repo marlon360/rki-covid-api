@@ -53,7 +53,11 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import { RKIError, checkDateParameterForMaps, CreateRedisClient, } from "./utils";
+import {
+  RKIError,
+  checkDateParameterForMaps,
+  CreateRedisClient,
+} from "./utils";
 
 const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },

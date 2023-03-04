@@ -15,7 +15,7 @@ export async function getCases(): Promise<ResponseData<number>> {
 }
 
 export async function getNewCases(): Promise<ResponseData<number>> {
-  const data  = await getCasesStatesJson();
+  const data = await getCasesStatesJson();
   return {
     data: data.data[0].newCases,
     lastUpdate: new Date(data.metaData.modified),
