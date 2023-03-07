@@ -94,9 +94,12 @@ export async function StatesResponse(
     hospitalizationData.data
   );
 
-  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1));
+  const yesterdayDate = new Date(
+    AddDaysToDate(statesData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
 
   let states = statesData.data.map((state) => {
+    if (!state.id) return;
     const stateAbbreviation = getStateAbbreviationById(state.id);
     const stateFixHistory = statesFixIncidence.data.find(
       (fixEntry) => fixEntry.abbreviation == stateAbbreviation
@@ -144,7 +147,9 @@ export async function StatesResponse(
 
   const statesKey = {};
   for (const state of states) {
-    statesKey[state.abbreviation] = state;
+    if (state) {
+      statesKey[state.abbreviation] = state;
+    }
   }
 
   return {
@@ -183,7 +188,9 @@ export async function StatesCasesHistoryResponse(
 
   const statesHistoryData = await getLastStateCasesHistory(days, id);
 
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const highDate = new Date(
+    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  ); //highest date, witch is "datenstand" -1
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
@@ -288,7 +295,9 @@ export async function StatesDeathsHistoryResponse(
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
 
   const statesHistoryData = await getLastStateDeathsHistory(days, id);
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const highDate = new Date(
+    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  ); //highest date, witch is "datenstand" -1
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
@@ -327,7 +336,9 @@ export async function StatesRecoveredHistoryResponse(
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
 
   const statesHistoryData = await getLastStateRecoveredHistory(days, id);
-  const highDate = AddDaysToDate(statesHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const highDate = new Date(
+    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  ); //highest date, witch is "datenstand" -1
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01

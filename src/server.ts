@@ -53,14 +53,21 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import { RKIError, checkDateParameterForMaps } from "./utils";
+import {
+  RKIError,
+  checkDateParameterForMaps,
+  CreateRedisClient,
+} from "./utils";
 
-const cache = require("express-redis-cache")({
+const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
   host: process.env.REDISHOST || process.env.REDIS_URL,
   port: process.env.REDISPORT,
   auth_pass: process.env.REDISPASSWORD,
 });
+
+// create redis client for base data
+export const redisClientBas = CreateRedisClient("bas:");
 
 Date.prototype.toJSON = function () {
   return this.toISOString();
@@ -951,9 +958,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.setHeader("Content-Type", "image/png");
     const response = await DistrictsMapResponse();
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -967,8 +973,7 @@ app.get(
       mapTypes.map,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -978,8 +983,7 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await DistrictsMapResponse(mapTypes.legendMap);
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -993,8 +997,7 @@ app.get(
       mapTypes.legendMap,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1008,9 +1011,8 @@ app.get(
 );
 
 app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
-  res.setHeader("Content-Type", "image/png");
   const response = await StatesMapResponse();
-  res.send(response);
+  res.setHeader("Content-Type", "image/png").send(response);
 });
 
 app.get(
@@ -1023,8 +1025,7 @@ app.get(
       mapTypes.map,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1033,9 +1034,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.setHeader("Content-Type", "image/png");
     const response = await StatesMapResponse(mapTypes.legendMap);
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1049,8 +1049,7 @@ app.get(
       mapTypes.legendMap,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1068,9 +1067,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.setHeader("Content-Type", "image/png");
     const response = await StatesHospitalizationMapResponse(mapTypes.legendMap);
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1079,9 +1077,8 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    res.setHeader("Content-Type", "image/png");
     const response = await StatesHospitalizationMapResponse();
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1095,8 +1092,7 @@ app.get(
       mapTypes.legendMap,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
@@ -1110,8 +1106,7 @@ app.get(
       mapTypes.map,
       checkedDateString
     );
-    res.setHeader("Content-Type", "image/png");
-    res.send(response);
+    res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 

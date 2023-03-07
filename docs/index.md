@@ -58,15 +58,21 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 
 **Time series data**
 
-[https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0)
+[https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore](https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore)
+
+All these values are calculated from the daily RKI Dump
 
 **States data**
 
-[https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0)
+[https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore](https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore)
+
+All these values are calculated from the daily RKI Dump
 
 **Districts data**
 
-[https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0)
+[https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore](https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore)
+
+All these values are calculated from the daily RKI Dump
 
 **Vaccination data**
 
@@ -89,7 +95,9 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 
 **Age groups**
 
-[https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0](https://npgeo-corona-npgeo-de.hub.arcgis.com/datasets/23b1ccb051f543a5b526021275c1c6e5_0)
+[https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore](https://github.com/Rubber1Duck/RD_RKI_COVID19_DATA/tree/master/dataStore)
+
+All these values are calculated from the daily RKI Dump
 
 **Hospitalization data**
 

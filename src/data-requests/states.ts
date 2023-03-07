@@ -1,11 +1,10 @@
-import axios from "axios";
 import {
   getDateBefore,
   getStateAbbreviationById,
-  RKIError,
-  getAlternateDataSource,
-  parseDate,
-  shouldUseAlternateDataSource,
+  getCasesStatesJson,
+  getCasesHistoryStatesJson,
+  CasesHistoryStatesJson,
+  getAgeGroupStatesJson,
 } from "../utils";
 import { AgeGroupData } from "./germany";
 import { ResponseData } from "./response-data";
@@ -18,210 +17,88 @@ export interface IStateData {
   deaths: number;
   casesPerWeek: number;
   deathsPerWeek: number;
-  lastUpdated: number;
 }
 
 export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
-  const response = await axios.get(
-    `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Coronaf%C3%A4lle_in_den_Bundesl%C3%A4ndern/FeatureServer/0/query?where=1%3D1&outFields=LAN_ew_EWZ,LAN_ew_AGS,Fallzahl,Aktualisierung,Death,cases7_bl,death7_bl,LAN_ew_GEN&returnGeometry=false&f=json`
-  );
-  const data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  const states = data.features.map((feature) => {
+  const data = await getCasesStatesJson();
+  const states = data.data.map((state) => {
     return {
-      id: parseInt(feature.attributes.LAN_ew_AGS),
-      name: feature.attributes.LAN_ew_GEN,
-      population: feature.attributes.LAN_ew_EWZ,
-      cases: feature.attributes.Fallzahl,
-      deaths: feature.attributes.Death,
-      casesPerWeek: feature.attributes.cases7_bl,
-      deathsPerWeek: feature.attributes.death7_bl,
+      id: parseInt(state.IdBundesland),
+      name: state.Bundesland,
+      population: state.population,
+      cases: state.accuCases,
+      deaths: state.accuDeaths,
+      casesPerWeek: state.accuCasesPerWeek,
+      deathsPerWeek: state.accuDeathsPerWeek,
     };
   });
-  // data.features[0].attributes.Aktualisierung is a
-  // millisecond value witch is GMT!
-  // lets always convert this to GMT date and time 00:00:00
-  // regardless of whether it is summer or standart time in Germany
-  // (add 2 hours in summertime or 1 hour in standarttime)
-  // e.g. Aktualisierung is 1665093600000 = "Thu Oct 06 2022 22:00:00 GMT+0000"
-  // ->wrong date for lastUpdate!
-  // first convert this to german Time = "7.10.2022, 00:00:00"
-  const germanDate = new Date(
-    data.features[0].attributes.Aktualisierung
-  ).toLocaleString("de-DE", { timeZone: "Europe/Berlin" });
-  // now parse this string and set lastUpdate to "Fri Oct 07 2022 00:00:00 GMT+0000"
-  // -> right date for lastUpdate!
-  const lastUpdate = parseDate(germanDate);
   return {
     data: states,
-    lastUpdate: lastUpdate,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
 export async function getStatesRecoveredData(): Promise<
   ResponseData<{ id: number; recovered: number }[]>
 > {
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    data = await getAlternateDataSource(url);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
-  }
-  const states = data.features.map((feature) => {
+  const data = await getCasesStatesJson();
+  const states = data.data.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      recovered: feature.attributes.recovered,
+      id: parseInt(state.IdBundesland),
+      recovered: state.accuRecovered,
     };
   });
   return {
     data: states,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
 export async function getNewStateRecovered(): Promise<
   ResponseData<{ id: number; recovered: number }[]>
 > {
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuGenesen IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  if (data.features.length == 0) {
-    // This meens there are no new recovered in all states!
-    // but we need the field "Datenstand" from the rki Data Base so
-    // lets request the total recovered (there is always a result!)
-    // and "build" a result with "total recovered Datenstand" and "new recovered = 0"
-    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuGenesen IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-    const response2 = await axios.get(url2);
-    const data2 = response2.data;
-    if (data2.error) {
-      throw new RKIError(data2.error, response2.config.url);
-    }
-    data.features[0] = {
-      attributes: {
-        IdBundesland: 1,
-        recovered: 0,
-        Datenstand: data2.features[0].attributes.Datenstand,
-      },
-    };
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    data = await getAlternateDataSource(url);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
-  }
-  const states = data.features.map((feature) => {
+  const data = await getCasesStatesJson();
+  const states = data.data.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      recovered: feature.attributes.recovered,
+      id: parseInt(state.IdBundesland),
+      recovered: state.newRecovered,
     };
   });
   return {
     data: states,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
 export async function getNewStateCases(): Promise<
   ResponseData<{ id: number; cases: number }[]>
 > {
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerFall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  if (data.features.length == 0) {
-    // This meens there are no new cases in all states!
-    // but we need the field "Datenstand" from the rki Data Base so
-    // lets request the total cases (there is always a result!)
-    // and "build" a result with "total cases Datenstand" and "new cases = 0"
-    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerFall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-    const response2 = await axios.get(url2);
-    const data2 = response2.data;
-    if (data2.error) {
-      throw new RKIError(data2.error, response2.config.url);
-    }
-    data.features[0] = {
-      attributes: {
-        IdBundesland: 1,
-        cases: 0,
-        Datenstand: data2.features[0].attributes.Datenstand,
-      },
-    };
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    data = await getAlternateDataSource(url);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
-  }
-  const states = data.features.map((feature) => {
+  const data = await getCasesStatesJson();
+  const states = data.data.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      cases: feature.attributes.cases,
+      id: parseInt(state.IdBundesland),
+      cases: state.newCases,
     };
   });
   return {
     data: states,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
 export async function getNewStateDeaths(): Promise<
   ResponseData<{ id: number; deaths: number }[]>
 > {
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,-1)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  // check if there is a result
-  if (data.features.length == 0) {
-    // This meens there are no new deaths in all states!
-    // if not, we need the field "Datenstand" from the rki Data Base so
-    // lets request the total deaths (there is always a result!)
-    // and "build" one result with "total deaths Datenstand" and "new deaths = 0" and "IdBundesland=1"
-    const url2 = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=NeuerTodesfall IN(1,0)&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,IdBundeland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland&groupByFieldsForStatistics=IdBundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"},{"statisticType":"max","onStatisticField":"MeldeDatum","outStatisticFieldName":"date"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-    const response2 = await axios.get(url2);
-    const data2 = response2.data;
-    if (data2.error) {
-      throw new RKIError(data2.error, response2.config.url);
-    }
-    data.features[0] = {
-      attributes: {
-        IdBundesland: 1,
-        deaths: 0,
-        Datenstand: data2.features[0].attributes.Datenstand,
-      },
-    };
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    const data2 = await getAlternateDataSource(url);
-    if (data2.features.length > 0) {
-      data = data2;
-      datenstand = parseDate(data2.features[0].attributes.Datenstand);
-    }
-  }
-  const states = data.features.map((feature) => {
+  const data = await getCasesStatesJson();
+  const states = data.data.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      deaths: feature.attributes.deaths,
+      id: parseInt(state.IdBundesland),
+      deaths: state.newDeaths,
     };
   });
   return {
     data: states,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
@@ -231,46 +108,38 @@ export async function getLastStateCasesHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; cases: number; date: Date }[]>
 > {
-  const whereParams = [`NeuerFall IN(1,0)`];
-  if (days) {
-    const dateString = getDateBefore(days);
-    whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
-  }
+  const data = await getCasesHistoryStatesJson();
+  let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    whereParams.push(`IdBundesland = ${id}`);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
+  } else {
+    historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
-    " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlFall,MeldeDatum,Bundesland,IdBundesland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland,MeldeDatum&groupByFieldsForStatistics=IdBundesland,MeldeDatum,Bundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlFall","outStatisticFieldName":"cases"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0") : null;
-    data = await getAlternateDataSource(url, blId);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
     name: string;
     cases: number;
     date: Date;
-  }[] = data.features.map((feature) => {
+  }[] = historyData.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      name: feature.attributes.Bundesland,
-      cases: feature.attributes.cases,
-      date: new Date(feature.attributes.MeldeDatum),
+      id: parseInt(state.IdBundesland),
+      name: state.Bundesland,
+      cases: state.cases,
+      date: new Date(state.Meldedatum),
     };
   });
 
   return {
     data: history,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
@@ -280,46 +149,38 @@ export async function getLastStateDeathsHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; deaths: number; date: Date }[]>
 > {
-  const whereParams = [`NeuerTodesfall IN(1,0,-9)`];
-  if (days) {
-    const dateString = getDateBefore(days);
-    whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
-  }
+  const data = await getCasesHistoryStatesJson();
+  let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    whereParams.push(`IdBundesland = ${id}`);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
+  } else {
+    historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
-    " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlTodesfall,MeldeDatum,Bundesland,IdBundesland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland,MeldeDatum&groupByFieldsForStatistics=IdBundesland,MeldeDatum,Bundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlTodesfall","outStatisticFieldName":"deaths"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0") : null;
-    data = await getAlternateDataSource(url, blId);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
     name: string;
     deaths: number;
     date: Date;
-  }[] = data.features.map((feature) => {
+  }[] = historyData.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      name: feature.attributes.Bundesland,
-      deaths: feature.attributes.deaths,
-      date: new Date(feature.attributes.MeldeDatum),
+      id: parseInt(state.IdBundesland),
+      name: state.Bundesland,
+      deaths: state.deaths,
+      date: new Date(state.Meldedatum),
     };
   });
 
   return {
     data: history,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
@@ -329,46 +190,38 @@ export async function getLastStateRecoveredHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; recovered: number; date: Date }[]>
 > {
-  const whereParams = [`NeuGenesen IN(1,0,-9)`];
-  if (days) {
-    const dateString = getDateBefore(days);
-    whereParams.push(`MeldeDatum >= TIMESTAMP '${dateString}'`);
-  }
+  const data = await getCasesHistoryStatesJson();
+  let historyData: CasesHistoryStatesJson["data"];
   if (id) {
-    whereParams.push(`IdBundesland = ${id}`);
+    historyData = data.data.filter(
+      (state) => parseInt(state.IdBundesland) == id
+    );
+  } else {
+    historyData = data.data.filter((state) => state.IdBundesland != "00");
   }
-  const url = `https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/Covid19_hubv/FeatureServer/0/query?where=${whereParams.join(
-    " AND "
-  )}&objectIds=&time=&resultType=standard&outFields=AnzahlGenesen,MeldeDatum,Bundesland,IdBundesland,Datenstand&returnIdsOnly=false&returnUniqueIdsOnly=false&returnCountOnly=false&returnDistinctValues=false&cacheHint=false&orderByFields=IdBundesland,MeldeDatum&groupByFieldsForStatistics=IdBundesland,MeldeDatum,Bundesland,Datenstand&outStatistics=[{"statisticType":"sum","onStatisticField":"AnzahlGenesen","outStatisticFieldName":"recovered"}]&having=&resultOffset=&resultRecordCount=&sqlFormat=none&f=json&token=`;
-
-  const response = await axios.get(url);
-  let data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  let datenstand = parseDate(data.features[0].attributes.Datenstand);
-  if (shouldUseAlternateDataSource(datenstand)) {
-    const blId = id ? id.toString().padStart(2, "0") : null;
-    data = await getAlternateDataSource(url, blId);
-    datenstand = parseDate(data.features[0].attributes.Datenstand);
+  if (days) {
+    const reference_date = new Date(getDateBefore(days));
+    historyData = historyData.filter(
+      (dates) => dates.Meldedatum >= reference_date
+    );
   }
   const history: {
     id: number;
     name: string;
     recovered: number;
     date: Date;
-  }[] = data.features.map((feature) => {
+  }[] = historyData.map((state) => {
     return {
-      id: feature.attributes.IdBundesland,
-      name: feature.attributes.Bundesland,
-      recovered: feature.attributes.recovered,
-      date: new Date(feature.attributes.MeldeDatum),
+      id: parseInt(state.IdBundesland),
+      name: state.Bundesland,
+      recovered: state.recovered,
+      date: new Date(state.Meldedatum),
     };
   });
 
   return {
     data: history,
-    lastUpdate: datenstand,
+    lastUpdate: new Date(data.metaData.modified),
   };
 }
 
@@ -381,33 +234,24 @@ export interface AgeGroupsData {
 export async function getStatesAgeGroups(
   id?: number
 ): Promise<ResponseData<AgeGroupsData>> {
-  const response = await axios.get(
-    "https://services7.arcgis.com/mOBPykOjAyBO2ZKk/arcgis/rest/services/rki_altersgruppen_hubv/FeatureServer/0/query?where=AdmUnitId%3C17&outFields=*&f=json"
-  );
-  const data = response.data;
-  if (data.error) {
-    throw new RKIError(data.error, response.config.url);
-  }
-  const lastModified = response.headers["last-modified"];
-  const lastUpdate = lastModified != null ? new Date(lastModified) : new Date();
+  const data = await getAgeGroupStatesJson();
+  const lastUpdate = new Date(data.metaData.modified);
 
   const states: AgeGroupsData = {};
-  data.features.forEach((feature) => {
-    if (!feature.attributes.BundeslandId) return;
-    if (id && feature.attributes.BundeslandId != id) return;
-    const abbreviation = getStateAbbreviationById(
-      feature.attributes.BundeslandId
-    );
+  data.data.forEach((entry) => {
+    if (!parseInt(entry.IdBundesland)) return;
+    if (id && parseInt(entry.IdBundesland) != id) return;
+    const abbreviation = getStateAbbreviationById(parseInt(entry.IdBundesland));
     if (!states[abbreviation]) states[abbreviation] = {};
-    states[abbreviation][feature.attributes.Altersgruppe] = {
-      casesMale: feature.attributes.AnzFallM,
-      casesFemale: feature.attributes.AnzFallW,
-      deathsMale: feature.attributes.AnzTodesfallM,
-      deathsFemale: feature.attributes.AnzTodesfallW,
-      casesMalePer100k: feature.attributes.AnzFall100kM,
-      casesFemalePer100k: feature.attributes.AnzFall100kW,
-      deathsMalePer100k: feature.attributes.AnzTodesfall100kM,
-      deathsFemalePer100k: feature.attributes.AnzTodesfall100kW,
+    states[abbreviation][entry.Altersgruppe] = {
+      casesMale: entry.casesMale,
+      casesFemale: entry.casesFemale,
+      deathsMale: entry.deathsMale,
+      deathsFemale: entry.deathsFemale,
+      casesMalePer100k: entry.casesMalePer100k,
+      casesFemalePer100k: entry.casesFemalePer100k,
+      deathsMalePer100k: entry.deathsMalePer100k,
+      deathsFemalePer100k: entry.deathsFemalePer100k,
     };
   });
 

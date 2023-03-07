@@ -73,7 +73,9 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return null;
   }
 
-  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1));
+  const yesterdayDate = new Date(
+    AddDaysToDate(districtsData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
 
   let districts = districtsData.data.map((district) => {
     const districtFixHistory = districtsFixIncidence.data.find(
@@ -147,14 +149,10 @@ export async function DistrictsCasesHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  if (!ags && days) {
-    // if ags is not defined restrict days to 336
-    days = Math.min(days, 336);
-  } else if (!ags) {
-    days = 336;
-  }
   const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
-  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set
@@ -251,14 +249,10 @@ export async function DistrictsDeathsHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  if (!ags && days) {
-    // if ags is not defined restrict days to 330
-    days = Math.min(days, 330);
-  } else if (!ags) {
-    days = 330;
-  }
   const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
-  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, if all datasets are actual, this is yesterday!
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  );
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set
@@ -293,14 +287,10 @@ export async function DistrictsRecoveredHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  if (!ags && days) {
-    // if ags is not defined restrict days to 330
-    days = Math.min(days, 330);
-  } else if (!ags) {
-    days = 330;
-  }
   const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
-  const highDate = AddDaysToDate(districtsHistoryData.lastUpdate, -1); //highest date, witch is "datenstand" -1
+  const highDate = new Date(
+    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
+  ); //highest date, witch is "datenstand" -1
   const lowDate = days
     ? AddDaysToDate(highDate, (days - 1) * -1)
     : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
