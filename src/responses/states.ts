@@ -83,6 +83,9 @@ export async function StatesResponse(
     getStatesFrozenIncidenceHistory(3),
   ]);
 
+  // remove the first element from statesData.data (=Bundesgebiet)
+  statesData.data.shift();
+
   function getStateById(data: ResponseData<any[]>, id: number): any | null {
     for (const state of data.data) {
       if (state.id == id) return state;
@@ -99,7 +102,6 @@ export async function StatesResponse(
   );
 
   let states = statesData.data.map((state) => {
-    if (!state.id) return;
     const stateAbbreviation = getStateAbbreviationById(state.id);
     const stateFixHistory = statesFixIncidence.data.find(
       (fixEntry) => fixEntry.abbreviation == stateAbbreviation
