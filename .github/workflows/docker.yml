@@ -33,7 +33,7 @@ jobs:
           VAR1: ${{ steps.docker.outputs.IMAGE_SHA_NAME }}
           VAR2: ${{ steps.docker.outputs.IMAGE_URL }}
       - name: Publish to Docker Hub
-        uses: elgohr/Publish-Docker-Github-Action@master
+        uses: elgohr/Publish-Docker-Github-Action@v5
         with:
           name: marlon360/rki-covid-server
           dockerfile: "./docker/Dockerfile"
