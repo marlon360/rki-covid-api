@@ -24,47 +24,47 @@
   "data": {
     "history": [
       {
-        "calendarWeek": "until CW10, 2020",
-        "performedTests": 69184,
+        "calendarWeek": "10/2020",
+        "performedTests": 69493,
         "positiveTests": 1722,
-        "positivityRate": null,
+        "positivityRate": 0.0248,
         "laboratoryCount": null
       },
       {
         "calendarWeek": "11/2020",
-        "performedTests": 128008,
-        "positiveTests": 7470,
-        "positivityRate": 0.05835572776701456,
-        "laboratoryCount": 118
+        "performedTests": 129291,
+        "positiveTests": 7502,
+        "positivityRate": 0.058,
+        "laboratoryCount": 119
       },
       {
         "calendarWeek": "12/2020",
         "performedTests": 374534,
         "positiveTests": 25886,
-        "positivityRate": 0.06911522051402542,
+        "positivityRate": 0.0691,
         "laboratoryCount": 154
       },
-      // ...
+      ...
       {
-        "calendarWeek": "12/2021",
-        "performedTests": 1415220,
-        "positiveTests": 131857,
-        "positivityRate": 0.09317067311089441,
-        "laboratoryCount": 206
+        "calendarWeek": "10/2023",
+        "performedTests": 56415,
+        "positiveTests": 17614,
+        "positivityRate": 0.3122,
+        "laboratoryCount": 72
       },
       {
-        "calendarWeek": "13/2021",
-        "performedTests": 1167760,
-        "positiveTests": 128266,
-        "positivityRate": 0.10983935055148318,
-        "laboratoryCount": 204
+        "calendarWeek": "11/2023",
+        "performedTests": 54080,
+        "positiveTests": 18130,
+        "positivityRate": 0.3352,
+        "laboratoryCount": 72
       },
       {
-        "calendarWeek": "14/2021",
-        "performedTests": 1152511,
-        "positiveTests": 138738,
-        "positivityRate": 0.12037889443137637,
-        "laboratoryCount": 201
+        "calendarWeek": "12/2023",
+        "performedTests": 47813,
+        "positiveTests": 15385,
+        "positivityRate": 0.3218,
+        "laboratoryCount": 72
       }
     ]
   },
@@ -72,8 +72,8 @@
     "source": "Robert Koch-Institut",
     "contact": "Marlon Lueckert (m.lueckert@me.com)",
     "info": "https://github.com/marlon360/rki-covid-api",
-    "lastUpdate": "2021-04-14T14:54:08.000Z",
-    "lastCheckedForUpdate": "2021-04-14T20:59:21.345Z"
+    "lastUpdate": "2023-03-30T10:00:05.000Z",
+    "lastCheckedForUpdate": "2023-04-05T16:41:31.125Z"
   }
 }
 ```
