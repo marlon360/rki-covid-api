@@ -191,9 +191,7 @@ export async function GermanyWeekIncidenceHistoryResponse(
   const history = await GermanyCasesHistoryResponse(days);
   const statesData = await getStatesData();
 
-  const population = statesData.data
-    .map((state) => state.population)
-    .reduce((cur, acc) => (cur += acc));
+  const population = statesData.data[0].population;
 
   const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
 
