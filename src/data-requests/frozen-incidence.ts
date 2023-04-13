@@ -342,8 +342,10 @@ async function finalizeData(
   paramDays?: number,
   paramDate?: Date
 ): Promise<{ data: FrozenIncidenceData[]; lastUpdate: Date }> {
-  // lastUpdate from actual data is date of last entry
-  const lastDate = new Date(actualData.lastUpdate).setHours(0, 0, 0);
+  // get last date from one actualData history
+  const lastDate = new Date(
+    actualData.data[0].history[actualData.data[0].history.length - 1].date
+  ).setHours(0, 0, 0);
   const today = new Date().setHours(0, 0, 0);
   let lastUpdate: Date;
   // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
