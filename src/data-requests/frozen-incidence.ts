@@ -121,26 +121,6 @@ const ArchiveStates: RequestTypeParameter = {
 // create redis client for frozen-incidence Excel- and Date-Data
 const redisClientFix = CreateRedisClient("fix:");
 
-function GetNextMonday(date = new Date()) {
-  const dateCopy = new Date(date.getTime());
-  const nextMonday = new Date(
-    dateCopy.setUTCDate(
-      dateCopy.getUTCDate() + ((7 - dateCopy.getUTCDay() + 1) % 7 || 7)
-    )
-  );
-  return nextMonday;
-}
-
-function GetLastMonday(date = new Date()) {
-  const dateCopy = new Date(date.getTime());
-  const lastMonday = new Date(
-    dateCopy.setUTCDate(
-      dateCopy.getUTCDate() - ((dateCopy.getUTCDay() + 6) % 7 || 7)
-    )
-  );
-  return lastMonday;
-}
-
 // this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
 const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
@@ -227,38 +207,12 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     //prepare data for redis entry for the excelsheet
     const JsonData = JSON.stringify({ lastUpdate, data });
 
-    let validForSec: number;
-
-    // if archive data, set validForSec to neverExpire = -1
-    // (archive data excel sheet should never change)
-    if (type == ArchiveDistricts.type || type == ArchiveStates.type) {
-      validForSec = neverExpire;
-    } else {
-      // get next monday
-      const nextMonday = GetNextMonday();
-
-      // get lastMonday
-      const lastMonday = GetLastMonday();
-
-      // set validToMs to nextMonday 8 o`clock in milliseconds (RKI update should be done then)
-      let validToMs = new Date(nextMonday).setUTCHours(8, 0, 0, 0);
-
-      // if lastUpdate < last monday 0 o`clock maybe today is public holiday
-      // and the data will be updated tomorrow!
-      // set validToMs to tomorrow 8 o`clock (new try tomorrow)
-      if (new Date(lastUpdate).getTime() < lastMonday.setUTCHours(0, 0, 0, 0)) {
-        validToMs = AddDaysToDate(new Date(), 1).setHours(8, 0, 0, 0);
-      }
-      // calculate the seconds from now to validTo or set to -1 if validTo is set to -1
-      validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
-    }
-
     // add to redis
     await AddRedisEntry(
       redisClientFix,
       redisKey,
       JsonData,
-      validForSec,
+      neverExpire,
       "json"
     );
   } else {
@@ -273,7 +227,6 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
 const MissingDateDataPromise = async function (resolve, reject) {
   const requestType: RequestTypeParameter = this.requestType;
   const date = this.date;
-  const lastUpdateRKI: Date = this.lastUpdateRKI;
   const redisKey = `${requestType.redisKey}_${date}`;
   const githubUrlPre = requestType.githubUrlPre;
   const githubUrlPost = requestType.githubUrlPost;
@@ -296,33 +249,12 @@ const MissingDateDataPromise = async function (resolve, reject) {
     // prepare data for redis
     const redisData = unziped.toString();
 
-    // get next monday
-    const nextMonday = GetNextMonday();
-
-    //get last monday
-    const lastMonday = GetLastMonday();
-
-    // set validToMs to nextMonday 8 o`clock in milliseconds (RKI Update should be done then)
-    let validToMs = new Date(nextMonday).setUTCHours(8, 0, 0, 0);
-
-    // if lastUpdate < last monday 0 o`clock, maybe today is public holiday
-    // or the RKI is late and the data will updated later or tomorrow!
-    // set validToMs to tomorrow 8 o`clock (new try tomorrow)
-    if (
-      new Date(lastUpdateRKI).getTime() < lastMonday.setUTCHours(0, 0, 0, 0)
-    ) {
-      validToMs = AddDaysToDate(new Date(), 1).setHours(8, 0, 0, 0);
-    }
-
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
-
     // add to redis
     await AddRedisEntry(
       redisClientFix,
       redisKey,
       redisData,
-      validForSec,
+      neverExpire,
       "json"
     );
     missingDateData = JSON.parse(redisData, dateReviver);
@@ -371,7 +303,6 @@ async function finalizeData(
           MissingDateDataPromise.bind({
             date: missingDate,
             requestType: requestType,
-            lastUpdateRKI: actualData.lastUpdate,
           })
         )
       );
