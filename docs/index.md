@@ -185,6 +185,7 @@ Now you can access the server at `http://localhost:8080`.
 - Statistik für Baden-Württemberg mit Differenz zum Vortag [https://corona-in-bw.de](https://corona-in-bw.de)
 - Covid 19 Statistics Germany [https://covid19ger.netlify.app/](https://covid19ger.netlify.app/)
 - Covid-19 Analysis and Visualisation [http://mb.cmbt.de](http://mb.cmbt.de), github: [https://github.com/1c3t3a/Covid-19-analysis](https://github.com/1c3t3a/Covid-19-analysis)
+- Dashboard: 7-Tage Prognosen für Fallzahlen auf kommunaler Ebene [https://covid-prognosen.de](https://covid-prognosen.de)
 
 ## License
 
