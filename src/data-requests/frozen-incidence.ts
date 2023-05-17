@@ -1,13 +1,11 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import zlib from "zlib";
+import { getMetaData } from "../utils";
 
 import {
-  AddDaysToDate,
   getDateBefore,
   getStateAbbreviationByName,
   RKIError,
-  getStateIdByAbbreviation,
   CreateRedisClient,
   AddRedisEntry,
   GetRedisEntry,
@@ -38,8 +36,7 @@ export interface FrozenIncidenceData {
     dataSource: string;
   }[];
 }
-
-interface RequestTypeParameter {
+interface ActualParameter {
   type: string;
   url: string;
   WorkBook: string;
@@ -47,98 +44,106 @@ interface RequestTypeParameter {
   startRow: number;
   startColumn: number;
   key: string;
-  githubUrlPre: string;
-  githubUrlPost: string;
   redisKey: string;
 }
-
-interface FrozenIncidenceDayFile {
-  [key: string]: {
-    Bundesland: string;
-    Datenstand: string;
-    AnzahlFall_7d: number;
-    incidence_7d: number;
-  };
+interface ArchiveParameter {
+  type: string;
+  url: string;
+  WorkBook: string;
+  SheetName: string;
+  startRow: number;
+  startColumn: number;
+  key: string;
+  redisKey: string;
+}
+interface UnofficialParameter {
+  key: string;
+  githubUrlUnofficial: string;
+  redisKeyUnofficial: string;
+  unofficialSheetName: string;
+}
+interface Region {
+  Actual: ActualParameter;
+  Archive: ArchiveParameter;
+  Unofficial: UnofficialParameter;
 }
 
 // value for redis entry for never expire
 const neverExpire = -1;
 
-const ActualDistricts: RequestTypeParameter = {
-  type: "ActualDistricts",
-  url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-  WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
-  SheetName: "LK_7-Tage-Inzidenz (fixiert)",
-  startRow: 4,
-  startColumn: 2,
-  key: "ags",
-  githubUrlPre:
-    "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
-  githubUrlPost: "_LK.json.gz",
-  redisKey: "ActualDistricts",
+const Districts: Region = {
+  Actual: {
+    type: "ActualDistricts",
+    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
+    WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
+    SheetName: "LK_7-Tage-Inzidenz (fixiert)",
+    startRow: 4,
+    startColumn: 2,
+    key: "ags",
+    redisKey: "DistrictsActual",
+  },
+  Archive: {
+    type: "ArchiveDistricts",
+    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
+    WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
+    SheetName: "LK_7-Tage-Inzidenz (fixiert)",
+    startRow: 4,
+    startColumn: 3,
+    key: "ags",
+    redisKey: "DistrictsArchive",
+  },
+  Unofficial: {
+    key: "ags",
+    githubUrlUnofficial:
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.xlsx",
+    redisKeyUnofficial: "DistrictsUnofficial",
+    unofficialSheetName: "LK",
+  },
 };
 
-const ArchiveDistricts: RequestTypeParameter = {
-  type: "ArchiveDistricts",
-  url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-  WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
-  SheetName: "LK_7-Tage-Inzidenz (fixiert)",
-  startRow: 4,
-  startColumn: 3,
-  key: "ags",
-  githubUrlPre: "",
-  githubUrlPost: "",
-  redisKey: "ArchiveDistricts",
+const States: Region = {
+  Actual: {
+    type: "ActualStates",
+    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
+    WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
+    SheetName: "BL_7-Tage-Inzidenz (fixiert)",
+    startRow: 4,
+    startColumn: 1,
+    key: "abbreviation",
+    redisKey: "StatesActual",
+  },
+  Archive: {
+    type: "ArchiveStates",
+    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
+    WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
+    SheetName: "BL_7-Tage-Inzidenz (fixiert)",
+    startRow: 4,
+    startColumn: 1,
+    key: "abbreviation",
+    redisKey: "StatesArchive",
+  },
+  Unofficial: {
+    key: "abbreviation",
+    githubUrlUnofficial:
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.xlsx",
+    redisKeyUnofficial: "StatesUnofficial",
+    unofficialSheetName: "BL",
+  },
 };
 
-const ActualStates: RequestTypeParameter = {
-  type: "ActualStates",
-  url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-  WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
-  SheetName: "BL_7-Tage-Inzidenz (fixiert)",
-  startRow: 4,
-  startColumn: 1,
-  key: "abbreviation",
-  githubUrlPre:
-    "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/frozen-incidence_",
-  githubUrlPost: "_BL.json.gz",
-  redisKey: "ActualStates",
-};
-
-const ArchiveStates: RequestTypeParameter = {
-  type: "ArchiveStates",
-  url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-  WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
-  SheetName: "BL_7-Tage-Inzidenz (fixiert)",
-  startRow: 4,
-  startColumn: 1,
-  key: "abbreviation",
-  githubUrlPre: "",
-  githubUrlPost: "",
-  redisKey: "ArchiveStates",
-};
-
-// create redis client for frozen-incidence Excel- and Date-Data
+// create redis client for frozen-incidence Excel- and self calculated unofficial data
 const redisClientFix = CreateRedisClient("fix:");
 
 // this is the promise to prepare the districts AND states data from the excel sheets
 // and store this to redis (if not exists!) they will not expire
-const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
-  const requestType: RequestTypeParameter = this.requestType;
-  const type = requestType.type;
-  const url = requestType.url;
-  const WorkBook = requestType.WorkBook;
-  const SheetName = requestType.SheetName;
-  const startRow = requestType.startRow;
-  const startColumn = requestType.startColumn;
-  const key = requestType.key;
-  const redisKey = requestType.redisKey;
+const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
+  const parameter: ActualParameter | ArchiveParameter = this.requestType;
 
   let data = [];
   let lastUpdate: Date;
 
   // check if a redis entry exists, if yes use it
-  const redisEntry = await GetRedisEntry(redisClientFix, redisKey);
+  const redisEntry = await GetRedisEntry(redisClientFix, parameter.redisKey);
 
   // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
   const redisData = redisEntry.length
@@ -149,7 +154,9 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   if (
     new Date(redisData.lastUpdate).getTime() == new Date(1970, 0, 1).getTime()
   ) {
-    const response = await axios.get(url, { responseType: "arraybuffer" });
+    const response = await axios.get(parameter.url, {
+      responseType: "arraybuffer",
+    });
     const rdata = response.data;
     if (rdata.error) {
       reject(new RKIError(rdata.error, response.config.url));
@@ -157,21 +164,21 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     }
     lastUpdate = new Date(response.headers["last-modified"]);
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
-    const sheet = workbook.Sheets[SheetName];
+    const sheet = workbook.Sheets[parameter.SheetName];
     // table starts in row "startRow" (parameter is zero indexed)
     // if type == Districts.Archive.type filter out rows with "NR"
     let json = [];
-    if (type == ArchiveDistricts.type) {
+    if (parameter.type == Districts.Archive.type) {
       json = XLSX.utils
-        .sheet_to_json(sheet, { range: startRow })
+        .sheet_to_json(sheet, { range: parameter.startRow })
         .filter((entry) => !!entry["NR"]);
     } else {
-      json = XLSX.utils.sheet_to_json(sheet, { range: startRow });
+      json = XLSX.utils.sheet_to_json(sheet, { range: parameter.startRow });
     }
     data = json.map((entry) => {
       const name =
-        key == "abbreviation"
-          ? type == ActualStates.type
+        parameter.key == "abbreviation"
+          ? parameter.type == States.Actual.type
             ? entry["MeldeLandkreisBundesland"] == "Gesamt"
               ? "Bundesgebiet"
               : entry["MeldeLandkreisBundesland"]
@@ -180,7 +187,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
             : entry["__EMPTY"]
           : entry["LK"];
       const regionKey =
-        key == "abbreviation"
+        parameter.key == "abbreviation"
           ? getStateAbbreviationByName(name) == null
             ? "Bund"
             : getStateAbbreviationByName(name)
@@ -192,16 +199,16 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       const dateKeys = Object.keys(entry);
 
       // ignore the first startColumn elements (rowNumber, LK, LKNR)
-      dateKeys.splice(0, startColumn);
+      dateKeys.splice(0, parameter.startColumn);
       dateKeys.forEach((dateKey) => {
         const date = getDateFromString(dateKey.toString());
         history.push({
           weekIncidence: entry[dateKey],
           date: date,
-          dataSource: WorkBook,
+          dataSource: parameter.WorkBook,
         });
       });
-      return { [key]: regionKey, name: name, history: history };
+      return { [parameter.key]: regionKey, name: name, history: history };
     });
 
     //prepare data for redis entry for the excelsheet
@@ -210,7 +217,7 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     // add to redis
     await AddRedisEntry(
       redisClientFix,
-      redisKey,
+      parameter.redisKey,
       JsonData,
       neverExpire,
       "json"
@@ -222,44 +229,91 @@ const RkiFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   resolve({ lastUpdate, data });
 };
 
-// this is the Promise to download the files or get it from redis for the missing frozen-incidence dates
-// dateData parameter, witch date is requested and the date when the RKI excel file is last updated must be bind
-const MissingDateDataPromise = async function (resolve, reject) {
-  const requestType: RequestTypeParameter = this.requestType;
-  const date = this.date;
-  const redisKey = `${requestType.redisKey}_${date}`;
-  const githubUrlPre = requestType.githubUrlPre;
-  const githubUrlPost = requestType.githubUrlPost;
-
-  let missingDateData: FrozenIncidenceDayFile;
-  const redisEntry = await GetRedisEntry(redisClientFix, redisKey);
-  if (redisEntry.length == 1) {
-    missingDateData = JSON.parse(redisEntry[0].body, dateReviver);
-  } else {
-    const url = `${githubUrlPre}${date}${githubUrlPost}`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      reject(new RKIError(rdata.error, response.config.url));
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
-    );
-    // prepare data for redis
-    const redisData = unziped.toString();
-
-    // add to redis
-    await AddRedisEntry(
-      redisClientFix,
-      redisKey,
-      redisData,
-      neverExpire,
-      "json"
-    );
-    missingDateData = JSON.parse(redisData, dateReviver);
+export interface UnofficialData {
+  [key: string]: {
+    name: string;
+    history: {
+      date: Date;
+      weekIncidence: number;
+      dataSource: string;
+    }[];
+  };
+}
+// this reloads the unofficial data from LK.xlsx or BL.xlsx and store this to redis
+async function reloadUnofficial(
+  requestType: UnofficialParameter,
+  lastUpdate: Date
+): Promise<UnofficialData> {
+  const response = await axios.get(requestType.githubUrlUnofficial, {
+    responseType: "arraybuffer",
+  });
+  const rdata = response.data;
+  if (rdata.error) {
+    throw new RKIError(rdata.error, response.config.url);
   }
-  resolve(missingDateData);
+  const wb = XLSX.read(rdata, { type: "buffer", cellDates: true });
+  const sheet = wb.Sheets[requestType.unofficialSheetName];
+  const jsonData = XLSX.utils.sheet_to_json(sheet);
+  let unofficial: UnofficialData = {};
+  jsonData.forEach((entry) => {
+    const name =
+      requestType.key == "abbreviation"
+        ? entry["Bundesland"]
+        : entry["Landkreis"];
+    let regionKey =
+      requestType.key == "abbreviation"
+        ? getStateAbbreviationByName(name)
+        : entry["IdLandkreis"].padStart(5, "0");
+    let keyEntry = unofficial[regionKey];
+    if (!keyEntry) {
+      const history = [];
+      unofficial[regionKey] = { name: name, history: history };
+    }
+    unofficial[regionKey].history.push({
+      date: new Date(entry["Datenstand"]),
+      weekIncidence: entry["incidence_7d"],
+      dataSource: "Unofficial, calculated from daily RKI Dump",
+    });
+  });
+  const redisData = JSON.stringify({ lastUpdate, unofficial });
+  // add to redis
+  await AddRedisEntry(
+    redisClientFix,
+    requestType.redisKeyUnofficial,
+    redisData,
+    neverExpire,
+    "json"
+  );
+  return unofficial;
+}
+// this is the Promise to get BL.xlsx or LK.xlsx from redis for all dates after 2023-04-17
+// if not present call a reload and store to redis (reloadUnofficial)
+// if metadata lastUpdate is newer the the stored date in redis, reload and store new unofficial data to redis (reloadUnofficial)
+// requestType mus be bind
+const UnofficialDataPromise = async function (resolve, reject) {
+  const requestType: UnofficialParameter = this.requestType;
+
+  const metaData = await getMetaData();
+  const lastUpdateMeta = new Date(metaData.publication_date);
+  let unofficialData: UnofficialData = {};
+  const redisEntry = await GetRedisEntry(
+    redisClientFix,
+    requestType.redisKeyUnofficial
+  );
+  if (redisEntry.length == 1) {
+    const unofficialRedis = JSON.parse(redisEntry[0].body, dateReviver);
+    if (
+      new Date(lastUpdateMeta).getTime() <=
+      new Date(unofficialRedis.lastUpdate).getTime()
+    ) {
+      unofficialData = unofficialRedis.unofficial;
+    } else {
+      unofficialData = await reloadUnofficial(requestType, lastUpdateMeta);
+    }
+  } else {
+    unofficialData = await reloadUnofficial(requestType, lastUpdateMeta);
+  }
+  resolve(unofficialData);
 };
 
 // function to finalize the request
@@ -268,88 +322,41 @@ const MissingDateDataPromise = async function (resolve, reject) {
 async function finalizeData(
   actualData: { lastUpdate: Date; data: FrozenIncidenceData[] },
   archiveData: { lastUpdate: Date; data: FrozenIncidenceData[] },
+  unofficialData: UnofficialData,
   metaLastFileDate: Date,
-  requestType: RequestTypeParameter,
+  region: Region,
   paramKey: string,
   paramDays?: number,
   paramDate?: Date
 ): Promise<{ data: FrozenIncidenceData[]; lastUpdate: Date }> {
-  // get last date from one actualData history
-  const lastDate = new Date(
-    actualData.data[0].history[actualData.data[0].history.length - 1].date
-  ).setHours(0, 0, 0);
-  const today = new Date().setHours(0, 0, 0);
-  let lastUpdate: Date;
-  // if lastDate < today and lastDate <= lastFileDate get the missing dates from github stored json files
-  if (lastDate < today && lastDate <= metaLastFileDate.getTime()) {
-    lastUpdate = new Date(metaLastFileDate);
-    const maxNumberOfDays =
-      (metaLastFileDate.setHours(0, 0, 0, 0) - lastDate) / 86400000;
-    const startDay = paramDays
-      ? paramDays <= maxNumberOfDays
-        ? maxNumberOfDays - paramDays + 1
-        : 1
-      : 1;
-    const MissingDateDataPromises = [];
-
-    // create a Promise for each missing Date
-    for (let day = startDay; day <= maxNumberOfDays; day++) {
-      const missingDate = new Date(AddDaysToDate(new Date(lastDate), day))
-        .toISOString()
-        .split("T")
-        .shift();
-      MissingDateDataPromises.push(
-        new Promise<FrozenIncidenceDayFile>(
-          MissingDateDataPromise.bind({
-            date: missingDate,
-            requestType: requestType,
-          })
-        )
-      );
-    }
-
-    // pull the data
-    const MissingDateDataResults: FrozenIncidenceDayFile[] = await Promise.all(
-      MissingDateDataPromises
-    );
-
-    // add the missing dates data to actual data
-    MissingDateDataResults.forEach((result) => {
-      actualData.data = actualData.data.map((entry) => {
-        const key: string =
-          requestType == ActualStates
-            ? getStateIdByAbbreviation(entry[requestType.key])
-                .toString()
-                .padStart(2, "0")
-            : entry[requestType.key];
-        if (result[key]) {
-          entry.history.push({
-            weekIncidence: result[key].incidence_7d,
-            date: new Date(result[key].Datenstand),
-            dataSource: "Unofficial, calculated from daily RKI Dump",
-          });
-        }
-        return entry;
-      });
-    });
-  } else {
-    lastUpdate = new Date(actualData.lastUpdate);
-  }
-
   // merge archive data with current data
   actualData.data = actualData.data.map((entry) => {
     entry.history.unshift(
       ...archiveData.data.find(
-        (element) => element[requestType.key] === entry[requestType.key]
+        (element) => element[region.Actual.key] === entry[region.Actual.key]
       ).history
     );
     return entry;
   });
 
+  // merge unofficial data with current data
+  actualData.data.forEach((entry) => {
+    if (unofficialData[entry[region.Unofficial.key]] != null) {
+      entry.history.unshift(
+        ...unofficialData[entry[region.Unofficial.key]].history
+      );
+    }
+    entry.history.sort((a, b) => {
+      const dateA = new Date(a.date);
+      const dateB = new Date(b.date);
+      return dateA.getTime() - dateB.getTime();
+    });
+  });
+
   // filter by requestType.key (ags or abbreviation)
   if (paramKey) {
     actualData.data = actualData.data.filter(
-      (entry) => entry[requestType.key] === paramKey
+      (entry) => entry[region.Actual.key] === paramKey
     );
   }
 
@@ -372,7 +379,7 @@ async function finalizeData(
       return entry;
     });
   }
-  return { data: actualData.data, lastUpdate: lastUpdate };
+  return { data: actualData.data, lastUpdate: new Date(metaLastFileDate) };
 }
 
 export async function getDistrictsFrozenIncidenceHistory(
@@ -381,16 +388,21 @@ export async function getDistrictsFrozenIncidenceHistory(
   date?: Date
 ): Promise<ResponseData<FrozenIncidenceData[]>> {
   const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
-    RkiFrozenIncidenceHistoryPromise.bind({
-      requestType: ActualDistricts,
+    RKIFrozenIncidenceHistoryPromise.bind({
+      requestType: Districts.Actual,
     })
   );
   const archiveDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
-    RkiFrozenIncidenceHistoryPromise.bind({
-      requestType: ArchiveDistricts,
+    RKIFrozenIncidenceHistoryPromise.bind({
+      requestType: Districts.Archive,
     })
   );
-  let [actual, archive, metaLastFileDate] = await Promise.all([
+  const GitUnofficialDataPromise = new Promise<UnofficialData>(
+    UnofficialDataPromise.bind({
+      requestType: Districts.Unofficial,
+    })
+  );
+  let [actual, archive, metaLastFileDate, unofficialData] = await Promise.all([
     actualDataPromise,
     archiveDataPromise,
     axios
@@ -400,13 +412,15 @@ export async function getDistrictsFrozenIncidenceHistory(
       .then((response) => {
         return new Date(response.data.modified);
       }),
+    GitUnofficialDataPromise,
   ]);
 
   const districtsFinal = await finalizeData(
     actual,
     archive,
+    unofficialData,
     metaLastFileDate,
-    ActualDistricts,
+    Districts,
     ags,
     days,
     date
@@ -424,16 +438,21 @@ export async function getStatesFrozenIncidenceHistory(
   date?: Date
 ): Promise<ResponseData<FrozenIncidenceData[]>> {
   const actualDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
-    RkiFrozenIncidenceHistoryPromise.bind({
-      requestType: ActualStates,
+    RKIFrozenIncidenceHistoryPromise.bind({
+      requestType: States.Actual,
     })
   );
   const archiveDataPromise = new Promise<ResponseData<FrozenIncidenceData[]>>(
-    RkiFrozenIncidenceHistoryPromise.bind({
-      requestType: ArchiveStates,
+    RKIFrozenIncidenceHistoryPromise.bind({
+      requestType: States.Archive,
     })
   );
-  let [actual, archive, metaLastFileDate] = await Promise.all([
+  const GitUnofficialDataPromise = new Promise<UnofficialData>(
+    UnofficialDataPromise.bind({
+      requestType: States.Unofficial,
+    })
+  );
+  let [actual, archive, metaLastFileDate, unofficialData] = await Promise.all([
     actualDataPromise,
     archiveDataPromise,
     axios
@@ -443,13 +462,15 @@ export async function getStatesFrozenIncidenceHistory(
       .then((response) => {
         return new Date(response.data.modified);
       }),
+    GitUnofficialDataPromise,
   ]);
 
   const statesFinal = await finalizeData(
     actual,
     archive,
+    unofficialData,
     metaLastFileDate,
-    ActualStates,
+    States,
     abbreviation,
     days,
     date
