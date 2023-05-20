@@ -479,17 +479,19 @@ export function dateReviver(objKey: string, objValue: string | number | Date) {
   return objValue;
 }
 
-interface MetaData {
-  created: number;
-  modified: number;
-  name: string;
+export interface MetaData {
+  publication_date: string;
+  version: string;
   size: number;
+  filename: string;
+  url: string;
+  modified: number;
 }
 
 const baseUrl =
   "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/";
 
-async function getMetaData(): Promise<MetaData> {
+export async function getMetaData(): Promise<MetaData> {
   let metaData: MetaData;
   // check if redis entry for meta data exists, if yes use it
   const redisEntryMeta = await GetRedisEntry(redisClientBas, "meta");
@@ -512,7 +514,11 @@ async function getMetaData(): Promise<MetaData> {
       0
     );
     // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
+    const validForSec =
+      Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
+        ? Math.ceil((validToMs - new Date().getTime()) / 1000)
+        : 3600;
     // create redis Entry for metaData
     await AddRedisEntry(redisClientBas, "meta", metaRedis, validForSec, "json");
   } else {
