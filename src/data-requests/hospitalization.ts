@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ResponseData } from "./response-data";
 import parse from "csv-parse";
+import { ApiData } from "./r-value";
 
 enum AgeGroup {
   "00-04" = "A00-A04",
@@ -294,10 +295,11 @@ export async function getHospitalizationData(): Promise<
     hospitalizationDataPromise,
     axios
       .get(
-        `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/master/Metadaten/zenodo.json`
+        "https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master"
       )
       .then((response) => {
-        return new Date(response.data.publication_date);
+        const apiData: ApiData = response.data
+        return new Date(apiData.commit.author.date);
       }),
   ]);
 

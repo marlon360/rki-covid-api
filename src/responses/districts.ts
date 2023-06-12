@@ -19,6 +19,8 @@ import {
   RequestType,
   RegionType,
   limit,
+  getMetaData,
+  MetaData,
 } from "../utils";
 import {
   FrozenIncidenceData,
@@ -46,6 +48,7 @@ interface DistrictsData extends IResponseMeta {
 }
 
 export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
+  const metaData = await getMetaData();
   // make all requests
   const [
     districtsData,
@@ -55,12 +58,12 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     districtNewRecoveredData,
     districtsFixIncidence,
   ] = await Promise.all([
-    getDistrictsData(),
-    getDistrictsRecoveredData(),
-    getNewDistrictCases(),
-    getNewDistrictDeaths(),
-    getNewDistrictRecovered(),
-    getDistrictsFrozenIncidenceHistory(3),
+    getDistrictsData(metaData),
+    getDistrictsRecoveredData(metaData),
+    getNewDistrictCases(metaData),
+    getNewDistrictDeaths(metaData),
+    getNewDistrictRecovered(metaData),
+    getDistrictsFrozenIncidenceHistory(metaData, 3),
   ]);
 
   function getDistrictByAgs(
@@ -138,7 +141,8 @@ interface DistrictsCasesHistory {
 }
 export async function DistrictsCasesHistoryResponse(
   days?: number,
-  ags?: string
+  ags?: string,
+  metaData?: MetaData
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -149,7 +153,14 @@ export async function DistrictsCasesHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const districtsHistoryData = await getLastDistrictCasesHistory(days, ags);
+  if (metaData == null) {
+    metaData = await getMetaData();
+  }
+  const districtsHistoryData = await getLastDistrictCasesHistory(
+    metaData,
+    days,
+    ags
+  );
   const highDate = new Date(
     AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -188,9 +199,13 @@ export async function DistrictsWeekIncidenceHistoryResponse(
       days += 6;
     }
   }
-
-  const districtsHistoryData = await DistrictsCasesHistoryResponse(days, ags);
-  const districtsData = await getDistrictsData();
+  const metaData = await getMetaData();
+  const districtsHistoryData = await DistrictsCasesHistoryResponse(
+    days,
+    ags,
+    metaData
+  );
+  const districtsData = await getDistrictsData(metaData);
 
   function getDistrictByAGS(
     data: ResponseData<IDistrictData[]>,
@@ -236,6 +251,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
 interface DistrictsDeathsHistory {
   [key: string]: DistrictHistory<{ deaths: number; date: Date }>;
 }
+
 export async function DistrictsDeathsHistoryResponse(
   days?: number,
   ags?: string
@@ -249,7 +265,12 @@ export async function DistrictsDeathsHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const districtsHistoryData = await getLastDistrictDeathsHistory(days, ags);
+  const metaData = await getMetaData();
+  const districtsHistoryData = await getLastDistrictDeathsHistory(
+    metaData,
+    days,
+    ags
+  );
   const highDate = new Date(
     AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -287,7 +308,12 @@ export async function DistrictsRecoveredHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const districtsHistoryData = await getLastDistrictRecoveredHistory(days, ags);
+  const metaData = await getMetaData();
+  const districtsHistoryData = await getLastDistrictRecoveredHistory(
+    metaData,
+    days,
+    ags
+  );
   const highDate = new Date(
     AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   ); //highest date, witch is "datenstand" -1
@@ -328,7 +354,9 @@ export async function FrozenIncidenceHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
+  const metaData = await getMetaData();
   const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(
+    metaData,
     days,
     ags
   );
@@ -348,7 +376,8 @@ export async function DistrictsAgeGroupsResponse(ags?: string): Promise<{
   data: AgeGroupsData;
   meta: ResponseMeta;
 }> {
-  const AgeGroupsData = await getDistrictsAgeGroups(ags);
+  const metaData = await getMetaData();
+  const AgeGroupsData = await getDistrictsAgeGroups(metaData, ags);
 
   const data = {};
   Object.keys(AgeGroupsData.data).forEach((ags) => {

@@ -21,6 +21,7 @@ import {
   getStateAbbreviationById,
   getStateNameByAbbreviation,
   getStateIdByName,
+  getMetaData,
 } from "../utils";
 
 export enum mapTypes {
@@ -31,8 +32,8 @@ export enum mapTypes {
 // Begin normal map responses
 export async function DistrictsMapResponse(mapType: mapTypes = mapTypes.map) {
   const mapData = DistrictsMap;
-
-  const districtsData = await getDistrictsData();
+  const metaData = await getMetaData();
+  const districtsData = await getDistrictsData(metaData);
 
   // create hashmap for faster access
   const districtsDataHashMap = districtsData.data.reduce(function (map, obj) {
@@ -73,8 +74,8 @@ export async function DistrictsMapResponse(mapType: mapTypes = mapTypes.map) {
 
 export async function StatesMapResponse(mapType: mapTypes = mapTypes.map) {
   const mapData = StatesMap;
-
-  const statesData = await getStatesData();
+  const metaData = await getMetaData();
+  const statesData = await getStatesData(metaData);
 
   // create hashmap for faster access
   const statesDataHashMap = statesData.data.reduce(function (map, obj) {
@@ -120,8 +121,9 @@ export async function DistrictsHistoryMapResponse(
 ) {
   const date = new Date(dateString);
   const mapData = DistrictsMap;
-
+  const metaData = await getMetaData();
   const districtsIncidenceHistory = await getDistrictsFrozenIncidenceHistory(
+    metaData,
     null,
     null,
     date
@@ -184,8 +186,9 @@ export async function StatesHistoryMapResponse(
 ) {
   const date = new Date(dateString);
   const mapData = StatesMap;
-
+  const metaData = await getMetaData();
   const statesIncidenceHistory = await getStatesFrozenIncidenceHistory(
+    metaData,
     null,
     null,
     date

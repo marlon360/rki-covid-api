@@ -5,6 +5,7 @@ import {
   getCasesHistoryStatesJson,
   CasesHistoryStatesJson,
   getAgeGroupStatesJson,
+  MetaData,
 } from "../utils";
 import { AgeGroupData } from "./germany";
 import { ResponseData } from "./response-data";
@@ -19,8 +20,10 @@ export interface IStateData {
   deathsPerWeek: number;
 }
 
-export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
-  const data = await getCasesStatesJson();
+export async function getStatesData(
+  metaData: MetaData
+): Promise<ResponseData<IStateData[]>> {
+  const data = await getCasesStatesJson(metaData);
   const states = data.data.map((state) => {
     return {
       id: parseInt(state.IdBundesland),
@@ -38,10 +41,10 @@ export async function getStatesData(): Promise<ResponseData<IStateData[]>> {
   };
 }
 
-export async function getStatesRecoveredData(): Promise<
-  ResponseData<{ id: number; recovered: number }[]>
-> {
-  const data = await getCasesStatesJson();
+export async function getStatesRecoveredData(
+  metaData: MetaData
+): Promise<ResponseData<{ id: number; recovered: number }[]>> {
+  const data = await getCasesStatesJson(metaData);
   const states = data.data.map((state) => {
     return {
       id: parseInt(state.IdBundesland),
@@ -54,10 +57,10 @@ export async function getStatesRecoveredData(): Promise<
   };
 }
 
-export async function getNewStateRecovered(): Promise<
-  ResponseData<{ id: number; recovered: number }[]>
-> {
-  const data = await getCasesStatesJson();
+export async function getNewStateRecovered(
+  metaData: MetaData
+): Promise<ResponseData<{ id: number; recovered: number }[]>> {
+  const data = await getCasesStatesJson(metaData);
   const states = data.data.map((state) => {
     return {
       id: parseInt(state.IdBundesland),
@@ -70,10 +73,10 @@ export async function getNewStateRecovered(): Promise<
   };
 }
 
-export async function getNewStateCases(): Promise<
-  ResponseData<{ id: number; cases: number }[]>
-> {
-  const data = await getCasesStatesJson();
+export async function getNewStateCases(
+  metaData: MetaData
+): Promise<ResponseData<{ id: number; cases: number }[]>> {
+  const data = await getCasesStatesJson(metaData);
   const states = data.data.map((state) => {
     return {
       id: parseInt(state.IdBundesland),
@@ -86,10 +89,10 @@ export async function getNewStateCases(): Promise<
   };
 }
 
-export async function getNewStateDeaths(): Promise<
-  ResponseData<{ id: number; deaths: number }[]>
-> {
-  const data = await getCasesStatesJson();
+export async function getNewStateDeaths(
+  metaData: MetaData
+): Promise<ResponseData<{ id: number; deaths: number }[]>> {
+  const data = await getCasesStatesJson(metaData);
   const states = data.data.map((state) => {
     return {
       id: parseInt(state.IdBundesland),
@@ -103,12 +106,13 @@ export async function getNewStateDeaths(): Promise<
 }
 
 export async function getLastStateCasesHistory(
+  metaData: MetaData,
   days?: number,
   id?: number
 ): Promise<
   ResponseData<{ id: number; name: string; cases: number; date: Date }[]>
 > {
-  const data = await getCasesHistoryStatesJson();
+  const data = await getCasesHistoryStatesJson(metaData);
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
     historyData = data.data.filter(
@@ -144,12 +148,13 @@ export async function getLastStateCasesHistory(
 }
 
 export async function getLastStateDeathsHistory(
+  metaData: MetaData,
   days?: number,
   id?: number
 ): Promise<
   ResponseData<{ id: number; name: string; deaths: number; date: Date }[]>
 > {
-  const data = await getCasesHistoryStatesJson();
+  const data = await getCasesHistoryStatesJson(metaData);
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
     historyData = data.data.filter(
@@ -185,12 +190,13 @@ export async function getLastStateDeathsHistory(
 }
 
 export async function getLastStateRecoveredHistory(
+  metaData: MetaData,
   days?: number,
   id?: number
 ): Promise<
   ResponseData<{ id: number; name: string; recovered: number; date: Date }[]>
 > {
-  const data = await getCasesHistoryStatesJson();
+  const data = await getCasesHistoryStatesJson(metaData);
   let historyData: CasesHistoryStatesJson["data"];
   if (id) {
     historyData = data.data.filter(
@@ -232,10 +238,11 @@ export interface AgeGroupsData {
 }
 
 export async function getStatesAgeGroups(
+  metaData: MetaData,
   id?: number
 ): Promise<ResponseData<AgeGroupsData>> {
-  const data = await getAgeGroupStatesJson();
-  const lastUpdate = new Date(data.metaData.modified);
+  const data = await getAgeGroupStatesJson(metaData);
+  const lastUpdate = new Date(metaData.modified);
 
   const states: AgeGroupsData = {};
   data.data.forEach((entry) => {
