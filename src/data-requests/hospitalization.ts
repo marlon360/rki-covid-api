@@ -298,7 +298,7 @@ export async function getHospitalizationData(): Promise<
         "https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master"
       )
       .then((response) => {
-        const apiData: ApiData = response.data
+        const apiData: ApiData = response.data;
         return new Date(apiData.commit.author.date);
       }),
   ]);

@@ -10,97 +10,97 @@ export interface RValueHistoryEntry {
 }
 
 export interface ApiData {
-  "sha": string;
-  "node_id": string;
-  "commit": {
-    "author": {
-      "name": string;
-      "email": string;
-      "date": string;
+  sha: string;
+  node_id: string;
+  commit: {
+    author: {
+      name: string;
+      email: string;
+      date: string;
     };
-    "committer": {
-      "name": string;
-      "email": string;
-      "date": string;
+    committer: {
+      name: string;
+      email: string;
+      date: string;
     };
-    "message": string;
-    "tree": {
-      "sha": string;
-      "url": string;
+    message: string;
+    tree: {
+      sha: string;
+      url: string;
     };
-    "url": string;
-    "comment_count": number;
-    "verification": {
-      "verified": boolean;
-      "reason": string;
-      "signature": string;
-      "payload": string;
-    }
+    url: string;
+    comment_count: number;
+    verification: {
+      verified: boolean;
+      reason: string;
+      signature: string;
+      payload: string;
+    };
   };
-  "url": string;
-  "html_url": string;
-  "comments_url": string;
-  "author": {
-    "login": string;
-    "id": number;
-    "node_id": string;
-    "avatar_url": string;
-    "gravatar_id": string;
-    "url": string;
-    "html_url": string;
-    "followers_url": string;
-    "following_url": string;
-    "gists_url": string;
-    "starred_url": string;
-    "subscriptions_url": string;
-    "organizations_url": string;
-    "repos_url": string;
-    "events_url": string;
-    "received_events_url": string;
-    "type": string;
-    "site_admin": boolean;
+  url: string;
+  html_url: string;
+  comments_url: string;
+  author: {
+    login: string;
+    id: number;
+    node_id: string;
+    avatar_url: string;
+    gravatar_id: string;
+    url: string;
+    html_url: string;
+    followers_url: string;
+    following_url: string;
+    gists_url: string;
+    starred_url: string;
+    subscriptions_url: string;
+    organizations_url: string;
+    repos_url: string;
+    events_url: string;
+    received_events_url: string;
+    type: string;
+    site_admin: boolean;
   };
-  "committer": {
-    "login": string;
-    "id": number;
-    "node_id": string;
-    "avatar_url": string;
-    "gravatar_id": string;
-    "url": string;
-    "html_url": string;
-    "followers_url": string;
-    "following_url": string;
-    "gists_url": string;
-    "starred_url": string;
-    "subscriptions_url": string;
-    "organizations_url": string;
-    "repos_url": string;
-    "events_url": string;
-    "received_events_url": string;
-    "type": string;
-    "site_admin": boolean;
+  committer: {
+    login: string;
+    id: number;
+    node_id: string;
+    avatar_url: string;
+    gravatar_id: string;
+    url: string;
+    html_url: string;
+    followers_url: string;
+    following_url: string;
+    gists_url: string;
+    starred_url: string;
+    subscriptions_url: string;
+    organizations_url: string;
+    repos_url: string;
+    events_url: string;
+    received_events_url: string;
+    type: string;
+    site_admin: boolean;
   };
-  "parents": {
-    "sha": string;
-    "url": string;
-    "html_url": string;
+  parents: {
+    sha: string;
+    url: string;
+    html_url: string;
   }[];
-  "stats": {
-    "total": number;
-    "additions": number;
-    "deletions": number;
+  stats: {
+    total: number;
+    additions: number;
+    deletions: number;
   };
-  "files": {
-		"sha": string;
-    "filename": string;
-    "status": string;
-		"additions": number;
-		"deletions": number;
-		"changes": number;
-		"blob_url": string;
-		"raw_url": string;
-		"contents_url": string;
-		"patch": string;
+  files: {
+    sha: string;
+    filename: string;
+    status: string;
+    additions: number;
+    deletions: number;
+    changes: number;
+    blob_url: string;
+    raw_url: string;
+    contents_url: string;
+    patch: string;
   }[];
 }
 
@@ -124,8 +124,8 @@ const rValueDataUrl =
 const rValueMetaUrl =
   "https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json";
 
-const rValueApiUrl = "https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main"
-
+const rValueApiUrl =
+  "https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main";
 
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {
@@ -176,7 +176,7 @@ export async function getRValue() {
   const data = response.data;
   const rData = parseRValue(data);
   const apiResponse = await axios.get(rValueApiUrl);
-  const apiData: ApiData = apiResponse.data
+  const apiData: ApiData = apiResponse.data;
   return {
     data: rData,
     lastUpdate: new Date(apiData.commit.author.date),
