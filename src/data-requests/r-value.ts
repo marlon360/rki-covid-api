@@ -121,9 +121,6 @@ function sumInterval(
 const rValueDataUrl =
   "https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv";
 
-const rValueMetaUrl =
-  "https://github.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/raw/main/Metadaten/zenodo.json";
-
 const rValueApiUrl =
   "https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main";
 
@@ -193,8 +190,9 @@ export async function getRValueHistory(
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  const meta = await axios.get(rValueMetaUrl);
-  const lastUpdate = new Date(meta.data.publication_date);
+  const apiResponse = await axios.get(rValueApiUrl);
+  const apiData: ApiData = apiResponse.data;
+  const lastUpdate = new Date(apiData.commit.author.date);
 
   const workbook = XLSX.read(data, { type: "buffer", cellDates: true });
   const sheet = workbook.Sheets[workbook.SheetNames[0]];

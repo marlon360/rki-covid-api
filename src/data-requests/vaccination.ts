@@ -8,6 +8,7 @@ import {
   AddDaysToDate,
   limit,
 } from "../utils";
+import { ApiData } from "./r-value";
 
 function clearEntry(entry: any) {
   for (const key in entry) {
@@ -438,7 +439,7 @@ export async function getVaccinationCoverage(): Promise<
   ResponseData<VaccinationCoverage>
 > {
   const url =
-    "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Bundeslaender_COVID-19-Impfungen.csv";
+    "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Bundeslaender_COVID-19-Impfungen.csv";
   const actualDataPromise = new Promise<VaccineVaccinationData>(
     DataPromise.bind({ url: url })
   );
@@ -456,7 +457,7 @@ export async function getVaccinationCoverage(): Promise<
       // get csv as stream
       const response = await axios({
         method: "get",
-        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Impfquoten_COVID-19.csv",
+        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Impfquoten_COVID-19.csv",
         responseType: "stream",
       });
 
@@ -587,22 +588,39 @@ export async function getVaccinationCoverage(): Promise<
       });
     }
   );
-
-  const lastUpdate = await axios
+  const apiResponse: {lastUpdate: Date, sha: string} = await axios
     .get(
-      `https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/Metadaten/zenodo.json`
+      `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
     )
     .then((response) => {
-      return new Date(response.data.publication_date);
+      const apiData: ApiData = response.data;
+      const lastUpdate = new Date(apiData.commit.author.date);
+      const sha = apiData.sha;
+      return {lastUpdate, sha};
     });
+    const lastUpdate = apiResponse.lastUpdate;
+    const sha = apiResponse.sha
 
-  const weekday = lastUpdate.getDay();
-  const offset = weekday == 1 ? -2 : -1;
-  const archiveDate = AddDaysToDate(lastUpdate, offset)
-    .toISOString()
-    .split("T")
-    .shift();
-  const archiveUrl = `https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Archiv/${archiveDate}_Deutschland_Bundeslaender_COVID-19-Impfungen.csv`;
+  // finde den letzten Datansatz bevor dem aktuellen
+  const filesUrl = `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`
+  const filesResponse = await axios.get(filesUrl);
+  const baseFiles = filesResponse.data.tree;
+  let archiveSha: string;
+  baseFiles.forEach((entry) => {
+    if (entry.path == "Archiv"){
+      archiveSha = entry.sha
+    }
+  });
+  const archiveApiUrl = `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`
+  const archiveResponse = await axios.get(archiveApiUrl);
+  const archiveFile = archiveResponse.data.tree
+    .filter((entry) => entry.path.includes("Bundeslaender"))
+    .sort((a, b) => {
+      const dateA = new Date(a.path.substr(0, 10));
+      const dateB = new Date(b.path.substr(0, 10));
+      return dateB.getTime() - dateA.getTime();
+    })[1].path;
+  const archiveUrl = `https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Archiv/${archiveFile}`;
   const archiveDataPromise = new Promise<VaccineVaccinationData>(
     DataPromise.bind({ url: archiveUrl })
   );
@@ -1152,7 +1170,7 @@ export async function getVaccinationHistory(
       // get csv as stream
       const response = await axios({
         method: "get",
-        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/master/Aktuell_Deutschland_Bundeslaender_COVID-19-Impfungen.csv",
+        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Bundeslaender_COVID-19-Impfungen.csv",
         responseType: "stream",
       });
 
@@ -1210,12 +1228,13 @@ export async function getVaccinationHistory(
   const [vaccinationHistoryObject, lastUpdate] = await Promise.all([
     vaccinationHistoryPromise,
     axios
-      .get(
-        "https://raw.githubusercontent.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/master/Metadaten/zenodo.json"
-      )
-      .then((response) => {
-        return new Date(response.data.publication_date);
-      }),
+    .get(
+      `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
+    )
+    .then((response) => {
+      const apiData: ApiData = response.data;
+      return new Date(apiData.commit.author.date);
+    }),
   ]);
   let vaccinationHistory: VaccinationHistoryEntry[] = [];
   for (const entry of Object.keys(vaccinationHistoryObject)) {
