@@ -209,6 +209,8 @@ export function getStateIdByName(name: string): number | null {
   }
 }
 
+export const neverExpire = -1;
+
 export function getDateBefore(days: number): string {
   let offsetDate = new Date();
   offsetDate.setHours(0, 0, 0, 0);
@@ -448,8 +450,8 @@ export async function AddRedisEntry(
 
 export interface redisEntry {
   body: string;
-  touched: Number;
-  expire: Number;
+  touched: number;
+  expire: number;
   type: string;
 }
 
@@ -495,8 +497,16 @@ export async function getMetaData(): Promise<MetaData> {
   let metaData: MetaData;
   // check if redis entry for meta data exists, if yes use it
   const redisEntryMeta = await GetRedisEntry(redisClientBas, "meta");
+  // check if redisEmtry is older than 1 day
+  let olderThenOneDay = false;
+  if (redisEntryMeta.length == 1) {
+    const now = new Date().getTime();
+    metaData = JSON.parse(redisEntryMeta[0].body);
+    const redisEntryAge = now - metaData.modified;
+    olderThenOneDay = redisEntryAge > 24 * 60 * 60 * 1000;
+  }
   // if redisEntry for metadata not exists get data from github and store data to redis
-  if (redisEntryMeta.length == 0) {
+  if (redisEntryMeta.length == 0 || olderThenOneDay) {
     const metaUrl = `${baseUrl}meta/meta.json`;
     const metaResponse = await axios.get(metaUrl);
     const rMetaData = metaResponse.data;
@@ -506,19 +516,38 @@ export async function getMetaData(): Promise<MetaData> {
     metaData = rMetaData;
     // prepare for redis
     const metaRedis = JSON.stringify(metaData);
-    // metaData redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
-    const validForSec =
-      Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
-        ? Math.ceil((validToMs - new Date().getTime()) / 1000)
-        : 3600;
+    let validForSec = 0;
+    if (olderThenOneDay) {
+      const oldMetaData: MetaData = JSON.parse(redisEntryMeta[0].body);
+      const oldModified = oldMetaData.modified;
+      const newModified = metaData.modified;
+      newModified > oldModified;
+      if (newModified > oldModified) {
+        const validToMs = AddDaysToDate(
+          new Date(metaData.modified),
+          1
+        ).setHours(3, 0, 0, 0);
+        // calculate the seconds from now to validTo
+        // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
+        validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+      } else {
+        validForSec = 3600;
+      }
+    } else {
+      // metaData redisEntry is valid to next day 3 o`clock GMT
+      const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
+        3,
+        0,
+        0,
+        0
+      );
+      // calculate the seconds from now to validTo
+      // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
+      validForSec =
+        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
+          ? Math.ceil((validToMs - new Date().getTime()) / 1000)
+          : 3600;
+    }
     // create redis Entry for metaData
     await AddRedisEntry(redisClientBas, "meta", metaRedis, validForSec, "json");
   } else {
@@ -548,16 +577,30 @@ interface CasesStatesJson {
   metaData: MetaData;
 }
 
-export async function getCasesStatesJson(): Promise<CasesStatesJson> {
-  const metaData = await getMetaData();
-  let data;
+export async function getCasesStatesJson(
+  metaData: MetaData
+): Promise<CasesStatesJson> {
+  let casesStatesJson: CasesStatesJson = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
   const redisEntryCasesStatesJson = await GetRedisEntry(
     redisClientBas,
     "casesStatesJson"
   );
+  if (redisEntryCasesStatesJson.length == 1) {
+    casesStatesJson = JSON.parse(
+      redisEntryCasesStatesJson[0].body,
+      dateReviver
+    );
+    const oldModified = casesStatesJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryCasesStatesJson.length == 0) {
+  if (redisEntryCasesStatesJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}cases/states.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -569,31 +612,18 @@ export async function getCasesStatesJson(): Promise<CasesStatesJson> {
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataCasesStates = unziped.toString();
-    data = JSON.parse(redisDataCasesStates, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    casesStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesStatesJson.metaData = metaData;
+    const redisCasesHistoryStates = JSON.stringify(casesStatesJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
       "casesStatesJson",
-      redisDataCasesStates,
-      validForSec,
+      redisCasesHistoryStates,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryCasesStatesJson[0].body, dateReviver);
   }
-
-  const casesStatesJson: CasesStatesJson = { data: data, metaData: metaData };
-
   return casesStatesJson;
 }
 
@@ -610,16 +640,30 @@ export interface CasesHistoryStatesJson {
   metaData: MetaData;
 }
 
-export async function getCasesHistoryStatesJson(): Promise<CasesHistoryStatesJson> {
-  const metaData = await getMetaData();
-  let data;
+export async function getCasesHistoryStatesJson(
+  metaData: MetaData
+): Promise<CasesHistoryStatesJson> {
+  let casesHistoryStatesJson: CasesHistoryStatesJson = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
   const redisEntryCasesHistoryStatesJson = await GetRedisEntry(
     redisClientBas,
     "casesHistoryStatesJson"
   );
+  if (redisEntryCasesHistoryStatesJson.length == 1) {
+    casesHistoryStatesJson = JSON.parse(
+      redisEntryCasesHistoryStatesJson[0].body,
+      dateReviver
+    );
+    const oldModified = casesHistoryStatesJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryCasesHistoryStatesJson.length == 0) {
+  if (redisEntryCasesHistoryStatesJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}history/states.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -631,33 +675,18 @@ export async function getCasesHistoryStatesJson(): Promise<CasesHistoryStatesJso
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataCasesHistoryStates = unziped.toString();
-    data = JSON.parse(redisDataCasesHistoryStates, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    casesHistoryStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesHistoryStatesJson.metaData = metaData;
+    const redisCasesHistoryStates = JSON.stringify(casesHistoryStatesJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
       "casesHistoryStatesJson",
-      redisDataCasesHistoryStates,
-      validForSec,
+      redisCasesHistoryStates,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryCasesHistoryStatesJson[0].body, dateReviver);
   }
-  const casesHistoryStatesJson: CasesHistoryStatesJson = {
-    data: data,
-    metaData: metaData,
-  };
-
   return casesHistoryStatesJson;
 }
 
@@ -683,16 +712,30 @@ interface CasesDistrictsJson {
   metaData: MetaData;
 }
 
-export async function getCasesDistrictsJson(): Promise<CasesDistrictsJson> {
-  const metaData = await getMetaData();
-  let data;
+export async function getCasesDistrictsJson(
+  metaData: MetaData
+): Promise<CasesDistrictsJson> {
+  let casesDistrictsJson: CasesDistrictsJson = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
-  const redisEntryCasesDistrictsJson = await GetRedisEntry(
+  const redisEntryCasesHistoryDistrictsJson = await GetRedisEntry(
     redisClientBas,
     "casesDistrictsJson"
   );
+  if (redisEntryCasesHistoryDistrictsJson.length == 1) {
+    casesDistrictsJson = JSON.parse(
+      redisEntryCasesHistoryDistrictsJson[0].body,
+      dateReviver
+    );
+    const oldModified = casesDistrictsJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryCasesDistrictsJson.length == 0) {
+  if (redisEntryCasesHistoryDistrictsJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}cases/districts.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -704,34 +747,18 @@ export async function getCasesDistrictsJson(): Promise<CasesDistrictsJson> {
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataCasesDistricts = unziped.toString();
-    data = JSON.parse(redisDataCasesDistricts, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    casesDistrictsJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesDistrictsJson.metaData = metaData;
+    const redisCasesDistricts = JSON.stringify(casesDistrictsJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
       "casesDistrictsJson",
-      redisDataCasesDistricts,
-      validForSec,
+      redisCasesDistricts,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryCasesDistrictsJson[0].body, dateReviver);
   }
-
-  const casesDistrictsJson: CasesDistrictsJson = {
-    data: data,
-    metaData: metaData,
-  };
-
   return casesDistrictsJson;
 }
 
@@ -748,16 +775,30 @@ interface CasesHistoryDistrictsJson {
   metaData: MetaData;
 }
 
-export async function getCasesHistoryDistrictsJson(): Promise<CasesHistoryDistrictsJson> {
-  const metaData = await getMetaData();
-  let data;
+export async function getCasesHistoryDistrictsJson(
+  metaData: MetaData
+): Promise<CasesHistoryDistrictsJson> {
+  let casesHistoryDistrictsJson: CasesHistoryDistrictsJson = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
   const redisEntryCasesHistoryDistrictsJson = await GetRedisEntry(
     redisClientBas,
     "casesHistoryDistrictsJson"
   );
+  if (redisEntryCasesHistoryDistrictsJson.length == 1) {
+    casesHistoryDistrictsJson = JSON.parse(
+      redisEntryCasesHistoryDistrictsJson[0].body,
+      dateReviver
+    );
+    const oldModified = casesHistoryDistrictsJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryCasesHistoryDistrictsJson.length == 0) {
+  if (redisEntryCasesHistoryDistrictsJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}history/districts.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -769,33 +810,23 @@ export async function getCasesHistoryDistrictsJson(): Promise<CasesHistoryDistri
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataCasesHistoryDistricts = unziped.toString();
-    data = JSON.parse(redisDataCasesHistoryDistricts, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
+    casesHistoryDistrictsJson.data = JSON.parse(
+      unziped.toString(),
+      dateReviver
     );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    casesHistoryDistrictsJson.metaData = metaData;
+    const redisCasesHistoryDistricts = JSON.stringify(
+      casesHistoryDistrictsJson
+    );
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
       "casesHistoryDistrictsJson",
-      redisDataCasesHistoryDistricts,
-      validForSec,
+      redisCasesHistoryDistricts,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryCasesHistoryDistrictsJson[0].body, dateReviver);
   }
-  const casesHistoryDistrictsJson: CasesHistoryDistrictsJson = {
-    data: data,
-    metaData: metaData,
-  };
-
   return casesHistoryDistrictsJson;
 }
 
@@ -815,16 +846,30 @@ interface AgeGroupStates {
   metaData: MetaData;
 }
 
-export async function getAgeGroupStatesJson(): Promise<AgeGroupStates> {
-  const metaData = await getMetaData();
-  let data;
+export async function getAgeGroupStatesJson(
+  metaData: MetaData
+): Promise<AgeGroupStates> {
+  let ageGroupStatesJson: AgeGroupStates = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
-  const redisEntryAgeGroupStates = await GetRedisEntry(
+  const redisEntryAgeGroupStatesJson = await GetRedisEntry(
     redisClientBas,
-    "ageGroupStates"
+    "ageGroupStatesJson"
   );
+  if (redisEntryAgeGroupStatesJson.length == 1) {
+    ageGroupStatesJson = JSON.parse(
+      redisEntryAgeGroupStatesJson[0].body,
+      dateReviver
+    );
+    const oldModified = ageGroupStatesJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryAgeGroupStates.length == 0) {
+  if (redisEntryAgeGroupStatesJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}agegroup/states.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -836,30 +881,18 @@ export async function getAgeGroupStatesJson(): Promise<AgeGroupStates> {
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataAgeGroupStates = unziped.toString();
-    data = JSON.parse(redisDataAgeGroupStates, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    ageGroupStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    ageGroupStatesJson.metaData = metaData;
+    const redisAgeGroupStatesJson = JSON.stringify(ageGroupStatesJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
-      "ageGroupStates",
-      redisDataAgeGroupStates,
-      validForSec,
+      "ageGroupStatesJson",
+      redisAgeGroupStatesJson,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryAgeGroupStates[0].body, dateReviver);
   }
-  const ageGroupStatesJson: AgeGroupStates = { data: data, metaData: metaData };
-
   return ageGroupStatesJson;
 }
 
@@ -879,16 +912,30 @@ interface AgeGroupDistricts {
   metaData: MetaData;
 }
 
-export async function getAgeGroupDistrictsJson(): Promise<AgeGroupDistricts> {
-  const metaData = await getMetaData();
-  let data;
+export async function getAgeGroupDistrictsJson(
+  metaData: MetaData
+): Promise<AgeGroupDistricts> {
+  let ageGroupDistrictsJson: AgeGroupDistricts = {
+    data: undefined,
+    metaData: undefined,
+  };
+  let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
-  const redisEntryAgeGroupDistricts = await GetRedisEntry(
+  const redisEntryAgeGroupDistrictsJson = await GetRedisEntry(
     redisClientBas,
-    "ageGroupDistricts"
+    "ageGroupDistrictsJson"
   );
+  if (redisEntryAgeGroupDistrictsJson.length == 1) {
+    ageGroupDistrictsJson = JSON.parse(
+      redisEntryAgeGroupDistrictsJson[0].body,
+      dateReviver
+    );
+    const oldModified = ageGroupDistrictsJson.metaData.modified;
+    const modified = metaData.modified;
+    newerDataAvail = modified > oldModified;
+  }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryAgeGroupDistricts.length == 0) {
+  if (redisEntryAgeGroupDistrictsJson.length == 0 || newerDataAvail) {
     const url = `${baseUrl}agegroup/districts.json.gz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
@@ -900,32 +947,17 @@ export async function getAgeGroupDistrictsJson(): Promise<AgeGroupDistricts> {
       zlib.gunzip(rdata, (_, result) => resolve(result))
     );
     // prepare data for redis
-    const redisDataAgeGroupDistricts = unziped.toString();
-    data = JSON.parse(redisDataAgeGroupDistricts, dateReviver);
-    // cases data redisEntry is valid to next day 3 o`clock GMT
-    const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-      3,
-      0,
-      0,
-      0
-    );
-    // calculate the seconds from now to validTo
-    const validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+    ageGroupDistrictsJson.data = JSON.parse(unziped.toString(), dateReviver);
+    ageGroupDistrictsJson.metaData = metaData;
+    const redisAgeGroupDistrictsJson = JSON.stringify(ageGroupDistrictsJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
-      "ageGroupDistricts",
-      redisDataAgeGroupDistricts,
-      validForSec,
+      "ageGroupDistrictsJson",
+      redisAgeGroupDistrictsJson,
+      neverExpire,
       "json"
     );
-  } else {
-    data = JSON.parse(redisEntryAgeGroupDistricts[0].body, dateReviver);
   }
-  const ageGroupDistrictsJson: AgeGroupDistricts = {
-    data: data,
-    metaData: metaData,
-  };
-
   return ageGroupDistrictsJson;
 }

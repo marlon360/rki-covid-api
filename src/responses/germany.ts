@@ -25,6 +25,8 @@ import {
   RequestType,
   fill0CasesDaysGermany,
   limit,
+  getMetaData,
+  MetaData,
 } from "../utils";
 
 interface GermanyData extends IResponseMeta {
@@ -62,6 +64,8 @@ interface GermanyData extends IResponseMeta {
 }
 
 export async function GermanyResponse(): Promise<GermanyData> {
+  // get metaData
+  const metaData = await getMetaData();
   // make all requests
   const [
     casesData,
@@ -75,16 +79,16 @@ export async function GermanyResponse(): Promise<GermanyData> {
     hospitalizationData,
     germanFixIncidence,
   ] = await Promise.all([
-    getCases(),
-    getDeaths(),
-    getRecovered(),
-    getNewCases(),
-    getNewDeaths(),
-    getNewRecovered(),
-    getStatesData(),
+    getCases(metaData),
+    getDeaths(metaData),
+    getRecovered(metaData),
+    getNewCases(metaData),
+    getNewDeaths(metaData),
+    getNewRecovered(metaData),
+    getStatesData(metaData),
     getRValue(),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(3, "Bund"),
+    getStatesFrozenIncidenceHistory(metaData, 3, "Bund"),
   ]);
 
   // calculate week incidence
@@ -143,7 +147,8 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 }
 
 export async function GermanyCasesHistoryResponse(
-  days?: number
+  days?: number,
+  metaData?: MetaData
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -154,7 +159,10 @@ export async function GermanyCasesHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const history = await getLastCasesHistory(days);
+  if (metaData == null) {
+    metaData = await getMetaData();
+  }
+  const history = await getLastCasesHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -187,9 +195,9 @@ export async function GermanyWeekIncidenceHistoryResponse(
       days += 6;
     }
   }
-
-  const history = await GermanyCasesHistoryResponse(days);
-  const statesData = await getStatesData();
+  const metaData = await getMetaData();
+  const history = await GermanyCasesHistoryResponse(days, metaData);
+  const statesData = await getStatesData(metaData);
 
   const population = statesData.data[0].population;
 
@@ -225,7 +233,8 @@ export async function GermanyDeathsHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const history = await getLastDeathsHistory(days);
+  const metaData = await getMetaData();
+  const history = await getLastDeathsHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -256,7 +265,8 @@ export async function GermanyRecoveredHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  const history = await getLastRecoveredHistory(days);
+  const metaData = await getMetaData();
+  const history = await getLastRecoveredHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -358,7 +368,8 @@ export async function GermanyAgeGroupsResponse(): Promise<{
   };
   meta: ResponseMeta;
 }> {
-  const AgeGroupsData = await getGermanyAgeGroups();
+  const metaData = await getMetaData();
+  const AgeGroupsData = await getGermanyAgeGroups(metaData);
   const hospitalizationData = await getHospitalizationData();
 
   const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
@@ -403,7 +414,9 @@ export async function GermanyFrozenIncidenceHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
+  const metaData = await getMetaData();
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
+    metaData,
     days
   );
 

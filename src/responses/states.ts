@@ -24,6 +24,8 @@ import {
   RegionType,
   RequestType,
   limit,
+  getMetaData,
+  MetaData,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -64,6 +66,7 @@ interface StatesData extends IResponseMeta {
 export async function StatesResponse(
   abbreviation?: string
 ): Promise<StatesData> {
+  const metaData = await getMetaData();
   // make all requests
   const [
     statesData,
@@ -74,13 +77,13 @@ export async function StatesResponse(
     hospitalizationData,
     statesFixIncidence,
   ] = await Promise.all([
-    getStatesData(),
-    getStatesRecoveredData(),
-    getNewStateCases(),
-    getNewStateDeaths(),
-    getNewStateRecovered(),
+    getStatesData(metaData),
+    getStatesRecoveredData(metaData),
+    getNewStateCases(metaData),
+    getNewStateDeaths(metaData),
+    getNewStateRecovered(metaData),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(3),
+    getStatesFrozenIncidenceHistory(metaData, 3),
   ]);
 
   // remove the first element from statesData.data (=Bundesgebiet)
@@ -172,9 +175,11 @@ interface StatesHistoryData<T> extends IResponseMeta {
 interface StatesCasesHistory {
   [key: string]: StateHistory<{ cases: number; date: Date }>;
 }
+
 export async function StatesCasesHistoryResponse(
   days?: number,
-  abbreviation?: string
+  abbreviation?: string,
+  metaData?: MetaData
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -187,8 +192,10 @@ export async function StatesCasesHistoryResponse(
   }
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-
-  const statesHistoryData = await getLastStateCasesHistory(days, id);
+  if (metaData == null) {
+    metaData = await getMetaData();
+  }
+  const statesHistoryData = await getLastStateCasesHistory(metaData, days, id);
 
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
@@ -229,12 +236,14 @@ export async function StatesWeekIncidenceHistoryResponse(
       days += 6;
     }
   }
+  const metaData = await getMetaData();
 
   const statesHistoryCasesData = await StatesCasesHistoryResponse(
     days,
-    abbreviation
+    abbreviation,
+    metaData
   );
-  const statesData = await getStatesData();
+  const statesData = await getStatesData(metaData);
 
   function getStateById(
     data: ResponseData<IStateData[]>,
@@ -295,8 +304,8 @@ export async function StatesDeathsHistoryResponse(
   }
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-
-  const statesHistoryData = await getLastStateDeathsHistory(days, id);
+  const metaData = await getMetaData();
+  const statesHistoryData = await getLastStateDeathsHistory(metaData, days, id);
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   ); //highest date, witch is "datenstand" -1
@@ -336,8 +345,12 @@ export async function StatesRecoveredHistoryResponse(
   }
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-
-  const statesHistoryData = await getLastStateRecoveredHistory(days, id);
+  const metaData = await getMetaData();
+  const statesHistoryData = await getLastStateRecoveredHistory(
+    metaData,
+    days,
+    id
+  );
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   ); //highest date, witch is "datenstand" -1
@@ -528,8 +541,8 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   meta: ResponseMeta;
 }> {
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-
-  const AgeGroupsData = await getStatesAgeGroups(id);
+  const metaData = await getMetaData();
+  const AgeGroupsData = await getStatesAgeGroups(metaData, id);
   const hospitalizationData = await getHospitalizationData();
 
   const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
@@ -584,7 +597,9 @@ export async function StatesFrozenIncidenceHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
+  const metaData = await getMetaData();
   const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
+    metaData,
     days,
     abbreviation
   );

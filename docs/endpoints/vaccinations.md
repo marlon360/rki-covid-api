@@ -2,6 +2,8 @@
 
 ## `/vaccinations`
 
+Since 2023-06-14 the data is updated monthly, on the second Tuesday of each month !
+
 ### Request
 
 `GET https://api.corona-zahlen.org/vaccinations`

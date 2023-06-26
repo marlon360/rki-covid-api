@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getMetaData } from "../utils";
+import { MetaData, neverExpire } from "../utils";
 
 import {
   getDateBefore,
@@ -67,9 +67,6 @@ interface Region {
   Archive: ArchiveParameter;
   Unofficial: UnofficialParameter;
 }
-
-// value for redis entry for never expire
-const neverExpire = -1;
 
 const Districts: Region = {
   Actual: {
@@ -292,8 +289,8 @@ async function reloadUnofficial(
 // requestType mus be bind
 const UnofficialDataPromise = async function (resolve, reject) {
   const requestType: UnofficialParameter = this.requestType;
+  const metaData: MetaData = this.metaData;
 
-  const metaData = await getMetaData();
   const lastUpdateMeta = new Date(metaData.publication_date);
   let unofficialData: UnofficialData = {};
   const redisEntry = await GetRedisEntry(
@@ -383,6 +380,7 @@ async function finalizeData(
 }
 
 export async function getDistrictsFrozenIncidenceHistory(
+  metaData: MetaData,
   days?: number,
   ags?: string,
   date?: Date
@@ -400,6 +398,7 @@ export async function getDistrictsFrozenIncidenceHistory(
   const GitUnofficialDataPromise = new Promise<UnofficialData>(
     UnofficialDataPromise.bind({
       requestType: Districts.Unofficial,
+      metaData: metaData,
     })
   );
   let [actual, archive, metaLastFileDate, unofficialData] = await Promise.all([
@@ -433,6 +432,7 @@ export async function getDistrictsFrozenIncidenceHistory(
 }
 
 export async function getStatesFrozenIncidenceHistory(
+  metaData: MetaData,
   days?: number,
   abbreviation?: string,
   date?: Date
@@ -450,6 +450,7 @@ export async function getStatesFrozenIncidenceHistory(
   const GitUnofficialDataPromise = new Promise<UnofficialData>(
     UnofficialDataPromise.bind({
       requestType: States.Unofficial,
+      metaData: metaData,
     })
   );
   let [actual, archive, metaLastFileDate, unofficialData] = await Promise.all([
