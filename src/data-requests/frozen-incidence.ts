@@ -1,5 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
+import zlib from "zlib";
 import { MetaData, neverExpire } from "../utils";
 
 import {
@@ -60,7 +61,6 @@ interface UnofficialParameter {
   key: string;
   githubUrlUnofficial: string;
   redisKeyUnofficial: string;
-  unofficialSheetName: string;
 }
 interface Region {
   Actual: ActualParameter;
@@ -92,9 +92,8 @@ const Districts: Region = {
   Unofficial: {
     key: "ags",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.xlsx",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.json.gz",
     redisKeyUnofficial: "DistrictsUnofficial",
-    unofficialSheetName: "LK",
   },
 };
 
@@ -122,9 +121,8 @@ const States: Region = {
   Unofficial: {
     key: "abbreviation",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.xlsx",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.json.gz",
     redisKeyUnofficial: "StatesUnofficial",
-    unofficialSheetName: "BL",
   },
 };
 
@@ -248,9 +246,13 @@ async function reloadUnofficial(
   if (rdata.error) {
     throw new RKIError(rdata.error, response.config.url);
   }
-  const wb = XLSX.read(rdata, { type: "buffer", cellDates: true });
-  const sheet = wb.Sheets[requestType.unofficialSheetName];
-  const jsonData = XLSX.utils.sheet_to_json(sheet);
+  //unzip data
+  const unziped = await new Promise((resolve) =>
+    zlib.gunzip(rdata, (_, result) => resolve(result))
+  );
+  // parse Json
+  const jsonData = JSON.parse(unziped.toString(), dateReviver);
+  // build unofficial data
   let unofficial: UnofficialData = {};
   jsonData.forEach((entry) => {
     const name =
