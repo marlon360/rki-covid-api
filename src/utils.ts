@@ -1,6 +1,7 @@
 import axios from "axios";
 import zlib from "zlib";
 import { redisClientBas } from "./server";
+import { ApiData } from "./data-requests/r-value";
 
 export function getStateAbbreviationById(id: number): string | null {
   switch (id) {
@@ -960,4 +961,63 @@ export async function getAgeGroupDistrictsJson(
     );
   }
   return ageGroupDistrictsJson;
+}
+
+export async function GetApiCommit(url: string, key: string): Promise<ApiData> {
+  let apiData: ApiData;
+  const apiDataRedis = await GetRedisEntry(redisClientBas, key);
+  if (apiDataRedis.length == 1) {
+    apiData = JSON.parse(apiDataRedis[0].body, dateReviver);
+  } else {
+    // if redisEntry for cases not exists get data from github und store data to redis
+    const response = await axios.get(url);
+    const rData = response.data;
+    if (rData.error) {
+      throw new RKIError(rData.error, response.config.url);
+    }
+    // prepare data for redis
+    apiData = rData;
+    const apiDataRedis = JSON.stringify(apiData);
+    // create redis Entry for metaData
+    await AddRedisEntry(redisClientBas, key, apiDataRedis, 720, "json");
+  }
+  return apiData;
+}
+
+export interface ApiTreesSha {
+  sha: string;
+  url: string;
+  truncated: boolean;
+  tree: {
+    path: string;
+    mode: string;
+    type: string;
+    sha: string;
+    size: number;
+    url: string;
+  }[];
+}
+
+export async function GetApiTrees(
+  url: string,
+  key: string
+): Promise<ApiTreesSha> {
+  let apiData: ApiTreesSha;
+  const apiDataRedis = await GetRedisEntry(redisClientBas, key);
+  if (apiDataRedis.length == 1) {
+    apiData = JSON.parse(apiDataRedis[0].body, dateReviver);
+  } else {
+    // if redisEntry for cases not exists get data from github und store data to redis
+    const response = await axios.get(url);
+    const rData = response.data;
+    if (rData.error) {
+      throw new RKIError(rData.error, response.config.url);
+    }
+    // prepare data for redis
+    apiData = rData;
+    const apiDataRedis = JSON.stringify(apiData);
+    // create redis Entry for metaData
+    await AddRedisEntry(redisClientBas, key, apiDataRedis, 720, "json");
+  }
+  return apiData;
 }
