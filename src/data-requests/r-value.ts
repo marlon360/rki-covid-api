@@ -118,8 +118,12 @@ function sumInterval(
   return sum;
 }
 
-const rValueDataUrl = new URL("https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv");
-const rValueApiUrl = new URL("https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main");
+const rValueDataUrl = new URL(
+  "https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv"
+);
+const rValueApiUrl = new URL(
+  "https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main"
+);
 
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {

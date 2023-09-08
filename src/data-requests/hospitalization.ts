@@ -291,14 +291,15 @@ export async function getHospitalizationData(): Promise<
       });
     }
   );
-  const apiUrl = new URL("https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master");
+  const apiUrl = new URL(
+    "https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master"
+  );
   const [hospitalizationData, lastUpdate] = await Promise.all([
     hospitalizationDataPromise,
-    GetApiCommit(apiUrl.href, apiUrl.pathname)
-      .then((response) => {
-        const apiData: ApiData = response;
-        return new Date(apiData.commit.author.date);
-      }),
+    GetApiCommit(apiUrl.href, apiUrl.pathname).then((response) => {
+      const apiData: ApiData = response;
+      return new Date(apiData.commit.author.date);
+    }),
   ]);
 
   return {

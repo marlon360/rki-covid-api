@@ -964,15 +964,12 @@ export async function getAgeGroupDistrictsJson(
 }
 
 export async function GetApiCommit(url: string, key: string): Promise<ApiData> {
-  let apiData: ApiData
-  const apiDataRedis = await GetRedisEntry(redisClientBas, key,);
+  let apiData: ApiData;
+  const apiDataRedis = await GetRedisEntry(redisClientBas, key);
   if (apiDataRedis.length == 1) {
-    apiData = JSON.parse(
-      apiDataRedis[0].body,
-      dateReviver
-    );
+    apiData = JSON.parse(apiDataRedis[0].body, dateReviver);
   } else {
-  // if redisEntry for cases not exists get data from github und store data to redis
+    // if redisEntry for cases not exists get data from github und store data to redis
     const response = await axios.get(url);
     const rData = response.data;
     if (rData.error) {
@@ -982,15 +979,9 @@ export async function GetApiCommit(url: string, key: string): Promise<ApiData> {
     apiData = rData;
     const apiDataRedis = JSON.stringify(apiData);
     // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      key,
-      apiDataRedis,
-      720,
-      "json"
-    );
+    await AddRedisEntry(redisClientBas, key, apiDataRedis, 720, "json");
   }
-  return apiData
+  return apiData;
 }
 
 export interface ApiTreesSha {
@@ -1007,16 +998,16 @@ export interface ApiTreesSha {
   }[];
 }
 
-export async function GetApiTrees(url: string, key: string): Promise<ApiTreesSha> {
-  let apiData: ApiTreesSha
-  const apiDataRedis = await GetRedisEntry(redisClientBas, key,);
+export async function GetApiTrees(
+  url: string,
+  key: string
+): Promise<ApiTreesSha> {
+  let apiData: ApiTreesSha;
+  const apiDataRedis = await GetRedisEntry(redisClientBas, key);
   if (apiDataRedis.length == 1) {
-    apiData = JSON.parse(
-      apiDataRedis[0].body,
-      dateReviver
-    );
+    apiData = JSON.parse(apiDataRedis[0].body, dateReviver);
   } else {
-  // if redisEntry for cases not exists get data from github und store data to redis
+    // if redisEntry for cases not exists get data from github und store data to redis
     const response = await axios.get(url);
     const rData = response.data;
     if (rData.error) {
@@ -1026,13 +1017,7 @@ export async function GetApiTrees(url: string, key: string): Promise<ApiTreesSha
     apiData = rData;
     const apiDataRedis = JSON.stringify(apiData);
     // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      key,
-      apiDataRedis,
-      720,
-      "json"
-    );
+    await AddRedisEntry(redisClientBas, key, apiDataRedis, 720, "json");
   }
-  return apiData
+  return apiData;
 }

@@ -590,23 +590,37 @@ export async function getVaccinationCoverage(): Promise<
       });
     }
   );
-  const apiUrlCommitsMain = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`);
-  const apiResponse: { lastUpdate: Date; sha: string } = await GetApiCommit(apiUrlCommitsMain.href, apiUrlCommitsMain.pathname)
-    .then((apiData) => {
-      const lastUpdate = new Date(apiData.commit.author.date);
-      const sha = apiData.sha;
-      return { lastUpdate, sha };
-    });
+  const apiUrlCommitsMain = new URL(
+    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
+  );
+  const apiResponse: { lastUpdate: Date; sha: string } = await GetApiCommit(
+    apiUrlCommitsMain.href,
+    apiUrlCommitsMain.pathname
+  ).then((apiData) => {
+    const lastUpdate = new Date(apiData.commit.author.date);
+    const sha = apiData.sha;
+    return { lastUpdate, sha };
+  });
   const lastUpdate = apiResponse.lastUpdate;
   const sha = apiResponse.sha;
 
   // finde den letzten Datansatz bevor dem aktuellen
-  const apiUrlTreesSha = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`);
-  const filesResponse = await GetApiTrees(apiUrlTreesSha.href,apiUrlTreesSha.pathname);
+  const apiUrlTreesSha = new URL(
+    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`
+  );
+  const filesResponse = await GetApiTrees(
+    apiUrlTreesSha.href,
+    apiUrlTreesSha.pathname
+  );
   const baseFiles = filesResponse.tree;
   const archiveSha = baseFiles.find((entry) => entry.path == "Archiv").sha;
-  const apiUrlTreesArchivSha = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`);
-  const archiveResponse = await GetApiTrees(apiUrlTreesArchivSha.href, apiUrlTreesArchivSha.pathname);
+  const apiUrlTreesArchivSha = new URL(
+    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`
+  );
+  const archiveResponse = await GetApiTrees(
+    apiUrlTreesArchivSha.href,
+    apiUrlTreesArchivSha.pathname
+  );
   const archiveFile = archiveResponse.tree
     .filter((entry) => entry.path.includes("Bundeslaender"))
     .sort((a, b) => {
