@@ -2,6 +2,7 @@ import axios from "axios";
 import { ResponseData } from "./response-data";
 import parse from "csv-parse";
 import { ApiData } from "./r-value";
+import { GetApiCommit } from "../utils";
 
 enum AgeGroup {
   "00-04" = "A00-A04",
@@ -290,15 +291,12 @@ export async function getHospitalizationData(): Promise<
       });
     }
   );
-
+  const apiUrl = new URL("https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master");
   const [hospitalizationData, lastUpdate] = await Promise.all([
     hospitalizationDataPromise,
-    axios
-      .get(
-        "https://api.github.com/repos/robert-koch-institut/COVID-19-Hospitalisierungen_in_Deutschland/commits/master"
-      )
+    GetApiCommit(apiUrl.href, apiUrl.pathname)
       .then((response) => {
-        const apiData: ApiData = response.data;
+        const apiData: ApiData = response;
         return new Date(apiData.commit.author.date);
       }),
   ]);

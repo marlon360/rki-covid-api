@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import { getDateBefore, RKIError } from "../utils";
+import { getDateBefore, GetApiCommit, RKIError } from "../utils";
 import { ResponseData } from "./response-data";
 
 export interface RValueHistoryEntry {
@@ -118,11 +118,8 @@ function sumInterval(
   return sum;
 }
 
-const rValueDataUrl =
-  "https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv";
-
-const rValueApiUrl =
-  "https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main";
+const rValueDataUrl = new URL("https://raw.githubusercontent.com/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/main/Nowcast_R_aktuell.csv");
+const rValueApiUrl = new URL("https://api.github.com/repos/robert-koch-institut/SARS-CoV-2-Nowcasting_und_-R-Schaetzung/commits/main");
 
 function parseRValue(data: ArrayBuffer): {
   rValue4Days: {
@@ -167,13 +164,12 @@ function parseRValue(data: ArrayBuffer): {
 }
 
 export async function getRValue() {
-  const response = await axios.get(rValueDataUrl, {
+  const response = await axios.get(rValueDataUrl.href, {
     responseType: "arraybuffer",
   });
   const data = response.data;
   const rData = parseRValue(data);
-  const apiResponse = await axios.get(rValueApiUrl);
-  const apiData: ApiData = apiResponse.data;
+  const apiData = await GetApiCommit(rValueApiUrl.href, rValueApiUrl.pathname);
   return {
     data: rData,
     lastUpdate: new Date(apiData.commit.author.date),
@@ -183,15 +179,14 @@ export async function getRValue() {
 export async function getRValueHistory(
   days?: number
 ): Promise<ResponseData<RValueHistoryEntry[]>> {
-  const response = await axios.get(rValueDataUrl, {
+  const response = await axios.get(rValueDataUrl.href, {
     responseType: "arraybuffer",
   });
   const data = response.data;
   if (data.error) {
     throw new RKIError(data.error, response.config.url);
   }
-  const apiResponse = await axios.get(rValueApiUrl);
-  const apiData: ApiData = apiResponse.data;
+  const apiData = await GetApiCommit(rValueApiUrl.href, rValueApiUrl.pathname);
   const lastUpdate = new Date(apiData.commit.author.date);
 
   const workbook = XLSX.read(data, { type: "buffer", cellDates: true });

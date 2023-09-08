@@ -7,6 +7,8 @@ import {
   getDateBefore,
   AddDaysToDate,
   limit,
+  GetApiCommit,
+  GetApiTrees,
 } from "../utils";
 import { ApiData } from "./r-value";
 
@@ -588,12 +590,9 @@ export async function getVaccinationCoverage(): Promise<
       });
     }
   );
-  const apiResponse: { lastUpdate: Date; sha: string } = await axios
-    .get(
-      `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
-    )
-    .then((response) => {
-      const apiData: ApiData = response.data;
+  const apiUrlCommitsMain = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`);
+  const apiResponse: { lastUpdate: Date; sha: string } = await GetApiCommit(apiUrlCommitsMain.href, apiUrlCommitsMain.pathname)
+    .then((apiData) => {
       const lastUpdate = new Date(apiData.commit.author.date);
       const sha = apiData.sha;
       return { lastUpdate, sha };
@@ -602,18 +601,13 @@ export async function getVaccinationCoverage(): Promise<
   const sha = apiResponse.sha;
 
   // finde den letzten Datansatz bevor dem aktuellen
-  const filesUrl = `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`;
-  const filesResponse = await axios.get(filesUrl);
-  const baseFiles = filesResponse.data.tree;
-  let archiveSha: string;
-  baseFiles.forEach((entry) => {
-    if (entry.path == "Archiv") {
-      archiveSha = entry.sha;
-    }
-  });
-  const archiveApiUrl = `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`;
-  const archiveResponse = await axios.get(archiveApiUrl);
-  const archiveFile = archiveResponse.data.tree
+  const apiUrlTreesSha = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`);
+  const filesResponse = await GetApiTrees(apiUrlTreesSha.href,apiUrlTreesSha.pathname);
+  const baseFiles = filesResponse.tree;
+  const archiveSha = baseFiles.find((entry) => entry.path == "Archiv").sha;
+  const apiUrlTreesArchivSha = new URL(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`);
+  const archiveResponse = await GetApiTrees(apiUrlTreesArchivSha.href, apiUrlTreesArchivSha.pathname);
+  const archiveFile = archiveResponse.tree
     .filter((entry) => entry.path.includes("Bundeslaender"))
     .sort((a, b) => {
       const dateA = new Date(a.path.substr(0, 10));
