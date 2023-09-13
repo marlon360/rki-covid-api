@@ -5,7 +5,6 @@ import {
   cleanupString,
   getStateAbbreviationByName,
   getDateBefore,
-  AddDaysToDate,
   limit,
   GetApiCommit,
   GetApiTrees,
@@ -56,6 +55,7 @@ enum UV {
   V7 = "biontechBivalent",
   V8 = "modernaBivalent",
   V9 = "biontechInfant",
+  V10 = "vidPrevtynBeta",
 }
 
 // UsedVaccinesDelta
@@ -69,6 +69,7 @@ enum UVD {
   V7 = "deltaBiontechBivalent",
   V8 = "deltaModernaBivalent",
   V9 = "deltaBiontechInfant",
+  V10 = "deltaVidPrevtynBeta",
 }
 
 // VaccineNameReverse
@@ -82,6 +83,11 @@ enum VNR {
   "Comirnaty bivalent (Original/Omikron)" = "biontechBivalent",
   "Spikevax bivalent (Original/Omikron)" = "modernaBivalent",
   "Comirnaty-Kleinkinder" = "biontechInfant",
+  "Comirnaty Original/Omicron BA.1" = "biontechBivalent",
+  "Comirnaty Original/Omicron BA.4-5" = "biontechBivalent",
+  "Spikevax bivalent Original/Omicron BA.1" = "modernaBivalent",
+  "Spikevax bivalent Original/Omicron BA.4-5" = "modernaBivalent",
+  "VidPrevtyn Beta" = "vidPrevtynBeta",
 }
 
 // UsedAgeGroups
@@ -229,6 +235,7 @@ interface Vaccines {
   [UV.V7]: number;
   [UV.V8]: number;
   [UV.V9]: number;
+  [UV.V10]: number;
 }
 
 interface Vaccine extends Vaccines {
@@ -245,6 +252,7 @@ interface CoverageVaccine extends Vaccines {
   [UVD.V7]: number;
   [UVD.V8]: number;
   [UVD.V9]: number;
+  [UVD.V10]: number;
 }
 
 interface StateEntry {
@@ -316,6 +324,7 @@ const emptyVaccinesObject: Vaccines = {
   [UV.V7]: null,
   [UV.V8]: null,
   [UV.V9]: null,
+  [UV.V10]: null,
 };
 // empty CoverageVaccineObject
 const emptyCoverageVaccineObject: CoverageVaccine = {
@@ -329,6 +338,7 @@ const emptyCoverageVaccineObject: CoverageVaccine = {
   [UVD.V7]: null,
   [UVD.V8]: null,
   [UVD.V9]: null,
+  [UVD.V10]: null,
 };
 // empty CoverageQuotesS1S2Object
 const emptyCoverageQuotesS1S2Object: CoverageQuotesS1S2 = {
@@ -381,7 +391,7 @@ const DataPromise = async function (resolve, reject) {
     delimiter: ",",
     from: 2,
     cast: true,
-    cast_date: true,
+    cast_date: false,
   });
 
   // get csv as stream
@@ -634,7 +644,7 @@ export async function getVaccinationCoverage(): Promise<
   );
 
   // request all data
-  const [actualVaccinationData, archiveVaccinationData, quoteVaccinationData] =
+  const [actualData, archiveData, quoteData] =
     await Promise.all([
       actualDataPromise,
       archiveDataPromise,
@@ -685,11 +695,11 @@ export async function getVaccinationCoverage(): Promise<
   };
   //fill
   for (let id = 0; id < 18; id++) {
-    const actual = actualVaccinationData[id];
+    const actual = actualData[id];
     clearEntry(actual);
-    const quotes = quoteVaccinationData[id];
+    const quotes = quoteData[id];
     clearEntry(quotes);
-    const archive = archiveVaccinationData[id];
+    const archive = archiveData[id];
     clearEntry(archive);
     // prettier-ignore
     if (id == 0) {
@@ -705,6 +715,7 @@ export async function getVaccinationCoverage(): Promise<
         [UV.V7]: actual[US.S1][UV.V7],
         [UV.V8]: actual[US.S1][UV.V8],
         [UV.V9]: actual[US.S1][UV.V9],
+        [UV.V10]: actual[US.S1][UV.V10],
         [UVD.V1]: actual[US.S1][UV.V1] === null && archive[US.S1][UV.V1] === null ? null : actual[US.S1][UV.V1] - archive[US.S1][UV.V1],
         [UVD.V2]: actual[US.S1][UV.V2] === null && archive[US.S1][UV.V2] === null ? null : actual[US.S1][UV.V2] - archive[US.S1][UV.V2],
         [UVD.V3]: actual[US.S1][UV.V3] === null && archive[US.S1][UV.V3] === null ? null : actual[US.S1][UV.V3] - archive[US.S1][UV.V3],
@@ -714,6 +725,7 @@ export async function getVaccinationCoverage(): Promise<
         [UVD.V7]: actual[US.S1][UV.V7] === null && archive[US.S1][UV.V7] === null ? null : actual[US.S1][UV.V7] - archive[US.S1][UV.V7],
         [UVD.V8]: actual[US.S1][UV.V8] === null && archive[US.S1][UV.V8] === null ? null : actual[US.S1][UV.V8] - archive[US.S1][UV.V8],
         [UVD.V9]: actual[US.S1][UV.V9] === null && archive[US.S1][UV.V9] === null ? null : actual[US.S1][UV.V9] - archive[US.S1][UV.V9],
+        [UVD.V10]: actual[US.S1][UV.V10] === null && archive[US.S1][UV.V10] === null ? null : actual[US.S1][UV.V10] - archive[US.S1][UV.V10],
       };
       coverage.delta = archive[US.S1].total === null ? null : actual[US.S1].total - archive[US.S1].total;
       coverage.quote = quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3);
@@ -736,6 +748,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S2][UV.V7],
           [UV.V8]: actual[US.S2][UV.V8],
           [UV.V9]: actual[US.S2][UV.V9],
+          [UV.V10]: actual[US.S2][UV.V10],
           [UVD.V1]: actual[US.S2][UV.V1] === null && archive[US.S2][UV.V1] === null ? null : actual[US.S2][UV.V1] - archive[US.S2][UV.V1],
           [UVD.V2]: actual[US.S2][UV.V2] === null && archive[US.S2][UV.V2] === null ? null : actual[US.S2][UV.V2] - archive[US.S2][UV.V2],
           [UVD.V3]: actual[US.S2][UV.V3] === null && archive[US.S2][UV.V3] === null ? null : actual[US.S2][UV.V3] - archive[US.S2][UV.V3],
@@ -745,6 +758,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S2][UV.V7] === null && archive[US.S2][UV.V7] === null ? null : actual[US.S2][UV.V7] - archive[US.S2][UV.V7],
           [UVD.V8]: actual[US.S2][UV.V8] === null && archive[US.S2][UV.V8] === null ? null : actual[US.S2][UV.V8] - archive[US.S2][UV.V8],
           [UVD.V9]: actual[US.S2][UV.V9] === null && archive[US.S2][UV.V9] === null ? null : actual[US.S2][UV.V9] - archive[US.S2][UV.V9],
+          [UVD.V10]: actual[US.S2][UV.V10] === null && archive[US.S2][UV.V10] === null ? null : actual[US.S2][UV.V10] - archive[US.S2][UV.V10],
         },
         delta: archive[US.S2].total === null ? null : actual[US.S2].total - archive[US.S2].total,
         quote: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
@@ -774,6 +788,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S3][UV.V7],
           [UV.V8]: actual[US.S3][UV.V8],
           [UV.V9]: actual[US.S3][UV.V9],
+          [UV.V10]: actual[US.S3][UV.V10],
           [UVD.V1]: actual[US.S3][UV.V1] === null && archive[US.S3][UV.V1] === null ? null : actual[US.S3][UV.V1] - archive[US.S3][UV.V1],
           [UVD.V2]: actual[US.S3][UV.V2] === null && archive[US.S3][UV.V2] === null ? null : actual[US.S3][UV.V2] - archive[US.S3][UV.V2],
           [UVD.V3]: actual[US.S3][UV.V3] === null && archive[US.S3][UV.V3] === null ? null : actual[US.S3][UV.V3] - archive[US.S3][UV.V3],
@@ -783,6 +798,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S3][UV.V7] === null && archive[US.S3][UV.V7] === null ? null : actual[US.S3][UV.V7] - archive[US.S3][UV.V7],
           [UVD.V8]: actual[US.S3][UV.V8] === null && archive[US.S3][UV.V8] === null ? null : actual[US.S3][UV.V8] - archive[US.S3][UV.V8],
           [UVD.V9]: actual[US.S3][UV.V9] === null && archive[US.S3][UV.V9] === null ? null : actual[US.S3][UV.V9] - archive[US.S3][UV.V9],
+          [UVD.V10]: actual[US.S3][UV.V10] === null && archive[US.S3][UV.V10] === null ? null : actual[US.S3][UV.V10] - archive[US.S3][UV.V10],
         },
         delta: archive[US.S3].total === null ? null : actual[US.S3].total - archive[US.S3].total,
         quote: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
@@ -808,6 +824,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S4][UV.V7],
           [UV.V8]: actual[US.S4][UV.V8],
           [UV.V9]: actual[US.S4][UV.V9],
+          [UV.V10]: actual[US.S4][UV.V10],
           [UVD.V1]: actual[US.S4][UV.V1] === null && archive[US.S4][UV.V1] === null ? null : actual[US.S4][UV.V1] - archive[US.S4][UV.V1],
           [UVD.V2]: actual[US.S4][UV.V2] === null && archive[US.S4][UV.V2] === null ? null : actual[US.S4][UV.V2] - archive[US.S4][UV.V2],
           [UVD.V3]: actual[US.S4][UV.V3] === null && archive[US.S4][UV.V3] === null ? null : actual[US.S4][UV.V3] - archive[US.S4][UV.V3],
@@ -817,6 +834,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S4][UV.V7] === null && archive[US.S4][UV.V7] === null ? null : actual[US.S4][UV.V7] - archive[US.S4][UV.V7],
           [UVD.V8]: actual[US.S4][UV.V8] === null && archive[US.S4][UV.V8] === null ? null : actual[US.S4][UV.V8] - archive[US.S4][UV.V8],
           [UVD.V9]: actual[US.S4][UV.V9] === null && archive[US.S4][UV.V9] === null ? null : actual[US.S4][UV.V9] - archive[US.S4][UV.V9],
+          [UVD.V10]: actual[US.S4][UV.V10] === null && archive[US.S4][UV.V10] === null ? null : actual[US.S4][UV.V10] - archive[US.S4][UV.V10],
         },
         delta: archive[US.S4].total === null ? null : actual[US.S4].total - archive[US.S4].total,
         quote: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
@@ -842,6 +860,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S5][UV.V7],
           [UV.V8]: actual[US.S5][UV.V8],
           [UV.V9]: actual[US.S5][UV.V9],
+          [UV.V10]: actual[US.S5][UV.V10],
           [UVD.V1]: actual[US.S5][UV.V1] === null && archive[US.S5][UV.V1] === null ? null : actual[US.S5][UV.V1] - archive[US.S5][UV.V1],
           [UVD.V2]: actual[US.S5][UV.V2] === null && archive[US.S5][UV.V2] === null ? null : actual[US.S5][UV.V2] - archive[US.S5][UV.V2],
           [UVD.V3]: actual[US.S5][UV.V3] === null && archive[US.S5][UV.V3] === null ? null : actual[US.S5][UV.V3] - archive[US.S5][UV.V3],
@@ -851,6 +870,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S5][UV.V7] === null && archive[US.S5][UV.V7] === null ? null : actual[US.S5][UV.V7] - archive[US.S5][UV.V7],
           [UVD.V8]: actual[US.S5][UV.V8] === null && archive[US.S5][UV.V8] === null ? null : actual[US.S5][UV.V8] - archive[US.S5][UV.V8],
           [UVD.V9]: actual[US.S5][UV.V9] === null && archive[US.S5][UV.V9] === null ? null : actual[US.S5][UV.V9] - archive[US.S5][UV.V9],
+          [UVD.V10]: actual[US.S5][UV.V10] === null && archive[US.S5][UV.V10] === null ? null : actual[US.S5][UV.V10] - archive[US.S5][UV.V10],
         },
         delta: archive[US.S5].total === null ? null : actual[US.S5].total - archive[US.S5].total,
         /* The RKI does not provide any quotes for the third Booster
@@ -878,6 +898,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S6][UV.V7],
           [UV.V8]: actual[US.S6][UV.V8],
           [UV.V9]: actual[US.S6][UV.V9],
+          [UV.V10]: actual[US.S6][UV.V10],
           [UVD.V1]: actual[US.S6][UV.V1] === null && archive[US.S6][UV.V1] === null ? null : actual[US.S6][UV.V1] - archive[US.S6][UV.V1],
           [UVD.V2]: actual[US.S6][UV.V2] === null && archive[US.S6][UV.V2] === null ? null : actual[US.S6][UV.V2] - archive[US.S6][UV.V2],
           [UVD.V3]: actual[US.S6][UV.V3] === null && archive[US.S6][UV.V3] === null ? null : actual[US.S6][UV.V3] - archive[US.S6][UV.V3],
@@ -887,6 +908,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S6][UV.V7] === null && archive[US.S6][UV.V7] === null ? null : actual[US.S6][UV.V7] - archive[US.S6][UV.V7],
           [UVD.V8]: actual[US.S6][UV.V8] === null && archive[US.S6][UV.V8] === null ? null : actual[US.S6][UV.V8] - archive[US.S6][UV.V8],
           [UVD.V9]: actual[US.S6][UV.V9] === null && archive[US.S6][UV.V9] === null ? null : actual[US.S6][UV.V9] - archive[US.S6][UV.V9],
+          [UVD.V10]: actual[US.S6][UV.V10] === null && archive[US.S6][UV.V10] === null ? null : actual[US.S6][UV.V10] - archive[US.S6][UV.V10],
         },
         delta: archive[US.S6].total === null ? null : actual[US.S6].total - archive[US.S6].total,
         /* The RKI does not provide any quotes for the fourth Booster
@@ -922,6 +944,7 @@ export async function getVaccinationCoverage(): Promise<
           [UV.V7]: actual[US.S1][UV.V7],
           [UV.V8]: actual[US.S1][UV.V8],
           [UV.V9]: actual[US.S1][UV.V9],
+          [UV.V10]: actual[US.S1][UV.V10],
           [UVD.V1]: actual[US.S1][UV.V1] === null && archive[US.S1][UV.V1] === null ? null : actual[US.S1][UV.V1] - archive[US.S1][UV.V1],
           [UVD.V2]: actual[US.S1][UV.V2] === null && archive[US.S1][UV.V2] === null ? null : actual[US.S1][UV.V2] - archive[US.S1][UV.V2],
           [UVD.V3]: actual[US.S1][UV.V3] === null && archive[US.S1][UV.V3] === null ? null : actual[US.S1][UV.V3] - archive[US.S1][UV.V3],
@@ -931,6 +954,7 @@ export async function getVaccinationCoverage(): Promise<
           [UVD.V7]: actual[US.S1][UV.V7] === null && archive[US.S1][UV.V7] === null ? null : actual[US.S1][UV.V7] - archive[US.S1][UV.V7],
           [UVD.V8]: actual[US.S1][UV.V8] === null && archive[US.S1][UV.V8] === null ? null : actual[US.S1][UV.V8] - archive[US.S1][UV.V8],
           [UVD.V9]: actual[US.S1][UV.V9] === null && archive[US.S1][UV.V9] === null ? null : actual[US.S1][UV.V9] - archive[US.S1][UV.V9],
+          [UVD.V10]: actual[US.S1][UV.V10] === null && archive[US.S1][UV.V10] === null ? null : actual[US.S1][UV.V10] - archive[US.S1][UV.V10],
         },
         delta: archive[US.S1].total === null ? null : actual[US.S1].total - archive[US.S1].total,
         quote: quotes[US.S1].total === null ? null : limit(quotes[US.S1].total / 100.0, 3),
@@ -959,6 +983,7 @@ export async function getVaccinationCoverage(): Promise<
             [UV.V7]: actual[US.S2][UV.V7],
             [UV.V8]: actual[US.S2][UV.V8],
             [UV.V9]: actual[US.S2][UV.V9],
+            [UV.V10]: actual[US.S2][UV.V10],
             [UVD.V1]: actual[US.S2][UV.V1] === null && archive[US.S2][UV.V1] === null ? null : actual[US.S2][UV.V1] - archive[US.S2][UV.V1],
             [UVD.V2]: actual[US.S2][UV.V2] === null && archive[US.S2][UV.V2] === null ? null : actual[US.S2][UV.V2] - archive[US.S2][UV.V2],
             [UVD.V3]: actual[US.S2][UV.V3] === null && archive[US.S2][UV.V3] === null ? null : actual[US.S2][UV.V3] - archive[US.S2][UV.V3],
@@ -968,6 +993,7 @@ export async function getVaccinationCoverage(): Promise<
             [UVD.V7]: actual[US.S2][UV.V7] === null && archive[US.S2][UV.V7] === null ? null : actual[US.S2][UV.V7] - archive[US.S2][UV.V7],
             [UVD.V8]: actual[US.S2][UV.V8] === null && archive[US.S2][UV.V8] === null ? null : actual[US.S2][UV.V8] - archive[US.S2][UV.V8],
             [UVD.V9]: actual[US.S2][UV.V9] === null && archive[US.S2][UV.V9] === null ? null : actual[US.S2][UV.V9] - archive[US.S2][UV.V9],
+            [UVD.V10]: actual[US.S2][UV.V10] === null && archive[US.S2][UV.V10] === null ? null : actual[US.S2][UV.V10] - archive[US.S2][UV.V10],
           },
           delta: archive[US.S2].total === null ? null : actual[US.S2].total - archive[US.S2].total,
           quote: quotes[US.S2].total === null ? null : limit(quotes[US.S2].total / 100.0, 3),
@@ -997,6 +1023,7 @@ export async function getVaccinationCoverage(): Promise<
             [UV.V7]: actual[US.S3][UV.V7],
             [UV.V8]: actual[US.S3][UV.V8],
             [UV.V9]: actual[US.S3][UV.V9],
+            [UV.V10]: actual[US.S3][UV.V10],
             [UVD.V1]: actual[US.S3][UV.V1] === null && archive[US.S3][UV.V1] === null ? null : actual[US.S3][UV.V1] - archive[US.S3][UV.V1],
             [UVD.V2]: actual[US.S3][UV.V2] === null && archive[US.S3][UV.V2] === null ? null : actual[US.S3][UV.V2] - archive[US.S3][UV.V2],
             [UVD.V3]: actual[US.S3][UV.V3] === null && archive[US.S3][UV.V3] === null ? null : actual[US.S3][UV.V3] - archive[US.S3][UV.V3],
@@ -1006,6 +1033,7 @@ export async function getVaccinationCoverage(): Promise<
             [UVD.V7]: actual[US.S3][UV.V7] === null && archive[US.S3][UV.V7] === null ? null : actual[US.S3][UV.V7] - archive[US.S3][UV.V7],
             [UVD.V8]: actual[US.S3][UV.V8] === null && archive[US.S3][UV.V8] === null ? null : actual[US.S3][UV.V8] - archive[US.S3][UV.V8],
             [UVD.V9]: actual[US.S3][UV.V9] === null && archive[US.S3][UV.V9] === null ? null : actual[US.S3][UV.V9] - archive[US.S3][UV.V9],
+            [UVD.V10]: actual[US.S3][UV.V10] === null && archive[US.S3][UV.V10] === null ? null : actual[US.S3][UV.V10] - archive[US.S3][UV.V10],
           },
           delta: archive[US.S3].total === null ? null : actual[US.S3].total - archive[US.S3].total,
           quote: quotes[US.S3].total === null ? null : limit(quotes[US.S3].total / 100.0, 3),
@@ -1031,6 +1059,7 @@ export async function getVaccinationCoverage(): Promise<
             [UV.V7]: actual[US.S4][UV.V7],
             [UV.V8]: actual[US.S4][UV.V8],
             [UV.V9]: actual[US.S4][UV.V9],
+            [UV.V10]: actual[US.S4][UV.V10],
             [UVD.V1]: actual[US.S4][UV.V1] === null && archive[US.S4][UV.V1] === null ? null : actual[US.S4][UV.V1] - archive[US.S4][UV.V1],
             [UVD.V2]: actual[US.S4][UV.V2] === null && archive[US.S4][UV.V2] === null ? null : actual[US.S4][UV.V2] - archive[US.S4][UV.V2],
             [UVD.V3]: actual[US.S4][UV.V3] === null && archive[US.S4][UV.V3] === null ? null : actual[US.S4][UV.V3] - archive[US.S4][UV.V3],
@@ -1040,6 +1069,7 @@ export async function getVaccinationCoverage(): Promise<
             [UVD.V7]: actual[US.S4][UV.V7] === null && archive[US.S4][UV.V7] === null ? null : actual[US.S4][UV.V7] - archive[US.S4][UV.V7],
             [UVD.V8]: actual[US.S4][UV.V8] === null && archive[US.S4][UV.V8] === null ? null : actual[US.S4][UV.V8] - archive[US.S4][UV.V8],
             [UVD.V9]: actual[US.S4][UV.V9] === null && archive[US.S4][UV.V9] === null ? null : actual[US.S4][UV.V9] - archive[US.S4][UV.V9],
+            [UVD.V10]: actual[US.S4][UV.V10] === null && archive[US.S4][UV.V10] === null ? null : actual[US.S4][UV.V10] - archive[US.S4][UV.V10],
           },
           delta: archive[US.S4].total === null ? null : actual[US.S4].total - archive[US.S4].total,
           quote: quotes[US.S4].total === null ? null : limit(quotes[US.S4].total / 100.0, 3),
@@ -1065,6 +1095,7 @@ export async function getVaccinationCoverage(): Promise<
             [UV.V7]: actual[US.S5][UV.V7],
             [UV.V8]: actual[US.S5][UV.V8],
             [UV.V9]: actual[US.S5][UV.V9],
+            [UV.V10]: actual[US.S5][UV.V10],
             [UVD.V1]: actual[US.S5][UV.V1] === null && archive[US.S5][UV.V1] === null ? null : actual[US.S5][UV.V1] - archive[US.S5][UV.V1],
             [UVD.V2]: actual[US.S5][UV.V2] === null && archive[US.S5][UV.V2] === null ? null : actual[US.S5][UV.V2] - archive[US.S5][UV.V2],
             [UVD.V3]: actual[US.S5][UV.V3] === null && archive[US.S5][UV.V3] === null ? null : actual[US.S5][UV.V3] - archive[US.S5][UV.V3],
@@ -1074,6 +1105,7 @@ export async function getVaccinationCoverage(): Promise<
             [UVD.V7]: actual[US.S5][UV.V7] === null && archive[US.S5][UV.V7] === null ? null : actual[US.S5][UV.V7] - archive[US.S5][UV.V7],
             [UVD.V8]: actual[US.S5][UV.V8] === null && archive[US.S5][UV.V8] === null ? null : actual[US.S5][UV.V8] - archive[US.S5][UV.V8],
             [UVD.V9]: actual[US.S5][UV.V9] === null && archive[US.S5][UV.V9] === null ? null : actual[US.S5][UV.V9] - archive[US.S5][UV.V9],
+            [UVD.V10]: actual[US.S5][UV.V10] === null && archive[US.S5][UV.V10] === null ? null : actual[US.S5][UV.V10] - archive[US.S5][UV.V10],
           },
           delta: archive[US.S5].total === null ? null : actual[US.S5].total - archive[US.S5].total,
           /* The RKI does not provide any quotes for the third Booster
@@ -1101,6 +1133,7 @@ export async function getVaccinationCoverage(): Promise<
             [UV.V7]: actual[US.S6][UV.V7],
             [UV.V8]: actual[US.S6][UV.V8],
             [UV.V9]: actual[US.S6][UV.V9],
+            [UV.V10]: actual[US.S6][UV.V10],
             [UVD.V1]: actual[US.S6][UV.V1] === null && archive[US.S6][UV.V1] === null ? null : actual[US.S6][UV.V1] - archive[US.S6][UV.V1],
             [UVD.V2]: actual[US.S6][UV.V2] === null && archive[US.S6][UV.V2] === null ? null : actual[US.S6][UV.V2] - archive[US.S6][UV.V2],
             [UVD.V3]: actual[US.S6][UV.V3] === null && archive[US.S6][UV.V3] === null ? null : actual[US.S6][UV.V3] - archive[US.S6][UV.V3],
@@ -1110,6 +1143,7 @@ export async function getVaccinationCoverage(): Promise<
             [UVD.V7]: actual[US.S6][UV.V7] === null && archive[US.S6][UV.V7] === null ? null : actual[US.S6][UV.V7] - archive[US.S6][UV.V7],
             [UVD.V8]: actual[US.S6][UV.V8] === null && archive[US.S6][UV.V8] === null ? null : actual[US.S6][UV.V8] - archive[US.S6][UV.V8],
             [UVD.V9]: actual[US.S6][UV.V9] === null && archive[US.S6][UV.V9] === null ? null : actual[US.S6][UV.V9] - archive[US.S6][UV.V9],
+            [UVD.V10]: actual[US.S6][UV.V10] === null && archive[US.S6][UV.V10] === null ? null : actual[US.S6][UV.V10] - archive[US.S6][UV.V10],
           },
           delta: archive[US.S6].total === null ? null : actual[US.S6].total - archive[US.S6].total,
           /* The RKI does not provide any quotes for the fourth Booster
