@@ -644,12 +644,11 @@ export async function getVaccinationCoverage(): Promise<
   );
 
   // request all data
-  const [actualData, archiveData, quoteData] =
-    await Promise.all([
-      actualDataPromise,
-      archiveDataPromise,
-      quoteDataPromise,
-    ]);
+  const [actualData, archiveData, quoteData] = await Promise.all([
+    actualDataPromise,
+    archiveDataPromise,
+    quoteDataPromise,
+  ]);
 
   // now we have all the stuff we need to fill the coverage
   // init
