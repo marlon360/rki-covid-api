@@ -5,6 +5,8 @@ import compression from "compression";
 import queue from "@marlon360/express-queue";
 import "express-async-errors";
 import axios from "axios";
+import { VideoResponse, Region } from "./responses/mapvideo";
+import fs from "fs";
 
 import {
   StatesCasesHistoryResponse,
@@ -100,6 +102,206 @@ const queuedCache = () => {
 app.get("/", async function (req, res) {
   res.redirect("docs");
 });
+
+app.get("/video", async function (req, res) {
+  res.redirect("/video/districts");
+});
+
+app.get("/video/districts-legend/", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(
+    Region.districts,
+    mapTypes.legendMap,
+    true
+  );
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/districts-legend/",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.legendMap,
+      false
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get(
+  "/video/districts-legend/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.legendMap,
+      true,
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get(
+  "nocpucheck/video/districts-legend/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.legendMap,
+      false,
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get("/video/districts", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(Region.districts, mapTypes.map, true);
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/districts",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(Region.districts, mapTypes.map, false);
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get("/video/districts/:days", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(
+    Region.districts,
+    mapTypes.map,
+    true,
+    parseInt(req.params.days)
+  );
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/districts/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.map,
+      false,
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get("/video/states-legend", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(Region.states, mapTypes.legendMap, true);
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/states-legend",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.legendMap,
+      false
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get("/video/states-legend/:days", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(
+    Region.states,
+    mapTypes.legendMap,
+    true,
+    parseInt(req.params.days)
+  );
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/states-legend/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.legendMap,
+      false,
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
+
+app.get("/video/states", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(Region.states, mapTypes.map, true);
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get("/nocpucheck/video/states", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(Region.states, mapTypes.map, false);
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get("/video/states/:days", queuedCache(), async function (req, res) {
+  const response = await VideoResponse(
+    Region.states,
+    mapTypes.map,
+    true,
+    parseInt(req.params.days)
+  );
+  const videoStream = fs.createReadStream(response.filename);
+  res.setHeader("Content-Type", "video/mp4");
+  videoStream.pipe(res);
+});
+
+app.get(
+  "/nocpucheck/video/states/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.map,
+      false,
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get("/germany", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyResponse();

@@ -234,7 +234,7 @@ export interface UnofficialData {
     }[];
   };
 }
-// this reloads the unofficial data from LK.xlsx or BL.xlsx and store this to redis
+// this reloads the unofficial data from LK.json.gz or BL.json.gz and store this to redis
 async function reloadUnofficial(
   requestType: UnofficialParameter,
   lastUpdate: Date
@@ -285,7 +285,7 @@ async function reloadUnofficial(
   );
   return unofficial;
 }
-// this is the Promise to get BL.xlsx or LK.xlsx from redis for all dates after 2023-04-17
+// this is the Promise to get BL.json.gz or LK.json.gz from redis for all dates after 2023-04-17
 // if not present call a reload and store to redis (reloadUnofficial)
 // if metadata lastUpdate is newer the the stored date in redis, reload and store new unofficial data to redis (reloadUnofficial)
 // requestType mus be bind

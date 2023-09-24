@@ -44,6 +44,7 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 - number of performed PCR-test, number of positive tests and positivity rate
 - cases and deaths per age group
 - hospitalization
+- map videos of the from the course of the pandemic
 
 ## Endpoints
 
@@ -53,6 +54,7 @@ Leave a star if you like it or [open an issue](https://github.com/marlon360/rki-
 - [Vaccinations](endpoints/vaccinations.md)
 - [Maps](endpoints/maps.md)
 - [Testing](endpoints/testing.md)
+- [Video](endpoints/video.md)
 
 ## Data sources
 

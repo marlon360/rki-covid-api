@@ -17,5 +17,8 @@ services:
       - redis
     environment:
       - REDISHOST=redis
+    volumes:
+      - ./temp:/usr/src/app/temp
+      - ./videos:/usr/src/app/videos
     networks:
       - redis-net
