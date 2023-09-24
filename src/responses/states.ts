@@ -63,6 +63,16 @@ interface StatesData extends IResponseMeta {
   };
 }
 
+export function getStateById(
+  data: ResponseData<any[]>,
+  id: number
+): any | null {
+  for (const state of data.data) {
+    if (state.id == id) return state;
+  }
+  return null;
+}
+
 export async function StatesResponse(
   abbreviation?: string
 ): Promise<StatesData> {
@@ -88,13 +98,6 @@ export async function StatesResponse(
 
   // remove the first element from statesData.data (=Bundesgebiet)
   statesData.data.shift();
-
-  function getStateById(data: ResponseData<any[]>, id: number): any | null {
-    for (const state of data.data) {
-      if (state.id == id) return state;
-    }
-    return null;
-  }
 
   const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
     hospitalizationData.data
@@ -168,11 +171,11 @@ interface StateHistory<T> {
   name: string;
   history: T[];
 }
-interface StatesHistoryData<T> extends IResponseMeta {
+export interface StatesHistoryData<T> extends IResponseMeta {
   data: T;
 }
 
-interface StatesCasesHistory {
+export interface StatesCasesHistory {
   [key: string]: StateHistory<{ cases: number; date: Date }>;
 }
 

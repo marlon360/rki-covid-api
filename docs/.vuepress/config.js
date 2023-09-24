@@ -50,6 +50,10 @@ module.exports = {
             title: "Testing",
             path: "/endpoints/testing",
           },
+          {
+            title: "Videos of Maps",
+            path: "/endpoints/video",
+          },
         ],
       },
     ],

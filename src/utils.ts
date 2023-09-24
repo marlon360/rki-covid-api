@@ -219,6 +219,13 @@ export function getDateBefore(days: number): string {
   return offsetDate.toISOString().split("T").shift();
 }
 
+export function getDateBeforeDate(date: string): string {
+  let offsetDate = new Date(date);
+  offsetDate.setHours(0, 0, 0, 0);
+  offsetDate.setDate(new Date().getDate() - 1);
+  return offsetDate.toISOString().split("T").shift();
+}
+
 export function getDayDifference(date1: Date, date2: Date): number {
   const diffTime = date1.getTime() - date2.getTime();
   return Math.ceil(diffTime / (1000 * 60 * 60 * 24));

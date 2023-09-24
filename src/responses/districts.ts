@@ -47,6 +47,16 @@ interface DistrictsData extends IResponseMeta {
   };
 }
 
+export function getDistrictByAGS(
+  data: ResponseData<any[]>,
+  ags: string
+): any | null {
+  for (const district of data.data) {
+    if (district.ags == ags) return district;
+  }
+  return null;
+}
+
 export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
   const metaData = await getMetaData();
   // make all requests
@@ -66,16 +76,6 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     getDistrictsFrozenIncidenceHistory(metaData, 3),
   ]);
 
-  function getDistrictByAgs(
-    data: ResponseData<any[]>,
-    ags: string
-  ): any | null {
-    for (const district of data.data) {
-      if (district.ags == ags) return district;
-    }
-    return null;
-  }
-
   const yesterdayDate = new Date(
     AddDaysToDate(districtsData.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -91,15 +91,15 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
       recovered:
-        getDistrictByAgs(districtsRecoveredData, district.ags)?.recovered ?? 0,
+        getDistrictByAGS(districtsRecoveredData, district.ags)?.recovered ?? 0,
       weekIncidence: (district.casesPerWeek / district.population) * 100000,
       casesPer100k: (district.cases / district.population) * 100000,
       delta: {
-        cases: getDistrictByAgs(districtNewCasesData, district.ags)?.cases ?? 0,
+        cases: getDistrictByAGS(districtNewCasesData, district.ags)?.cases ?? 0,
         deaths:
-          getDistrictByAgs(districtNewDeathsData, district.ags)?.deaths ?? 0,
+          getDistrictByAGS(districtNewDeathsData, district.ags)?.deaths ?? 0,
         recovered:
-          getDistrictByAgs(districtNewRecoveredData, district.ags)?.recovered ??
+          getDistrictByAGS(districtNewRecoveredData, district.ags)?.recovered ??
           0,
         weekIncidence: limit(
           (district.casesPerWeek / district.population) * 100000 -
@@ -132,11 +132,11 @@ interface DistrictHistory<T> {
   name: string;
   history: T[];
 }
-interface DistrictsHistoryData<T> extends IResponseMeta {
+export interface DistrictsHistoryData<T> extends IResponseMeta {
   data: T;
 }
 
-interface DistrictsCasesHistory {
+export interface DistrictsCasesHistory {
   [key: string]: DistrictHistory<{ cases: number; date: Date }>;
 }
 export async function DistrictsCasesHistoryResponse(
@@ -206,16 +206,6 @@ export async function DistrictsWeekIncidenceHistoryResponse(
     metaData
   );
   const districtsData = await getDistrictsData(metaData);
-
-  function getDistrictByAGS(
-    data: ResponseData<IDistrictData[]>,
-    ags: string
-  ): IDistrictData | null {
-    for (const district of data.data) {
-      if (district.ags == ags) return district;
-    }
-    return null;
-  }
 
   const incidenceData: DistrictsWeekIncidenceHistory = {};
 

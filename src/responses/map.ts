@@ -25,8 +25,8 @@ import {
 } from "../utils";
 
 export enum mapTypes {
-  map,
-  legendMap,
+  map = "withoutLegend",
+  legendMap = "withLegend",
 }
 
 // Begin normal map responses
@@ -347,7 +347,7 @@ export async function StatesHospitalizationHistoryMapResponse(
   }
 }
 
-function getColorForValue(value: number, ranges: ColorRange[]): string {
+export function getColorForValue(value: number, ranges: ColorRange[]): string {
   for (const range of ranges) {
     if (range.isValueInRange(value)) {
       return range.color;
@@ -356,7 +356,7 @@ function getColorForValue(value: number, ranges: ColorRange[]): string {
   return "#FFF";
 }
 
-function getMapBackground(
+export function getMapBackground(
   headline: string,
   lastUpdate: Date,
   ranges: ColorRange[]
