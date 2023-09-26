@@ -219,10 +219,10 @@ export function getDateBefore(days: number): string {
   return offsetDate.toISOString().split("T").shift();
 }
 
-export function getDateBeforeDate(date: string): string {
+export function getDateBeforeDate(date: string, days: number): string {
   let offsetDate = new Date(date);
   offsetDate.setHours(0, 0, 0, 0);
-  offsetDate.setDate(new Date().getDate() - 1);
+  offsetDate.setDate(new Date().getDate() - days);
   return offsetDate.toISOString().split("T").shift();
 }
 
