@@ -4,3 +4,8 @@ dist/
 # minified svg files:
 src/maps/districts.json
 src/maps/states.json
+
+# payPics json files
+dayPics/districts-incidencesPerDay*.json
+dayPics/states-incidencesPerDay*.json
+dayPics/status.json
