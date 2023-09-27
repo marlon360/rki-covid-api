@@ -22,7 +22,7 @@ services:
       - REDISHOST=redis
     volumes:
       - ./src/cache:/usr/src/app/dist/cache
-      - ./temp:/usr/src/app/temp
+      - ./dayPics:/usr/src/app/dayPics
       - ./videos:/usr/src/app/videos
     networks:
       - redis-net

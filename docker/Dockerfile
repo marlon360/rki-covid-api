@@ -64,7 +64,7 @@ COPY . .
 
 RUN npm run build
 
-VOLUME [ "/usr/src/app/temp", "/usr/src/app/videos"]
+VOLUME [ "/usr/src/app/dayPics", "/usr/src/app/videos"]
 
 EXPOSE 8080
 CMD ["pm2-runtime", "dist/server.js", "-i", "-1"]
