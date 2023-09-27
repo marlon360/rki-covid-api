@@ -236,66 +236,68 @@ export async function VideoResponse(
     }
 
     // re-/calculate all new or changed days as promise
-    const promises = [];
-    allDiffs.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
-    allDiffs.forEach((dateString) => {
-      const frameName = framesFullPath.replace(
-        "F-0000",
-        `F-${(
-          (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
-          1
-        )
-          .toString()
-          .padStart(4, "0")}`
-      );
-      const frameDate = new Date(dateString).getTime();
-      // add fill color to every region
-      for (const regionPathElement of mapData.children) {
-        const idAttribute = regionPathElement.attributes.id;
-        const id = idAttribute.split("-")[1];
-        const regionIncidence = incidencesPerDay[dateString][id].incidence;
-        regionPathElement.attributes["fill"] = getColorForValue(
-          regionIncidence,
-          weekIncidenceColorRanges
+    if (allDiffs.length > 0) {
+      const promises = [];
+      allDiffs.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+      allDiffs.forEach((dateString) => {
+        const frameName = framesFullPath.replace(
+          "F-0000",
+          `F-${(
+            (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
+            1
+          )
+            .toString()
+            .padStart(4, "0")}`
         );
-        if (region == Region.states) {
-          regionPathElement.attributes["stroke"] = "#DBDBDB";
-          regionPathElement.attributes["stroke-width"] = "0.9";
+        const frameDate = new Date(dateString).getTime();
+        // add fill color to every region
+        for (const regionPathElement of mapData.children) {
+          const idAttribute = regionPathElement.attributes.id;
+          const id = idAttribute.split("-")[1];
+          const regionIncidence = incidencesPerDay[dateString][id].incidence;
+          regionPathElement.attributes["fill"] = getColorForValue(
+            regionIncidence,
+            weekIncidenceColorRanges
+          );
+          if (region == Region.states) {
+            regionPathElement.attributes["stroke"] = "#DBDBDB";
+            regionPathElement.attributes["stroke-width"] = "0.9";
+          }
         }
-      }
-      const svgBuffer = Buffer.from(stringify(mapData));
-      if (mapType == mapTypes.legendMap && region == Region.districts) {
-        promises.push(
-          sharp(
-            getMapBackground(
-              "7-Tage-Inzidenz der Landkreise",
-              new Date(dateString),
-              weekIncidenceColorRanges
+        const svgBuffer = Buffer.from(stringify(mapData));
+        if (mapType == mapTypes.legendMap && region == Region.districts) {
+          promises.push(
+            sharp(
+              getMapBackground(
+                "7-Tage-Inzidenz der Landkreise",
+                new Date(dateString),
+                weekIncidenceColorRanges
+              )
             )
-          )
-            .composite([{ input: svgBuffer, top: 100, left: 180 }])
-            .png({ quality: 100 })
-            .toFile(frameName)
-        );
-      } else if (mapType == mapTypes.legendMap && region == Region.states) {
-        promises.push(
-          sharp(
-            getMapBackground(
-              "7-Tage-Inzidenz der Bundesländer",
-              new Date(dateString),
-              weekIncidenceColorRanges
+              .composite([{ input: svgBuffer, top: 100, left: 180 }])
+              .png({ quality: 100 })
+              .toFile(frameName)
+          );
+        } else if (mapType == mapTypes.legendMap && region == Region.states) {
+          promises.push(
+            sharp(
+              getMapBackground(
+                "7-Tage-Inzidenz der Bundesländer",
+                new Date(dateString),
+                weekIncidenceColorRanges
+              )
             )
-          )
-            .composite([{ input: svgBuffer, top: 100, left: 180 }])
-            .png({ quality: 100 })
-            .toFile(frameName)
-        );
-      } else {
-        promises.push(sharp(svgBuffer).png({ quality: 100 }).toFile(frameName));
-      }
-    });
+              .composite([{ input: svgBuffer, top: 100, left: 180 }])
+              .png({ quality: 100 })
+              .toFile(frameName)
+          );
+        } else {
+          promises.push(sharp(svgBuffer).png({ quality: 100 }).toFile(frameName));
+        }
+      });
 
-    await Promise.all(promises);
+      await Promise.all(promises);
+    }
     status[region][mapType] = true;
     fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   }
