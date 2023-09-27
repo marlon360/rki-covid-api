@@ -132,6 +132,27 @@ export async function VideoResponse(
       fs.rmSync(`./videos/${filename}`);
     }
   });
+  const incidenceDataPath = "./dayPics/";
+  // read status
+  const status: Status = JSON.parse(
+    fs.readFileSync(`${incidenceDataPath}status.json`).toString()
+  );
+  //check if incidencesPerDay_date.json exists
+  let incidencesPerDay: IncidencesPerDay = {};
+  const jsonFileName = `${incidenceDataPath}${region}-incidencesPerDay_${refDate}.json`;
+  if (fs.existsSync(jsonFileName)) {
+    incidencesPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
+  } else {
+    incidencesPerDay = await IncidencePerDayHistory(metaData, region);
+    const jsonData = JSON.stringify(incidencesPerDay);
+    fs.writeFileSync(jsonFileName, jsonData);
+    // new incidencesPerDay , change status
+    status[region][mapTypes.legendMap] = false;
+    status[region][mapTypes.map] = false;
+  }
+  const incidencesPerDayKeys = Object.keys(incidencesPerDay).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
   let oldDays: number;
   if (days != null) {
     if (isNaN(days)) {
@@ -140,7 +161,13 @@ export async function VideoResponse(
       );
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
+    } else if (days > incidencesPerDayKeys.length) {
+      throw new TypeError(`':days' parameter must be <= '${incidencesPerDayKeys.length}'`);
+    } else if (days == incidencesPerDayKeys.length) {
+      days = null;
     }
+  }
+  if (days){
     oldDays = days;
     days += 6;
   }
@@ -148,15 +175,15 @@ export async function VideoResponse(
   const mp4FileName = daysString
     ? `./videos/${region}-${mapType}_${refDate}_D${daysString}.mp4`
     : `./videos/${region}-${mapType}_${refDate}.mp4`;
-  const framesPath = `./dayPics/${mapType}/`;
-  const incidenceDataPath = "./dayPics/";
+  const dayPicsPath = "./dayPics/";
+  
   // check if requested video exist, if yes return the path
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
   }
   // check if the lockfile for the requestd video exist, witch meens that the video is calculating now by a other process
   // wait for unlinking the lockFile and the return the mp4FileName
-  const lockFile = `${framesPath}lock-${region}_${refDate}`;
+  const lockFile = `${dayPicsPath}lock-${region}_${refDate}`;
   // wait for the other prozess to finish check every 5 seconds
   if (fs.existsSync(lockFile)) {
     while (fs.existsSync(lockFile)) {
@@ -170,30 +197,9 @@ export async function VideoResponse(
       return { filename: mp4FileName };
     }
   }
-  // read status
-  const status: Status = JSON.parse(
-    fs.readFileSync(`${incidenceDataPath}status.json`).toString()
-  );
-  let incidencesPerDay: IncidencesPerDay = {};
-  const framesFullPath = `${framesPath}${region}_F-0000.png`;
-
-  //check if incidencesPerDay_date.json exists
-  const jsonFileName = `${incidenceDataPath}${region}-incidencesPerDay_${refDate}.json`;
-  if (fs.existsSync(jsonFileName)) {
-    incidencesPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
-  } else {
-    incidencesPerDay = await IncidencePerDayHistory(metaData, region);
-    const jsonData = JSON.stringify(incidencesPerDay);
-    fs.writeFileSync(jsonFileName, jsonData);
-    // new incidencesPerDay , change status
-    status[region][mapTypes.legendMap] = false;
-    status[region][mapTypes.map] = false;
-  }
-  const firstPossibleDate = new Date(
-    Object.keys(incidencesPerDay).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    )[0]
-  ).getTime();
+  const framesFullPathLegend = `${dayPicsPath}${mapTypes.legendMap}/${region}_F-0000.png`;
+  const framesFullPath = `${dayPicsPath}${mapTypes.map}/${region}_F-0000.png`;
+  const firstPossibleDate = new Date(incidencesPerDayKeys[0]).getTime();
   // create lockfile and start prozessing this mp4 file
   fs.writeFileSync(lockFile, "");
   // calculate the new pictures only if no other prozess has done this
@@ -203,9 +209,9 @@ export async function VideoResponse(
     //find the last stored incidencePerDay file witch is the basis of the stored pict files
     const allincidenceFiles = fs.readdirSync(incidenceDataPath);
     const allRegionIncidencePerDayFiles = allincidenceFiles
-      .filter((file) => file.includes(region))
+      .filter((file) => file.includes(`${region}-incidencesPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
-    const jsonFileBevor = `${incidenceDataPath}${allRegionIncidencePerDayFiles[1]}`;
+    const jsonFileBevor = allRegionIncidencePerDayFiles.length > 1 ? `${incidenceDataPath}${allRegionIncidencePerDayFiles[1]}`: "dummy";
     let oldIncidencesPerDay: IncidencesPerDay = {};
     function isDifferend(obj1, obj2) {
       return JSON.stringify(obj1) !== JSON.stringify(obj2);
@@ -216,7 +222,7 @@ export async function VideoResponse(
         fs.readFileSync(jsonFileBevor).toString()
       );
     }
-    for (const dateKey of Object.keys(incidencesPerDay)) {
+    for (const dateKey of incidencesPerDayKeys) {
       if (!oldIncidencesPerDay[dateKey]) {
         allDiffs.push(dateKey);
       } else if (
@@ -240,7 +246,15 @@ export async function VideoResponse(
             .toString()
             .padStart(4, "0")}`
         );
-        const frameDate = new Date(dateString).getTime();
+        const frameNameLegend = framesFullPathLegend.replace(
+          "F-0000",
+          `F-${(
+            (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
+            1
+          )
+            .toString()
+            .padStart(4, "0")}`
+        );
         // add fill color to every region
         for (const regionPathElement of mapData.children) {
           const idAttribute = regionPathElement.attributes.id;
@@ -256,7 +270,7 @@ export async function VideoResponse(
           }
         }
         const svgBuffer = Buffer.from(stringify(mapData));
-        if (mapType == mapTypes.legendMap && region == Region.districts) {
+        if (region == Region.districts) {
           promises.push(
             sharp(
               getMapBackground(
@@ -267,9 +281,9 @@ export async function VideoResponse(
             )
               .composite([{ input: svgBuffer, top: 100, left: 180 }])
               .png({ quality: 100 })
-              .toFile(frameName)
+              .toFile(frameNameLegend)
           );
-        } else if (mapType == mapTypes.legendMap && region == Region.states) {
+        } else if (region == Region.states) {
           promises.push(
             sharp(
               getMapBackground(
@@ -280,31 +294,27 @@ export async function VideoResponse(
             )
               .composite([{ input: svgBuffer, top: 100, left: 180 }])
               .png({ quality: 100 })
-              .toFile(frameName)
-          );
-        } else {
-          promises.push(
-            sharp(getSimpleMapBackground(new Date(dateString))            )
-              .composite([{ input: svgBuffer, top: 6, left: 22 }])
-              .png({ quality: 100 })
-              .toFile(frameName)
+              .toFile(frameNameLegend)
           );
         }
+        promises.push(
+          sharp(getSimpleMapBackground(new Date(dateString))            )
+            .composite([{ input: svgBuffer, top: 6, left: 22 }])
+            .png({ quality: 100 })
+            .toFile(frameName)
+        );
       });
 
       await Promise.all(promises);
     }
-    status[region][mapType] = true;
+    status[region][mapTypes.legendMap] = true;
+    status[region][mapTypes.map] = true;
     fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   }
-  const framesNameSearch = framesFullPath.replace("F-0000", "F-%04d");
-  const incidencePerDayKeys = Object.keys(incidencesPerDay).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
-  const lastFrameDateTime = new Date(
-    incidencePerDayKeys[incidencePerDayKeys.length - 1]
-  ).getTime();
-  const numberOfFrames = days ? oldDays : incidencePerDayKeys.length - 1;
+  const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
+  
+  const lastFrameDateTime = new Date(incidencesPerDayKeys[incidencesPerDayKeys.length - 1]).getTime();
+  const numberOfFrames = days ? oldDays : incidencesPerDayKeys.length - 1;
   const firstFrameNumber = days
     ? ((lastFrameDateTime - firstPossibleDate) / 86400000 - oldDays + 2)
         .toString()
@@ -320,7 +330,7 @@ export async function VideoResponse(
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
   const mp4Out = await ffmpegSync(
-    framesNameSearch,
+    framesNameVideo,
     mp4FileName,
     frameRate.toString(),
     firstFrameNumber
