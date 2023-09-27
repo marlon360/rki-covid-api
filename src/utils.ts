@@ -222,7 +222,7 @@ export function getDateBefore(days: number): string {
 export function getDateBeforeDate(date: string, days: number): string {
   let offsetDate = new Date(date);
   offsetDate.setHours(0, 0, 0, 0);
-  offsetDate.setDate(new Date().getDate() - days);
+  offsetDate.setDate(new Date(date).getDate() - days);
   return offsetDate.toISOString().split("T").shift();
 }
 
