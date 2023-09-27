@@ -121,11 +121,12 @@ export async function VideoResponse(
   days?: number
 ): Promise<{ filename: string }> {
   const metaData = await getMetaData();
+  const refDate = getDateBeforeDate(metaData.version, 1);
   // cleanUp ./video directory
   const allVideoFiles = fs.readdirSync("./videos");
   allVideoFiles.forEach((filename) => {
     if (
-      !filename.includes(getDateBeforeDate(metaData.version, 1)) &&
+      !filename.includes(refDate) &&
       filename !== "Readme.md"
     ) {
       fs.rmSync(`./videos/${filename}`);
@@ -144,26 +145,18 @@ export async function VideoResponse(
     days += 6;
   }
   const daysString = days ? oldDays.toString().padStart(4, "0") : null;
-  const mp4FileNameDummy = daysString
-    ? `./videos/${region}-${mapType}_0000-00-00_D${daysString}.mp4`
-    : `./videos/${region}-${mapType}_0000-00-00.mp4`;
+  const mp4FileName = daysString
+    ? `./videos/${region}-${mapType}_${refDate}_D${daysString}.mp4`
+    : `./videos/${region}-${mapType}_${refDate}.mp4`;
   const framesPath = `./dayPics/${mapType}/`;
   const incidenceDataPath = "./dayPics/";
   // check if requested video exist, if yes return the path
-  let mp4FileName = mp4FileNameDummy.replace(
-    "0000-00-00",
-    getDateBeforeDate(metaData.version, 1)
-  );
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
   }
   // check if the lockfile for the requestd video exist, witch meens that the video is calculating now by a other process
   // wait for unlinking the lockFile and the return the mp4FileName
-  const lockFileDummy = `${framesPath}lock-${region}_0000-00-00`;
-  const lockFile = lockFileDummy.replace(
-    "0000-00-00",
-    getDateBeforeDate(metaData.version, 1)
-  );
+  const lockFile = `${framesPath}lock-${region}_${refDate}`;
   // wait for the other prozess to finish check every 5 seconds
   if (fs.existsSync(lockFile)) {
     while (fs.existsSync(lockFile)) {
@@ -185,10 +178,7 @@ export async function VideoResponse(
   const framesFullPath = `${framesPath}${region}_F-0000.png`;
 
   //check if incidencesPerDay_date.json exists
-  const jsonFileName = `${incidenceDataPath}${region}-incidencesPerDay_${getDateBeforeDate(
-    metaData.version,
-    1
-  )}.json`;
+  const jsonFileName = `${incidenceDataPath}${region}-incidencesPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
     incidencesPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
   } else {
@@ -196,7 +186,8 @@ export async function VideoResponse(
     const jsonData = JSON.stringify(incidencesPerDay);
     fs.writeFileSync(jsonFileName, jsonData);
     // new incidencesPerDay , change status
-    status[region][mapType] = false;
+    status[region][mapTypes.legendMap] = false;
+    status[region][mapTypes.map] = false;
   }
   const firstPossibleDate = new Date(
     Object.keys(incidencesPerDay).sort(
@@ -292,7 +283,12 @@ export async function VideoResponse(
               .toFile(frameName)
           );
         } else {
-          promises.push(sharp(svgBuffer).png({ quality: 100 }).toFile(frameName));
+          promises.push(
+            sharp(getSimpleMapBackground(new Date(dateString))            )
+              .composite([{ input: svgBuffer, top: 6, left: 22 }])
+              .png({ quality: 100 })
+              .toFile(frameName)
+          );
         }
       });
 
@@ -338,10 +334,31 @@ export async function VideoResponse(
   // keep the last 2 files
   if (allJsonFiles.length > 2) {
     allJsonFiles.sort((a, b) => (a > b ? -1 : 1));
-    for (let index = 2; index <= allJsonFiles.length; index++) {
-      fs.rmSync(allJsonFiles[index]);
+    for (let index = 2; index < allJsonFiles.length; index++) {
+      fs.rmSync(`${incidenceDataPath + allJsonFiles[index]}`);
     }
   }
 
   return mp4Out;
+}
+
+function getSimpleMapBackground(
+  lastUpdate: Date,
+): Buffer {
+  const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }); // localized lastUpdate string
+  // the first part of svg
+  let svg = `
+    <svg width="700px" height="900px" viewBox="0 0 700 900" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <rect fill="#F4F8FB" x="0" y="0" width="700" height="900"></rect>
+        <text id="Stand:-22.11.2021" font-family="Arial" font-size="22" font-weight="normal" fill="#010501">
+          <tspan x="350" y="40">Stand: ${lastUpdateLocaleString}</tspan>
+        </text>
+      </g>
+    </svg>`;
+  return Buffer.from(svg);
 }
