@@ -60,7 +60,7 @@ export enum Region {
 interface IncidencesPerDay {
   [dateString: string]: {
     [key: string]: {
-      incidence: number;
+      color: string;
     };
   };
 }
@@ -103,11 +103,19 @@ export async function IncidencePerDayHistory(
       }
       if (!incidencesPerDay[date.toISOString()]) {
         incidencesPerDay[date.toISOString()] = {
-          [keyToUse]: { incidence: (sum / regionData.population) * 100000 },
+          [keyToUse]: {
+            color: getColorForValue(
+              (sum / regionData.population) * 100000,
+              weekIncidenceColorRanges
+            ),
+          },
         };
       } else {
         incidencesPerDay[date.toISOString()][keyToUse] = {
-          incidence: (sum / regionData.population) * 100000,
+          color: getColorForValue(
+            (sum / regionData.population) * 100000,
+            weekIncidenceColorRanges
+          ),
         };
       }
     }
@@ -125,10 +133,7 @@ export async function VideoResponse(
   // cleanUp ./video directory
   const allVideoFiles = fs.readdirSync("./videos");
   allVideoFiles.forEach((filename) => {
-    if (
-      !filename.includes(refDate) &&
-      filename !== "Readme.md"
-    ) {
+    if (!filename.includes(refDate) && filename !== "Readme.md") {
       fs.rmSync(`./videos/${filename}`);
     }
   });
@@ -162,12 +167,14 @@ export async function VideoResponse(
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     } else if (days > incidencesPerDayKeys.length) {
-      throw new TypeError(`':days' parameter must be <= '${incidencesPerDayKeys.length}'`);
+      throw new TypeError(
+        `':days' parameter must be <= '${incidencesPerDayKeys.length}'`
+      );
     } else if (days == incidencesPerDayKeys.length) {
       days = null;
     }
   }
-  if (days){
+  if (days) {
     oldDays = days;
     days += 6;
   }
@@ -176,7 +183,7 @@ export async function VideoResponse(
     ? `./videos/${region}-${mapType}_${refDate}_D${daysString}.mp4`
     : `./videos/${region}-${mapType}_${refDate}.mp4`;
   const dayPicsPath = "./dayPics/";
-  
+
   // check if requested video exist, if yes return the path
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
@@ -211,7 +218,10 @@ export async function VideoResponse(
     const allRegionIncidencePerDayFiles = allincidenceFiles
       .filter((file) => file.includes(`${region}-incidencesPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
-    const jsonFileBevor = allRegionIncidencePerDayFiles.length > 1 ? `${incidenceDataPath}${allRegionIncidencePerDayFiles[1]}`: "dummy";
+    const jsonFileBevor =
+      allRegionIncidencePerDayFiles.length > 1
+        ? `${incidenceDataPath}${allRegionIncidencePerDayFiles[1]}`
+        : "dummy";
     let oldIncidencesPerDay: IncidencesPerDay = {};
     function isDifferend(obj1, obj2) {
       return JSON.stringify(obj1) !== JSON.stringify(obj2);
@@ -259,11 +269,8 @@ export async function VideoResponse(
         for (const regionPathElement of mapData.children) {
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
-          const regionIncidence = incidencesPerDay[dateString][id].incidence;
-          regionPathElement.attributes["fill"] = getColorForValue(
-            regionIncidence,
-            weekIncidenceColorRanges
-          );
+          regionPathElement.attributes["fill"] =
+            incidencesPerDay[dateString][id].color;
           if (region == Region.states) {
             regionPathElement.attributes["stroke"] = "#DBDBDB";
             regionPathElement.attributes["stroke-width"] = "0.9";
@@ -298,7 +305,7 @@ export async function VideoResponse(
           );
         }
         promises.push(
-          sharp(getSimpleMapBackground(new Date(dateString))            )
+          sharp(getSimpleMapBackground(new Date(dateString)))
             .composite([{ input: svgBuffer, top: 6, left: 22 }])
             .png({ quality: 100 })
             .toFile(frameName)
@@ -312,8 +319,10 @@ export async function VideoResponse(
     fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   }
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
-  
-  const lastFrameDateTime = new Date(incidencesPerDayKeys[incidencesPerDayKeys.length - 1]).getTime();
+
+  const lastFrameDateTime = new Date(
+    incidencesPerDayKeys[incidencesPerDayKeys.length - 1]
+  ).getTime();
   const numberOfFrames = days ? oldDays : incidencesPerDayKeys.length - 1;
   const firstFrameNumber = days
     ? ((lastFrameDateTime - firstPossibleDate) / 86400000 - oldDays + 2)
@@ -352,9 +361,7 @@ export async function VideoResponse(
   return mp4Out;
 }
 
-function getSimpleMapBackground(
-  lastUpdate: Date,
-): Buffer {
+function getSimpleMapBackground(lastUpdate: Date): Buffer {
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
