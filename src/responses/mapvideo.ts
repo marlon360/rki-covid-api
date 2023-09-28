@@ -19,21 +19,16 @@ import { getStatesData } from "../data-requests/states";
 import { StatesCasesHistoryResponse, getStateById } from "./states";
 
 interface Status {
-  districts: {
-    withLegend: boolean;
-    withoutLegend: boolean;
-  };
-  states: {
-    withLegend: boolean;
-    withoutLegend: boolean;
-  };
+  districts: boolean;
+  states: boolean;
 }
 
 function ffmpegSync(
   framesNameSearch: string,
   mp4FileName: string,
   frameRate: string,
-  startFrame: string
+  startFrame: string,
+  lockFileName: string
 ) {
   return new Promise<{ filename: string }>((resolve, reject) => {
     ffmpeg()
@@ -46,7 +41,10 @@ function ffmpegSync(
       .on("end", () => {
         resolve({ filename: mp4FileName });
       })
-      .on("error", (err) => {
+      .on("error", (err, stdout, stderr) => {
+        fs.rmSync(lockFileName);
+        console.log("ffmpeg stdout:\n" + stdout);
+        console.log("ffmpeg stderr:\n" + stderr);
         return reject(new Error(err));
       });
   });
@@ -57,7 +55,7 @@ export enum Region {
   states = "states",
 }
 
-interface IncidencesPerDay {
+interface IncidenceColorsPerDay {
   [dateString: string]: {
     [key: string]: {
       color: string;
@@ -65,28 +63,29 @@ interface IncidencesPerDay {
   };
 }
 
-export async function IncidencePerDayHistory(
+export async function IncidenceColorsPerDay(
   metaData: MetaData,
-  region: Region,
-  days?: number
-): Promise<IncidencesPerDay> {
-  let regionHistoryData;
+  region: Region
+): Promise<IncidenceColorsPerDay> {
+  // initialize history and regions data variable
+  let regionCasesHistory;
   let regionsData;
+  // request the data depending on region
   if (region == Region.districts) {
-    regionHistoryData = await DistrictsCasesHistoryResponse(
-      days,
+    regionCasesHistory = await DistrictsCasesHistoryResponse(
+      null,
       null,
       metaData
     );
     regionsData = await getDistrictsData(metaData);
   } else if (region == Region.states) {
-    regionHistoryData = await StatesCasesHistoryResponse(days, null, metaData);
+    regionCasesHistory = await StatesCasesHistoryResponse(null, null, metaData);
     regionsData = await getStatesData(metaData);
   }
-  const incidencesPerDay: IncidencesPerDay = {};
-
-  for (const key of Object.keys(regionHistoryData.data)) {
-    const regionHistory = regionHistoryData.data[key].history;
+  const incidenceColorsPerDay: IncidenceColorsPerDay = {};
+  // build region incidence color history
+  for (const key of Object.keys(regionCasesHistory.data)) {
+    const regionHistory = regionCasesHistory.data[key].history;
     const keyToUse =
       region == Region.districts
         ? key
@@ -101,8 +100,8 @@ export async function IncidencePerDayHistory(
       for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
         sum += regionHistory[dayOffset].cases;
       }
-      if (!incidencesPerDay[date.toISOString()]) {
-        incidencesPerDay[date.toISOString()] = {
+      if (!incidenceColorsPerDay[date.toISOString()]) {
+        incidenceColorsPerDay[date.toISOString()] = {
           [keyToUse]: {
             color: getColorForValue(
               (sum / regionData.population) * 100000,
@@ -111,7 +110,7 @@ export async function IncidencePerDayHistory(
           },
         };
       } else {
-        incidencesPerDay[date.toISOString()][keyToUse] = {
+        incidenceColorsPerDay[date.toISOString()][keyToUse] = {
           color: getColorForValue(
             (sum / regionData.population) * 100000,
             weekIncidenceColorRanges
@@ -120,7 +119,7 @@ export async function IncidencePerDayHistory(
       }
     }
   }
-  return incidencesPerDay;
+  return incidenceColorsPerDay;
 }
 
 export async function VideoResponse(
@@ -128,69 +127,82 @@ export async function VideoResponse(
   mapType: mapTypes = mapTypes.map,
   days?: number
 ): Promise<{ filename: string }> {
+  // get the actual meta data
   const metaData = await getMetaData();
+  // set the reference date
   const refDate = getDateBeforeDate(metaData.version, 1);
   // cleanUp ./video directory
+  // delete all video files witch dont include the reference date
   const allVideoFiles = fs.readdirSync("./videos");
   allVideoFiles.forEach((filename) => {
     if (!filename.includes(refDate) && filename !== "Readme.md") {
       fs.rmSync(`./videos/${filename}`);
     }
   });
+  // the path to stored incidence per day files
   const incidenceDataPath = "./dayPics/";
+  // if no status.json file exists write a initial one
+  if (!fs.existsSync(`${incidenceDataPath}status.json`)) {
+    const initialStatus: Status = { states: false, districts: false };
+    fs.writeFileSync(
+      `${incidenceDataPath}status.json`,
+      JSON.stringify(initialStatus)
+    );
+  }
   // read status
   const status: Status = JSON.parse(
     fs.readFileSync(`${incidenceDataPath}status.json`).toString()
   );
   //check if incidencesPerDay_date.json exists
-  let incidencesPerDay: IncidencesPerDay = {};
-  const jsonFileName = `${incidenceDataPath}${region}-incidencesPerDay_${refDate}.json`;
+  let incidenceColorsPerDay: IncidenceColorsPerDay = {};
+  const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
-    incidencesPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
+    incidenceColorsPerDay = JSON.parse(
+      fs.readFileSync(jsonFileName).toString()
+    );
   } else {
-    incidencesPerDay = await IncidencePerDayHistory(metaData, region);
-    const jsonData = JSON.stringify(incidencesPerDay);
+    // if region incidence per day data file not exists requst the data
+    incidenceColorsPerDay = await IncidenceColorsPerDay(metaData, region);
+    // store to disc
+    const jsonData = JSON.stringify(incidenceColorsPerDay);
     fs.writeFileSync(jsonFileName, jsonData);
     // new incidencesPerDay , change status
-    status[region][mapTypes.legendMap] = false;
-    status[region][mapTypes.map] = false;
+    status[region] = false;
   }
-  const incidencesPerDayKeys = Object.keys(incidencesPerDay).sort(
+  // get a sorted list of incidencePerDay keys
+  const incidenceColorsPerDayKeys = Object.keys(incidenceColorsPerDay).sort(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
-  let oldDays: number;
+
+  // some checks for :days
   if (days != null) {
     if (isNaN(days)) {
       throw new TypeError(
         "Wrong format for ':days' parameter! This is not a number."
       );
-    } else if (days <= 0) {
-      throw new TypeError("':days' parameter must be > '0'");
-    } else if (days > incidencesPerDayKeys.length) {
-      throw new TypeError(
-        `':days' parameter must be <= '${incidencesPerDayKeys.length}'`
+    } else if (days > incidenceColorsPerDayKeys.length || days < 100) {
+      throw new RangeError(
+        `':days' parameter must be between '100' and '${incidenceColorsPerDayKeys.length}'`
       );
-    } else if (days == incidencesPerDayKeys.length) {
+    } else if (days == incidenceColorsPerDayKeys.length) {
       days = null;
     }
   }
-  if (days) {
-    oldDays = days;
-    days += 6;
-  }
-  const daysString = days ? oldDays.toString().padStart(4, "0") : null;
+  // video file name that is requested
+  const daysString = days ? days.toString().padStart(4, "0") : null;
   const mp4FileName = daysString
     ? `./videos/${region}-${mapType}_${refDate}_D${daysString}.mp4`
     : `./videos/${region}-${mapType}_${refDate}.mp4`;
-  const dayPicsPath = "./dayPics/";
-
+  // path where the differend frames are stored
+  const dayPicsPath = `./dayPics/${region}/`;
   // check if requested video exist, if yes return the path
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
   }
-  // check if the lockfile for the requestd video exist, witch meens that the video is calculating now by a other process
-  // wait for unlinking the lockFile and the return the mp4FileName
-  const lockFile = `${dayPicsPath}lock-${region}_${refDate}`;
+  // lockfilename
+  const lockFile = `./dayPics/lock-${region}_${refDate}`;
+  // check if the lockfile exist,
+  // witch meens that the single frames (region) or one video (region) is calculating now by a other process
   // wait for the other prozess to finish check every 5 seconds
   if (fs.existsSync(lockFile)) {
     while (fs.existsSync(lockFile)) {
@@ -199,111 +211,112 @@ export async function VideoResponse(
       }
       await delay(5000);
     }
-    // if the other prozess calculates the same video return the name
+    // maybe the other prozess calculates the same video return the name
     if (fs.existsSync(mp4FileName)) {
       return { filename: mp4FileName };
     }
   }
+  // create lockfile and start prozessing single frames and/or mp4 file
+  fs.writeFileSync(lockFile, "");
+  // set basic full path for frames with legend and frames without legend
   const framesFullPathLegend = `${dayPicsPath}${mapTypes.legendMap}/${region}_F-0000.png`;
   const framesFullPath = `${dayPicsPath}${mapTypes.map}/${region}_F-0000.png`;
-  const firstPossibleDate = new Date(incidencesPerDayKeys[0]).getTime();
-  // create lockfile and start prozessing this mp4 file
-  fs.writeFileSync(lockFile, "");
-  // calculate the new pictures only if no other prozess has done this
-  if (!status[region][mapType]) {
+  // calculate the new pictures only if no other prozess has done this. check the status file
+  if (!status[region]) {
+    //load the region mapfile
     const mapData = region == Region.districts ? DistrictsMap : StatesMap;
-    // check witch day is changed
-    //find the last stored incidencePerDay file witch is the basis of the stored pict files
-    const allincidenceFiles = fs.readdirSync(incidenceDataPath);
-    const allRegionIncidencePerDayFiles = allincidenceFiles
-      .filter((file) => file.includes(`${region}-incidencesPerDay_`))
+    // find the last stored incidencePerDay file witch is the basis of the stored pict files
+    let allIncidenceFiles = fs.readdirSync(incidenceDataPath);
+    allIncidenceFiles = allIncidenceFiles
+      .filter((file) => file.includes(`${region}-incidenceColorsPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
     const jsonFileBevor =
-      allRegionIncidencePerDayFiles.length > 1
-        ? `${incidenceDataPath}${allRegionIncidencePerDayFiles[1]}`
+      allIncidenceFiles.length > 1
+        ? `${incidenceDataPath}${allIncidenceFiles[1]}`
         : "dummy";
-    let oldIncidencesPerDay: IncidencesPerDay = {};
-    function isDifferend(obj1, obj2) {
-      return JSON.stringify(obj1) !== JSON.stringify(obj2);
-    }
-    let allDiffs = [];
+    // load the old incidences (if exists)
+    let oldIncidenceColorsPerDay: IncidenceColorsPerDay = {};
     if (fs.existsSync(jsonFileBevor)) {
-      oldIncidencesPerDay = JSON.parse(
+      oldIncidenceColorsPerDay = JSON.parse(
         fs.readFileSync(jsonFileBevor).toString()
       );
     }
-    for (const dateKey of incidencesPerDayKeys) {
-      if (!oldIncidencesPerDay[dateKey]) {
+    // function to compare two Objects
+    function isDifferend(obj1, obj2) {
+      return JSON.stringify(obj1) !== JSON.stringify(obj2);
+    }
+    // find all days that changed one ore more colors, and store this key to allDiffs
+    let allDiffs = [];
+    for (const dateKey of incidenceColorsPerDayKeys) {
+      // if key is not present in old incidences file always calculate this date, push key to allDiffs[]
+      if (!oldIncidenceColorsPerDay[dateKey]) {
         allDiffs.push(dateKey);
+        // if newData[key] differend to oldData[key], push key to allDiffs[]
       } else if (
-        isDifferend(incidencesPerDay[dateKey], oldIncidencesPerDay[dateKey])
+        isDifferend(
+          incidenceColorsPerDay[dateKey],
+          oldIncidenceColorsPerDay[dateKey]
+        )
       ) {
         allDiffs.push(dateKey);
       }
     }
-
-    // re-/calculate all new or changed days as promise
+    // if length allDiffs[] > 0
+    // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
+      const firstPossibleDate = new Date(
+        incidenceColorsPerDayKeys[0]
+      ).getTime();
       const promises = [];
-      allDiffs.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
       allDiffs.forEach((dateString) => {
+        // calculate the frameNumber
+        const frameNumberString = (
+          (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
+          1
+        )
+          .toString()
+          .padStart(4, "0");
+        // frameName without legend
         const frameName = framesFullPath.replace(
           "F-0000",
-          `F-${(
-            (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
-            1
-          )
-            .toString()
-            .padStart(4, "0")}`
+          `F-${frameNumberString}`
         );
+        // frameName with legend
         const frameNameLegend = framesFullPathLegend.replace(
           "F-0000",
-          `F-${(
-            (new Date(dateString).getTime() - firstPossibleDate) / 86400000 +
-            1
-          )
-            .toString()
-            .padStart(4, "0")}`
+          `F-${frameNumberString}`
         );
         // add fill color to every region
         for (const regionPathElement of mapData.children) {
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
           regionPathElement.attributes["fill"] =
-            incidencesPerDay[dateString][id].color;
+            incidenceColorsPerDay[dateString][id].color;
           if (region == Region.states) {
             regionPathElement.attributes["stroke"] = "#DBDBDB";
             regionPathElement.attributes["stroke-width"] = "0.9";
           }
         }
         const svgBuffer = Buffer.from(stringify(mapData));
-        if (region == Region.districts) {
-          promises.push(
-            sharp(
-              getMapBackground(
-                "7-Tage-Inzidenz der Landkreise",
-                new Date(dateString),
-                weekIncidenceColorRanges
-              )
+        // define headline depending on region
+        const headline =
+          region == Region.districts
+            ? "7-Tage-Inzidenz der Landkreise"
+            : "7-Tage-Inzidenz der Bundesländer";
+        // push new promise for frames with legend
+        promises.push(
+          sharp(
+            getMapBackground(
+              headline,
+              new Date(dateString),
+              weekIncidenceColorRanges
             )
-              .composite([{ input: svgBuffer, top: 100, left: 180 }])
-              .png({ quality: 100 })
-              .toFile(frameNameLegend)
-          );
-        } else if (region == Region.states) {
-          promises.push(
-            sharp(
-              getMapBackground(
-                "7-Tage-Inzidenz der Bundesländer",
-                new Date(dateString),
-                weekIncidenceColorRanges
-              )
-            )
-              .composite([{ input: svgBuffer, top: 100, left: 180 }])
-              .png({ quality: 100 })
-              .toFile(frameNameLegend)
-          );
-        }
+          )
+            .composite([{ input: svgBuffer, top: 100, left: 180 }])
+            .png({ quality: 100 })
+            .toFile(frameNameLegend)
+        );
+        // push new promise for frames without legend
         promises.push(
           sharp(getSimpleMapBackground(new Date(dateString)))
             .composite([{ input: svgBuffer, top: 6, left: 22 }])
@@ -311,25 +324,23 @@ export async function VideoResponse(
             .toFile(frameName)
         );
       });
-
+      // await all frames promises
       await Promise.all(promises);
     }
-    status[region][mapTypes.legendMap] = true;
-    status[region][mapTypes.map] = true;
+    // set status for region to true (all frames are processed)
+    status[region] = true;
+    // write status to disc
     fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   }
+  // set searchpath for frames
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
-
-  const lastFrameDateTime = new Date(
-    incidencesPerDayKeys[incidencesPerDayKeys.length - 1]
-  ).getTime();
-  const numberOfFrames = days ? oldDays : incidencesPerDayKeys.length - 1;
+  // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
   const firstFrameNumber = days
-    ? ((lastFrameDateTime - firstPossibleDate) / 86400000 - oldDays + 2)
-        .toString()
-        .padStart(4, "0")
+    ? (incidenceColorsPerDayKeys.length - days + 1).toString().padStart(4, "0")
     : "0001";
-  // minimum FrameRate = 5; maximum Framrate = 25; max Videoduration ~ 60 Seconds
+  // calculate the frame rate
+  // minimum frameRate = 5; maximum framrate = 25; max videoduration ~ 60 Seconds
+  const numberOfFrames = days ? days : incidenceColorsPerDayKeys.length - 1;
   const frameRate =
     Math.floor(numberOfFrames / 60) < 5
       ? 5
@@ -338,29 +349,30 @@ export async function VideoResponse(
       : Math.floor(numberOfFrames / 60);
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
-  const mp4Out = await ffmpegSync(
+  // calculate the requested video
+  const mp4out = await ffmpegSync(
     framesNameVideo,
     mp4FileName,
     frameRate.toString(),
-    firstFrameNumber
+    firstFrameNumber,
+    lockFile
   );
-
-  // all done remove lockfile
+  // all done, remove lockfile
   fs.rmSync(lockFile);
-  // cleanup .json files
+  // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
-  allJsonFiles = allJsonFiles.filter((file) => file.includes(region));
-  // keep the last 2 files
-  if (allJsonFiles.length > 2) {
+  allJsonFiles = allJsonFiles.filter((file) => file.includes(`${region}-incidence`));
+  // keep the actual file only
+  if (allJsonFiles.length > 1) {
     allJsonFiles.sort((a, b) => (a > b ? -1 : 1));
-    for (let index = 2; index < allJsonFiles.length; index++) {
+    for (let index = 1; index < allJsonFiles.length; index++) {
       fs.rmSync(`${incidenceDataPath + allJsonFiles[index]}`);
     }
   }
 
-  return mp4Out;
+  return mp4out;
 }
-
+// function for a simple map back ground with date only
 function getSimpleMapBackground(lastUpdate: Date): Buffer {
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
@@ -368,7 +380,7 @@ function getSimpleMapBackground(lastUpdate: Date): Buffer {
     day: "2-digit",
   }); // localized lastUpdate string
   // the first part of svg
-  let svg = `
+  const svg = `
     <svg width="700px" height="900px" viewBox="0 0 700 900" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
       <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="#F4F8FB" x="0" y="0" width="700" height="900"></rect>
