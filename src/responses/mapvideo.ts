@@ -251,14 +251,16 @@ export async function VideoResponse(
       // if key is not present in old incidences file always calculate this date, push key to allDiffs[]
       if (!oldIncidenceColorsPerDay[dateKey]) {
         allDiffs.push(dateKey);
-        // if newData[key] differend to oldData[key], push key to allDiffs[]
-      } else if (
-        isDifferend(
-          incidenceColorsPerDay[dateKey],
-          oldIncidenceColorsPerDay[dateKey]
-        )
-      ) {
-        allDiffs.push(dateKey);
+      } else {
+        // else test every regionKey for changed colors,
+        for (const regionKey of Object.keys(incidenceColorsPerDay[dateKey])) {
+          if (isDifferend(incidenceColorsPerDay[dateKey][regionKey], oldIncidenceColorsPerDay[dateKey][regionKey])) {
+            // push datekey to allDiffs[] if one color is differend,
+            allDiffs.push(dateKey)
+            // and break this "for loop"
+            break;
+          }
+        }
       }
     }
     // if length allDiffs[] > 0
