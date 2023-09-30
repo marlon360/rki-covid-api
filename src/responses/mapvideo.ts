@@ -381,15 +381,13 @@ function getSimpleMapBackground(lastUpdate: Date): Buffer {
     month: "2-digit",
     day: "2-digit",
   }); // localized lastUpdate string
-  // the first part of svg
+  // svg data
   const svg = `
     <svg width="700px" height="900px" viewBox="0 0 700 900" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
-        <rect fill="#F4F8FB" x="0" y="0" width="700" height="900"></rect>
-        <text id="Stand:-22.11.2021" font-family="Arial" font-size="22" font-weight="normal" fill="#010501">
-          <tspan x="350" y="40">Stand: ${lastUpdateLocaleString}</tspan>
-        </text>
-      </g>
+      <rect fill="#F4F8FB" x="0" y="0" width="700" height="900"></rect>
+      <text font-family="Arial" font-size="22" font-weight="normal" fill="#010501">
+        <tspan x="350" y="40">Stand: ${lastUpdateLocaleString}</tspan>
+      </text>
     </svg>`;
   return Buffer.from(svg);
 }
