@@ -21,17 +21,15 @@
     "axios": "^1.3.2",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
-    "cron": "^1.8.2",
     "csv-parse": "^4.16.3",
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
-    "express-redis-cache-next": "^1.2.0",
+    "express-redis-cache-next": "^1.2.1",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
     "pm2": "^5.1.2",
     "sharp": "^0.30.5",
     "svgson": "^5.2.1",
-    "systeminformation": "^5.21.8",
     "xlsx": "^0.17.4"
   },
   "devDependencies": {
