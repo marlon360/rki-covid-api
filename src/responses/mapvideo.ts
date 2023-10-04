@@ -171,8 +171,21 @@ export async function VideoResponse(
   const refDate = getDateBeforeDate(metaData.version, 1);
   // the path to stored incidence per day files and status
   const incidenceDataPath = "./dayPics/";
+  // path and filename for status.json
+  const statusFileName = `${incidenceDataPath}status.json`
+  // path and filename for status lockfile
+  const statusLockFile = `${incidenceDataPath}status.lockfile`
+  // wait for unlocked status file
+  if (fs.existsSync(statusLockFile)) {
+    while (fs.existsSync(statusLockFile)) {
+      function delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+      }
+      await delay(50); //wait 50 ms
+    }
+  }
   // if no status.json file exists write a initial one
-  if (!fs.existsSync(`${incidenceDataPath}status.json`)) {
+  if (!fs.existsSync(statusFileName)) {
     const initialStatus: Status = {
       states: false,
       districts: false,
@@ -182,7 +195,7 @@ export async function VideoResponse(
       },
     };
     fs.writeFileSync(
-      `${incidenceDataPath}status.json`,
+      statusFileName,
       JSON.stringify(initialStatus)
     );
   }
@@ -195,8 +208,6 @@ export async function VideoResponse(
     }
   });
   let status: Status;
-  const statusFileName = `${incidenceDataPath}status.json`
-  const statusLockFile = `${incidenceDataPath}status.lockfile`
   //check if incidencesPerDay_date.json exists
   let incidenceColorsPerDay: IncidenceColorsPerDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
@@ -219,17 +230,17 @@ export async function VideoResponse(
         }
         await delay(50); //wait 50 ms
       }
-      //set status lockfile
-      fs.writeFileSync(statusLockFile,"");
-      // read status
-      status = JSON.parse(fs.readFileSync(statusFileName).toString());
-      // change status
-      status[region] = false;
-      // write status to disc
-      fs.writeFileSync(statusFileName, JSON.stringify(status));
-      //unset status lockfile
-      fs.rmSync(statusLockFile);
     }
+    //set status lockfile
+    fs.writeFileSync(statusLockFile,"");
+    // read status
+    status = JSON.parse(fs.readFileSync(statusFileName).toString());
+    // change status
+    status[region] = false;
+    // write status to disc
+    fs.writeFileSync(statusFileName, JSON.stringify(status));
+    //unset status lockfile
+    fs.rmSync(statusLockFile);
   }
   // get a sorted list of incidencePerDay keys
   const incidenceColorsPerDayKeys = Object.keys(incidenceColorsPerDay).sort(
@@ -445,17 +456,17 @@ export async function VideoResponse(
         }
         await delay(50); //wait 50 ms
       }
-      //set status lockfile
-      fs.writeFileSync(statusLockFile,"");
-      // read status
-      status = JSON.parse(fs.readFileSync(statusFileName).toString());
-      // set status for region to true (all frames are processed)
-      status[region] = true;
-      // write status to disc
-      fs.writeFileSync(statusFileName, JSON.stringify(status));
-      //unset status lockfile
-      fs.rmSync(statusLockFile);
-    }
+    } 
+    //set status lockfile
+    fs.writeFileSync(statusLockFile,"");
+    // read status
+    status = JSON.parse(fs.readFileSync(statusFileName).toString());
+    // set status for region to true (all frames are processed)
+    status[region] = true;
+    // write status to disc
+    fs.writeFileSync(statusFileName, JSON.stringify(status));
+    //unset status lockfile
+    fs.rmSync(statusLockFile);
   }
   // set searchpath for frames
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
@@ -481,23 +492,23 @@ export async function VideoResponse(
       }
       await delay(50); //wait 50 ms
     }
-    //set status lockfile
-    fs.writeFileSync(statusLockFile,"");
-    // read status
-    status = JSON.parse(fs.readFileSync(statusFileName).toString());
-    // push video data filename and crationtime to status
-    status.videos[region].push({ filename: mp4FileName, created: created });
-    // cleanup videofiles region, store only the 5 last created entrys
-    status.videos[region].sort((a, b) => b.created - a.created);
-    while (status.videos[region].length > 5) {
-      const removed = status.videos[region].pop();
-      fs.rmSync(removed.filename);
-    }
-    // write status to disc
-    fs.writeFileSync(statusFileName, JSON.stringify(status));
-    //unset status lockfile
-    fs.rmSync(statusLockFile);
   }
+  //set status lockfile
+  fs.writeFileSync(statusLockFile,"");
+  // read status
+  status = JSON.parse(fs.readFileSync(statusFileName).toString());
+  // push video data filename and crationtime to status
+  status.videos[region].push({ filename: mp4FileName, created: created });
+  // cleanup videofiles region, store only the 5 last created entrys
+  status.videos[region].sort((a, b) => b.created - a.created);
+  while (status.videos[region].length > 5) {
+    const removed = status.videos[region].pop();
+    fs.rmSync(removed.filename);
+  }
+  // write status to disc
+  fs.writeFileSync(statusFileName, JSON.stringify(status));
+  //unset status lockfile
+  fs.rmSync(statusLockFile);
   // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
   allJsonFiles = allJsonFiles.filter((file) =>
