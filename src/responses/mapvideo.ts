@@ -21,6 +21,16 @@ import { StatesCasesHistoryResponse, getStateById } from "./states";
 interface Status {
   districts: boolean;
   states: boolean;
+  videos: {
+    districts: {
+      filename: string;
+      created: number;
+    }[];
+    states: {
+      filename: string;
+      created: number;
+    }[];
+  }
 }
 
 function ffmpegSync(
@@ -125,25 +135,25 @@ export async function IncidenceColorsPerDay(
 export async function VideoResponse(
   region: Region,
   mapType: mapTypes = mapTypes.map,
+  videoduration: number,
   days?: number
 ): Promise<{ filename: string }> {
   // get the actual meta data
   const metaData = await getMetaData();
   // set the reference date
   const refDate = getDateBeforeDate(metaData.version, 1);
-  // cleanUp ./video directory
-  // delete all video files witch dont include the reference date
-  const allVideoFiles = fs.readdirSync("./videos");
-  allVideoFiles.forEach((filename) => {
-    if (!filename.includes(refDate) && filename !== "Readme.md") {
-      fs.rmSync(`./videos/${filename}`);
-    }
-  });
-  // the path to stored incidence per day files
+  // the path to stored incidence per day files and status
   const incidenceDataPath = "./dayPics/";
   // if no status.json file exists write a initial one
   if (!fs.existsSync(`${incidenceDataPath}status.json`)) {
-    const initialStatus: Status = { states: false, districts: false };
+    const initialStatus: Status = {
+      states: false,
+      districts: false,
+      videos: {
+        districts: [],
+        states: [],
+      }
+    };
     fs.writeFileSync(
       `${incidenceDataPath}status.json`,
       JSON.stringify(initialStatus)
@@ -153,6 +163,15 @@ export async function VideoResponse(
   const status: Status = JSON.parse(
     fs.readFileSync(`${incidenceDataPath}status.json`).toString()
   );
+  // cleanUp ./video directory
+  // delete all video files witch dont include the reference date (=files from last day)
+  const allVideoFiles = fs.readdirSync("./videos");
+  allVideoFiles.forEach((filename) => {
+    if (!filename.includes(refDate) && filename !== "Readme.md") {
+      fs.rmSync(`./videos/${filename}`);
+    }
+  });
+  
   //check if incidencesPerDay_date.json exists
   let incidenceColorsPerDay: IncidenceColorsPerDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
@@ -184,15 +203,41 @@ export async function VideoResponse(
       throw new RangeError(
         `':days' parameter must be between '100' and '${incidenceColorsPerDayKeys.length}'`
       );
-    } else if (days == incidenceColorsPerDayKeys.length) {
-      days = null;
     }
+  } else {
+    days = incidenceColorsPerDayKeys.length
   }
+  const numberOfFrames = days;
+  // some checks for :duration
+  if (videoduration != null) {
+    if (isNaN(videoduration)) {
+      throw new TypeError(
+        "Wrong format for ':duration' parameter! This is not a number."
+      );
+    } else if (Math.floor(numberOfFrames / videoduration) < 5 || Math.floor(numberOfFrames / videoduration) > 25) {
+      throw new RangeError(
+        `':duration' parameter must be between '${Math.floor(numberOfFrames / 5)}' and '${Math.floor(numberOfFrames/25) + 1}' seconds`
+      );
+    }
+  } else {
+    videoduration = 60;
+  }
+  // calculate the frame rate
+  // minimum frameRate = 5; maximum framrate = 25; max videoduration ~ 60 Seconds
+  const frameRate =
+    Math.floor(numberOfFrames / videoduration) < 5
+      ? 5
+      : Math.floor(numberOfFrames / videoduration) > 25
+      ? 25
+      : Math.floor(numberOfFrames / videoduration);
+
+  
   // video file name that is requested
-  const daysString = days ? days.toString().padStart(4, "0") : null;
-  const mp4FileName = daysString
-    ? `./videos/${region}-${mapType}_${refDate}_D${daysString}.mp4`
-    : `./videos/${region}-${mapType}_${refDate}.mp4`;
+  const daysString = days.toString().padStart(4, "0");
+  const durationString = videoduration.toString().padStart(4, "0")
+  const nowTimeOnly = new Date().toISOString().split("T")[1]
+  const created = new Date(`${refDate}T${nowTimeOnly}`).getTime();
+  const mp4FileName = `./videos/${region}-${mapType}_${refDate}_Days${daysString}_Duration${durationString}.mp4`;
   // path where the differend frames are stored
   const dayPicsPath = `./dayPics/${region}/`;
   // check if requested video exist, if yes return the path
@@ -200,7 +245,7 @@ export async function VideoResponse(
     return { filename: mp4FileName };
   }
   // lockfilename
-  const lockFile = `./dayPics/lock-${region}_${refDate}`;
+  const lockFile = `./dayPics/${region}.lockfile`;
   // check if the lockfile exist,
   // witch meens that the single frames (region) or one video (region) is calculating now by a other process
   // wait for the other prozess to finish check every 5 seconds
@@ -331,24 +376,11 @@ export async function VideoResponse(
     }
     // set status for region to true (all frames are processed)
     status[region] = true;
-    // write status to disc
-    fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   }
   // set searchpath for frames
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
   // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
-  const firstFrameNumber = days
-    ? (incidenceColorsPerDayKeys.length - days + 1).toString().padStart(4, "0")
-    : "0001";
-  // calculate the frame rate
-  // minimum frameRate = 5; maximum framrate = 25; max videoduration ~ 60 Seconds
-  const numberOfFrames = days ? days : incidenceColorsPerDayKeys.length - 1;
-  const frameRate =
-    Math.floor(numberOfFrames / 60) < 5
-      ? 5
-      : Math.floor(numberOfFrames / 60) > 25
-      ? 25
-      : Math.floor(numberOfFrames / 60);
+  const firstFrameNumber = (incidenceColorsPerDayKeys.length - days + 1).toString().padStart(4, "0");
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
   // calculate the requested video
@@ -359,6 +391,16 @@ export async function VideoResponse(
     firstFrameNumber,
     lockFile
   );
+  // push video data to status
+  status.videos[region].push({filename: mp4FileName, created: created})
+  // write status to disc
+  fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
+  // cleanup videofiles region, store only the 5 last created entrys
+  status.videos[region].sort((a, b) => a.created - b.created);
+  while (status.videos[region].length > 5) {
+    const removed = status.videos[region].pop();
+    fs.rmSync(removed.filename);
+  }
   // all done, remove lockfile
   fs.rmSync(lockFile);
   // cleanup region incidences .json files
@@ -374,6 +416,7 @@ export async function VideoResponse(
 
   return mp4out;
 }
+
 // function for a simple map back ground with date only
 function getSimpleMapBackground(lastUpdate: Date): Buffer {
   const lastUpdateLocaleString = lastUpdate.toLocaleDateString("de-DE", {
