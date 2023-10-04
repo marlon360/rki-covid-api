@@ -359,7 +359,8 @@ export function getColorForValue(value: number, ranges: ColorRange[]): string {
 export function getMapBackground(
   headline: string,
   lastUpdate: Date,
-  ranges: ColorRange[]
+  ranges: ColorRange[],
+  averageColorOfTheDay?: string
 ): Buffer {
   const border = 32; // for the legend, left and down
   const rectsize = 30; //x and y of the rects
@@ -387,7 +388,7 @@ export function getMapBackground(
             <rect fill="${
               range.color
             }" x="0" y="0" width="30" height="30"></rect>
-            <text x="48" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="#010501">
+            <text x="48" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="${range.color == averageColorOfTheDay ? "#A9141A" : "#010501"}">
               <tspan>${range.toString()}</tspan>
             </text>
           </g>

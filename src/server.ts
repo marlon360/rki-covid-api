@@ -108,18 +108,30 @@ app.get("/video", async function (req, res) {
 });
 
 app.get("/video/districts-legend/", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(Region.districts, mapTypes.legendMap, 60);
+  const response = await VideoResponse(
+    Region.districts,
+    mapTypes.legendMap,
+    60
+  );
   const videoStream = fs.createReadStream(response.filename);
   res.setHeader("Content-Type", "video/mp4");
   videoStream.pipe(res);
 });
 
-app.get("/video/:duration/districts-legend/", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(Region.districts, mapTypes.legendMap, parseInt(req.params.duration));
-  const videoStream = fs.createReadStream(response.filename);
-  res.setHeader("Content-Type", "video/mp4");
-  videoStream.pipe(res);
-});
+app.get(
+  "/video/:duration/districts-legend/",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.legendMap,
+      parseInt(req.params.duration)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get(
   "/video/districts-legend/:days",
@@ -161,7 +173,11 @@ app.get("/video/districts", queuedCache(), async function (req, res) {
 });
 
 app.get("/video/:duration/districts", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(Region.districts, mapTypes.map, parseInt(req.params.duration));
+  const response = await VideoResponse(
+    Region.districts,
+    mapTypes.map,
+    parseInt(req.params.duration)
+  );
   const videoStream = fs.createReadStream(response.filename);
   res.setHeader("Content-Type", "video/mp4");
   videoStream.pipe(res);
@@ -179,17 +195,21 @@ app.get("/video/districts/:days", queuedCache(), async function (req, res) {
   videoStream.pipe(res);
 });
 
-app.get("/video/:duration/districts/:days", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(
-    Region.districts,
-    mapTypes.map,
-    parseInt(req.params.duration),
-    parseInt(req.params.days)
-  );
-  const videoStream = fs.createReadStream(response.filename);
-  res.setHeader("Content-Type", "video/mp4");
-  videoStream.pipe(res);
-});
+app.get(
+  "/video/:duration/districts/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.districts,
+      mapTypes.map,
+      parseInt(req.params.duration),
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get("/video/states-legend", queuedCache(), async function (req, res) {
   const response = await VideoResponse(Region.states, mapTypes.legendMap, null);
@@ -198,12 +218,20 @@ app.get("/video/states-legend", queuedCache(), async function (req, res) {
   videoStream.pipe(res);
 });
 
-app.get("/video/:duration/states-legend", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(Region.states, mapTypes.legendMap, parseInt(req.params.duration));
-  const videoStream = fs.createReadStream(response.filename);
-  res.setHeader("Content-Type", "video/mp4");
-  videoStream.pipe(res);
-});
+app.get(
+  "/video/:duration/states-legend",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.legendMap,
+      parseInt(req.params.duration)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get("/video/states-legend/:days", queuedCache(), async function (req, res) {
   const response = await VideoResponse(
@@ -217,17 +245,21 @@ app.get("/video/states-legend/:days", queuedCache(), async function (req, res) {
   videoStream.pipe(res);
 });
 
-app.get("/video/:duration/states-legend/:days", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(
-    Region.states,
-    mapTypes.legendMap,
-    parseInt(req.params.duration),
-    parseInt(req.params.days)
-  );
-  const videoStream = fs.createReadStream(response.filename);
-  res.setHeader("Content-Type", "video/mp4");
-  videoStream.pipe(res);
-});
+app.get(
+  "/video/:duration/states-legend/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.legendMap,
+      parseInt(req.params.duration),
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get("/video/states", queuedCache(), async function (req, res) {
   const response = await VideoResponse(Region.states, mapTypes.map, null);
@@ -237,7 +269,11 @@ app.get("/video/states", queuedCache(), async function (req, res) {
 });
 
 app.get("/video/:duration/states", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(Region.states, mapTypes.map, parseInt(req.params.duration));
+  const response = await VideoResponse(
+    Region.states,
+    mapTypes.map,
+    parseInt(req.params.duration)
+  );
   const videoStream = fs.createReadStream(response.filename);
   res.setHeader("Content-Type", "video/mp4");
   videoStream.pipe(res);
@@ -255,17 +291,21 @@ app.get("/video/states/:days", queuedCache(), async function (req, res) {
   videoStream.pipe(res);
 });
 
-app.get("/video/:duration/states/:days", queuedCache(), async function (req, res) {
-  const response = await VideoResponse(
-    Region.states,
-    mapTypes.map,
-    parseInt(req.params.duration),
-    parseInt(req.params.days)
-  );
-  const videoStream = fs.createReadStream(response.filename);
-  res.setHeader("Content-Type", "video/mp4");
-  videoStream.pipe(res);
-});
+app.get(
+  "/video/:duration/states/:days",
+  queuedCache(),
+  async function (req, res) {
+    const response = await VideoResponse(
+      Region.states,
+      mapTypes.map,
+      parseInt(req.params.duration),
+      parseInt(req.params.days)
+    );
+    const videoStream = fs.createReadStream(response.filename);
+    res.setHeader("Content-Type", "video/mp4");
+    videoStream.pipe(res);
+  }
+);
 
 app.get("/germany", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyResponse();

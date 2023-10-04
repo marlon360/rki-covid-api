@@ -30,7 +30,7 @@ interface Status {
       filename: string;
       created: number;
     }[];
-  }
+  };
 }
 
 function ffmpegSync(
@@ -73,6 +73,15 @@ interface IncidenceColorsPerDay {
   };
 }
 
+interface AveragePerDay {
+  [dateString: string]: {
+    sum: number;
+    count: number;
+    average: number;
+    averageColor: string;
+  };
+}
+
 export async function IncidenceColorsPerDay(
   metaData: MetaData,
   region: Region
@@ -93,6 +102,7 @@ export async function IncidenceColorsPerDay(
     regionsData = await getStatesData(metaData);
   }
   const incidenceColorsPerDay: IncidenceColorsPerDay = {};
+  const averagePerDay: AveragePerDay = {};
   // build region incidence color history
   for (const key of Object.keys(regionCasesHistory.data)) {
     const regionHistory = regionCasesHistory.data[key].history;
@@ -127,7 +137,24 @@ export async function IncidenceColorsPerDay(
           ),
         };
       }
+      if (!averagePerDay[date.toISOString()]) {
+        averagePerDay[date.toISOString()] = {
+          sum: (sum / regionData.population) * 100000, count: 1,
+          average: (sum / regionData.population) * 100000,
+          averageColor: getColorForValue((sum / regionData.population) * 100000, weekIncidenceColorRanges)
+        };
+      } else {
+        const temp = JSON.parse(JSON.stringify(averagePerDay[date.toISOString()])); //independent copy!
+        temp.sum = temp.sum + (sum / regionData.population) * 100000;
+        temp.count += 1;
+        temp.average = temp.sum / temp.count;
+        temp.averageColor = getColorForValue(temp.average, weekIncidenceColorRanges); 
+        averagePerDay[date.toISOString()] = temp; 
+      }
     }
+  }
+  for (const dateString of Object.keys(averagePerDay)) {
+    incidenceColorsPerDay[dateString]["99999"] = {color: averagePerDay[dateString].averageColor}; 
   }
   return incidenceColorsPerDay;
 }
@@ -152,7 +179,7 @@ export async function VideoResponse(
       videos: {
         districts: [],
         states: [],
-      }
+      },
     };
     fs.writeFileSync(
       `${incidenceDataPath}status.json`,
@@ -171,7 +198,7 @@ export async function VideoResponse(
       fs.rmSync(`./videos/${filename}`);
     }
   });
-  
+
   //check if incidencesPerDay_date.json exists
   let incidenceColorsPerDay: IncidenceColorsPerDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
@@ -193,6 +220,8 @@ export async function VideoResponse(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
 
+  // save days to oldDays
+  let oldDays: number;
   // some checks for :days
   if (days != null) {
     if (isNaN(days)) {
@@ -205,7 +234,8 @@ export async function VideoResponse(
       );
     }
   } else {
-    days = incidenceColorsPerDayKeys.length
+    oldDays = days;
+    days = incidenceColorsPerDayKeys.length;
   }
   const numberOfFrames = days;
   // some checks for :duration
@@ -214,9 +244,16 @@ export async function VideoResponse(
       throw new TypeError(
         "Wrong format for ':duration' parameter! This is not a number."
       );
-    } else if (Math.floor(numberOfFrames / videoduration) < 5 || Math.floor(numberOfFrames / videoduration) > 25) {
+    } else if (
+      Math.floor(numberOfFrames / videoduration) < 5 ||
+      Math.floor(numberOfFrames / videoduration) > 25
+    ) {
       throw new RangeError(
-        `':duration' parameter must be between '${Math.floor(numberOfFrames / 5)}' and '${Math.floor(numberOfFrames/25) + 1}' seconds`
+        `':duration' parameter must be between '${
+          Math.floor(numberOfFrames / 25) + 1
+        }' and '${Math.floor(numberOfFrames / 5)}' seconds at '${
+          oldDays ? oldDays.toString() : "unlimited"
+        }' ':days'`
       );
     }
   } else {
@@ -231,11 +268,10 @@ export async function VideoResponse(
       ? 25
       : Math.floor(numberOfFrames / videoduration);
 
-  
   // video file name that is requested
   const daysString = days.toString().padStart(4, "0");
-  const durationString = videoduration.toString().padStart(4, "0")
-  const nowTimeOnly = new Date().toISOString().split("T")[1]
+  const durationString = videoduration.toString().padStart(4, "0");
+  const nowTimeOnly = new Date().toISOString().split("T")[1];
   const created = new Date(`${refDate}T${nowTimeOnly}`).getTime();
   const mp4FileName = `./videos/${region}-${mapType}_${refDate}_Days${daysString}_Duration${durationString}.mp4`;
   // path where the differend frames are stored
@@ -299,9 +335,14 @@ export async function VideoResponse(
       } else {
         // else test every regionKey for changed colors,
         for (const regionKey of Object.keys(incidenceColorsPerDay[dateKey])) {
-          if (isDifferend(incidenceColorsPerDay[dateKey][regionKey], oldIncidenceColorsPerDay[dateKey][regionKey])) {
+          if (
+            isDifferend(
+              incidenceColorsPerDay[dateKey][regionKey],
+              oldIncidenceColorsPerDay[dateKey][regionKey]
+            )
+          ) {
             // push datekey to allDiffs[] if one color is differend,
-            allDiffs.push(dateKey)
+            allDiffs.push(dateKey);
             // and break this "for loop"
             break;
           }
@@ -356,7 +397,8 @@ export async function VideoResponse(
             getMapBackground(
               headline,
               new Date(dateString),
-              weekIncidenceColorRanges
+              weekIncidenceColorRanges,
+              incidenceColorsPerDay[dateString]["99999"].color
             )
           )
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
@@ -380,7 +422,9 @@ export async function VideoResponse(
   // set searchpath for frames
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
   // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
-  const firstFrameNumber = (incidenceColorsPerDayKeys.length - days + 1).toString().padStart(4, "0");
+  const firstFrameNumber = (incidenceColorsPerDayKeys.length - days + 1)
+    .toString()
+    .padStart(4, "0");
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
   // calculate the requested video
@@ -392,20 +436,22 @@ export async function VideoResponse(
     lockFile
   );
   // push video data to status
-  status.videos[region].push({filename: mp4FileName, created: created})
-  // write status to disc
-  fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
+  status.videos[region].push({ filename: mp4FileName, created: created });
   // cleanup videofiles region, store only the 5 last created entrys
-  status.videos[region].sort((a, b) => a.created - b.created);
+  status.videos[region].sort((a, b) => b.created - a.created);
   while (status.videos[region].length > 5) {
     const removed = status.videos[region].pop();
     fs.rmSync(removed.filename);
   }
+  // write status to disc
+  fs.writeFileSync(`${incidenceDataPath}status.json`, JSON.stringify(status));
   // all done, remove lockfile
   fs.rmSync(lockFile);
   // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
-  allJsonFiles = allJsonFiles.filter((file) => file.includes(`${region}-incidence`));
+  allJsonFiles = allJsonFiles.filter((file) =>
+    file.includes(`${region}-incidence`)
+  );
   // keep the last 2 files only
   if (allJsonFiles.length > 2) {
     allJsonFiles.sort((a, b) => (a > b ? -1 : 1));
