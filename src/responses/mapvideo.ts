@@ -246,7 +246,7 @@ export async function VideoResponse(
   );
 
   // save days to oldDays
-  let oldDays: number;
+  let oldDays = days;
   
   // some checks for :days
   if (days != null) {
@@ -260,7 +260,6 @@ export async function VideoResponse(
       );
     }
   } else {
-    oldDays = days;
     days = incidenceColorsPerDayKeys.length;
   }
   const numberOfFrames = days;
@@ -278,9 +277,9 @@ export async function VideoResponse(
       throw new RangeError(
         `':duration' parameter must be between '${
           Math.floor(numberOfFrames / 25) + 1
-        }' and '${Math.floor(numberOfFrames / 5)}' seconds at '${
+        }' and '${Math.floor(numberOfFrames / 5)}' seconds if 'days:' is '${
           oldDays ? oldDays.toString() : "unlimited"
-        }' ':days'`
+        }'`
       );
     }
   } else {
