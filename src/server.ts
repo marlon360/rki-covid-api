@@ -1159,75 +1159,17 @@ app.get("/map", async function (req, res) {
   res.redirect("/map/districts");
 });
 
-app.get(
-  "/map/districts",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const response = await DistrictsMapResponse();
-    res.setHeader("Content-Type", "image/png").send(response);
-  }
-);
-
-app.get(
-  "/map/districts/history/:date",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
-    const response = await DistrictsHistoryMapResponse(
-      mapTypes.map,
-      checkedDateString
-    );
-    res.setHeader("Content-Type", "image/png").send(response);
-  }
-);
-
-app.get(
-  "/map/districts-legend",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    const response = await DistrictsMapResponse(mapTypes.legendMap);
-    res.setHeader("Content-Type", "image/png").send(response);
-  }
-);
-
-app.get(
-  "/map/districts-legend/history/:date",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
-    const response = await DistrictsHistoryMapResponse(
-      mapTypes.legendMap,
-      checkedDateString
-    );
-    res.setHeader("Content-Type", "image/png").send(response);
-  }
-);
-
-app.get(
-  "/map/districts/legend",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    res.json(IncidenceColorsResponse());
-  }
-);
-
-app.get("/map/states", queuedCache(), cache.route(), async function (req, res) {
-  const response = await StatesMapResponse();
+app.get("/map/districts", queuedCache(), async function (req, res) {
+  const response = await DistrictsMapResponse();
   res.setHeader("Content-Type", "image/png").send(response);
 });
 
 app.get(
-  "/map/states/history/:date",
+  "/map/districts/history/:date",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
-    const response = await StatesHistoryMapResponse(
+    const response = await DistrictsHistoryMapResponse(
       mapTypes.map,
       checkedDateString
     );
@@ -1235,20 +1177,50 @@ app.get(
   }
 );
 
+app.get("/map/districts-legend", queuedCache(), async function (req, res) {
+  const response = await DistrictsMapResponse(mapTypes.legendMap);
+  res.setHeader("Content-Type", "image/png").send(response);
+});
+
 app.get(
-  "/map/states-legend",
+  "/map/districts-legend/history/:date",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
-    const response = await StatesMapResponse(mapTypes.legendMap);
+    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    const response = await DistrictsHistoryMapResponse(
+      mapTypes.legendMap,
+      checkedDateString
+    );
     res.setHeader("Content-Type", "image/png").send(response);
   }
 );
 
+app.get("/map/districts/legend", queuedCache(), async function (req, res) {
+  res.json(IncidenceColorsResponse());
+});
+
+app.get("/map/states", queuedCache(), async function (req, res) {
+  const response = await StatesMapResponse();
+  res.setHeader("Content-Type", "image/png").send(response);
+});
+
+app.get("/map/states/history/:date", queuedCache(), async function (req, res) {
+  let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+  const response = await StatesHistoryMapResponse(
+    mapTypes.map,
+    checkedDateString
+  );
+  res.setHeader("Content-Type", "image/png").send(response);
+});
+
+app.get("/map/states-legend", queuedCache(), async function (req, res) {
+  const response = await StatesMapResponse(mapTypes.legendMap);
+  res.setHeader("Content-Type", "image/png").send(response);
+});
+
 app.get(
   "/map/states-legend/history/:date",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHistoryMapResponse(
@@ -1259,19 +1231,13 @@ app.get(
   }
 );
 
-app.get(
-  "/map/states/legend",
-  queuedCache(),
-  cache.route(),
-  async function (req, res) {
-    res.json(IncidenceColorsResponse());
-  }
-);
+app.get("/map/states/legend", queuedCache(), async function (req, res) {
+  res.json(IncidenceColorsResponse());
+});
 
 app.get(
   "/map/states-legend/hospitalization",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     const response = await StatesHospitalizationMapResponse(mapTypes.legendMap);
     res.setHeader("Content-Type", "image/png").send(response);
@@ -1281,7 +1247,6 @@ app.get(
 app.get(
   "/map/states/hospitalization",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     const response = await StatesHospitalizationMapResponse();
     res.setHeader("Content-Type", "image/png").send(response);
@@ -1291,7 +1256,6 @@ app.get(
 app.get(
   "/map/states-legend/hospitalization/history/:date",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
@@ -1305,7 +1269,6 @@ app.get(
 app.get(
   "/map/states/hospitalization/history/:date",
   queuedCache(),
-  cache.route(),
   async function (req, res) {
     let checkedDateString: string = checkDateParameterForMaps(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
