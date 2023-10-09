@@ -73,13 +73,19 @@ interface IncidenceColorsPerDay {
   };
 }
 
+interface AverageDayEntry {
+  sum: number;
+  count: number;
+  average: number;
+  averageColor: string;
+  min: number;
+  minColor: string;
+  max: number;
+  maxColor: string;
+}
+
 interface AveragePerDay {
-  [dateString: string]: {
-    sum: number;
-    count: number;
-    average: number;
-    averageColor: string;
-  };
+  [dateString: string]: AverageDayEntry;
 }
 
 export async function IncidenceColorsPerDay(
@@ -138,23 +144,59 @@ export async function IncidenceColorsPerDay(
         };
       }
       if (!averagePerDay[date.toISOString()]) {
+        const incidence = (sum / regionData.population) * 100000;
+        const incidenceColor = getColorForValue(
+          incidence,
+          weekIncidenceColorRanges
+        );
         averagePerDay[date.toISOString()] = {
-          sum: (sum / regionData.population) * 100000, count: 1,
-          average: (sum / regionData.population) * 100000,
-          averageColor: getColorForValue((sum / regionData.population) * 100000, weekIncidenceColorRanges)
+          sum: incidence,
+          count: 1,
+          average: incidence,
+          averageColor: incidenceColor,
+          min: incidence,
+          minColor: incidenceColor,
+          max: incidence,
+          maxColor: incidenceColor,
         };
       } else {
-        const temp = JSON.parse(JSON.stringify(averagePerDay[date.toISOString()])); //independent copy!
-        temp.sum = temp.sum + (sum / regionData.population) * 100000;
+        const temp: AverageDayEntry = JSON.parse(
+          JSON.stringify(averagePerDay[date.toISOString()])
+        ); //independent copy!
+        const incidence = (sum / regionData.population) * 100000;
+        const incidenceColor = getColorForValue(
+          incidence,
+          weekIncidenceColorRanges
+        );
+        temp.sum = temp.sum + incidence;
         temp.count += 1;
         temp.average = temp.sum / temp.count;
-        temp.averageColor = getColorForValue(temp.average, weekIncidenceColorRanges); 
-        averagePerDay[date.toISOString()] = temp; 
+        temp.averageColor = getColorForValue(
+          temp.average,
+          weekIncidenceColorRanges
+        );
+        if (incidence > temp.max) {
+          temp.max = incidence;
+          temp.maxColor = incidenceColor;
+        }
+        if (incidence < temp.min) {
+          temp.min = incidence;
+          temp.minColor = incidenceColor;
+        }
+        averagePerDay[date.toISOString()] = temp;
       }
     }
   }
   for (const dateString of Object.keys(averagePerDay)) {
-    incidenceColorsPerDay[dateString]["99999"] = {color: averagePerDay[dateString].averageColor}; 
+    incidenceColorsPerDay[dateString].min = {
+      color: averagePerDay[dateString].minColor,
+    };
+    incidenceColorsPerDay[dateString].avg = {
+      color: averagePerDay[dateString].averageColor,
+    };
+    incidenceColorsPerDay[dateString].max = {
+      color: averagePerDay[dateString].maxColor,
+    };
   }
   return incidenceColorsPerDay;
 }
@@ -165,21 +207,20 @@ export async function VideoResponse(
   videoduration: number,
   days?: number
 ): Promise<{ filename: string }> {
-  
   // get the actual meta data
   const metaData = await getMetaData();
-  
+
   // set the reference date
   const refDate = getDateBeforeDate(metaData.version, 1);
   // the path to stored incidence per day files and status
   const incidenceDataPath = "./dayPics/";
   // path and filename for status.json
-  const statusFileName = `${incidenceDataPath}status.json`
+  const statusFileName = `${incidenceDataPath}status.json`;
   // path and filename for status lockfile
-  const statusLockFile = `${incidenceDataPath}status.lockfile`
+  const statusLockFile = `${incidenceDataPath}status.lockfile`;
   // init status
   let status: Status;
-  
+
   // wait for unlocked status file
   if (fs.existsSync(statusLockFile)) {
     while (fs.existsSync(statusLockFile)) {
@@ -199,12 +240,9 @@ export async function VideoResponse(
         states: [],
       },
     };
-    fs.writeFileSync(
-      statusFileName,
-      JSON.stringify(initialStatus)
-    );
+    fs.writeFileSync(statusFileName, JSON.stringify(initialStatus));
   }
-  
+
   //check if incidencesPerDay_date.json exists
   let incidenceColorsPerDay: IncidenceColorsPerDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
@@ -229,7 +267,7 @@ export async function VideoResponse(
       }
     }
     //set status lockfile
-    fs.writeFileSync(statusLockFile,"");
+    fs.writeFileSync(statusLockFile, "");
     // read status
     status = JSON.parse(fs.readFileSync(statusFileName).toString());
     // change status
@@ -239,7 +277,7 @@ export async function VideoResponse(
     //unset status lockfile
     fs.rmSync(statusLockFile);
   }
-  
+
   // get a sorted list of incidencePerDay keys
   const incidenceColorsPerDayKeys = Object.keys(incidenceColorsPerDay).sort(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
@@ -247,7 +285,7 @@ export async function VideoResponse(
 
   // save days to oldDays
   let oldDays = days;
-  
+
   // some checks for :days
   if (days != null) {
     if (isNaN(days)) {
@@ -263,7 +301,7 @@ export async function VideoResponse(
     days = incidenceColorsPerDayKeys.length;
   }
   const numberOfFrames = days;
-  
+
   // some checks for :duration
   if (videoduration != null) {
     if (isNaN(videoduration)) {
@@ -285,7 +323,7 @@ export async function VideoResponse(
   } else {
     videoduration = 60;
   }
-  
+
   // calculate the frame rate
   // minimum frameRate = 5; maximum framrate = 25; max videoduration ~ 60 Seconds
   const frameRate =
@@ -307,10 +345,10 @@ export async function VideoResponse(
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
   }
-  
+
   // lockfilename
   const lockFile = `./dayPics/${region}.lockfile`;
-  
+
   // check if the lockfile exist,
   // witch meens that the single frames (region) or one video (region) is calculating now by a other process
   // wait for the other prozess to finish check every 5 seconds
@@ -319,23 +357,23 @@ export async function VideoResponse(
       function delay(ms: number) {
         return new Promise((resolve) => setTimeout(resolve, ms));
       }
-      await delay(5000);
+      await delay(2500);
     }
     // maybe the other prozess calculates the same video return the name
     if (fs.existsSync(mp4FileName)) {
       return { filename: mp4FileName };
     }
   }
-  
+
   // create lockfile and start prozessing single frames and/or mp4 file
   fs.writeFileSync(lockFile, "");
-  
+
   // set basic full path for frames with legend and frames without legend
   const framesFullPathLegend = `${dayPicsPath}${mapTypes.legendMap}/${region}_F-0000.png`;
   const framesFullPath = `${dayPicsPath}${mapTypes.map}/${region}_F-0000.png`;
   // calculate the new pictures only if no other prozess has done this. read the status file
   // no other region thread is running, because of region lockfile! locking status file is not nesessary!
-  
+
   // read status
   status = JSON.parse(
     fs.readFileSync(`${incidenceDataPath}status.json`).toString()
@@ -360,16 +398,16 @@ export async function VideoResponse(
         fs.readFileSync(jsonFileBevor).toString()
       );
     }
-    
+
     // function to compare two Objects
     function isDifferend(obj1, obj2) {
       return JSON.stringify(obj1) !== JSON.stringify(obj2);
     }
-    
-    // find all days that changed one ore more colors, and store this key to allDiffs
+
+    // find all days that changed one or more colors, and store this key to allDiffs
     let allDiffs = [];
     for (const dateKey of incidenceColorsPerDayKeys) {
-      // if key is not present in old incidences file always calculate this date, push key to allDiffs[]
+      // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
       if (!oldIncidenceColorsPerDay[dateKey]) {
         allDiffs.push(dateKey);
       } else {
@@ -389,7 +427,7 @@ export async function VideoResponse(
         }
       }
     }
-    
+
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
@@ -415,7 +453,7 @@ export async function VideoResponse(
           "F-0000",
           `F-${frameNumberString}`
         );
-        
+
         // add fill color to every region
         for (const regionPathElement of mapData.children) {
           const idAttribute = regionPathElement.attributes.id;
@@ -428,10 +466,16 @@ export async function VideoResponse(
           }
         }
         const svgBuffer = Buffer.from(stringify(mapData));
-        
+
         // define headline depending on region
-        const headline = region == Region.districts ? "7-Tage-Inzidenz der Landkreise" : "7-Tage-Inzidenz der Bundesländer";
-        
+        const headline =
+          region == Region.districts
+            ? "7-Tage-Inzidenz der Landkreise"
+            : "7-Tage-Inzidenz der Bundesländer";
+        let minAvgMax = [];
+        minAvgMax.push({name: "min", color: incidenceColorsPerDay[dateString]["min"].color});
+        minAvgMax.push({name: "avg", color: incidenceColorsPerDay[dateString]["avg"].color});
+        minAvgMax.push({name: "max", color: incidenceColorsPerDay[dateString]["max"].color});
         // push new promise for frames with legend
         promises.push(
           sharp(
@@ -439,14 +483,14 @@ export async function VideoResponse(
               headline,
               new Date(dateString),
               weekIncidenceColorRanges,
-              incidenceColorsPerDay[dateString]["99999"].color
+              minAvgMax
             )
           )
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
             .png({ quality: 100 })
             .toFile(frameNameLegend)
         );
-        
+
         // push new promise for frames without legend
         promises.push(
           sharp(getSimpleMapBackground(new Date(dateString)))
@@ -455,7 +499,7 @@ export async function VideoResponse(
             .toFile(frameName)
         );
       });
-      
+
       // await all frames promises
       await Promise.all(promises);
     }
@@ -467,9 +511,9 @@ export async function VideoResponse(
         }
         await delay(50); //wait 50 ms
       }
-    } 
+    }
     //set status lockfile
-    fs.writeFileSync(statusLockFile,"");
+    fs.writeFileSync(statusLockFile, "");
     // read status
     status = JSON.parse(fs.readFileSync(statusFileName).toString());
     // set status for region to true (all frames are processed)
@@ -479,16 +523,18 @@ export async function VideoResponse(
     //unset status lockfile
     fs.rmSync(statusLockFile);
   }
-  
+
   // set searchpath for frames
   const framesNameVideo = `${dayPicsPath}${mapType}/${region}_F-%04d.png`;
-  
+
   // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
-  const firstFrameNumber = (incidenceColorsPerDayKeys.length - days + 1).toString().padStart(4, "0");
-  
+  const firstFrameNumber = (incidenceColorsPerDayKeys.length - days + 1)
+    .toString()
+    .padStart(4, "0");
+
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
-  
+
   // calculate the requested video
   const mp4out = await ffmpegSync(
     framesNameVideo,
@@ -497,7 +543,7 @@ export async function VideoResponse(
     firstFrameNumber,
     lockFile
   );
-  
+
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {
     while (fs.existsSync(statusLockFile)) {
@@ -508,7 +554,7 @@ export async function VideoResponse(
     }
   }
   //set status lockfile
-  fs.writeFileSync(statusLockFile,"");
+  fs.writeFileSync(statusLockFile, "");
   // read status
   status = JSON.parse(fs.readFileSync(statusFileName).toString());
   // push video data filename and crationtime to status
@@ -523,7 +569,7 @@ export async function VideoResponse(
   fs.writeFileSync(statusFileName, JSON.stringify(status));
   //unset status lockfile
   fs.rmSync(statusLockFile);
-  
+
   // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
   allJsonFiles = allJsonFiles.filter((file) =>
@@ -536,10 +582,10 @@ export async function VideoResponse(
       fs.rmSync(`${incidenceDataPath + allJsonFiles[index]}`);
     }
   }
-  
+
   // all done, remove region lockfile
   fs.rmSync(lockFile);
-  
+
   return mp4out;
 }
 
