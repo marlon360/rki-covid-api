@@ -72,22 +72,23 @@ enum UVD {
   V10 = "deltaVidPrevtynBeta",
 }
 
-// VaccineNameReverse
+// VaccineNameMapping
 enum VNR {
-  "Vaxzevria" = "astraZeneca",
-  "Comirnaty" = "biontech",
-  "Jcovden" = "janssen",
-  "Spikevax" = "moderna",
-  "Nuvaxovid" = "novavax",
-  "Valneva" = "valneva",
-  "Comirnaty bivalent (Original/Omikron)" = "biontechBivalent",
-  "Spikevax bivalent (Original/Omikron)" = "modernaBivalent",
-  "Comirnaty-Kleinkinder" = "biontechInfant",
-  "Comirnaty Original/Omicron BA.1" = "biontechBivalent",
-  "Comirnaty Original/Omicron BA.4-5" = "biontechBivalent",
-  "Spikevax bivalent Original/Omicron BA.1" = "modernaBivalent",
-  "Spikevax bivalent Original/Omicron BA.4-5" = "modernaBivalent",
-  "VidPrevtyn Beta" = "vidPrevtynBeta",
+  "Vaxzevria" = UV.V1,
+  "Comirnaty" = UV.V2,
+  "Jcovden" = UV.V3,
+  "Spikevax" = UV.V4,
+  "Nuvaxovid" = UV.V5,
+  "Valneva" = UV.V6,
+  "Comirnaty bivalent (Original/Omikron)" = UV.V7,
+  "Spikevax bivalent (Original/Omikron)" = UV.V8,
+  "Comirnaty-Kleinkinder" = UV.V9,
+  "Comirnaty Original/Omicron BA.1" = UV.V7,
+  "Comirnaty Original/Omicron BA.4-5" = UV.V7,
+  "Spikevax bivalent Original/Omicron BA.1" = UV.V8,
+  "Spikevax bivalent Original/Omicron BA.4-5" = UV.V8,
+  "VidPrevtyn Beta" = UV.V10,
+  "Comirnaty Omicron XBB.1.5" = UV.V7,
 }
 
 // UsedAgeGroups
