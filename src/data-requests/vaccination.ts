@@ -88,7 +88,7 @@ enum VNR {
   "Spikevax bivalent Original/Omicron BA.1" = UV.V8,
   "Spikevax bivalent Original/Omicron BA.4-5" = UV.V8,
   "VidPrevtyn Beta" = UV.V10,
-  "Comirnaty Omicron XBB.1.5" = UV.V7
+  "Comirnaty Omicron XBB.1.5" = UV.V7,
 }
 
 // UsedAgeGroups
