@@ -27,7 +27,7 @@ Since 2023-06-14 the data is updated monthly, on the second Tuesday of each mont
 
 `vaccination.valneva` Number of people who were vaccinated with Valneva, trade name: `Valneva - Valneva`
 
-`vaccination.biontechBivalent` Number of people who are vaccinated with biontechBivalent, trade name: `Comirnaty bivalent (Original/Omikron)` or `Comirnaty Original/Omicron BA.1` or `Comirnaty Original/Omicron BA.4-5` - `BioNTech/Pfizer`
+`vaccination.biontechBivalent` Number of people who are vaccinated with biontechBivalent, trade name: `Comirnaty bivalent (Original/Omikron)` or `Comirnaty Original/Omicron BA.1` or `Comirnaty Original/Omicron BA.4-5` - `BioNTech/Pfizer` or `Comirnaty Omicron XBB.1.5`
 
 `vacciantion.modernaBivalent` Number of people who are vaccinated with modernaBivalent, trade name: `Spikevax bivalent (Original/Omikron)` or `Spikevax bivalent Original/Omicron BA.1` or `Spikevax bivalent Original/Omicron BA.4-5` - `Moderna`
 

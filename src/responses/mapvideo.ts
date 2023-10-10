@@ -473,9 +473,18 @@ export async function VideoResponse(
             ? "7-Tage-Inzidenz der Landkreise"
             : "7-Tage-Inzidenz der Bundesländer";
         let minAvgMax = [];
-        minAvgMax.push({name: "min", color: incidenceColorsPerDay[dateString]["min"].color});
-        minAvgMax.push({name: "avg", color: incidenceColorsPerDay[dateString]["avg"].color});
-        minAvgMax.push({name: "max", color: incidenceColorsPerDay[dateString]["max"].color});
+        minAvgMax.push({
+          name: "min",
+          color: incidenceColorsPerDay[dateString]["min"].color,
+        });
+        minAvgMax.push({
+          name: "avg",
+          color: incidenceColorsPerDay[dateString]["avg"].color,
+        });
+        minAvgMax.push({
+          name: "max",
+          color: incidenceColorsPerDay[dateString]["max"].color,
+        });
         // push new promise for frames with legend
         promises.push(
           sharp(

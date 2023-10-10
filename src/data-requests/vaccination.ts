@@ -635,8 +635,8 @@ export async function getVaccinationCoverage(): Promise<
   const archiveFile = archiveResponse.tree
     .filter((entry) => entry.path.includes("Bundeslaender"))
     .sort((a, b) => {
-      const dateA = new Date(a.path.substr(0, 10));
-      const dateB = new Date(b.path.substr(0, 10));
+      const dateA = new Date(a.path.substring(0, 10));
+      const dateB = new Date(b.path.substring(0, 10));
       return dateB.getTime() - dateA.getTime();
     })[1].path;
   const archiveUrl = `https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Archiv/${archiveFile}`;
