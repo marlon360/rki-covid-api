@@ -601,23 +601,23 @@ export async function getVaccinationCoverage(): Promise<
       });
     }
   );
-  const apiUrlCommitsMain = new URL(
-    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
+  // get last commit of Deutschland_Bundeslaender_COVID-19-Impfungen.csv
+  const apiDBUrl = new URL(
+    "https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits?path=Deutschland_Bundeslaender_COVID-19-Impfungen.csv"
   );
-  const apiResponse: { lastUpdate: Date; sha: string } = await GetApiCommit(
-    apiUrlCommitsMain.href,
-    apiUrlCommitsMain.pathname
+  const lastCommitData: { lastUpdate: Date; sha: string } = await GetApiCommit(
+    apiDBUrl.href,
+    apiDBUrl.pathname
   ).then((apiData) => {
-    const lastUpdate = new Date(apiData.commit.author.date);
-    const sha = apiData.sha;
-    return { lastUpdate, sha };
+    return {
+      lastUpdate: new Date(apiData[0].commit.author.date),
+      sha: apiData[0].sha,
+    };
   });
-  const lastUpdate = apiResponse.lastUpdate;
-  const sha = apiResponse.sha;
 
-  // finde den letzten Datansatz bevor dem aktuellen
+  // finde den letzten Datansatz vor dem aktuellen
   const apiUrlTreesSha = new URL(
-    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${sha}`
+    `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${lastCommitData.sha}`
   );
   const filesResponse = await GetApiTrees(
     apiUrlTreesSha.href,
@@ -1165,7 +1165,7 @@ export async function getVaccinationCoverage(): Promise<
 
   return {
     data: coverage,
-    lastUpdate: lastUpdate,
+    lastUpdate: lastCommitData.lastUpdate,
   };
 }
 
