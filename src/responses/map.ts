@@ -23,6 +23,7 @@ import {
   getStateIdByName,
   getMetaData,
 } from "../utils";
+import { MinAvgMax, MinAvgMaxGrouped } from "./mapvideo";
 
 export enum mapTypes {
   map = "withoutLegend",
@@ -360,18 +361,15 @@ export function getMapBackground(
   headline: string,
   lastUpdate: Date,
   ranges: ColorRange[],
-  minAvgMax?: { name: string; color: string }[]
+  minAvgMax?: MinAvgMax[],
+  minAvgMaxGrouped?: MinAvgMaxGrouped
 ): Buffer {
-  const borderd = 32; // for the legend down
-  const borderl = 12; // for the legend left
-  const rectR = 30; // x and y of the rangerects
-  const rectM = 5; // x and y of the min/avg/max rects
+  const dbord = 32; // for the legend down
+  const lbord = 12; // for the legend left
+  const size = 30; // x and y of the range rects
   const bgrC = "#F4F8FB"; // backgroundcolor
   const texC = "#010501"; // for legend text
-  const minC = "green"; // color for min indicator
-  const avgC = "orange"; // color for average indicator
-  const maxC = "red"; // color for max indicator
-  const yStart = 1000 - rectR; // start position from the bottom, add new ranges above
+  const yStart = 1000 - size; // start position from the bottom, add new ranges above
   const lUpdLocStr = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
@@ -388,81 +386,69 @@ export function getMapBackground(
         <text font-family="Arial" font-size="22" font-weight="normal" fill="${texC}">
           <tspan x="41" y="103">Stand: ${lUpdLocStr}</tspan>
         </text>
-        <g transform="translate(${borderl}, -${borderd})">
-        ${ranges.map((range, index) => {
-          return `
-          <g transform="translate(0, ${yStart - index * 40})">
-          <circle fill="${
+        <g transform="translate(${lbord}, -${dbord})">
+          ${ranges.map((range, index) => {
+            return `
+            <g transform="translate(0, ${yStart - index * 40})">
+              <rect fill="${
+                range.color
+              }" x="20" y="0" width="${size}" height="${size}"></rect>
+              <text x="68" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="${texC}">
+                <tspan>${range.toString()}</tspan>
+              </text>
+            </g>`;
+          })}
+          ${
             minAvgMax != null
-              ? range.color == minAvgMax[0].color
-                ? minC
-                : bgrC
-              : bgrC
-          }" cx="5" cy="25" r="${rectM}"></circle>
-          <circle fill="${
-            minAvgMax != null
-              ? range.color == minAvgMax[1].color
-                ? avgC
-                : bgrC
-              : bgrC
-          }" cx="5" cy="15" r="${rectM}"></circle>
-          <circle fill="${
-            minAvgMax != null
-              ? range.color == minAvgMax[2].color
-                ? maxC
-                : bgrC
-              : bgrC
-          }" cx="5" cy="5" r="${rectM}"></circle>
-            <rect fill="${
-              range.color
-            }" x="20" y="0" width="${rectR}" height="${rectR}"></rect>
-            <text x="68" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="${texC}">
-              <tspan>${range.toString()}</tspan>
-            </text>
-          </g>
-          `;
-        })}
-        ${
-          minAvgMax != null
-            ? minAvgMax.map((entry, index) => {
-                return `
-                <g transform="translate(0, ${
-                  yStart - ranges.length * 40 - index * 20
-                })">
-                  <circle fill="${
-                    minAvgMax != null
-                      ? entry.name == "min"
-                        ? minC
-                        : entry.name == "avg"
-                        ? avgC
-                        : entry.name == "max"
-                        ? maxC
-                        : bgrC
-                      : bgrC
-                  }" cx="5" cy="${15 - index * 5}" r="${rectM}"></circle>
-                  <text x="18" y="${
-                    19 - index * 5
-                  }" font-family="Arial" font-size="12" font-weight="normal" fill="${
-                  minAvgMax != null ? texC : bgrC
-                }">
-                    <tspan>${
-                      minAvgMax != null ? entry.name : ""
-                    } incidence is in this range</tspan>
-                  </text>
-                </g>`;
-              })
-            : ""
-        }
+              ? minAvgMax.map((entry, index) => {
+                  return `
+              <g id="${entry.name}" transform="translate(0, ${
+                    yStart - ranges.length * 40 - index * 20
+                  })">
+                <circle fill="${entry.nameColor}" cx="5" cy="${
+                    15 - index * 5
+                  }" r="5"></circle>
+                <text x="18" y="${
+                  19 - index * 5
+                }" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
+                  <tspan>${entry.name} incidence is in this range</tspan>
+                </text>
+              </g>`;
+                })
+              : ""
+          }
+          ${
+            minAvgMaxGrouped != null
+              ? Object.keys(minAvgMaxGrouped).map((value) => {
+                  let indiString = "";
+                  const count = minAvgMaxGrouped[value].length;
+                  const firstY = 15 + (count - 1) * 5;
+                  minAvgMaxGrouped[value].map((entry, index) => {
+                    indiString =
+                      indiString +
+                      ` <g id="${entry.name}" transform="translate(0, ${
+                        yStart - entry.rangeIndex * 40
+                      })">
+                          <circle fill="${entry.nameColor}" cx="5" cy="${
+                        firstY - index * 10
+                      }" r="5"></circle>
+                        </g>
+                      `;
+                  });
+                  return indiString;
+                })
+              : ""
+          }
         </g>
         <rect fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
         <text font-family="Arial" font-size="10" font-weight="normal" fill="${texC}">
           <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
         </text>
-        <text font-family="Arial" font-size="16" font-weight="normal" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="normal" fill="${texC}">
           <tspan x="15" y="189">Grafik von</tspan>
           <tspan font-family="Arial-Bold, Arial" font-weight="bold"> Marlon Lückert</tspan>
         </text>
-        <text font-family="Arial" font-size="16" font-weight="bold" fill="#243645">
+        <text font-family="Arial" font-size="16" font-weight="bold" fill="${texC}">
           <tspan x="15" y="211">https://api.corona-zahlen.org</tspan>
         </text>
       </g>

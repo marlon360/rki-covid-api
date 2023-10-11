@@ -88,6 +88,20 @@ interface AveragePerDay {
   [dateString: string]: AverageDayEntry;
 }
 
+export interface MinAvgMax {
+  incidenceColor: string;
+  name: string;
+  nameColor: string;
+}
+
+export interface MinAvgMaxGrouped {
+  [incidenceColor: string]: {
+    rangeIndex: number;
+    name: string;
+    nameColor: string;
+  }[];
+}
+
 export async function IncidenceColorsPerDay(
   metaData: MetaData,
   region: Region
@@ -472,19 +486,71 @@ export async function VideoResponse(
           region == Region.districts
             ? "7-Tage-Inzidenz der Landkreise"
             : "7-Tage-Inzidenz der Bundesländer";
-        let minAvgMax = [];
-        minAvgMax.push({
-          name: "min",
-          color: incidenceColorsPerDay[dateString]["min"].color,
-        });
+
+        // define minAvgMax
+        let minAvgMax: MinAvgMax[] = [
+          {
+            name: "min",
+            incidenceColor: incidenceColorsPerDay[dateString]["min"].color,
+            nameColor: "green",
+          },
+        ];
         minAvgMax.push({
           name: "avg",
-          color: incidenceColorsPerDay[dateString]["avg"].color,
+          incidenceColor: incidenceColorsPerDay[dateString]["avg"].color,
+          nameColor: "orange",
         });
         minAvgMax.push({
           name: "max",
-          color: incidenceColorsPerDay[dateString]["max"].color,
+          incidenceColor: incidenceColorsPerDay[dateString]["max"].color,
+          nameColor: "red",
         });
+
+        // define minAvgMaxGrouped
+        const minIndex = weekIncidenceColorRanges.findIndex(
+          (range) =>
+            range.color == incidenceColorsPerDay[dateString]["min"].color
+        );
+        const avgIndex = weekIncidenceColorRanges.findIndex(
+          (range) =>
+            range.color == incidenceColorsPerDay[dateString]["avg"].color
+        );
+        const maxIndex = weekIncidenceColorRanges.findIndex(
+          (range) =>
+            range.color == incidenceColorsPerDay[dateString]["max"].color
+        );
+        let minAvgMaxGrouped: MinAvgMaxGrouped = {
+          [incidenceColorsPerDay[dateString]["min"].color]: [
+            { name: "min", nameColor: "green", rangeIndex: minIndex },
+          ],
+        };
+        if (minAvgMaxGrouped[incidenceColorsPerDay[dateString]["avg"].color]) {
+          minAvgMaxGrouped[incidenceColorsPerDay[dateString]["avg"].color].push(
+            {
+              name: "avg",
+              nameColor: "orange",
+              rangeIndex: avgIndex,
+            }
+          );
+        } else {
+          minAvgMaxGrouped[incidenceColorsPerDay[dateString]["avg"].color] = [
+            { name: "avg", nameColor: "orange", rangeIndex: avgIndex },
+          ];
+        }
+        if (minAvgMaxGrouped[incidenceColorsPerDay[dateString]["max"].color]) {
+          minAvgMaxGrouped[incidenceColorsPerDay[dateString]["max"].color].push(
+            {
+              name: "max",
+              nameColor: "red",
+              rangeIndex: maxIndex,
+            }
+          );
+        } else {
+          minAvgMaxGrouped[incidenceColorsPerDay[dateString]["max"].color] = [
+            { name: "max", nameColor: "red", rangeIndex: maxIndex },
+          ];
+        }
+
         // push new promise for frames with legend
         promises.push(
           sharp(
@@ -492,7 +558,8 @@ export async function VideoResponse(
               headline,
               new Date(dateString),
               weekIncidenceColorRanges,
-              minAvgMax
+              minAvgMax,
+              minAvgMaxGrouped
             )
           )
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
