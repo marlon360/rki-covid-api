@@ -365,12 +365,12 @@ export function getMapBackground(
   const borderd = 32; // for the legend down
   const borderl = 12; // for the legend left
   const rectR = 30; // x and y of the rangerects
-  const rectM = 10; // x and y of the min/avg/max rects
+  const rectM = 5; // x and y of the min/avg/max rects
   const bgrC = "#F4F8FB"; // backgroundcolor
   const texC = "#010501"; // for legend text
-  const minC = "#25BA94"; // color for min indicator
-  const avgC = "#F1894A"; // color for average indicator
-  const maxC = "#A9141A"; // color for max indicator
+  const minC = "green"; // color for min indicator
+  const avgC = "orange"; // color for average indicator
+  const maxC = "red"; // color for max indicator
   const yStart = 1000 - rectR; // start position from the bottom, add new ranges above
   const lUpdLocStr = lastUpdate.toLocaleDateString("de-DE", {
     year: "numeric",
@@ -380,39 +380,39 @@ export function getMapBackground(
   // the first part of svg
   let svg = `
     <svg width="850px" height="1000px" viewBox="0 0 850 1000" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-      <g id="Artboard" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+      <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="${bgrC}" x="0" y="0" width="850" height="1000"></rect>
-        <text id="7-Tage-Inzidenz-der" font-family="Arial" font-size="42" font-weight="bold" fill="${texC}">
+        <text font-family="Arial" font-size="42" font-weight="bold" fill="${texC}">
           <tspan x="41" y="68">${headline}</tspan>
         </text>
-        <text id="Stand:-22.11.2021" font-family="Arial" font-size="22" font-weight="normal" fill="${texC}">
+        <text font-family="Arial" font-size="22" font-weight="normal" fill="${texC}">
           <tspan x="41" y="103">Stand: ${lUpdLocStr}</tspan>
         </text>
-        <g id="Legend" transform="translate(${borderl}, -${borderd})">
+        <g transform="translate(${borderl}, -${borderd})">
         ${ranges.map((range, index) => {
           return `
           <g transform="translate(0, ${yStart - index * 40})">
-          <rect fill="${
+          <circle fill="${
             minAvgMax != null
               ? range.color == minAvgMax[0].color
                 ? minC
                 : bgrC
               : bgrC
-          }" x="0" y="20" width="${rectM}" height="${rectM}"></rect>
-          <rect fill="${
+          }" cx="5" cy="25" r="${rectM}"></circle>
+          <circle fill="${
             minAvgMax != null
               ? range.color == minAvgMax[1].color
                 ? avgC
                 : bgrC
               : bgrC
-          }" x="0" y="10" width="${rectM}" height="${rectM}"></rect>
-          <rect fill="${
+          }" cx="5" cy="15" r="${rectM}"></circle>
+          <circle fill="${
             minAvgMax != null
               ? range.color == minAvgMax[2].color
                 ? maxC
                 : bgrC
               : bgrC
-          }" x="0" y="0" width="${rectM}" height="${rectM}"></rect>
+          }" cx="5" cy="5" r="${rectM}"></circle>
             <rect fill="${
               range.color
             }" x="20" y="0" width="${rectR}" height="${rectR}"></rect>
@@ -426,38 +426,36 @@ export function getMapBackground(
           minAvgMax != null
             ? minAvgMax.map((entry, index) => {
                 return `
-          <g transform="translate(0, ${
-            yStart - ranges.length * 40 - index * 20
-          })">
-            <rect fill="${
-              minAvgMax != null
-                ? entry.name == "min"
-                  ? minC
-                  : entry.name == "avg"
-                  ? avgC
-                  : entry.name == "max"
-                  ? maxC
-                  : bgrC
-                : bgrC
-            }" x="0" y="${
-                  10 - index * 5
-                }" width="${rectM}" height="${rectM}"></rect>
-            <text x="18" y="${
-              19 - index * 5
-            }" font-family="Arial" font-size="12" font-weight="normal" fill="${
+                <g transform="translate(0, ${
+                  yStart - ranges.length * 40 - index * 20
+                })">
+                  <circle fill="${
+                    minAvgMax != null
+                      ? entry.name == "min"
+                        ? minC
+                        : entry.name == "avg"
+                        ? avgC
+                        : entry.name == "max"
+                        ? maxC
+                        : bgrC
+                      : bgrC
+                  }" cx="5" cy="${15 - index * 5}" r="${rectM}"></circle>
+                  <text x="18" y="${
+                    19 - index * 5
+                  }" font-family="Arial" font-size="12" font-weight="normal" fill="${
                   minAvgMax != null ? texC : bgrC
                 }">
-              <tspan>${
-                minAvgMax != null ? entry.name : ""
-              } incidence is in this range</tspan>
-            </text>
-          </g>`;
+                    <tspan>${
+                      minAvgMax != null ? entry.name : ""
+                    } incidence is in this range</tspan>
+                  </text>
+                </g>`;
               })
             : ""
         }
         </g>
-        <rect id="Rectangle" fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
-        <text id="Quelle:-Robert-Koch-" font-family="Arial" font-size="10" font-weight="normal" fill="${texC}">
+        <rect fill="#A2D4FA" opacity="0.218688965" x="0" y="158" width="260" height="70"></rect>
+        <text font-family="Arial" font-size="10" font-weight="normal" fill="${texC}">
           <tspan x="576" y="987">Quelle: Robert Koch-Institut (https://api.corona-zahlen.org)</tspan>
         </text>
         <text font-family="Arial" font-size="16" font-weight="normal" fill="#243645">
