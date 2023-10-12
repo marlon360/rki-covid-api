@@ -23,7 +23,7 @@ import {
   getStateIdByName,
   getMetaData,
 } from "../utils";
-import { MinAvgMax, MinAvgMaxGrouped } from "./mapvideo";
+import { MAM, MAMGrpd } from "./mapvideo";
 
 export enum mapTypes {
   map = "withoutLegend",
@@ -358,19 +358,19 @@ export function getColorForValue(value: number, ranges: ColorRange[]): string {
 }
 
 export function getMapBackground(
-  headline: string,
-  lastUpdate: Date,
-  ranges: ColorRange[],
-  minAvgMax?: MinAvgMax[],
-  minAvgMaxGrouped?: MinAvgMaxGrouped
+  hline: string,
+  date: Date,
+  rngs: ColorRange[],
+  mAM?: MAM[],
+  mAMG?: MAMGrpd
 ): Buffer {
-  const dbord = 32; // for the legend down
-  const lbord = 12; // for the legend left
-  const size = 30; // x and y of the range rects
-  const bgrC = "#F4F8FB"; // backgroundcolor
-  const texC = "#010501"; // for legend text
-  const yStart = 1000 - size; // start position from the bottom, add new ranges above
-  const lUpdLocStr = lastUpdate.toLocaleDateString("de-DE", {
+  const dbord = 32; // down border for the legend
+  const lbord = 12; // left border for the legend
+  const recS = 30; // rectangle size of the range rectagles
+  const bgrC = "#F4F8FB"; // background color
+  const texC = "#010501"; // text color for legend
+  const ySt = 1000 - recS; // y start position from the bottom, add new ranges above
+  const dLoc = date.toLocaleDateString("de-DE", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -381,61 +381,59 @@ export function getMapBackground(
       <g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
         <rect fill="${bgrC}" x="0" y="0" width="850" height="1000"></rect>
         <text font-family="Arial" font-size="42" font-weight="bold" fill="${texC}">
-          <tspan x="41" y="68">${headline}</tspan>
+          <tspan x="41" y="68">${hline}</tspan>
         </text>
         <text font-family="Arial" font-size="22" font-weight="normal" fill="${texC}">
-          <tspan x="41" y="103">Stand: ${lUpdLocStr}</tspan>
+          <tspan x="41" y="103">Stand: ${dLoc}</tspan>
         </text>
         <g transform="translate(${lbord}, -${dbord})">
-          ${ranges.map((range, index) => {
+          ${rngs.map((rng, ind) => {
             return `
-            <g transform="translate(0, ${yStart - index * 40})">
-              <rect fill="${
-                range.color
-              }" x="20" y="0" width="${size}" height="${size}"></rect>
-              <text x="68" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="${texC}">
-                <tspan>${range.toString()}</tspan>
-              </text>
-            </g>`;
+          <g transform="translate(0, ${ySt - ind * 40})">
+            <rect fill="${
+              rng.color
+            }" x="20" y="0" width="${recS}" height="${recS}"></rect>
+            <text x="68" y="20" font-family="Arial" font-size="16" font-weight="normal" fill="${texC}">
+              <tspan>${rng.toString()}</tspan>
+            </text>
+          </g>`;
           })}
           ${
-            minAvgMax != null
-              ? minAvgMax.map((entry, index) => {
+            mAM != null
+              ? mAM.map((ety, ind) => {
                   return `
-              <g id="${entry.name}" transform="translate(0, ${
-                    yStart - ranges.length * 40 - index * 20
+          <g id="${ety.name}" transform="translate(0, ${
+                    ySt - rngs.length * 40 - ind * 20
                   })">
-                <circle fill="${entry.nameColor}" cx="5" cy="${
-                    15 - index * 5
+            <circle fill="${ety.nCol}" cx="5" cy="${
+                    15 - ind * 5
                   }" r="5"></circle>
-                <text x="18" y="${
-                  19 - index * 5
-                }" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
-                  <tspan>${entry.name} incidence is in this range</tspan>
-                </text>
-              </g>`;
+            <text x="18" y="${
+              19 - ind * 5
+            }" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
+              <tspan>${ety.name} incidence is in this range</tspan>
+            </text>
+          </g>`;
                 })
               : ""
           }
           ${
-            minAvgMaxGrouped != null
-              ? Object.keys(minAvgMaxGrouped).map((value) => {
-                  let indiString = "";
-                  const count = minAvgMaxGrouped[value].length;
-                  const firstY = 15 + (count - 1) * 5;
-                  minAvgMaxGrouped[value].map((entry, index) => {
-                    indiString =
-                      indiString +
-                      ` <g id="${entry.name}" transform="translate(0, ${
-                        yStart - entry.rangeIndex * 40
-                      })">
-                          <circle fill="${entry.nameColor}" cx="5" cy="${
-                        firstY - index * 10
-                      }" r="5"></circle>
-                        </g>
-                      `;
+            mAMG != null
+              ? Object.keys(mAMG).map((clr) => {
+                  let iStr = "";
+                  const count = mAMG[clr].length;
+                  const frtY = 15 + (count - 1) * 5;
+                  mAMG[clr].map((ety, ind) => {
+                    iStr += `<g id="${ety.name}" transform="translate(0, ${
+                      ySt - ety.rInd * 40
+                    })">
+            <circle fill="${ety.nCol}" cx="5" cy="${
+                      frtY - ind * 10
+                    }" r="5"></circle>
+          </g>
+          `;
                   });
-                  return indiString;
+                  return iStr;
                 })
               : ""
           }

@@ -5,10 +5,8 @@ cache/*
 dist
 .git
 videos/*.mp4
-dayPics/states/withLegend/*.png
-dayPics/states/withoutLegend/*.png
-dayPics/districts/withLegend/*.png
-dayPics/districts/withoutLegend/*.png
+dayPics/states/*.png
+dayPics/districts/*.png
 dayPics/districts*.json
 dayPics/states*.json
 dayPics/status.json
