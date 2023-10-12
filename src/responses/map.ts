@@ -364,8 +364,8 @@ export function getMapBackground(
   mAM?: MAM[],
   mAMG?: MAMGrpd
 ): Buffer {
-  const dbord = 32; // down border for the legend
-  const lbord = 12; // left border for the legend
+  const dbrd = 32; // down border for the legend
+  const lbrd = 12; // left border for the legend
   const recS = 30; // rectangle size of the range rectagles
   const bgrC = "#F4F8FB"; // background color
   const texC = "#010501"; // text color for legend
@@ -386,7 +386,7 @@ export function getMapBackground(
         <text font-family="Arial" font-size="22" font-weight="normal" fill="${texC}">
           <tspan x="41" y="103">Stand: ${dLoc}</tspan>
         </text>
-        <g transform="translate(${lbord}, -${dbord})">
+        <g transform="translate(${lbrd}, -${dbrd})">
           ${rngs.map((rng, ind) => {
             return `
           <g transform="translate(0, ${ySt - ind * 40})">
@@ -421,8 +421,7 @@ export function getMapBackground(
             mAMG != null
               ? Object.keys(mAMG).map((clr) => {
                   let iStr = "";
-                  const count = mAMG[clr].length;
-                  const frtY = 15 + (count - 1) * 5;
+                  const frtY = 15 + (mAMG[clr].length - 1) * 5;
                   mAMG[clr].map((ety, ind) => {
                     iStr += `<g id="${ety.name}" transform="translate(0, ${
                       ySt - ety.rInd * 40
