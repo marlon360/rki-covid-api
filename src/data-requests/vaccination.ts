@@ -607,7 +607,7 @@ export async function getVaccinationCoverage(): Promise<
   );
   const lastCommitData: { lastUpdate: Date; sha: string } = await GetApiCommit(
     apiDBUrl.href,
-    apiDBUrl.pathname
+    apiDBUrl.pathname + apiDBUrl.search
   ).then((apiData) => {
     return {
       lastUpdate: new Date(apiData[0].commit.author.date),
