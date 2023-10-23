@@ -71,8 +71,8 @@ interface Region {
 const Districts: Region = {
   Actual: {
     type: "ActualDistricts",
-    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-    WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
+    url: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/Fallzahlen/Fallzahlen_Kum_Tab_aktuell.xlsx",
+    WorkBook: "Unofficial, copy of Fallzahlen_Kum_Tab_aktuell.xlsx",
     SheetName: "LK_7-Tage-Inzidenz (fixiert)",
     startRow: 4,
     startColumn: 2,
@@ -81,8 +81,8 @@ const Districts: Region = {
   },
   Archive: {
     type: "ArchiveDistricts",
-    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-    WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
+    url: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/Fallzahlen/Fallzahlen_Kum_Tab_Archiv.xlsx",
+    WorkBook: "Unofficial, copy of Fallzahlen_Kum_Tab_Archiv.xlsx",
     SheetName: "LK_7-Tage-Inzidenz (fixiert)",
     startRow: 4,
     startColumn: 3,
@@ -100,8 +100,8 @@ const Districts: Region = {
 const States: Region = {
   Actual: {
     type: "ActualStates",
-    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_aktuell.xlsx?__blob=publicationFile",
-    WorkBook: "Official, from Fallzahlen_Kum_Tab_aktuell.xlsx",
+    url: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/Fallzahlen/Fallzahlen_Kum_Tab_aktuell.xlsx",
+    WorkBook: "Unofficial, copy of Fallzahlen_Kum_Tab_aktuell.xlsx",
     SheetName: "BL_7-Tage-Inzidenz (fixiert)",
     startRow: 4,
     startColumn: 1,
@@ -110,8 +110,8 @@ const States: Region = {
   },
   Archive: {
     type: "ArchiveStates",
-    url: "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Daten/Fallzahlen_Kum_Tab_Archiv.xlsx?__blob=publicationFile",
-    WorkBook: "Official, from Fallzahlen_Kum_Tab_Archiv.xlsx",
+    url: "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/Fallzahlen/Fallzahlen_Kum_Tab_Archiv.xlsx",
+    WorkBook: "Unofficial, copy of Fallzahlen_Kum_Tab_Archiv.xlsx",
     SheetName: "BL_7-Tage-Inzidenz (fixiert)",
     startRow: 4,
     startColumn: 1,
@@ -157,7 +157,6 @@ const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       reject(new RKIError(rdata.error, response.config.url));
       throw new RKIError(rdata.error, response.config.url);
     }
-    lastUpdate = new Date(response.headers["last-modified"]);
     const workbook = XLSX.read(rdata, { type: "buffer", cellDates: true });
     const sheet = workbook.Sheets[parameter.SheetName];
     // table starts in row "startRow" (parameter is zero indexed)
@@ -205,7 +204,7 @@ const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
       });
       return { [parameter.key]: regionKey, name: name, history: history };
     });
-
+    lastUpdate = new Date(data[0].history[data[0].history.length - 1].date);
     //prepare data for redis entry for the excelsheet
     const JsonData = JSON.stringify({ lastUpdate, data });
 
@@ -234,7 +233,7 @@ export interface UnofficialData {
     }[];
   };
 }
-// this reloads the unofficial data from LK.xlsx or BL.xlsx and store this to redis
+// this reloads the unofficial data from LK.json.gz or BL.json.gz and store this to redis
 async function reloadUnofficial(
   requestType: UnofficialParameter,
   lastUpdate: Date
@@ -285,7 +284,7 @@ async function reloadUnofficial(
   );
   return unofficial;
 }
-// this is the Promise to get BL.xlsx or LK.xlsx from redis for all dates after 2023-04-17
+// this is the Promise to get BL.json.gz or LK.json.gz from redis for all dates after 2023-04-17
 // if not present call a reload and store to redis (reloadUnofficial)
 // if metadata lastUpdate is newer the the stored date in redis, reload and store new unofficial data to redis (reloadUnofficial)
 // requestType mus be bind
