@@ -565,7 +565,13 @@ export async function VideoResponse(
   status = JSON.parse(fs.readFileSync(statusFileName).toString());
   // push video data filename and crationtime to status
   status.videos[region].push({ filename: mp4FileName, created: created });
-  // cleanup videofiles region, store only the 5 last created entrys
+  // find region video files not from refData
+  const oldVideoFiles = status.videos[region].filter((video) => !video.filename.includes(refDate));
+  // clean region video files in status.videos[region]
+  status.videos[region] = status.videos[region].filter((video) => video.filename.includes(refDate));
+  // delete old region video files
+  oldVideoFiles.forEach((video)=> fs.rmSync(video.filename));
+  // cleanup region videofiles, store only the 5 last created entrys, delete the oldest entry(s)
   status.videos[region].sort((a, b) => b.created - a.created);
   while (status.videos[region].length > 5) {
     const removed = status.videos[region].pop();
