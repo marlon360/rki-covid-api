@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import lzma from "lzma-native"
+import lzma from "lzma-native";
 import { MetaData, neverExpire } from "../utils";
 
 import {
@@ -247,8 +247,8 @@ async function reloadUnofficial(
   }
   //decompress lzma compressed data (xz)
   const decompressed = await new Promise((resolve) =>
-  lzma.decompress(rdata, undefined, result => resolve(result))
-);
+    lzma.decompress(rdata, undefined, (result) => resolve(result))
+  );
   // parse Json
   const jsonData = JSON.parse(decompressed.toString(), dateReviver);
   // build unofficial data

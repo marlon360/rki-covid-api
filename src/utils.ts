@@ -1,5 +1,5 @@
 import axios from "axios";
-import lzma from "lzma-native"
+import lzma from "lzma-native";
 import { redisClientBas } from "./server";
 import { ApiData } from "./data-requests/r-value";
 
@@ -610,7 +610,7 @@ export async function getCasesStatesJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
     casesStatesJson.data = JSON.parse(decompressed.toString(), dateReviver);
@@ -673,10 +673,13 @@ export async function getCasesHistoryStatesJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    casesHistoryStatesJson.data = JSON.parse(decompressed.toString(), dateReviver);
+    casesHistoryStatesJson.data = JSON.parse(
+      decompressed.toString(),
+      dateReviver
+    );
     casesHistoryStatesJson.metaData = metaData;
     const redisCasesHistoryStates = JSON.stringify(casesHistoryStatesJson);
     // create redis Entry for metaData
@@ -745,7 +748,7 @@ export async function getCasesDistrictsJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
     casesDistrictsJson.data = JSON.parse(decompressed.toString(), dateReviver);
@@ -808,7 +811,7 @@ export async function getCasesHistoryDistrictsJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
     casesHistoryDistrictsJson.data = JSON.parse(
@@ -879,7 +882,7 @@ export async function getAgeGroupStatesJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
     ageGroupStatesJson.data = JSON.parse(decompressed.toString(), dateReviver);
@@ -945,10 +948,13 @@ export async function getAgeGroupDistrictsJson(
     }
     //decompress lzma compressed data (xz)
     const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, result => resolve(result))
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    ageGroupDistrictsJson.data = JSON.parse(decompressed.toString(), dateReviver);
+    ageGroupDistrictsJson.data = JSON.parse(
+      decompressed.toString(),
+      dateReviver
+    );
     ageGroupDistrictsJson.metaData = metaData;
     const redisAgeGroupDistrictsJson = JSON.stringify(ageGroupDistrictsJson);
     // create redis Entry for metaData
