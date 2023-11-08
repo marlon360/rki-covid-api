@@ -92,7 +92,7 @@ const Districts: Region = {
   Unofficial: {
     key: "ags",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.json.gz",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.json.xz",
     redisKeyUnofficial: "DistrictsUnofficial",
   },
 };
@@ -121,7 +121,7 @@ const States: Region = {
   Unofficial: {
     key: "abbreviation",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.json.gz",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.json.xz",
     redisKeyUnofficial: "StatesUnofficial",
   },
 };
