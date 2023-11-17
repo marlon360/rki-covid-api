@@ -28,7 +28,7 @@
     "express-redis-cache-next": "^1.2.0",
     "lzma-native": "^8.0.6",
     "pm2": "^5.1.2",
-    "sharp": "^0.30.5",
+    "sharp": "^0.32.6",
     "svgson": "^5.2.1",
     "xlsx": "^0.17.4"
   },
