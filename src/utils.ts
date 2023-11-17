@@ -1,5 +1,5 @@
 import axios from "axios";
-import zlib from "zlib";
+import lzma from "lzma-native";
 import { redisClientBas } from "./server";
 import { ApiData } from "./data-requests/r-value";
 
@@ -602,18 +602,18 @@ export async function getCasesStatesJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryCasesStatesJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}cases/states.json.gz`;
+    const url = `${baseUrl}cases/states.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    casesStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesStatesJson.data = JSON.parse(decompressed.toString(), dateReviver);
     casesStatesJson.metaData = metaData;
     const redisCasesHistoryStates = JSON.stringify(casesStatesJson);
     // create redis Entry for metaData
@@ -665,18 +665,21 @@ export async function getCasesHistoryStatesJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryCasesHistoryStatesJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/states.json.gz`;
+    const url = `${baseUrl}history/states.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    casesHistoryStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesHistoryStatesJson.data = JSON.parse(
+      decompressed.toString(),
+      dateReviver
+    );
     casesHistoryStatesJson.metaData = metaData;
     const redisCasesHistoryStates = JSON.stringify(casesHistoryStatesJson);
     // create redis Entry for metaData
@@ -737,18 +740,18 @@ export async function getCasesDistrictsJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryCasesHistoryDistrictsJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}cases/districts.json.gz`;
+    const url = `${baseUrl}cases/districts.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    casesDistrictsJson.data = JSON.parse(unziped.toString(), dateReviver);
+    casesDistrictsJson.data = JSON.parse(decompressed.toString(), dateReviver);
     casesDistrictsJson.metaData = metaData;
     const redisCasesDistricts = JSON.stringify(casesDistrictsJson);
     // create redis Entry for metaData
@@ -800,19 +803,19 @@ export async function getCasesHistoryDistrictsJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryCasesHistoryDistrictsJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/districts.json.gz`;
+    const url = `${baseUrl}history/districts.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
     casesHistoryDistrictsJson.data = JSON.parse(
-      unziped.toString(),
+      decompressed.toString(),
       dateReviver
     );
     casesHistoryDistrictsJson.metaData = metaData;
@@ -871,18 +874,18 @@ export async function getAgeGroupStatesJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryAgeGroupStatesJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}agegroup/states.json.gz`;
+    const url = `${baseUrl}agegroup/states.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    ageGroupStatesJson.data = JSON.parse(unziped.toString(), dateReviver);
+    ageGroupStatesJson.data = JSON.parse(decompressed.toString(), dateReviver);
     ageGroupStatesJson.metaData = metaData;
     const redisAgeGroupStatesJson = JSON.stringify(ageGroupStatesJson);
     // create redis Entry for metaData
@@ -937,18 +940,21 @@ export async function getAgeGroupDistrictsJson(
   }
   // if redisEntry for cases not exists get data from github und store data to redis
   if (redisEntryAgeGroupDistrictsJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}agegroup/districts.json.gz`;
+    const url = `${baseUrl}agegroup/districts.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //unzip data
-    const unziped = await new Promise((resolve) =>
-      zlib.gunzip(rdata, (_, result) => resolve(result))
+    //decompress lzma compressed data (xz)
+    const decompressed = await new Promise((resolve) =>
+      lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    ageGroupDistrictsJson.data = JSON.parse(unziped.toString(), dateReviver);
+    ageGroupDistrictsJson.data = JSON.parse(
+      decompressed.toString(),
+      dateReviver
+    );
     ageGroupDistrictsJson.metaData = metaData;
     const redisAgeGroupDistrictsJson = JSON.stringify(ageGroupDistrictsJson);
     // create redis Entry for metaData

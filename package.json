@@ -26,6 +26,7 @@
     "express": "^4.17.3",
     "express-async-errors": "^3.1.1",
     "express-redis-cache-next": "^1.2.0",
+    "lzma-native": "^8.0.6",
     "pm2": "^5.1.2",
     "sharp": "^0.30.5",
     "svgson": "^5.2.1",
@@ -36,7 +37,8 @@
     "@types/node": "^16.11.6",
     "prettier": "2.4.1",
     "typescript": "^4.4.4",
-    "vuepress": "^1.9.5"
+    "vuepress": "^1.9.5",
+    "@types/lzma-native": "^4.0.4"
   },
   "engines": {
     "node": ">=16.0.0 <17"
