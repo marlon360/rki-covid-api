@@ -1,6 +1,6 @@
 import axios from "axios";
 import XLSX from "xlsx";
-import zlib from "zlib";
+import lzma from "lzma-native";
 import { MetaData, neverExpire } from "../utils";
 
 import {
@@ -92,7 +92,7 @@ const Districts: Region = {
   Unofficial: {
     key: "ags",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.json.gz",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/LK.json.xz",
     redisKeyUnofficial: "DistrictsUnofficial",
   },
 };
@@ -121,7 +121,7 @@ const States: Region = {
   Unofficial: {
     key: "abbreviation",
     githubUrlUnofficial:
-      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.json.gz",
+      "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/frozen-incidence/BL.json.xz",
     redisKeyUnofficial: "StatesUnofficial",
   },
 };
@@ -245,12 +245,12 @@ async function reloadUnofficial(
   if (rdata.error) {
     throw new RKIError(rdata.error, response.config.url);
   }
-  //unzip data
-  const unziped = await new Promise((resolve) =>
-    zlib.gunzip(rdata, (_, result) => resolve(result))
+  //decompress lzma compressed data (xz)
+  const decompressed = await new Promise((resolve) =>
+    lzma.decompress(rdata, undefined, (result) => resolve(result))
   );
   // parse Json
-  const jsonData = JSON.parse(unziped.toString(), dateReviver);
+  const jsonData = JSON.parse(decompressed.toString(), dateReviver);
   // build unofficial data
   let unofficial: UnofficialData = {};
   jsonData.forEach((entry) => {

@@ -4,7 +4,6 @@ import {
   getCasesHistoryDistrictsJson,
   getAgeGroupDistrictsJson,
   MetaData,
-  getMetaData,
 } from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
