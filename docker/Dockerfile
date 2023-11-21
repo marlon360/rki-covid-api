@@ -8,7 +8,6 @@ ARG VIPS_VERSION=8.14.5
 
 # System update, build dependencies, compile vips-x.xx.x and cleanup.
 RUN set -x -o pipefail \
-  && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz | tar xJC /tmp \
   && apk update \
   && apk upgrade \
   && apk add \
@@ -24,6 +23,7 @@ RUN set -x -o pipefail \
     zlib-dev libxml2-dev glib-dev gobject-introspection-dev libjpeg-turbo-dev \
     lcms2-dev fftw-dev giflib-dev libpng-dev orc-dev tiff-dev poppler-dev \
     librsvg-dev libimagequant-dev pango-dev py-gobject3-dev \
+  && wget -O- https://github.com/libvips/libvips/releases/download/v${VIPS_VERSION}/vips-${VIPS_VERSION}.tar.xz | tar xJC /tmp \
   && cd /tmp/vips-${VIPS_VERSION} \
   && meson setup build  --prefix=/usr --buildtype release \
   && cd build \                       
