@@ -522,7 +522,6 @@ export async function getMetaData(): Promise<MetaData> {
       const oldMetaData: MetaData = JSON.parse(redisEntryMeta[0].body);
       const oldModified = oldMetaData.modified;
       const newModified = metaData.modified;
-      newModified > oldModified;
       if (newModified > oldModified) {
         const validToMs = AddDaysToDate(
           new Date(metaData.modified),
