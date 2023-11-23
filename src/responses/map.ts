@@ -23,7 +23,7 @@ import {
   getStateIdByName,
   getMetaData,
 } from "../utils";
-import { MAM, MAMGrpd } from "./mapvideo";
+import { MAM, MAMGrouped } from "./mapvideo";
 
 export enum mapTypes {
   map = "withoutLegend",
@@ -362,7 +362,7 @@ export function getMapBackground(
   date: Date,
   rngs: ColorRange[],
   mAM?: MAM[],
-  mAMG?: MAMGrpd
+  mAMG?: MAMGrouped
 ): Buffer {
   const dbrd = 32; // down border for the legend
   const lbrd = 12; // left border for the legend

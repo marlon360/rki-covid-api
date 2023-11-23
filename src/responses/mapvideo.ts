@@ -1,31 +1,23 @@
 import { stringify } from "svgson";
 import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
-import { weekIncidenceColorRanges as wkIClrRngs } from "../configuration/colors";
+import { weekIncidenceColorRanges } from "../configuration/colors";
 import sharp from "sharp";
-import {
-  getColorForValue as gtClrFrVl,
-  getMapBackground as gtMpBckgrnd,
-} from "./map";
-import {
-  getDistrictByAGS as gtDByAGS,
-  DistrictsCasesHistoryResponse as DCHRspns,
-} from "./districts";
+import { getColorForValue, getMapBackground } from "./map";
+import { getDistrictByAGS, DistrictsCasesHistoryResponse } from "./districts";
 import ffmpegStatic from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
 import {
   getMetaData,
-  getDateBeforeDate as gtDtBfrDt,
+  getDateBeforeDate,
   MetaData,
-  getStateIdByAbbreviation as gtSIdByAbb,
+  getStateIdByAbbreviation,
 } from "../utils";
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
-import {
-  StatesCasesHistoryResponse as SCHRspns,
-  getStateById as gtSById,
-} from "./states";
+import { StatesCasesHistoryResponse, getStateById } from "./states";
+import { getTestingHistory } from "../data-requests/testing";
 
 interface Status {
   districts: boolean;
@@ -74,7 +66,7 @@ export enum Region {
   states = "states",
 }
 
-interface ClrsPrDy {
+interface ColorsPerDay {
   [dateString: string]: {
     [key: string]: {
       color: string;
@@ -82,19 +74,19 @@ interface ClrsPrDy {
   };
 }
 
-interface MAMDyEty {
+interface MAMDayEntry {
   sum: number;
   count: number;
   avg: number;
-  aColor: string;
+  avgColor: string;
   min: number;
   minColor: string;
   max: number;
   maxColor: string;
 }
 
-interface MAMPrDy {
-  [dateString: string]: MAMDyEty;
+interface MAMPerDay {
+  [dateString: string]: MAMDayEntry;
 }
 
 export interface MAM {
@@ -103,7 +95,7 @@ export interface MAM {
   nCol: string;
 }
 
-export interface MAMGrpd {
+export interface MAMGrouped {
   [incidenceColor: string]: {
     rInd: number;
     name: string;
@@ -111,89 +103,98 @@ export interface MAMGrpd {
   }[];
 }
 
-export async function ClrsPrDy(
+export async function ColorsPerDay(
   metaData: MetaData,
   region: Region
-): Promise<ClrsPrDy> {
+): Promise<ColorsPerDay> {
   // initialize history and regions data variable
-  let rgnCssHstry;
-  let rgnsDt;
+  const start = new Date().getTime();
+  let regionsCasesHistory;
+  let regionsData;
   // request the data depending on region
   if (region == Region.districts) {
-    rgnCssHstry = await DCHRspns(null, null, metaData);
-    rgnsDt = await getDistrictsData(metaData);
+    regionsCasesHistory = (
+      await DistrictsCasesHistoryResponse(null, null, metaData)
+    ).data;
+    regionsData = await getDistrictsData(metaData);
   } else if (region == Region.states) {
-    rgnCssHstry = await SCHRspns(null, null, metaData);
-    rgnsDt = await getStatesData(metaData);
+    regionsCasesHistory = (
+      await StatesCasesHistoryResponse(null, null, metaData)
+    ).data;
+    regionsData = await getStatesData(metaData);
   }
-  const clrsPrDy: ClrsPrDy = {};
-  const mAMPrDy: MAMPrDy = {};
+  const colorsPerDay: ColorsPerDay = {};
+  const mAMPerDay: MAMPerDay = {};
   // build region incidence color history
-  for (const key of Object.keys(rgnCssHstry.data)) {
-    const rgnHstry = rgnCssHstry.data[key].history;
-    const kyTUs = region == Region.districts ? key : gtSIdByAbb(key).toString();
-    const rgnDt =
+  for (const key of Object.keys(regionsCasesHistory)) {
+    const regionHistory = regionsCasesHistory[key].history;
+    const keyToUse =
       region == Region.districts
-        ? gtDByAGS(rgnsDt, kyTUs)
-        : gtSById(rgnsDt, parseInt(kyTUs));
-    for (let i = 6; i < rgnHstry.length; i++) {
-      const date = rgnHstry[i].date;
+        ? key
+        : getStateIdByAbbreviation(key).toString();
+    const regionData =
+      region == Region.districts
+        ? getDistrictByAGS(regionsData, keyToUse)
+        : getStateById(regionsData, parseInt(keyToUse));
+    for (let i = 6; i < regionHistory.length; i++) {
+      const date = regionHistory[i].date;
       let sum = 0;
       for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-        sum += rgnHstry[dayOffset].cases;
+        sum += regionHistory[dayOffset].cases;
       }
-      if (!clrsPrDy[date.toISOString()]) {
-        clrsPrDy[date.toISOString()] = {
-          [kyTUs]: {
-            color: gtClrFrVl((sum / rgnDt.population) * 100000, wkIClrRngs),
-          },
+      const incidence = (sum / regionData.population) * 100000;
+      const incidenceColor = getColorForValue(
+        incidence,
+        weekIncidenceColorRanges
+      );
+      if (!colorsPerDay[date.toISOString()]) {
+        colorsPerDay[date.toISOString()] = {
+          [keyToUse]: { color: incidenceColor },
         };
       } else {
-        clrsPrDy[date.toISOString()][kyTUs] = {
-          color: gtClrFrVl((sum / rgnDt.population) * 100000, wkIClrRngs),
-        };
+        colorsPerDay[date.toISOString()][keyToUse] = { color: incidenceColor };
       }
-      if (!mAMPrDy[date.toISOString()]) {
-        const incdnc = (sum / rgnDt.population) * 100000;
-        const incdncClr = gtClrFrVl(incdnc, wkIClrRngs);
-        mAMPrDy[date.toISOString()] = {
-          sum: incdnc,
+      if (!mAMPerDay[date.toISOString()]) {
+        mAMPerDay[date.toISOString()] = {
+          sum: incidence,
           count: 1,
-          avg: incdnc,
-          aColor: incdncClr,
-          min: incdnc,
-          minColor: incdncClr,
-          max: incdnc,
-          maxColor: incdncClr,
+          avg: incidence,
+          avgColor: incidenceColor,
+          min: incidence,
+          minColor: incidenceColor,
+          max: incidence,
+          maxColor: incidenceColor,
         };
       } else {
-        const temp: MAMDyEty = JSON.parse(
-          JSON.stringify(mAMPrDy[date.toISOString()])
+        const temp: MAMDayEntry = JSON.parse(
+          JSON.stringify(mAMPerDay[date.toISOString()])
         ); //independent copy!
-        const incdnc = (sum / rgnDt.population) * 100000;
-        const incdncClr = gtClrFrVl(incdnc, wkIClrRngs);
-        temp.sum += incdnc;
+        temp.sum += incidence;
         temp.count += 1;
         temp.avg = temp.sum / temp.count;
-        temp.aColor = gtClrFrVl(temp.avg, wkIClrRngs);
-        if (incdnc > temp.max) {
-          temp.max = incdnc;
-          temp.maxColor = incdncClr;
+        temp.avgColor = getColorForValue(temp.avg, weekIncidenceColorRanges);
+        if (incidence > temp.max) {
+          temp.max = incidence;
+          temp.maxColor = incidenceColor;
         }
-        if (incdnc < temp.min) {
-          temp.min = incdnc;
-          temp.minColor = incdncClr;
+        if (incidence < temp.min) {
+          temp.min = incidence;
+          temp.minColor = incidenceColor;
         }
-        mAMPrDy[date.toISOString()] = temp;
+        mAMPerDay[date.toISOString()] = temp;
       }
     }
   }
-  for (const date of Object.keys(mAMPrDy)) {
-    clrsPrDy[date].min = { color: mAMPrDy[date].minColor };
-    clrsPrDy[date].avg = { color: mAMPrDy[date].aColor };
-    clrsPrDy[date].max = { color: mAMPrDy[date].maxColor };
+  for (const date of Object.keys(mAMPerDay)) {
+    colorsPerDay[date].min = { color: mAMPerDay[date].minColor };
+    colorsPerDay[date].avg = { color: mAMPerDay[date].avgColor };
+    colorsPerDay[date].max = { color: mAMPerDay[date].maxColor };
   }
-  return clrsPrDy;
+  const stop = new Date().getTime();
+  console.log(
+    `${region} colorPerDay creation time: ${(stop - start) / 1000} seconds`
+  );
+  return colorsPerDay;
 }
 
 export async function VideoResponse(
@@ -205,7 +206,7 @@ export async function VideoResponse(
   const metaData = await getMetaData();
 
   // set the reference date
-  const refDate = gtDtBfrDt(metaData.version, 1);
+  const refDate = getDateBeforeDate(metaData.version, 1);
   // the path to stored incidence per day files and status
   const incidenceDataPath = "./dayPics/";
   // path and filename for status.json
@@ -238,15 +239,15 @@ export async function VideoResponse(
   }
 
   //check if incidencesPerDay_date.json exists
-  let clrsPrDy: ClrsPrDy = {};
+  let colorsPerDay: ColorsPerDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
-    clrsPrDy = JSON.parse(fs.readFileSync(jsonFileName).toString());
+    colorsPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
   } else {
     // if region incidence per day data file not exists requst the data
-    clrsPrDy = await ClrsPrDy(metaData, region);
+    colorsPerDay = await ColorsPerDay(metaData, region);
     // store to disc
-    const jsonData = JSON.stringify(clrsPrDy);
+    const jsonData = JSON.stringify(colorsPerDay);
     fs.writeFileSync(jsonFileName, jsonData);
     // new incidencesPerDay , change status
     // wait for ulocked status.json file
@@ -271,7 +272,7 @@ export async function VideoResponse(
   }
 
   // get a sorted list of incidencePerDay keys
-  const clrsPrDyKys = Object.keys(clrsPrDy).sort(
+  const colorsPerDayKeys = Object.keys(colorsPerDay).sort(
     (a, b) => new Date(a).getTime() - new Date(b).getTime()
   );
 
@@ -284,13 +285,13 @@ export async function VideoResponse(
       throw new TypeError(
         "Wrong format for ':days' parameter! This is not a number."
       );
-    } else if (days > clrsPrDyKys.length || days < 100) {
+    } else if (days > colorsPerDayKeys.length || days < 100) {
       throw new RangeError(
-        `':days' parameter must be between '100' and '${clrsPrDyKys.length}'`
+        `':days' parameter must be between '100' and '${colorsPerDayKeys.length}'`
       );
     }
   } else {
-    days = clrsPrDyKys.length;
+    days = colorsPerDayKeys.length;
   }
   const numberOfFrames = days;
 
@@ -371,33 +372,40 @@ export async function VideoResponse(
     //load the region mapfile
     const mapData = region == Region.districts ? DistrictsMap : StatesMap;
     // find the last stored incidencePerDay file witch is the basis of the stored pict files
-    let allIFls = fs.readdirSync(incidenceDataPath);
-    allIFls = allIFls
+    let allRegionsColorsPerDayFiles = fs.readdirSync(incidenceDataPath);
+    allRegionsColorsPerDayFiles = allRegionsColorsPerDayFiles
       .filter((file) => file.includes(`${region}-incidenceColorsPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
-    const iFlOld =
-      allIFls.length > 1 ? `${incidenceDataPath}${allIFls[1]}` : "dummy";
+    const oldRegionsColorsPerDayFile =
+      allRegionsColorsPerDayFiles.length > 1
+        ? `${incidenceDataPath}${allRegionsColorsPerDayFiles[1]}`
+        : "dummy";
     // load the old incidences (if exists)
-    let oldClrsPrDy: ClrsPrDy = {};
-    if (fs.existsSync(iFlOld)) {
-      oldClrsPrDy = JSON.parse(fs.readFileSync(iFlOld).toString());
+    let oldColorsPerDay: ColorsPerDay = {};
+    if (fs.existsSync(oldRegionsColorsPerDayFile)) {
+      oldColorsPerDay = JSON.parse(
+        fs.readFileSync(oldRegionsColorsPerDayFile).toString()
+      );
     }
 
     // function to compare two Objects
-    function isDffrnd(obj1, obj2) {
+    function isDiffernd(obj1, obj2) {
       return JSON.stringify(obj1) !== JSON.stringify(obj2);
     }
 
     // find all days that changed one or more colors, and store this key to allDiffs
+    let start = new Date().getTime();
     let allDiffs = [];
-    for (const date of clrsPrDyKys) {
+    for (const date of colorsPerDayKeys) {
       // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
-      if (!oldClrsPrDy[date]) {
+      if (!oldColorsPerDay[date]) {
         allDiffs.push(date);
       } else {
         // else test every regionKey for changed colors,
-        for (const rgnKy of Object.keys(clrsPrDy[date])) {
-          if (isDffrnd(clrsPrDy[date][rgnKy], oldClrsPrDy[date][rgnKy])) {
+        for (const rgnKy of Object.keys(colorsPerDay[date])) {
+          if (
+            isDiffernd(colorsPerDay[date][rgnKy], oldColorsPerDay[date][rgnKy])
+          ) {
             // push datekey to allDiffs[] if one color is differend,
             allDiffs.push(date);
             // and break this "for loop"
@@ -406,16 +414,20 @@ export async function VideoResponse(
         }
       }
     }
-
+    let stop = new Date().getTime();
+    console.log(
+      `${region} allDiffs calculation time: ${(stop - start) / 1000} seconds`
+    );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
-      const frstPssblDt = new Date(clrsPrDyKys[0]).getTime();
+      const start = new Date().getTime();
+      const firstPossibleDate = new Date(colorsPerDayKeys[0]).getTime();
       const promises = [];
       allDiffs.forEach((date) => {
         // calculate the frameNumber
         const frmNmbrStr = (
-          (new Date(date).getTime() - frstPssblDt) / 86400000 +
+          (new Date(date).getTime() - firstPossibleDate) / 86400000 +
           1
         )
           .toString()
@@ -424,13 +436,13 @@ export async function VideoResponse(
         const frameName = framesFullPath.replace("F-0000", `F-${frmNmbrStr}`);
 
         // add fill color to every region
-        for (const rgnPthElmnt of mapData.children) {
-          const idAttribute = rgnPthElmnt.attributes.id;
+        for (const regionPathElement of mapData.children) {
+          const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
-          rgnPthElmnt.attributes["fill"] = clrsPrDy[date][id].color;
+          regionPathElement.attributes["fill"] = colorsPerDay[date][id].color;
           if (region == Region.states) {
-            rgnPthElmnt.attributes["stroke"] = "#DBDBDB";
-            rgnPthElmnt.attributes["stroke-width"] = "0.9";
+            regionPathElement.attributes["stroke"] = "#DBDBDB";
+            regionPathElement.attributes["stroke-width"] = "0.9";
           }
         }
         const svgBuffer = Buffer.from(stringify(mapData));
@@ -443,71 +455,87 @@ export async function VideoResponse(
 
         // define mAM
         let mAM: MAM[] = [
-          { name: "min", iCol: clrsPrDy[date]["min"].color, nCol: "green" },
+          { name: "min", iCol: colorsPerDay[date]["min"].color, nCol: "green" },
         ];
         mAM.push({
           name: "avg",
-          iCol: clrsPrDy[date]["avg"].color,
+          iCol: colorsPerDay[date]["avg"].color,
           nCol: "orange",
         });
         mAM.push({
           name: "max",
-          iCol: clrsPrDy[date]["max"].color,
+          iCol: colorsPerDay[date]["max"].color,
           nCol: "red",
         });
 
         // define mAMG
         // get range index of min color
-        const minRind = wkIClrRngs.findIndex(
-          (rng) => rng.color == clrsPrDy[date]["min"].color
+        const minRangeindex = weekIncidenceColorRanges.findIndex(
+          (range) => range.color == colorsPerDay[date]["min"].color
         );
         // get range index of avg color
-        const avgRind = wkIClrRngs.findIndex(
-          (rng) => rng.color == clrsPrDy[date]["avg"].color
+        const avgRangeindex = weekIncidenceColorRanges.findIndex(
+          (range) => range.color == colorsPerDay[date]["avg"].color
         );
         //get range index of max color
-        const maxRind = wkIClrRngs.findIndex(
-          (rng) => rng.color == clrsPrDy[date]["max"].color
+        const maxRangeindex = weekIncidenceColorRanges.findIndex(
+          (range) => range.color == colorsPerDay[date]["max"].color
         );
-        let mAMG: MAMGrpd = {
-          [clrsPrDy[date]["min"].color]: [
-            { name: "min", nCol: "green", rInd: minRind },
+        let mAMG: MAMGrouped = {
+          [colorsPerDay[date]["min"].color]: [
+            { name: "min", nCol: "green", rInd: minRangeindex },
           ],
         };
-        if (mAMG[clrsPrDy[date]["avg"].color]) {
-          mAMG[clrsPrDy[date]["avg"].color].push({
+        if (mAMG[colorsPerDay[date]["avg"].color]) {
+          mAMG[colorsPerDay[date]["avg"].color].push({
             name: "avg",
             nCol: "orange",
-            rInd: avgRind,
+            rInd: avgRangeindex,
           });
         } else {
-          mAMG[clrsPrDy[date]["avg"].color] = [
-            { name: "avg", nCol: "orange", rInd: avgRind },
+          mAMG[colorsPerDay[date]["avg"].color] = [
+            { name: "avg", nCol: "orange", rInd: avgRangeindex },
           ];
         }
-        if (mAMG[clrsPrDy[date]["max"].color]) {
-          mAMG[clrsPrDy[date]["max"].color].push({
+        if (mAMG[colorsPerDay[date]["max"].color]) {
+          mAMG[colorsPerDay[date]["max"].color].push({
             name: "max",
             nCol: "red",
-            rInd: maxRind,
+            rInd: maxRangeindex,
           });
         } else {
-          mAMG[clrsPrDy[date]["max"].color] = [
-            { name: "max", nCol: "red", rInd: maxRind },
+          mAMG[colorsPerDay[date]["max"].color] = [
+            { name: "max", nCol: "red", rInd: maxRangeindex },
           ];
         }
 
         // push new promise for frames with legend
         promises.push(
-          sharp(gtMpBckgrnd(hdline, new Date(date), wkIClrRngs, mAM, mAMG))
+          sharp(
+            getMapBackground(
+              hdline,
+              new Date(date),
+              weekIncidenceColorRanges,
+              mAM,
+              mAMG
+            )
+          )
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
             .png({ quality: 100 })
             .toFile(frameName)
         );
       });
-
+      const stop = new Date().getTime();
+      console.log(
+        `${region} Promises creation time: ${(stop - start) / 1000} seconds`
+      );
       // await all frames promises
+      const start1 = new Date().getTime();
       await Promise.all(promises);
+      const stop1 = new Date().getTime();
+      console.log(
+        `${region} Promises execution time: ${(stop1 - start1) / 1000} seconds`
+      );
     }
     // wait for unlocked status.json
     if (fs.existsSync(statusLockFile)) {
@@ -534,7 +562,7 @@ export async function VideoResponse(
   const framesNameVideo = `${dayPicsPath}${region}_F-%04d.png`;
 
   // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
-  const firstFrameNumber = (clrsPrDyKys.length - days + 1)
+  const firstFrameNumber = (colorsPerDayKeys.length - days + 1)
     .toString()
     .padStart(4, "0");
 
@@ -542,6 +570,7 @@ export async function VideoResponse(
   ffmpeg.setFfmpegPath(ffmpegStatic);
 
   // calculate the requested video
+  const start = new Date().getTime();
   const mp4out = await ffmpegSync(
     framesNameVideo,
     mp4FileName,
@@ -549,7 +578,10 @@ export async function VideoResponse(
     firstFrameNumber,
     lockFile
   );
-
+  const stop = new Date().getTime();
+  console.log(
+    `${region} Video rendering time: ${(stop - start) / 1000} seconds.`
+  );
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {
     while (fs.existsSync(statusLockFile)) {
