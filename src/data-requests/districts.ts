@@ -101,6 +101,7 @@ export async function getDistrictsCasesHistory(
 ): Promise<
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
+  const start = new Date().getTime();
   let json = await getDistrictsCasesHistoryJson(metaData);
   let history: {
     ags: string;
@@ -123,6 +124,9 @@ export async function getDistrictsCasesHistory(
     ags = ags.padStart(5, "0");
     history = history.filter((entry) => entry.ags == ags);
   }
+  const end = new Date().getTime();
+  const logtime = new Date().toISOString().substring(0, 19);
+  console.log(`${logtime}: districts get cases history json data time: ${(end - start) / 1000} seconds`)
   return {
     data: history,
     lastUpdate: new Date(json.metaData.modified),
