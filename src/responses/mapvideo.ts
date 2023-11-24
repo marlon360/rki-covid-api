@@ -191,8 +191,9 @@ export async function ColorsPerDay(
     colorsPerDay[date].max = { color: mAMPerDay[date].maxColor };
   }
   const stop = new Date().getTime();
+  const logtime = new Date().toISOString().substring(0, 18);
   console.log(
-    `${region} colorPerDay creation time: ${(stop - start) / 1000} seconds`
+    `${logtime}: ${region} colorsPerDay creation time: ${(stop - start) / 1000} seconds`
   );
   return colorsPerDay;
 }
@@ -396,10 +397,13 @@ export async function VideoResponse(
     // find all days that changed one or more colors, and store this key to allDiffs
     let start = new Date().getTime();
     let allDiffs = [];
+    let newFrames = 0;
+    let changedFrames = 0;
     for (const date of colorsPerDayKeys) {
       // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
       if (!oldColorsPerDay[date]) {
         allDiffs.push(date);
+        newFrames += 1;
       } else {
         // else test every regionKey for changed colors,
         for (const rgnKy of Object.keys(colorsPerDay[date])) {
@@ -408,6 +412,7 @@ export async function VideoResponse(
           ) {
             // push datekey to allDiffs[] if one color is differend,
             allDiffs.push(date);
+            changedFrames += 1;
             // and break this "for loop"
             break;
           }
@@ -415,13 +420,14 @@ export async function VideoResponse(
       }
     }
     let stop = new Date().getTime();
+    let logtime = new Date().toISOString().substring(0, 18);
     console.log(
-      `${region} allDiffs calculation time: ${(stop - start) / 1000} seconds`
+      `${logtime}: ${region}; new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${(stop - start) / 1000} seconds`
     );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
-      const start = new Date().getTime();
+      let start = new Date().getTime();
       const firstPossibleDate = new Date(colorsPerDayKeys[0]).getTime();
       const promises = [];
       allDiffs.forEach((date) => {
@@ -525,16 +531,18 @@ export async function VideoResponse(
             .toFile(frameName)
         );
       });
-      const stop = new Date().getTime();
+      let stop = new Date().getTime();
+      let logtime = new Date().toISOString().substring(0, 18);
       console.log(
-        `${region} Promises creation time: ${(stop - start) / 1000} seconds`
+        `${logtime}: ${region} frames promises creation time: ${(stop - start) / 1000} seconds`
       );
       // await all frames promises
-      const start1 = new Date().getTime();
+      start = new Date().getTime();
       await Promise.all(promises);
-      const stop1 = new Date().getTime();
+      stop = new Date().getTime();
+      logtime = new Date().toISOString().substring(0, 18);
       console.log(
-        `${region} Promises execution time: ${(stop1 - start1) / 1000} seconds`
+        `${logtime}: ${region} frames promises execution time: ${(stop - start) / 1000} seconds`
       );
     }
     // wait for unlocked status.json
@@ -579,8 +587,9 @@ export async function VideoResponse(
     lockFile
   );
   const stop = new Date().getTime();
+  const logtime = new Date().toISOString().substring(0, 18);
   console.log(
-    `${region} Video rendering time: ${(stop - start) / 1000} seconds.`
+    `${logtime}: ${region} video rendering time: ${(stop - start) / 1000} seconds.`
   );
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {
