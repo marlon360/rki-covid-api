@@ -172,7 +172,7 @@ export async function DistrictsCasesHistoryResponse(
   );
   const end = new Date().getTime();
   const logtime = new Date().toISOString().substring(0, 19);
-  console.log(`${logtime}: fill 0 days time: ${(end - start) / 1000} seconds`);
+  console.log(`${logtime}: districts fill 0 days time: ${(end - start) / 1000} seconds`);
   return {
     data,
     meta: new ResponseMeta(districtsHistoryData.lastUpdate),

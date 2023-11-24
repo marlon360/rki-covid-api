@@ -425,7 +425,7 @@ export async function VideoResponse(
     let stop = new Date().getTime();
     let logtime = new Date().toISOString().substring(0, 19);
     console.log(
-      `${logtime}: ${region}; new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${(stop - start) / 1000} seconds`
+      `${logtime}: ${region} new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${(stop - start) / 1000} seconds`
     );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
