@@ -17,7 +17,6 @@ import {
 import { getDistrictsData } from "../data-requests/districts";
 import { getStatesData } from "../data-requests/states";
 import { StatesCasesHistoryResponse, getStateById } from "./states";
-import { getTestingHistory } from "../data-requests/testing";
 
 interface Status {
   districts: boolean;

@@ -1,14 +1,14 @@
 import { IResponseMeta, ResponseMeta } from "./meta";
 import {
-  getLastCasesHistory,
-  getCases,
-  getDeaths,
-  getNewCases,
-  getNewDeaths,
-  getNewRecovered,
-  getRecovered,
-  getLastDeathsHistory,
-  getLastRecoveredHistory,
+  getGermanyCasesHistory,
+  getGermanyCases,
+  getGermanyDeaths,
+  getGermanyNewCases,
+  getGermanyNewDeaths,
+  getGermanyNewRecovered,
+  getGermanyRecovered,
+  getGermanyDeathsHistory,
+  getGermanyRecoveredHistory,
   getGermanyAgeGroups,
   AgeGroupData,
 } from "../data-requests/germany";
@@ -79,12 +79,12 @@ export async function GermanyResponse(): Promise<GermanyData> {
     hospitalizationData,
     germanFixIncidence,
   ] = await Promise.all([
-    getCases(metaData),
-    getDeaths(metaData),
-    getRecovered(metaData),
-    getNewCases(metaData),
-    getNewDeaths(metaData),
-    getNewRecovered(metaData),
+    getGermanyCases(metaData),
+    getGermanyDeaths(metaData),
+    getGermanyRecovered(metaData),
+    getGermanyNewCases(metaData),
+    getGermanyNewDeaths(metaData),
+    getGermanyNewRecovered(metaData),
     getStatesData(metaData),
     getRValue(),
     getHospitalizationData(),
@@ -162,7 +162,7 @@ export async function GermanyCasesHistoryResponse(
   if (metaData == null) {
     metaData = await getMetaData();
   }
-  const history = await getLastCasesHistory(metaData, days);
+  const history = await getGermanyCasesHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -234,7 +234,7 @@ export async function GermanyDeathsHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const history = await getLastDeathsHistory(metaData, days);
+  const history = await getGermanyDeathsHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -266,7 +266,7 @@ export async function GermanyRecoveredHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const history = await getLastRecoveredHistory(metaData, days);
+  const history = await getGermanyRecoveredHistory(metaData, days);
   const highDate = new Date(
     AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
   );

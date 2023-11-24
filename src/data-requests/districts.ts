@@ -1,8 +1,8 @@
 import {
   getDateBefore,
-  getCasesDistrictsJson,
-  getCasesHistoryDistrictsJson,
-  getAgeGroupDistrictsJson,
+  getDistrictsCasesJson,
+  getDistrictsCasesHistoryJson,
+  getDistrictsAgeGroupJson,
   MetaData,
 } from "../utils";
 import { ResponseData } from "./response-data";
@@ -17,6 +17,7 @@ export interface IDistrictData {
   population: number;
   cases: number;
   deaths: number;
+  recovered: number;
   casesPerWeek: number;
   deathsPerWeek: number;
 }
@@ -24,9 +25,8 @@ export interface IDistrictData {
 export async function getDistrictsData(
   metaData: MetaData
 ): Promise<ResponseData<IDistrictData[]>> {
-  const data = await getCasesDistrictsJson(metaData);
-
-  const districts = data.data.map((district) => {
+  const json = await getDistrictsCasesJson(metaData);
+  const districts = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       name: LK_Names.names[district.Landkreis].GEN,
@@ -35,38 +35,22 @@ export async function getDistrictsData(
       population: district.population,
       cases: district.accuCases,
       deaths: district.accuDeaths,
+      recovered: district.accuRecovered,
       casesPerWeek: district.accuCasesPerWeek,
       deathsPerWeek: district.accuDeathsPerWeek,
     };
   });
   return {
     data: districts,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getDistrictsRecoveredData(
-  metaData: MetaData
-): Promise<ResponseData<{ ags: string; recovered: number }[]>> {
-  let data = await getCasesDistrictsJson(metaData);
-  const districts = data.data.map((district) => {
-    return {
-      ags: district.IdLandkreis,
-      recovered: district.accuRecovered,
-    };
-  });
-  return {
-    data: districts,
-    lastUpdate: new Date(data.metaData.modified),
-  };
-}
-
-export async function getNewDistrictCases(
+export async function getDistrictsNewCases(
   metaData: MetaData
 ): Promise<ResponseData<{ ags: string; cases: number }[]>> {
-  let data = await getCasesDistrictsJson(metaData);
-
-  const districts = data.data.map((district) => {
+  let json = await getDistrictsCasesJson(metaData);
+  const districts = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       cases: district.newCases,
@@ -74,16 +58,15 @@ export async function getNewDistrictCases(
   });
   return {
     data: districts,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getNewDistrictDeaths(
+export async function getDistrictsNewDeaths(
   metaData: MetaData
 ): Promise<ResponseData<{ ags: string; deaths: number }[]>> {
-  let data = await getCasesDistrictsJson(metaData);
-
-  const districts = data.data.map((district) => {
+  let json = await getDistrictsCasesJson(metaData);
+  const districts = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       deaths: district.newDeaths,
@@ -91,16 +74,15 @@ export async function getNewDistrictDeaths(
   });
   return {
     data: districts,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getNewDistrictRecovered(
+export async function getDistrictsNewRecovered(
   metaData: MetaData
 ): Promise<ResponseData<{ ags: string; recovered: number }[]>> {
-  let data = await getCasesDistrictsJson(metaData);
-
-  const districts = data.data.map((district) => {
+  let json = await getDistrictsCasesJson(metaData);
+  const districts = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       recovered: district.newRecovered,
@@ -108,25 +90,24 @@ export async function getNewDistrictRecovered(
   });
   return {
     data: districts,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastDistrictCasesHistory(
+export async function getDistrictsCasesHistory(
   metaData: MetaData,
   days?: number,
   ags?: string
 ): Promise<
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
-  let data = await getCasesHistoryDistrictsJson(metaData);
-
+  let json = await getDistrictsCasesHistoryJson(metaData);
   let history: {
     ags: string;
     name: string;
     cases: number;
     date: Date;
-  }[] = data.data.map((district) => {
+  }[] = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       name: district.Landkreis,
@@ -144,25 +125,24 @@ export async function getLastDistrictCasesHistory(
   }
   return {
     data: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastDistrictDeathsHistory(
+export async function getDistrictsDeathsHistory(
   metaData: MetaData,
   days?: number,
   ags?: string
 ): Promise<
   ResponseData<{ ags: string; name: string; deaths: number; date: Date }[]>
 > {
-  let data = await getCasesHistoryDistrictsJson(metaData);
-
+  let json = await getDistrictsCasesHistoryJson(metaData);
   let history: {
     ags: string;
     name: string;
     deaths: number;
     date: Date;
-  }[] = data.data.map((district) => {
+  }[] = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       name: district.Landkreis,
@@ -170,7 +150,6 @@ export async function getLastDistrictDeathsHistory(
       date: new Date(district.Meldedatum),
     };
   });
-
   if (days) {
     const reference_date = new Date(getDateBefore(days));
     history = history.filter((entry) => new Date(entry.date) > reference_date);
@@ -179,28 +158,26 @@ export async function getLastDistrictDeathsHistory(
     ags = ags.padStart(5, "0");
     history = history.filter((entry) => entry.ags == ags);
   }
-
   return {
     data: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastDistrictRecoveredHistory(
+export async function getDistrictsRecoveredHistory(
   metaData: MetaData,
   days?: number,
   ags?: string
 ): Promise<
   ResponseData<{ ags: string; name: string; recovered: number; date: Date }[]>
 > {
-  let data = await getCasesHistoryDistrictsJson(metaData);
-
+  let json = await getDistrictsCasesHistoryJson(metaData);
   let history: {
     ags: string;
     name: string;
     recovered: number;
     date: Date;
-  }[] = data.data.map((district) => {
+  }[] = json.data.map((district) => {
     return {
       ags: district.IdLandkreis,
       name: district.Landkreis,
@@ -208,7 +185,6 @@ export async function getLastDistrictRecoveredHistory(
       date: new Date(district.Meldedatum),
     };
   });
-
   if (days) {
     const reference_date = new Date(getDateBefore(days));
     history = history.filter((entry) => new Date(entry.date) > reference_date);
@@ -217,10 +193,9 @@ export async function getLastDistrictRecoveredHistory(
     ags = ags.padStart(5, "0");
     history = history.filter((entry) => entry.ags == ags);
   }
-
   return {
     data: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
@@ -228,11 +203,10 @@ export async function getDistrictsAgeGroups(
   metaData: MetaData,
   paramAgs?: string
 ): Promise<ResponseData<AgeGroupsData>> {
-  let data = await getAgeGroupDistrictsJson(metaData);
-  const lastUpdate = new Date(metaData.modified);
+  let json = await getDistrictsAgeGroupJson(metaData);
   if (paramAgs) paramAgs = paramAgs.padStart(5, "0");
   const districts: AgeGroupsData = {};
-  data.data.forEach((entry) => {
+  json.data.forEach((entry) => {
     const ags = entry.IdLandkreis;
     if (paramAgs && paramAgs != ags) return;
     if (!districts[ags]) districts[ags] = {};
@@ -247,9 +221,8 @@ export async function getDistrictsAgeGroups(
       deathsFemalePer100k: entry.deathsFemalePer100k,
     };
   });
-
   return {
     data: districts,
-    lastUpdate,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }

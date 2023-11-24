@@ -1,14 +1,13 @@
 import { IResponseMeta, ResponseMeta } from "./meta";
 import {
-  getLastStateCasesHistory,
-  getLastStateDeathsHistory,
-  getLastStateRecoveredHistory,
-  getNewStateCases,
-  getNewStateDeaths,
+  getStatesCasesHistory,
+  getStatesDeathsHistory,
+  getStatesRecoveredHistory,
+  getStatesNewCases,
+  getStatesNewDeaths,
+  getStatesNewRecovered,
   getStatesData,
-  getStatesRecoveredData,
   IStateData,
-  getNewStateRecovered,
   getStatesAgeGroups,
   AgeGroupsData,
 } from "../data-requests/states";
@@ -80,7 +79,6 @@ export async function StatesResponse(
   // make all requests
   const [
     statesData,
-    statesRecoverdData,
     statesNewCasesData,
     statesNewDeathsData,
     statesNewRecoveredData,
@@ -88,10 +86,9 @@ export async function StatesResponse(
     statesFixIncidence,
   ] = await Promise.all([
     getStatesData(metaData),
-    getStatesRecoveredData(metaData),
-    getNewStateCases(metaData),
-    getNewStateDeaths(metaData),
-    getNewStateRecovered(metaData),
+    getStatesNewCases(metaData),
+    getStatesNewDeaths(metaData),
+    getStatesNewRecovered(metaData),
     getHospitalizationData(),
     getStatesFrozenIncidenceHistory(metaData, 3),
   ]);
@@ -117,7 +114,6 @@ export async function StatesResponse(
     ).weekIncidence;
     return {
       ...state,
-      recovered: getStateById(statesRecoverdData, state.id)?.recovered ?? 0,
       abbreviation: getStateAbbreviationById(state.id),
       weekIncidence: (state.casesPerWeek / state.population) * 100000,
       casesPer100k: (state.cases / state.population) * 100000,
@@ -198,7 +194,7 @@ export async function StatesCasesHistoryResponse(
   if (metaData == null) {
     metaData = await getMetaData();
   }
-  const statesHistoryData = await getLastStateCasesHistory(metaData, days, id);
+  const statesHistoryData = await getStatesCasesHistory(metaData, days, id);
 
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
@@ -308,7 +304,7 @@ export async function StatesDeathsHistoryResponse(
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
   const metaData = await getMetaData();
-  const statesHistoryData = await getLastStateDeathsHistory(metaData, days, id);
+  const statesHistoryData = await getStatesDeathsHistory(metaData, days, id);
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   ); //highest date, witch is "datenstand" -1
@@ -349,7 +345,7 @@ export async function StatesRecoveredHistoryResponse(
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
   const metaData = await getMetaData();
-  const statesHistoryData = await getLastStateRecoveredHistory(
+  const statesHistoryData = await getStatesRecoveredHistory(
     metaData,
     days,
     id

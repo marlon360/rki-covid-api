@@ -2,14 +2,13 @@ import { IResponseMeta, ResponseMeta } from "./meta";
 import { ResponseData } from "../data-requests/response-data";
 import {
   getDistrictsData,
-  getNewDistrictCases,
-  getNewDistrictDeaths,
+  getDistrictsNewCases,
+  getDistrictsNewDeaths,
+  getDistrictsNewRecovered,
   IDistrictData,
-  getLastDistrictCasesHistory,
-  getLastDistrictDeathsHistory,
-  getLastDistrictRecoveredHistory,
-  getDistrictsRecoveredData,
-  getNewDistrictRecovered,
+  getDistrictsCasesHistory,
+  getDistrictsDeathsHistory,
+  getDistrictsRecoveredHistory,
   getDistrictsAgeGroups,
 } from "../data-requests/districts";
 import {
@@ -62,17 +61,15 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
   // make all requests
   const [
     districtsData,
-    districtsRecoveredData,
-    districtNewCasesData,
-    districtNewDeathsData,
-    districtNewRecoveredData,
+    districtsNewCases,
+    districtsNewDeaths,
+    districtsNewRecovered,
     districtsFixIncidence,
   ] = await Promise.all([
     getDistrictsData(metaData),
-    getDistrictsRecoveredData(metaData),
-    getNewDistrictCases(metaData),
-    getNewDistrictDeaths(metaData),
-    getNewDistrictRecovered(metaData),
+    getDistrictsNewCases(metaData),
+    getDistrictsNewDeaths(metaData),
+    getDistrictsNewRecovered(metaData),
     getDistrictsFrozenIncidenceHistory(metaData, 3),
   ]);
 
@@ -90,16 +87,14 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     return {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
-      recovered:
-        getDistrictByAGS(districtsRecoveredData, district.ags)?.recovered ?? 0,
       weekIncidence: (district.casesPerWeek / district.population) * 100000,
       casesPer100k: (district.cases / district.population) * 100000,
       delta: {
-        cases: getDistrictByAGS(districtNewCasesData, district.ags)?.cases ?? 0,
+        cases: getDistrictByAGS(districtsNewCases, district.ags)?.cases ?? 0,
         deaths:
-          getDistrictByAGS(districtNewDeathsData, district.ags)?.deaths ?? 0,
+          getDistrictByAGS(districtsNewDeaths, district.ags)?.deaths ?? 0,
         recovered:
-          getDistrictByAGS(districtNewRecoveredData, district.ags)?.recovered ??
+          getDistrictByAGS(districtsNewRecovered, district.ags)?.recovered ??
           0,
         weekIncidence: limit(
           (district.casesPerWeek / district.population) * 100000 -
@@ -156,7 +151,7 @@ export async function DistrictsCasesHistoryResponse(
   if (metaData == null) {
     metaData = await getMetaData();
   }
-  const districtsHistoryData = await getLastDistrictCasesHistory(
+  const districtsHistoryData = await getDistrictsCasesHistory(
     metaData,
     days,
     ags
@@ -256,7 +251,7 @@ export async function DistrictsDeathsHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const districtsHistoryData = await getLastDistrictDeathsHistory(
+  const districtsHistoryData = await getDistrictsDeathsHistory(
     metaData,
     days,
     ags
@@ -299,7 +294,7 @@ export async function DistrictsRecoveredHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const districtsHistoryData = await getLastDistrictRecoveredHistory(
+  const districtsHistoryData = await getDistrictsRecoveredHistory(
     metaData,
     days,
     ags

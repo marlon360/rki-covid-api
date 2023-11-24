@@ -1,38 +1,38 @@
 import { ResponseData } from "./response-data";
 import {
   getDateBefore,
-  getCasesStatesJson,
-  getCasesHistoryStatesJson,
-  getAgeGroupStatesJson,
+  getStatesCasesJson,
+  getStatesCasesHistoryJson,
+  getStatesAgeGroupJson,
   MetaData,
 } from "../utils";
 
-export async function getCases(
+export async function getGermanyCases(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].accuCases,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].accuCases,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getNewCases(
+export async function getGermanyNewCases(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].newCases,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].newCases,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastCasesHistory(
+export async function getGermanyCasesHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { cases: number; date: Date }[]; lastUpdate: Date }> {
-  const data = await getCasesHistoryStatesJson(metaData);
-  let history = data.data
+  const json = await getStatesCasesHistoryJson(metaData);
+  let history = json.data
     .filter((state) => state.IdBundesland == "00")
     .map((state) => {
       return {
@@ -46,16 +46,16 @@ export async function getLastCasesHistory(
   }
   return {
     history: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastDeathsHistory(
+export async function getGermanyDeathsHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { deaths: number; date: Date }[]; lastUpdate: Date }> {
-  const data = await getCasesHistoryStatesJson(metaData);
-  let history = data.data
+  const json = await getStatesCasesHistoryJson(metaData);
+  let history = json.data
     .filter((state) => state.IdBundesland == "00")
     .map((state) => {
       return {
@@ -69,16 +69,16 @@ export async function getLastDeathsHistory(
   }
   return {
     history: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getLastRecoveredHistory(
+export async function getGermanyRecoveredHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { recovered: number; date: Date }[]; lastUpdate: Date }> {
-  const data = await getCasesHistoryStatesJson(metaData);
-  let history = data.data
+  const json = await getStatesCasesHistoryJson(metaData);
+  let history = json.data
     .filter((state) => state.IdBundesland == "00")
     .map((state) => {
       return {
@@ -92,47 +92,47 @@ export async function getLastRecoveredHistory(
   }
   return {
     history: history,
-    lastUpdate: new Date(data.metaData.modified),
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getDeaths(
+export async function getGermanyDeaths(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].accuDeaths,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].accuDeaths,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getNewDeaths(
+export async function getGermanyNewDeaths(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].newDeaths,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].newDeaths,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getRecovered(
+export async function getGermanyRecovered(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].accuRecovered,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].accuRecovered,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
-export async function getNewRecovered(
+export async function getGermanyNewRecovered(
   metaData: MetaData
 ): Promise<ResponseData<number>> {
-  const data = await getCasesStatesJson(metaData);
+  const json = await getStatesCasesJson(metaData);
   return {
-    data: data.data[0].newRecovered,
-    lastUpdate: new Date(data.metaData.modified),
+    data: json.data[0].newRecovered,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
 
@@ -150,10 +150,9 @@ export interface AgeGroupData {
 export async function getGermanyAgeGroups(
   metaData: MetaData
 ): Promise<ResponseData<{ [ageGroup: string]: AgeGroupData }>> {
-  const data = await getAgeGroupStatesJson(metaData);
-  const lastUpdate = new Date(metaData.modified);
+  const json = await getStatesAgeGroupJson(metaData);
   let germany_data: { [ageGroup: string]: AgeGroupData } = {};
-  data.data.forEach((entry) => {
+  json.data.forEach((entry) => {
     if (entry.Altersgruppe == "unbekannt") return;
     // germany has BundeslandId=0
     if (parseInt(entry.IdBundesland) === 0) {
@@ -169,9 +168,8 @@ export async function getGermanyAgeGroups(
       };
     }
   });
-
   return {
     data: germany_data,
-    lastUpdate,
+    lastUpdate: new Date(json.metaData.modified),
   };
 }
