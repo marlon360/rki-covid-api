@@ -108,10 +108,10 @@ export async function ColorsPerDay(
   region: Region
 ): Promise<ColorsPerDay> {
   // initialize history and regions data variable
-  const start = new Date().getTime();
   let regionsCasesHistory;
   let regionsData;
   // request the data depending on region
+  const getCasesStart = new Date().getTime();
   if (region == Region.districts) {
     regionsCasesHistory = (
       await DistrictsCasesHistoryResponse(null, null, metaData)
@@ -123,9 +123,13 @@ export async function ColorsPerDay(
     ).data;
     regionsData = await getStatesData(metaData);
   }
+  const getCasesEnd = new Date().getTime();
+  let logtime = new Date().toISOString().substring(0, 19);
+  console.log(`${logtime}: ${region} get cases history time: ${(getCasesEnd - getCasesStart) / 1000} seconds`);
   const colorsPerDay: ColorsPerDay = {};
   const mAMPerDay: MAMPerDay = {};
   // build region incidence color history
+  const start = new Date().getTime();
   for (const key of Object.keys(regionsCasesHistory)) {
     const regionHistory = regionsCasesHistory[key].history;
     const keyToUse =
@@ -191,7 +195,7 @@ export async function ColorsPerDay(
     colorsPerDay[date].max = { color: mAMPerDay[date].maxColor };
   }
   const stop = new Date().getTime();
-  const logtime = new Date().toISOString().substring(0, 18);
+  logtime = new Date().toISOString().substring(0, 19);
   console.log(
     `${logtime}: ${region} colorsPerDay creation time: ${(stop - start) / 1000} seconds`
   );
@@ -420,7 +424,7 @@ export async function VideoResponse(
       }
     }
     let stop = new Date().getTime();
-    let logtime = new Date().toISOString().substring(0, 18);
+    let logtime = new Date().toISOString().substring(0, 19);
     console.log(
       `${logtime}: ${region}; new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${(stop - start) / 1000} seconds`
     );
@@ -532,7 +536,7 @@ export async function VideoResponse(
         );
       });
       let stop = new Date().getTime();
-      let logtime = new Date().toISOString().substring(0, 18);
+      let logtime = new Date().toISOString().substring(0, 19);
       console.log(
         `${logtime}: ${region} frames promises creation time: ${(stop - start) / 1000} seconds`
       );
@@ -540,7 +544,7 @@ export async function VideoResponse(
       start = new Date().getTime();
       await Promise.all(promises);
       stop = new Date().getTime();
-      logtime = new Date().toISOString().substring(0, 18);
+      logtime = new Date().toISOString().substring(0, 19);
       console.log(
         `${logtime}: ${region} frames promises execution time: ${(stop - start) / 1000} seconds`
       );
@@ -587,7 +591,7 @@ export async function VideoResponse(
     lockFile
   );
   const stop = new Date().getTime();
-  const logtime = new Date().toISOString().substring(0, 18);
+  const logtime = new Date().toISOString().substring(0, 19);
   console.log(
     `${logtime}: ${region} video rendering time: ${(stop - start) / 1000} seconds.`
   );
