@@ -2,7 +2,7 @@ import { ResponseData } from "./response-data";
 import {
   getDateBefore,
   getStatesCasesJson,
-  getStatesCasesHistoryJson,
+  getStatesHistoryJson,
   getStatesAgeGroupJson,
   MetaData,
 } from "../utils";
@@ -31,13 +31,13 @@ export async function getGermanyCasesHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { cases: number; date: Date }[]; lastUpdate: Date }> {
-  const json = await getStatesCasesHistoryJson(metaData);
+  const json = await getStatesHistoryJson(metaData);
   let history = json.data
-    .filter((state) => state.IdBundesland == "00")
+    .filter((state) => state.i == "00")
     .map((state) => {
       return {
-        cases: state.cases,
-        date: new Date(state.Meldedatum),
+        cases: state.c,
+        date: new Date(state.m),
       };
     });
   if (days) {
@@ -54,13 +54,13 @@ export async function getGermanyDeathsHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { deaths: number; date: Date }[]; lastUpdate: Date }> {
-  const json = await getStatesCasesHistoryJson(metaData);
+  const json = await getStatesHistoryJson(metaData);
   let history = json.data
-    .filter((state) => state.IdBundesland == "00")
+    .filter((state) => state.i == "00")
     .map((state) => {
       return {
-        deaths: state.deaths,
-        date: new Date(state.Meldedatum),
+        deaths: state.d,
+        date: new Date(state.m),
       };
     });
   if (days) {
@@ -77,13 +77,13 @@ export async function getGermanyRecoveredHistory(
   metaData: MetaData,
   days?: number
 ): Promise<{ history: { recovered: number; date: Date }[]; lastUpdate: Date }> {
-  const json = await getStatesCasesHistoryJson(metaData);
+  const json = await getStatesHistoryJson(metaData);
   let history = json.data
-    .filter((state) => state.IdBundesland == "00")
+    .filter((state) => state.i == "00")
     .map((state) => {
       return {
-        recovered: state.recovered,
-        date: new Date(state.Meldedatum),
+        recovered: state.r,
+        date: new Date(state.m),
       };
     });
   if (days) {

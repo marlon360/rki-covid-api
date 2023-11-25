@@ -2,7 +2,7 @@ import {
   getDateBefore,
   getStateAbbreviationById,
   getStatesCasesJson,
-  getStatesCasesHistoryJson,
+  getStatesHistoryJson,
   getStatesAgeGroupJson,
   MetaData,
 } from "../utils";
@@ -97,7 +97,7 @@ export async function getStatesCasesHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; cases: number; date: Date }[]>
 > {
-  const json = await getStatesCasesHistoryJson(metaData);
+  const json = await getStatesHistoryJson(metaData);
   let history: {
     id: number;
     name: string;
@@ -105,10 +105,10 @@ export async function getStatesCasesHistory(
     date: Date;
   }[] = json.data.map((state) => {
     return {
-      id: parseInt(state.IdBundesland),
-      name: state.Bundesland,
-      cases: state.cases,
-      date: new Date(state.Meldedatum),
+      id: parseInt(state.i),
+      name: state.b,
+      cases: state.c,
+      date: new Date(state.m),
     };
   });
   if (id) {
@@ -133,7 +133,7 @@ export async function getStatesDeathsHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; deaths: number; date: Date }[]>
 > {
-  const json = await getStatesCasesHistoryJson(metaData);
+  const json = await getStatesHistoryJson(metaData);
   let history: {
     id: number;
     name: string;
@@ -141,10 +141,10 @@ export async function getStatesDeathsHistory(
     date: Date;
   }[] = json.data.map((state) => {
     return {
-      id: parseInt(state.IdBundesland),
-      name: state.Bundesland,
-      deaths: state.deaths,
-      date: new Date(state.Meldedatum),
+      id: parseInt(state.i),
+      name: state.b,
+      deaths: state.d,
+      date: new Date(state.m),
     };
   });
   if (id) {
@@ -169,7 +169,7 @@ export async function getStatesRecoveredHistory(
 ): Promise<
   ResponseData<{ id: number; name: string; recovered: number; date: Date }[]>
 > {
-  let json = await getStatesCasesHistoryJson(metaData);
+  let json = await getStatesHistoryJson(metaData);
   let history: {
     id: number;
     name: string;
@@ -177,10 +177,10 @@ export async function getStatesRecoveredHistory(
     date: Date;
   }[] = json.data.map((state) => {
     return {
-      id: parseInt(state.IdBundesland),
-      name: state.Bundesland,
-      recovered: state.recovered,
-      date: new Date(state.Meldedatum),
+      id: parseInt(state.i),
+      name: state.b,
+      recovered: state.r,
+      date: new Date(state.m),
     };
   });
   if (id) {

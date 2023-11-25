@@ -124,7 +124,11 @@ export async function ColorsPerDay(
   }
   const getCasesEnd = new Date().getTime();
   let logtime = new Date().toISOString().substring(0, 19);
-  console.log(`${logtime}: ${region} get cases history time: ${(getCasesEnd - getCasesStart) / 1000} seconds`);
+  console.log(
+    `${logtime}: ${region} get cases history time: ${
+      (getCasesEnd - getCasesStart) / 1000
+    } seconds`
+  );
   const colorsPerDay: ColorsPerDay = {};
   const mAMPerDay: MAMPerDay = {};
   // build region incidence color history
@@ -196,7 +200,9 @@ export async function ColorsPerDay(
   const stop = new Date().getTime();
   logtime = new Date().toISOString().substring(0, 19);
   console.log(
-    `${logtime}: ${region} colorsPerDay creation time: ${(stop - start) / 1000} seconds`
+    `${logtime}: ${region} colorsPerDay creation time: ${
+      (stop - start) / 1000
+    } seconds`
   );
   return colorsPerDay;
 }
@@ -425,7 +431,9 @@ export async function VideoResponse(
     let stop = new Date().getTime();
     let logtime = new Date().toISOString().substring(0, 19);
     console.log(
-      `${logtime}: ${region} new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${(stop - start) / 1000} seconds`
+      `${logtime}: ${region} new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${
+        (stop - start) / 1000
+      } seconds`
     );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
@@ -537,7 +545,9 @@ export async function VideoResponse(
       let stop = new Date().getTime();
       let logtime = new Date().toISOString().substring(0, 19);
       console.log(
-        `${logtime}: ${region} frames promises creation time: ${(stop - start) / 1000} seconds`
+        `${logtime}: ${region} frames promises creation time: ${
+          (stop - start) / 1000
+        } seconds`
       );
       // await all frames promises
       start = new Date().getTime();
@@ -545,7 +555,9 @@ export async function VideoResponse(
       stop = new Date().getTime();
       logtime = new Date().toISOString().substring(0, 19);
       console.log(
-        `${logtime}: ${region} frames promises execution time: ${(stop - start) / 1000} seconds`
+        `${logtime}: ${region} frames promises execution time: ${
+          (stop - start) / 1000
+        } seconds`
       );
     }
     // wait for unlocked status.json
@@ -592,7 +604,9 @@ export async function VideoResponse(
   const stop = new Date().getTime();
   const logtime = new Date().toISOString().substring(0, 19);
   console.log(
-    `${logtime}: ${region} video rendering time: ${(stop - start) / 1000} seconds.`
+    `${logtime}: ${region} video rendering time: ${
+      (stop - start) / 1000
+    } seconds.`
   );
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {

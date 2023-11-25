@@ -635,44 +635,43 @@ export async function getStatesCasesJson(
   return statesCasesJson;
 }
 
-export interface StatesCasesHistoryJson {
+export interface StatesHistoryJson {
   data: {
-    Meldedatum: Date;
-    IdBundesland: string;
-    Bundesland: string;
-    cases: number;
-    deaths: number;
-    Datenstand: Date;
-    recovered: number;
+    m: Date;
+    i: string;
+    b: string;
+    c: number;
+    d: number;
+    r: number;
   }[];
   metaData: MetaData;
 }
 
-export async function getStatesCasesHistoryJson(
+export async function getStatesHistoryJson(
   metaData: MetaData
-): Promise<StatesCasesHistoryJson> {
-  let statesCasesHistoryJson: StatesCasesHistoryJson = {
+): Promise<StatesHistoryJson> {
+  let statesHistoryJson: StatesHistoryJson = {
     data: undefined,
     metaData: undefined,
   };
   let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
-  const redisEntryStatesCasesHistoryJson = await GetRedisEntry(
+  const redisEntryStatesHistoryJson = await GetRedisEntry(
     redisClientBas,
-    "statesCasesHistoryJson"
+    "statesHistoryJson"
   );
-  if (redisEntryStatesCasesHistoryJson.length == 1) {
-    statesCasesHistoryJson = JSON.parse(
-      redisEntryStatesCasesHistoryJson[0].body,
+  if (redisEntryStatesHistoryJson.length == 1) {
+    statesHistoryJson = JSON.parse(
+      redisEntryStatesHistoryJson[0].body,
       dateReviver
     );
-    const oldModified = statesCasesHistoryJson.metaData.modified;
+    const oldModified = statesHistoryJson.metaData.modified;
     const modified = metaData.modified;
     newerDataAvail = modified > oldModified;
   }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryStatesCasesHistoryJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/states.json.xz`;
+  if (redisEntryStatesHistoryJson.length == 0 || newerDataAvail) {
+    const url = `${baseUrl}history/states_new.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
@@ -683,22 +682,19 @@ export async function getStatesCasesHistoryJson(
       lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    statesCasesHistoryJson.data = JSON.parse(
-      decompressed.toString(),
-      dateReviver
-    );
-    statesCasesHistoryJson.metaData = metaData;
-    const redisStatesCasesHistory = JSON.stringify(statesCasesHistoryJson);
+    statesHistoryJson.data = JSON.parse(decompressed.toString(), dateReviver);
+    statesHistoryJson.metaData = metaData;
+    const redisStatesHistory = JSON.stringify(statesHistoryJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
-      "statesCasesHistoryJson",
-      redisStatesCasesHistory,
+      "statesHistoryJson",
+      redisStatesHistory,
       neverExpire,
       "json"
     );
   }
-  return statesCasesHistoryJson;
+  return statesHistoryJson;
 }
 
 interface DistrictsCasesJson {
@@ -773,44 +769,43 @@ export async function getDistrictsCasesJson(
   return districtsCasesJson;
 }
 
-interface DistrictsCasesHistoryJson {
+interface DistrictsHistoryJson {
   data: {
-    IdLandkreis: string;
-    Meldedatum: Date;
-    Landkreis: string;
-    cases: number;
-    deaths: number;
-    Datenstand: Date;
-    recovered: number;
+    i: string;
+    m: Date;
+    l: string;
+    c: number;
+    d: number;
+    r: number;
   }[];
   metaData: MetaData;
 }
 
-export async function getDistrictsCasesHistoryJson(
+export async function getDistrictsHistoryJson(
   metaData: MetaData
-): Promise<DistrictsCasesHistoryJson> {
-  let districtsCasesHistoryJson: DistrictsCasesHistoryJson = {
+): Promise<DistrictsHistoryJson> {
+  let districtsHistoryJson: DistrictsHistoryJson = {
     data: undefined,
     metaData: undefined,
   };
   let newerDataAvail = false;
   // check if a redis entry for cases exists, if yes use it
-  const redisEntryDistrictsCasesHistoryJson = await GetRedisEntry(
+  const redisEntryDistrictsHistoryJson = await GetRedisEntry(
     redisClientBas,
-    "districtsCasesHistoryJson"
+    "districtsHistoryJson"
   );
-  if (redisEntryDistrictsCasesHistoryJson.length == 1) {
-    districtsCasesHistoryJson = JSON.parse(
-      redisEntryDistrictsCasesHistoryJson[0].body,
+  if (redisEntryDistrictsHistoryJson.length == 1) {
+    districtsHistoryJson = JSON.parse(
+      redisEntryDistrictsHistoryJson[0].body,
       dateReviver
     );
-    const oldModified = districtsCasesHistoryJson.metaData.modified;
+    const oldModified = districtsHistoryJson.metaData.modified;
     const modified = metaData.modified;
     newerDataAvail = modified > oldModified;
   }
   // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryDistrictsCasesHistoryJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/districts.json.xz`;
+  if (redisEntryDistrictsHistoryJson.length == 0 || newerDataAvail) {
+    const url = `${baseUrl}history/districts_new.json.xz`;
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
     if (rdata.error) {
@@ -821,24 +816,22 @@ export async function getDistrictsCasesHistoryJson(
       lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
     // prepare data for redis
-    districtsCasesHistoryJson.data = JSON.parse(
+    districtsHistoryJson.data = JSON.parse(
       decompressed.toString(),
       dateReviver
     );
-    districtsCasesHistoryJson.metaData = metaData;
-    const redisDistrictsCasesHistory = JSON.stringify(
-      districtsCasesHistoryJson
-    );
+    districtsHistoryJson.metaData = metaData;
+    const redisDistrictsHistory = JSON.stringify(districtsHistoryJson);
     // create redis Entry for metaData
     await AddRedisEntry(
       redisClientBas,
-      "districtsCasesHistoryJson",
-      redisDistrictsCasesHistory,
+      "districtsHistoryJson",
+      redisDistrictsHistory,
       neverExpire,
       "json"
     );
   }
-  return districtsCasesHistoryJson;
+  return districtsHistoryJson;
 }
 
 interface StatesAgeGroup {

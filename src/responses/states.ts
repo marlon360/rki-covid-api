@@ -345,11 +345,7 @@ export async function StatesRecoveredHistoryResponse(
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
   const metaData = await getMetaData();
-  const statesHistoryData = await getStatesRecoveredHistory(
-    metaData,
-    days,
-    id
-  );
+  const statesHistoryData = await getStatesRecoveredHistory(metaData, days, id);
   const highDate = new Date(
     AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   ); //highest date, witch is "datenstand" -1

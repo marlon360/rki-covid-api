@@ -91,11 +91,9 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       casesPer100k: (district.cases / district.population) * 100000,
       delta: {
         cases: getDistrictByAGS(districtsNewCases, district.ags)?.cases ?? 0,
-        deaths:
-          getDistrictByAGS(districtsNewDeaths, district.ags)?.deaths ?? 0,
+        deaths: getDistrictByAGS(districtsNewDeaths, district.ags)?.deaths ?? 0,
         recovered:
-          getDistrictByAGS(districtsNewRecovered, district.ags)?.recovered ??
-          0,
+          getDistrictByAGS(districtsNewRecovered, district.ags)?.recovered ?? 0,
         weekIncidence: limit(
           (district.casesPerWeek / district.population) * 100000 -
             yesterdayIncidence,
@@ -172,7 +170,9 @@ export async function DistrictsCasesHistoryResponse(
   );
   const end = new Date().getTime();
   const logtime = new Date().toISOString().substring(0, 19);
-  console.log(`${logtime}: districts fill 0 days time: ${(end - start) / 1000} seconds`);
+  console.log(
+    `${logtime}: districts fill 0 days time: ${(end - start) / 1000} seconds`
+  );
   return {
     data,
     meta: new ResponseMeta(districtsHistoryData.lastUpdate),
