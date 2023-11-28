@@ -433,7 +433,7 @@ export async function VideoResponse(
     console.log(
       `${logtime}: ${region} new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${
         (stop - start) / 1000
-      } seconds`
+      } seconds.`
     );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
@@ -515,7 +515,7 @@ export async function VideoResponse(
         `${logtime}: ${region} frames promises creation time: ${
           (stop - start) / 1000
         } seconds. (${
-          (((stop - start) / (newFrames + changedFrames)) * 60) / 1000
+          (((newFrames + changedFrames) / (stop - start)) * 60) / 1000
         } framePromises per minute)`
       );
       // await all frames promises
@@ -527,7 +527,7 @@ export async function VideoResponse(
         `${logtime}: ${region} frames promises execution time: ${
           (stop - start) / 1000
         } seconds. (${
-          (((stop - start) / (newFrames + changedFrames)) * 60) / 1000
+          (((newFrames + changedFrames) / (stop - start)) * 60) / 1000
         } frames per minute)`
       );
     }
