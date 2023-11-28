@@ -154,7 +154,6 @@ export async function DistrictsCasesHistoryResponse(
     days,
     ags
   );
-  const start = new Date().getTime();
   const highDate = new Date(
     AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
   );
@@ -167,11 +166,6 @@ export async function DistrictsCasesHistoryResponse(
     highDate,
     RegionType.districts,
     RequestType.cases
-  );
-  const end = new Date().getTime();
-  const logtime = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime}: districts fill 0 days time: ${(end - start) / 1000} seconds`
   );
   return {
     data,

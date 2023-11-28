@@ -101,15 +101,7 @@ export async function getDistrictsCasesHistory(
 ): Promise<
   ResponseData<{ ags: string; name: string; cases: number; date: Date }[]>
 > {
-  const start = new Date().getTime();
   let json = await getDistrictsHistoryJson(metaData);
-  const end = new Date().getTime();
-  const logtime = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime}: districts get cases history json data time: ${
-      (end - start) / 1000
-    } seconds`
-  );
   let history: {
     ags: string;
     name: string;
@@ -131,13 +123,6 @@ export async function getDistrictsCasesHistory(
     ags = ags.padStart(5, "0");
     history = history.filter((entry) => entry.ags == ags);
   }
-  const end2 = new Date().getTime();
-  const logtime2 = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime2}: districts json data mapping time: ${
-      (end2 - end) / 1000
-    } seconds`
-  );
   return {
     data: history,
     lastUpdate: new Date(json.metaData.modified),

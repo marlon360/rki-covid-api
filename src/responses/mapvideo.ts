@@ -514,7 +514,9 @@ export async function VideoResponse(
       console.log(
         `${logtime}: ${region} frames promises creation time: ${
           (stop - start) / 1000
-        } seconds`
+        } seconds. (${
+          (((stop - start) / (newFrames + changedFrames)) * 60) / 1000
+        } framePromises per minute)`
       );
       // await all frames promises
       start = new Date().getTime();
@@ -524,7 +526,9 @@ export async function VideoResponse(
       console.log(
         `${logtime}: ${region} frames promises execution time: ${
           (stop - start) / 1000
-        } seconds`
+        } seconds. (${
+          (((stop - start) / (newFrames + changedFrames)) * 60) / 1000
+        } frames per minute)`
       );
     }
     // wait for unlocked status.json
