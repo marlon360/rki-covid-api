@@ -23,7 +23,7 @@ import {
   getStateIdByName,
   getMetaData,
 } from "../utils";
-import { MAM, MAMGrouped } from "./mapvideo";
+import { MAMGrouped } from "./mapvideo";
 
 export enum mapTypes {
   map = "withoutLegend",
@@ -361,7 +361,6 @@ export function getMapBackground(
   hline: string,
   date: Date,
   rngs: ColorRange[],
-  mAM?: MAM[],
   mAMG?: MAMGrouped
 ): Buffer {
   const dbrd = 32; // down border for the legend
@@ -399,22 +398,31 @@ export function getMapBackground(
           </g>`;
           })}
           ${
-            mAM != null
-              ? mAM.map((ety, ind) => {
-                  return `
-          <g id="${ety.name}" transform="translate(0, ${
-                    ySt - rngs.length * 40 - ind * 20
-                  })">
-            <circle fill="${ety.nCol}" cx="5" cy="${
-                    15 - ind * 5
-                  }" r="5"></circle>
-            <text x="18" y="${
-              19 - ind * 5
-            }" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
-              <tspan>${ety.name} incidence is in this range</tspan>
-            </text>
-          </g>`;
-                })
+            mAMG != null
+              ? `<g id="min" transform="translate(0, ${
+                  ySt - rngs.length * 40
+                })">
+                  <circle fill="green" cx="5" cy="15" r="5"></circle>
+                  <text x="18" y="19" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
+                    <tspan>min incidence is in this range</tspan>
+                  </text>
+                </g>
+                <g id="avg" transform="translate(0, ${
+                  ySt - rngs.length * 40 - 20
+                })">
+                  <circle fill="orange" cx="5" cy="10" r="5"></circle>
+                  <text x="18" y="14" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
+                    <tspan>avg incidence is in this range</tspan>
+                  </text>
+                </g>
+                <g id="max" transform="translate(0, ${
+                  ySt - rngs.length * 40 - 40
+                })">
+                  <circle fill="red" cx="5" cy="5" r="5"></circle>
+                  <text x="18" y="9" font-family="Arial" font-size="12" font-weight="normal" fill="${texC}">
+                    <tspan>max incidence is in this range</tspan>
+                  </text>
+                </g>`
               : ""
           }
           ${
