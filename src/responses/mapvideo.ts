@@ -211,6 +211,9 @@ export async function VideoResponse(
   const refDate = getDateBeforeDate(metaData.version, 1);
   // the path to stored incidence per day files and status
   const incidenceDataPath = "./dayPics/";
+  if (!fs.existsSync(incidenceDataPath)) {
+    fs.mkdirSync(incidenceDataPath);
+  }
   // path and filename for status.json
   const statusFileName = `${incidenceDataPath}status.json`;
   // path and filename for status lockfile
@@ -325,13 +328,20 @@ export async function VideoResponse(
       : Math.floor(numberOfFrames / videoduration);
 
   // video file name that is requested
+  const videoPath = "./videos";
+  if (!fs.existsSync(videoPath)) {
+    fs.mkdirSync(videoPath);
+  }
   const daysStr = days.toString().padStart(4, "0");
   const durationStr = videoduration.toString().padStart(4, "0");
   const nowTimeOnly = new Date().toISOString().split("T")[1];
   const created = new Date(`${refDate}T${nowTimeOnly}`).getTime();
-  const mp4FileName = `./videos/${region}_${refDate}_Days${daysStr}_Duration${durationStr}.mp4`;
+  const mp4FileName = `${videoPath}/${region}_${refDate}_Days${daysStr}_Duration${durationStr}.mp4`;
   // path where the differend frames are stored
   const dayPicsPath = `./dayPics/${region}/`;
+  if (!fs.existsSync(dayPicsPath)) {
+    fs.mkdirSync(dayPicsPath);
+  }
   // check if requested video exist, if yes return the path
   if (fs.existsSync(mp4FileName)) {
     return { filename: mp4FileName };
