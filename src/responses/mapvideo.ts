@@ -102,7 +102,6 @@ export async function ColorsPerDay(
   let casesHistory;
   let regionsData;
   // request the data depending on region
-  const getCasesStart = new Date().getTime();
   if (region == Region.districts) {
     [casesHistory, regionsData] = await Promise.all([
       DistrictsCasesHistoryResponse(null, null, metaData),
@@ -114,17 +113,9 @@ export async function ColorsPerDay(
       getStatesData(metaData),
     ]);
   }
-  const getCasesEnd = new Date().getTime();
-  let logtime = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime}: ${region} get cases history time: ${
-      (getCasesEnd - getCasesStart) / 1000
-    } seconds`
-  );
   const cPerDay: CperDay = {};
   const mAMPerDay: MAMPerDay = {};
   // build region incidence color history
-  const start = new Date().getTime();
   for (const idKey of Object.keys(casesHistory.data)) {
     const regionHistory = casesHistory.data[idKey].history;
     const keyToUse =
@@ -188,13 +179,6 @@ export async function ColorsPerDay(
     cPerDay[date].avg = { cInd: mAMPerDay[date].avgInd };
     cPerDay[date].max = { cInd: mAMPerDay[date].maxInd };
   }
-  const stop = new Date().getTime();
-  logtime = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime}: ${region} colorsPerDay creation time: ${
-      (stop - start) / 1000
-    } seconds`
-  );
   return cPerDay;
 }
 
@@ -206,7 +190,6 @@ export async function VideoResponse(
 ): Promise<{ filename: string }> {
   // get the actual meta data
   const metaData = await getMetaData();
-
   // set the reference date
   const refDate = getDateBeforeDate(metaData.version, 1);
   // the path to stored incidence per day files and status
@@ -217,7 +200,7 @@ export async function VideoResponse(
   // path and filename for status.json
   const statusFileName = `${incidenceDataPath}status.json`;
   // path and filename for status lockfile
-  const statusLockFile = `${incidenceDataPath}status.lockfile`;
+  const statusLockFile = `${incidenceDataPath}status.lock`;
   // init status
   let status: Status;
 
@@ -242,7 +225,6 @@ export async function VideoResponse(
     };
     fs.writeFileSync(statusFileName, JSON.stringify(initialStatus));
   }
-
   //check if incidencesPerDay_date.json exists
   let cPerDay: CperDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
@@ -326,7 +308,6 @@ export async function VideoResponse(
       : Math.floor(numberOfFrames / videoduration) > 25
       ? 25
       : Math.floor(numberOfFrames / videoduration);
-
   // video file name that is requested
   const videoPath = "./videos";
   if (!fs.existsSync(videoPath)) {
@@ -348,7 +329,7 @@ export async function VideoResponse(
   }
 
   // lockfilename
-  const lockFile = `./dayPics/${region}.lockfile`;
+  const lockFile = `./dayPics/${region}.lock`;
 
   // check if the lockfile exist,
   // witch meens that the single frames (region) or one video (region) is calculating now by a other process
@@ -406,39 +387,26 @@ export async function VideoResponse(
     }
 
     // find all days that changed one or more colors, and store this key to allDiffs
-    let start = new Date().getTime();
     let allDiffs = [];
-    let newFrames = 0;
-    let changedFrames = 0;
     for (const date of cPerDayKeys) {
       // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
       if (!oldCPerDay[date]) {
         allDiffs.push(date);
-        newFrames += 1;
       } else {
         // else test every regionKey for changed colors,
         for (const rgnKy of Object.keys(cPerDay[date])) {
           if (isDiffernd(cPerDay[date][rgnKy], oldCPerDay[date][rgnKy])) {
             // push datekey to allDiffs[] if one color is differend,
             allDiffs.push(date);
-            changedFrames += 1;
             // and break this "for loop"
             break;
           }
         }
       }
     }
-    let stop = new Date().getTime();
-    let logtime = new Date().toISOString().substring(0, 19);
-    console.log(
-      `${logtime}: ${region} new frames: ${newFrames}; changed frames: ${changedFrames}; calculation time: ${
-        (stop - start) / 1000
-      } seconds.`
-    );
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
-      let start = new Date().getTime();
       const firstDate = new Date(cPerDayKeys[0]).getTime();
       const promises = [];
       allDiffs.forEach((date) => {
@@ -509,27 +477,8 @@ export async function VideoResponse(
             .toFile(frameName)
         );
       });
-      let stop = new Date().getTime();
-      let logtime = new Date().toISOString().substring(0, 19);
-      console.log(
-        `${logtime}: ${region} frames promises creation time: ${
-          (stop - start) / 1000
-        } seconds. (${
-          (newFrames + changedFrames) / ((stop - start) / 1000)
-        } framePromises per second.)`
-      );
       // await all frames promises
-      start = new Date().getTime();
       await Promise.all(promises);
-      stop = new Date().getTime();
-      logtime = new Date().toISOString().substring(0, 19);
-      console.log(
-        `${logtime}: ${region} frames promises execution time: ${
-          (stop - start) / 1000
-        } seconds. (${
-          (newFrames + changedFrames) / ((stop - start) / 1000)
-        } frames per second.)`
-      );
     }
     // wait for unlocked status.json
     if (fs.existsSync(statusLockFile)) {
@@ -564,20 +513,12 @@ export async function VideoResponse(
   ffmpeg.setFfmpegPath(ffmpegStatic);
 
   // calculate the requested video
-  const start = new Date().getTime();
   const mp4out = await ffmpegSync(
     framesNameVideo,
     mp4FileName,
     frameRate.toString(),
     firstFrameNumber,
     lockFile
-  );
-  const stop = new Date().getTime();
-  const logtime = new Date().toISOString().substring(0, 19);
-  console.log(
-    `${logtime}: ${region} video rendering time: ${
-      (stop - start) / 1000
-    } seconds.`
   );
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {
@@ -627,9 +568,8 @@ export async function VideoResponse(
       fs.rmSync(`${incidenceDataPath + allJsonFiles[index]}`);
     }
   }
-
   // all done, remove region lockfile
   fs.rmSync(lockFile);
-
+  // return mp4filename
   return mp4out;
 }
