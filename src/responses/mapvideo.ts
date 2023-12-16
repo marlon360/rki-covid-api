@@ -455,11 +455,11 @@ export async function VideoResponse(
       } else {
         // else test every regionKey for changed colors,
         for (const rgnKy of Object.keys(cPerDay[date])) {
-          // dont compare avg, count and sum
-          if (rgnKy != "avg" && rgnKy != "count" && rgnKy != "sum") {
+          // dont compare count and sum (that are only helpers to calculate cPerDay)
+          if (rgnKy != "count" && rgnKy != "sum") {
             const newdata = cPerDay[date][rgnKy];
             const olddata = oldCPerDay[date][rgnKy];
-            if (isDiffernd(cPerDay[date][rgnKy], oldCPerDay[date][rgnKy])) {
+            if (isDiffernd(newdata, olddata)) {
               // push datekey to allDiffs[] if one color is differend,
               allDiffs.push(date);
               // and break this "for loop"
