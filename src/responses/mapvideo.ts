@@ -473,7 +473,7 @@ export async function VideoResponse(
     console.log(
       `${region}: find all diffs: ${
         (findDiffsEnd - findDiffsStart) / 1000
-      } seconds`
+      } seconds. ${allDiffs.length} changes.`
     );
     const createPromisesStart = new Date().getTime();
     // if length allDiffs[] > 0
