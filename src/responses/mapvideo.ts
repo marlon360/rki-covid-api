@@ -4,7 +4,6 @@ import StatesMap from "../maps/states.json";
 import { weekIncidenceColorRanges as IColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 import { getMapBackground } from "./map";
-import { DistrictsCasesHistoryResponse } from "./districts";
 import ffmpegStatic from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
@@ -12,12 +11,9 @@ import {
   getMetaData,
   getDateBeforeDate,
   MetaData,
-  getStateIdByAbbreviation,
-  RegionType,
+  getData,
+  Files,
 } from "../utils";
-import { getDistrictsData } from "../data-requests/districts";
-import { getStatesData } from "../data-requests/states";
-import { StatesCasesHistoryResponse } from "./states";
 
 interface Status {
   districts: boolean;
@@ -74,18 +70,6 @@ interface CperDay {
   };
 }
 
-interface MAMDayEntry {
-  sum: number;
-  count: number;
-  avgInd: number;
-  minInd: number;
-  maxInd: number;
-}
-
-interface MAMPerDay {
-  [date: string]: MAMDayEntry;
-}
-
 export interface MAMGrouped {
   [cind: number]: {
     rInd: number;
@@ -94,91 +78,122 @@ export interface MAMGrouped {
   }[];
 }
 
+interface FileNames {
+  [date: string]: {
+    oldFileName: string;
+    newFileName: string;
+  };
+}
 export async function ColorsPerDay(
   metaData: MetaData,
   region: Region
 ): Promise<CperDay> {
-  // initialize history and regions data variable
-  let casesHistory;
-  let regionsData;
+  let cPerDay: CperDay = {};
   // request the data depending on region
   if (region == Region.districts) {
-    [casesHistory, regionsData] = await Promise.all([
-      DistrictsCasesHistoryResponse(null, null, metaData),
-      getDistrictsData(metaData),
-    ]);
-  } else if (region == Region.states) {
-    [casesHistory, regionsData] = await Promise.all([
-      StatesCasesHistoryResponse(null, null, metaData),
-      getStatesData(metaData),
-    ]);
-  }
-  const cPerDay: CperDay = {};
-  const mAMPerDay: MAMPerDay = {};
-  // build region incidence color history
-  for (const idKey of Object.keys(casesHistory.data)) {
-    const regionHistory = casesHistory.data[idKey].history;
-    const keyToUse =
-      region == Region.districts
-        ? idKey
-        : getStateIdByAbbreviation(idKey).toString();
-    const population = regionsData.data.find(
-      (entry) => entry[RegionType[region]] == keyToUse
-    ).population;
-    for (let i = 6; i < regionHistory.length; i++) {
-      const dateKey = regionHistory[i].date.toISOString().split("T").shift();
-      let sum = 0;
-      for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-        sum += regionHistory[dayOffset].cases;
-      }
-      const incidence = (sum / population) * 100000;
-      const cInd = IColorRanges.findIndex((range) => {
-        if (range.compareFn) {
-          return range.compareFn(incidence, range);
-        } else {
-          return incidence > range.min && incidence <= range.max;
-        }
-      });
-      if (!cPerDay[dateKey]) {
-        cPerDay[dateKey] = {
-          [keyToUse]: { cInd: cInd },
-        };
-      } else {
-        cPerDay[dateKey][keyToUse] = { cInd: cInd };
-      }
-      if (!mAMPerDay[dateKey]) {
-        mAMPerDay[dateKey] = {
-          sum: incidence,
-          count: 1,
-          avgInd: cInd,
-          minInd: cInd,
-          maxInd: cInd,
-        };
-      } else {
-        const temp: MAMDayEntry = JSON.parse(
-          JSON.stringify(mAMPerDay[dateKey])
-        ); //independent copy!
-        temp.sum += incidence;
-        temp.count += 1;
-        const avgI = temp.sum / temp.count;
-        temp.avgInd = IColorRanges.findIndex((range) => {
+    cPerDay = (await getData(metaData, Files.D_IncidenceHistory)).data.reduce(
+      (newObj, entry) => {
+        const dateStr = new Date(entry.m).toISOString().split("T").shift();
+        const cInd = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
-            return range.compareFn(avgI, range);
+            return range.compareFn(entry.i7, range);
           } else {
-            return avgI > range.min && avgI <= range.max;
+            return entry.i7 > range.min && entry.i7 <= range.max;
           }
         });
-        temp.maxInd = Math.max(cInd, temp.maxInd);
-        temp.minInd = Math.min(cInd, temp.minInd);
-        mAMPerDay[dateKey] = temp;
-      }
-    }
+        let min: number;
+        let max: number;
+        let sum: number;
+        let count: number;
+        if (newObj[dateStr]) {
+          min = Math.min(newObj[dateStr].min.cInd, cInd);
+          max = Math.max(newObj[dateStr].max.cInd, cInd);
+          sum = newObj[dateStr].sum.cInd + entry.i7;
+          count = newObj[dateStr].count.cInd + 1;
+        } else {
+          min = cInd;
+          max = cInd;
+          sum = entry.i7;
+          count = 1;
+        }
+        const avg = sum / count;
+        const avgInd = IColorRanges.findIndex((range) => {
+          if (range.compareFn) {
+            return range.compareFn(avg, range);
+          } else {
+            return avg > range.min && avg <= range.max;
+          }
+        });
+        if (newObj[dateStr]) {
+          newObj[dateStr][entry.i] = { cInd: cInd };
+        } else {
+          newObj[dateStr] = {
+            ...(newObj[dateStr] || {}),
+            [entry.i]: { cInd: cInd },
+          };
+        }
+        newObj[dateStr].min = { cInd: min };
+        newObj[dateStr].max = { cInd: max };
+        newObj[dateStr].avg = { cInd: avgInd };
+        newObj[dateStr].sum = { cInd: sum };
+        newObj[dateStr].count = { cInd: count };
+        return newObj;
+      },
+      {}
+    );
+  } else if (region == Region.states) {
+    cPerDay = (await getData(metaData, Files.S_IncidenceHistory)).data
+      .filter((entry) => entry.i != "00")
+      .reduce((newObj, entry) => {
+        const dateStr = new Date(entry.m).toISOString().split("T").shift();
+        const cInd = IColorRanges.findIndex((range) => {
+          if (range.compareFn) {
+            return range.compareFn(entry.i7, range);
+          } else {
+            return entry.i7 > range.min && entry.i7 <= range.max;
+          }
+        });
+        let min: number;
+        let max: number;
+        let sum: number;
+        let count: number;
+        if (newObj[dateStr]) {
+          min = Math.min(newObj[dateStr].min.cInd, cInd);
+          max = Math.max(newObj[dateStr].max.cInd, cInd);
+          sum = newObj[dateStr].sum.cInd + entry.i7;
+          count = newObj[dateStr].count.cInd + 1;
+        } else {
+          min = cInd;
+          max = cInd;
+          sum = entry.i7;
+          count = 1;
+        }
+        const avg = sum / count;
+        const avgInd = IColorRanges.findIndex((range) => {
+          if (range.compareFn) {
+            return range.compareFn(avg, range);
+          } else {
+            return avg > range.min && avg <= range.max;
+          }
+        });
+        const id = parseInt(entry.i).toString();
+        if (newObj[dateStr]) {
+          newObj[dateStr][id] = { cInd: cInd };
+        } else {
+          newObj[dateStr] = {
+            ...(newObj[dateStr] || {}),
+            [id]: { cInd: cInd },
+          };
+        }
+        newObj[dateStr].min = { cInd: min };
+        newObj[dateStr].max = { cInd: max };
+        newObj[dateStr].avg = { cInd: avgInd };
+        newObj[dateStr].sum = { cInd: sum };
+        newObj[dateStr].count = { cInd: count };
+        return newObj;
+      }, {});
   }
-  for (const date of Object.keys(mAMPerDay)) {
-    cPerDay[date].min = { cInd: mAMPerDay[date].minInd };
-    cPerDay[date].avg = { cInd: mAMPerDay[date].avgInd };
-    cPerDay[date].max = { cInd: mAMPerDay[date].maxInd };
-  }
+
   return cPerDay;
 }
 
@@ -226,16 +241,29 @@ export async function VideoResponse(
     fs.writeFileSync(statusFileName, JSON.stringify(initialStatus));
   }
   //check if incidencesPerDay_date.json exists
+  const cPerDayStart = new Date().getTime();
   let cPerDay: CperDay = {};
   const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
     cPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
+    const cPerDayEnd = new Date().getTime();
+    console.log(
+      `${region}: get cPerDay from redis or file: ${
+        (cPerDayEnd - cPerDayStart) / 1000
+      } seconds`
+    );
   } else {
     // if region incidence per day data file not exists requst the data
     cPerDay = await ColorsPerDay(metaData, region);
     // store to disc
     const jsonData = JSON.stringify(cPerDay);
     fs.writeFileSync(jsonFileName, jsonData);
+    const cPerDayEnd = new Date().getTime();
+    console.log(
+      `${region}: get cPerDay calculated from incidenceFile: ${
+        (cPerDayEnd - cPerDayStart) / 1000
+      } seconds`
+    );
     // new incidencesPerDay , change status
     // wait for ulocked status.json file
     if (fs.existsSync(statusLockFile)) {
@@ -380,13 +408,45 @@ export async function VideoResponse(
         fs.readFileSync(oldRegionsColorsPerDayFile).toString()
       );
     }
+    // get a sorted list of old incidencePerDay keys
+    const oldCPerDayKeys = Object.keys(oldCPerDay).sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    );
+    // toDo build renaming file and rename frames on disk if start date change!
 
+    let fileNames: FileNames = {};
+    if (oldCPerDayKeys[0] != cPerDayKeys[0]) {
+      cPerDayKeys.forEach((date, index) => {
+        const newFrmNmbrStr = (index + 1).toString().padStart(4, "0");
+        const newFileName = framesFullPath.replace(
+          "F-0000",
+          `F-${newFrmNmbrStr}`
+        );
+        const oldIndex = oldCPerDayKeys.indexOf(date);
+        const oldFrmNmbrStr = (oldIndex + 1).toString().padStart(4, "0");
+        const oldFileName =
+          oldIndex == -1
+            ? null
+            : framesFullPath.replace("F-0000", `F-${oldFrmNmbrStr}`);
+        fileNames[date] = { oldFileName, newFileName };
+      });
+      cPerDayKeys.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
+      cPerDayKeys.forEach((date) => {
+        const oldName = fileNames[date].oldFileName;
+        const newName = fileNames[date].newFileName;
+        if (oldName) {
+          fs.renameSync(oldName, newName);
+        }
+      });
+      cPerDayKeys.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+    }
     // function to compare two Objects
     function isDiffernd(obj1, obj2) {
       return JSON.stringify(obj1) !== JSON.stringify(obj2);
     }
 
     // find all days that changed one or more colors, and store this key to allDiffs
+    const findDiffsStart = new Date().getTime();
     let allDiffs = [];
     for (const date of cPerDayKeys) {
       // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
@@ -395,15 +455,27 @@ export async function VideoResponse(
       } else {
         // else test every regionKey for changed colors,
         for (const rgnKy of Object.keys(cPerDay[date])) {
-          if (isDiffernd(cPerDay[date][rgnKy], oldCPerDay[date][rgnKy])) {
-            // push datekey to allDiffs[] if one color is differend,
-            allDiffs.push(date);
-            // and break this "for loop"
-            break;
+          // dont compare avg, count and sum
+          if (rgnKy != "avg" && rgnKy != "count" && rgnKy != "sum") {
+            const newdata = cPerDay[date][rgnKy];
+            const olddata = oldCPerDay[date][rgnKy];
+            if (isDiffernd(cPerDay[date][rgnKy], oldCPerDay[date][rgnKy])) {
+              // push datekey to allDiffs[] if one color is differend,
+              allDiffs.push(date);
+              // and break this "for loop"
+              break;
+            }
           }
         }
       }
     }
+    const findDiffsEnd = new Date().getTime();
+    console.log(
+      `${region}: find all diffs: ${
+        (findDiffsEnd - findDiffsStart) / 1000
+      } seconds`
+    );
+    const createPromisesStart = new Date().getTime();
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
@@ -477,8 +549,20 @@ export async function VideoResponse(
             .toFile(frameName)
         );
       });
+      const createPromisesEnd = new Date().getTime();
+      console.log(
+        `${region}: create Promises ${
+          (createPromisesEnd - createPromisesStart) / 1000
+        } seconds`
+      );
       // await all frames promises
       await Promise.all(promises);
+      const executePromisesEnd = new Date().getTime();
+      console.log(
+        `${region}: execute Promises ${
+          (executePromisesEnd - createPromisesEnd) / 1000
+        } seconds`
+      );
     }
     // wait for unlocked status.json
     if (fs.existsSync(statusLockFile)) {
@@ -513,12 +597,19 @@ export async function VideoResponse(
   ffmpeg.setFfmpegPath(ffmpegStatic);
 
   // calculate the requested video
+  const createVideoStart = new Date().getTime();
   const mp4out = await ffmpegSync(
     framesNameVideo,
     mp4FileName,
     frameRate.toString(),
     firstFrameNumber,
     lockFile
+  );
+  const createVideoEnd = new Date().getTime();
+  console.log(
+    `${region}: video rendering time ${
+      (createVideoEnd - createVideoStart) / 1000
+    } seconds`
   );
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {

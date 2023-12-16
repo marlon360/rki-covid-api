@@ -288,134 +288,6 @@ export function parseDate(dateString: string): Date {
   );
 }
 
-export enum RequestType {
-  cases = "cases",
-  recovered = "recovered",
-  deaths = "deaths",
-}
-
-export enum RegionType {
-  districts = "ags",
-  states = "id",
-}
-
-export function fill0CasesDays(
-  sourceData: any,
-  lowDate: Date,
-  highDate: Date,
-  regionType: RegionType,
-  requestType: RequestType
-) {
-  const targetData = {};
-  for (const historyData of sourceData.data) {
-    const regionKey =
-      regionType == RegionType.states
-        ? getStateAbbreviationById(historyData[regionType])
-        : historyData[regionType];
-    if (!targetData[regionKey]) {
-      targetData[regionKey] = {
-        [regionType]: historyData[regionType],
-        name: historyData.name,
-        history: [],
-      };
-    }
-    // if history is empty and lowDate is missing insert lowDate
-    if (
-      historyData.date > lowDate &&
-      targetData[regionKey].history.length == 0
-    ) {
-      targetData[regionKey].history.push({
-        [requestType]: 0,
-        date: lowDate,
-      });
-    }
-    if (targetData[regionKey].history.length > 0) {
-      const nextDate: Date = historyData.date;
-      while (
-        getDayDifference(
-          nextDate,
-          targetData[regionKey].history[
-            targetData[regionKey].history.length - 1
-          ].date
-        ) > 1
-      ) {
-        targetData[regionKey].history.push({
-          [requestType]: 0,
-          date: AddDaysToDate(
-            targetData[regionKey].history[
-              targetData[regionKey].history.length - 1
-            ].date,
-            1
-          ),
-        });
-      }
-    }
-    targetData[regionKey].history.push({
-      [requestType]: historyData[requestType],
-      date: historyData.date,
-    });
-  }
-  // now fill top dates to highDate (datenstand -1) for each regionKey
-  for (const regionKey of Object.keys(targetData)) {
-    while (
-      targetData[regionKey].history[targetData[regionKey].history.length - 1]
-        .date < highDate
-    ) {
-      targetData[regionKey].history.push({
-        [requestType]: 0,
-        date: AddDaysToDate(
-          targetData[regionKey].history[
-            targetData[regionKey].history.length - 1
-          ].date,
-          1
-        ),
-      });
-    }
-  }
-  return targetData;
-}
-
-export function fill0CasesDaysGermany(
-  sourceData: any,
-  lowDate: Date,
-  highDate: Date,
-  requestType: RequestType
-) {
-  const targetData = [];
-  for (const historyData of sourceData.history) {
-    // if history is empty and lowDate is missing insert lowDate
-    if (historyData.date > lowDate && targetData.length == 0) {
-      targetData.push({
-        [requestType]: 0,
-        date: lowDate,
-      });
-    }
-    if (targetData.length > 0) {
-      const nextDate = historyData.date;
-      while (
-        getDayDifference(nextDate, targetData[targetData.length - 1].date) > 1
-      ) {
-        targetData.push({
-          [requestType]: 0,
-          date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
-        });
-      }
-    }
-    targetData.push({
-      [requestType]: historyData[requestType],
-      date: historyData.date,
-    });
-  }
-  // now fill top dates to highDate (datenstand -1) for each ags
-  while (targetData[targetData.length - 1].date < highDate) {
-    targetData.push({
-      [requestType]: 0,
-      date: AddDaysToDate(targetData[targetData.length - 1].date, 1),
-    });
-  }
-  return targetData;
-}
-
 export function limit(value: number, decimals: number): number {
   return parseFloat(value.toFixed(decimals));
 }
@@ -482,11 +354,32 @@ export function dateReviver(objKey: string, objValue: string | number | Date) {
     objKey.includes("date") ||
     objKey.includes("datum") ||
     objKey.includes("Datum") ||
-    objKey.includes("Datenstand")
+    objKey == "Datenstand"
   ) {
     return new Date(objValue);
   }
   return objValue;
+}
+
+export enum Files {
+  D_Data = "cases/districts.json.xz",
+  D_NewCases = "cases/districts.json.xz",
+  D_NewDeaths = "cases/districts.json.xz",
+  D_NewRecovered = "cases/districts.json.xz",
+  D_CasesHistory = "history/d_cases_short.json.xz",
+  D_DeathsHistory = "history/d_deaths_short.json.xz",
+  D_RecoveredHistory = "history/d_recovered_short.json.xz",
+  D_IncidenceHistory = "history/d_incidence_short.json.xz",
+  D_AgeGroups = "agegroup/districts.json.xz",
+  S_Data = "cases/states.json.xz",
+  S_NewCases = "cases/states.json.xz",
+  S_NewDeaths = "cases/states.json.xz",
+  S_NewRecovered = "cases/states.json.xz",
+  S_CasesHistory = "history/s_cases_short.json.xz",
+  S_DeathsHistory = "history/s_deaths_short.json.xz",
+  S_RecoveredHistory = "history/s_recovered_short.json.xz",
+  S_IncidenceHistory = "history/s_incidence_short.json.xz",
+  S_AgeGroups = "agegroup/states.json.xz",
 }
 
 export interface MetaData {
@@ -564,409 +457,67 @@ export async function getMetaData(): Promise<MetaData> {
   return metaData;
 }
 
-interface StatesCasesJson {
-  data: {
-    IdBundesland: string;
-    Bundesland: string;
-    Meldedatum: Date;
-    Datenstand: Date;
-    accuCases: number;
-    newCases: number;
-    accuCasesPerWeek: number;
-    newCasesPerWeek: number;
-    accuDeaths: number;
-    newDeaths: number;
-    accuDeathsPerWeek: number;
-    newDeathsPerWeek: number;
-    accuRecovered: number;
-    newRecovered: number;
-    population: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getStatesCasesJson(
-  metaData: MetaData
-): Promise<StatesCasesJson> {
-  let statesCasesJson: StatesCasesJson = {
-    data: undefined,
-    metaData: undefined,
-  };
+export async function getData(metaData: MetaData, whatToLoad: Files) {
+  let result;
   let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryStatesCasesJson = await GetRedisEntry(
-    redisClientBas,
-    "statesCasesJson"
-  );
-  if (redisEntryStatesCasesJson.length == 1) {
-    statesCasesJson = JSON.parse(
-      redisEntryStatesCasesJson[0].body,
-      dateReviver
-    );
-    const oldModified = statesCasesJson.metaData.modified;
+
+  // remove .xz extension from filename for rediskey
+  const redisKey = whatToLoad.split(".").slice(0, -1).join(".");
+
+  // check if a redis entry exists, if yes use it
+  // get redisKey from redis
+  const redisEntry = await GetRedisEntry(redisClientBas, redisKey);
+
+  // if length == 1 (entry exists)
+  if (redisEntry.length == 1) {
+    // parse json data
+    result = JSON.parse(redisEntry[0].body, dateReviver);
+
+    // compare redis.modified to meta.modified
+    const oldModified = result.metaData.modified;
     const modified = metaData.modified;
     newerDataAvail = modified > oldModified;
   }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryStatesCasesJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}cases/states.json.xz`;
+
+  // if redisEntry not exists or new data is avail get data from github und store data to redis
+  if (redisEntry.length == 0 || newerDataAvail) {
+    const url = `${baseUrl}${whatToLoad}`;
+
+    // request data
     const response = await axios.get(url, { responseType: "arraybuffer" });
     const rdata = response.data;
+
+    // error check
     if (rdata.error) {
       throw new RKIError(rdata.error, response.config.url);
     }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
+
+    // decompress lzma compressed data (files are xz compressed)
+    const decomp = await new Promise((resolve) =>
       lzma.decompress(rdata, undefined, (result) => resolve(result))
     );
+
+    // parse json data
+    result = {
+      data: JSON.parse(decomp.toString(), dateReviver),
+      metaData: metaData,
+    };
+
     // prepare data for redis
-    statesCasesJson.data = JSON.parse(decompressed.toString(), dateReviver);
-    statesCasesJson.metaData = metaData;
-    const redisStatesCasesHistory = JSON.stringify(statesCasesJson);
-    // create redis Entry for metaData
+    const redisResult = JSON.stringify(result);
+
+    // create redis Entry
     await AddRedisEntry(
       redisClientBas,
-      "statesCasesJson",
-      redisStatesCasesHistory,
+      redisKey,
+      redisResult,
       neverExpire,
       "json"
     );
   }
-  return statesCasesJson;
-}
 
-export interface StatesHistoryJson {
-  data: {
-    m: Date;
-    i: string;
-    b: string;
-    c: number;
-    d: number;
-    r: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getStatesHistoryJson(
-  metaData: MetaData
-): Promise<StatesHistoryJson> {
-  let statesHistoryJson: StatesHistoryJson = {
-    data: undefined,
-    metaData: undefined,
-  };
-  let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryStatesHistoryJson = await GetRedisEntry(
-    redisClientBas,
-    "statesHistoryJson"
-  );
-  if (redisEntryStatesHistoryJson.length == 1) {
-    statesHistoryJson = JSON.parse(
-      redisEntryStatesHistoryJson[0].body,
-      dateReviver
-    );
-    const oldModified = statesHistoryJson.metaData.modified;
-    const modified = metaData.modified;
-    newerDataAvail = modified > oldModified;
-  }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryStatesHistoryJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/states_new.json.xz`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
-    // prepare data for redis
-    statesHistoryJson.data = JSON.parse(decompressed.toString(), dateReviver);
-    statesHistoryJson.metaData = metaData;
-    const redisStatesHistory = JSON.stringify(statesHistoryJson);
-    // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "statesHistoryJson",
-      redisStatesHistory,
-      neverExpire,
-      "json"
-    );
-  }
-  return statesHistoryJson;
-}
-
-interface DistrictsCasesJson {
-  data: {
-    IdLandkreis: string;
-    Bundesland: string;
-    Landkreis: string;
-    Meldedatum: Date;
-    Datenstand: Date;
-    accuCases: number;
-    newCases: number;
-    accuCasesPerWeek: number;
-    newCasesPerWeek: number;
-    accuDeaths: number;
-    newDeaths: number;
-    accuDeathsPerWeek: number;
-    newDeathsPerWeek: number;
-    accuRecovered: number;
-    newRecovered: number;
-    population: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getDistrictsCasesJson(
-  metaData: MetaData
-): Promise<DistrictsCasesJson> {
-  let districtsCasesJson: DistrictsCasesJson = {
-    data: undefined,
-    metaData: undefined,
-  };
-  let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryDistrictsCasesHistoryJson = await GetRedisEntry(
-    redisClientBas,
-    "districtsCasesJson"
-  );
-  if (redisEntryDistrictsCasesHistoryJson.length == 1) {
-    districtsCasesJson = JSON.parse(
-      redisEntryDistrictsCasesHistoryJson[0].body,
-      dateReviver
-    );
-    const oldModified = districtsCasesJson.metaData.modified;
-    const modified = metaData.modified;
-    newerDataAvail = modified > oldModified;
-  }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryDistrictsCasesHistoryJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}cases/districts.json.xz`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
-    // prepare data for redis
-    districtsCasesJson.data = JSON.parse(decompressed.toString(), dateReviver);
-    districtsCasesJson.metaData = metaData;
-    const redisDistrictsCases = JSON.stringify(districtsCasesJson);
-    // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "districtsCasesJson",
-      redisDistrictsCases,
-      neverExpire,
-      "json"
-    );
-  }
-  return districtsCasesJson;
-}
-
-interface DistrictsHistoryJson {
-  data: {
-    i: string;
-    m: Date;
-    l: string;
-    c: number;
-    d: number;
-    r: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getDistrictsHistoryJson(
-  metaData: MetaData
-): Promise<DistrictsHistoryJson> {
-  let districtsHistoryJson: DistrictsHistoryJson = {
-    data: undefined,
-    metaData: undefined,
-  };
-  let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryDistrictsHistoryJson = await GetRedisEntry(
-    redisClientBas,
-    "districtsHistoryJson"
-  );
-  if (redisEntryDistrictsHistoryJson.length == 1) {
-    districtsHistoryJson = JSON.parse(
-      redisEntryDistrictsHistoryJson[0].body,
-      dateReviver
-    );
-    const oldModified = districtsHistoryJson.metaData.modified;
-    const modified = metaData.modified;
-    newerDataAvail = modified > oldModified;
-  }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryDistrictsHistoryJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}history/districts_new.json.xz`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
-    // prepare data for redis
-    districtsHistoryJson.data = JSON.parse(
-      decompressed.toString(),
-      dateReviver
-    );
-    districtsHistoryJson.metaData = metaData;
-    const redisDistrictsHistory = JSON.stringify(districtsHistoryJson);
-    // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "districtsHistoryJson",
-      redisDistrictsHistory,
-      neverExpire,
-      "json"
-    );
-  }
-  return districtsHistoryJson;
-}
-
-interface StatesAgeGroup {
-  data: {
-    Altersgruppe: string;
-    IdBundesland: string;
-    casesMale: number;
-    casesFemale: number;
-    deathsMale: number;
-    deathsFemale: number;
-    casesMalePer100k: number;
-    casesFemalePer100k: number;
-    deathsMalePer100k: number;
-    deathsFemalePer100k: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getStatesAgeGroupJson(
-  metaData: MetaData
-): Promise<StatesAgeGroup> {
-  let statesAgeGroupJson: StatesAgeGroup = {
-    data: undefined,
-    metaData: undefined,
-  };
-  let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryStatesAgeGroupJson = await GetRedisEntry(
-    redisClientBas,
-    "statesAgeGroupJson"
-  );
-  if (redisEntryStatesAgeGroupJson.length == 1) {
-    statesAgeGroupJson = JSON.parse(
-      redisEntryStatesAgeGroupJson[0].body,
-      dateReviver
-    );
-    const oldModified = statesAgeGroupJson.metaData.modified;
-    const modified = metaData.modified;
-    newerDataAvail = modified > oldModified;
-  }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryStatesAgeGroupJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}agegroup/states.json.xz`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
-    // prepare data for redis
-    statesAgeGroupJson.data = JSON.parse(decompressed.toString(), dateReviver);
-    statesAgeGroupJson.metaData = metaData;
-    const redisStatesAgeGroupJson = JSON.stringify(statesAgeGroupJson);
-    // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "statesAgeGroupJson",
-      redisStatesAgeGroupJson,
-      neverExpire,
-      "json"
-    );
-  }
-  return statesAgeGroupJson;
-}
-
-interface DistrictsAgeGroup {
-  data: {
-    IdLandkreis: string;
-    Altersgruppe: string;
-    casesMale: number;
-    casesFemale: number;
-    deathsMale: number;
-    deathsFemale: number;
-    casesMalePer100k: number;
-    casesFemalePer100k: number;
-    deathsMalePer100k: number;
-    deathsFemalePer100k: number;
-  }[];
-  metaData: MetaData;
-}
-
-export async function getDistrictsAgeGroupJson(
-  metaData: MetaData
-): Promise<DistrictsAgeGroup> {
-  let districtsAgeGroupJson: DistrictsAgeGroup = {
-    data: undefined,
-    metaData: undefined,
-  };
-  let newerDataAvail = false;
-  // check if a redis entry for cases exists, if yes use it
-  const redisEntryDistrictsAgeGroupJson = await GetRedisEntry(
-    redisClientBas,
-    "districtsAgeGroupJson"
-  );
-  if (redisEntryDistrictsAgeGroupJson.length == 1) {
-    districtsAgeGroupJson = JSON.parse(
-      redisEntryDistrictsAgeGroupJson[0].body,
-      dateReviver
-    );
-    const oldModified = districtsAgeGroupJson.metaData.modified;
-    const modified = metaData.modified;
-    newerDataAvail = modified > oldModified;
-  }
-  // if redisEntry for cases not exists get data from github und store data to redis
-  if (redisEntryDistrictsAgeGroupJson.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}agegroup/districts.json.xz`;
-    const response = await axios.get(url, { responseType: "arraybuffer" });
-    const rdata = response.data;
-    if (rdata.error) {
-      throw new RKIError(rdata.error, response.config.url);
-    }
-    //decompress lzma compressed data (xz)
-    const decompressed = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
-    // prepare data for redis
-    districtsAgeGroupJson.data = JSON.parse(
-      decompressed.toString(),
-      dateReviver
-    );
-    districtsAgeGroupJson.metaData = metaData;
-    const redisDistrictsAgeGroup = JSON.stringify(districtsAgeGroupJson);
-    // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "districtsAgeGroupJson",
-      redisDistrictsAgeGroup,
-      neverExpire,
-      "json"
-    );
-  }
-  return districtsAgeGroupJson;
+  // return requested data
+  return result;
 }
 
 export async function GetApiCommit(url: string, key: string): Promise<ApiData> {

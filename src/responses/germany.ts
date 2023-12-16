@@ -9,25 +9,17 @@ import {
   getGermanyRecovered,
   getGermanyDeathsHistory,
   getGermanyRecoveredHistory,
+  getGermanyIncidenceHistory,
   getGermanyAgeGroups,
-  AgeGroupData,
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
-import { getStatesData } from "../data-requests/states";
+import { getStatesData, AgeGroupData } from "../data-requests/states";
 import {
   getHospitalizationData,
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
 import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
-import {
-  getDateBefore,
-  AddDaysToDate,
-  RequestType,
-  fill0CasesDaysGermany,
-  limit,
-  getMetaData,
-  MetaData,
-} from "../utils";
+import { getDateBefore, AddDaysToDate, limit, getMetaData } from "../utils";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -147,8 +139,7 @@ interface GermanyHistoryData<T> extends IResponseMeta {
 }
 
 export async function GermanyCasesHistoryResponse(
-  days?: number,
-  metaData?: MetaData
+  days?: number
 ): Promise<GermanyHistoryData<{ cases: number; date: Date }>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -159,25 +150,13 @@ export async function GermanyCasesHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  if (metaData == null) {
-    metaData = await getMetaData();
-  }
-  const history = await getGermanyCasesHistory(metaData, days);
-  const highDate = new Date(
-    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
-  const data = fill0CasesDaysGermany(
-    history,
-    lowDate,
-    highDate,
-    RequestType.cases
-  );
+
+  const metaData = await getMetaData();
+  const data = await getGermanyCasesHistory(metaData, days);
+
   return {
-    data: data,
-    meta: new ResponseMeta(history.lastUpdate),
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
   };
 }
 
@@ -191,33 +170,14 @@ export async function GermanyWeekIncidenceHistoryResponse(
       );
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
-    } else {
-      days += 6;
     }
   }
   const metaData = await getMetaData();
-  const history = await GermanyCasesHistoryResponse(days, metaData);
-  const statesData = await getStatesData(metaData);
-
-  const population = statesData.data[0].population;
-
-  const weekIncidenceHistory: { weekIncidence: number; date: Date }[] = [];
-
-  for (let i = 6; i < history.data.length; i++) {
-    const date = history.data[i].date;
-    let sum = 0;
-    for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-      sum += history.data[dayOffset].cases;
-    }
-    weekIncidenceHistory.push({
-      weekIncidence: (sum / population) * 100000,
-      date: date,
-    });
-  }
+  const data = await getGermanyIncidenceHistory(metaData, days);
 
   return {
-    data: weekIncidenceHistory,
-    meta: history.meta,
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
   };
 }
 
@@ -234,22 +194,11 @@ export async function GermanyDeathsHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const history = await getGermanyDeathsHistory(metaData, days);
-  const highDate = new Date(
-    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
-  const data = fill0CasesDaysGermany(
-    history,
-    lowDate,
-    highDate,
-    RequestType.deaths
-  );
+  const data = await getGermanyDeathsHistory(metaData, days);
+
   return {
-    data: data,
-    meta: new ResponseMeta(history.lastUpdate),
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
   };
 }
 
@@ -266,22 +215,11 @@ export async function GermanyRecoveredHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const history = await getGermanyRecoveredHistory(metaData, days);
-  const highDate = new Date(
-    AddDaysToDate(history.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
-  const data = fill0CasesDaysGermany(
-    history,
-    lowDate,
-    highDate,
-    RequestType.recovered
-  );
+  const data = await getGermanyRecoveredHistory(metaData, days);
+
   return {
-    data: data,
-    meta: new ResponseMeta(history.lastUpdate),
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
   };
 }
 

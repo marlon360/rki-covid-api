@@ -3,6 +3,7 @@ import {
   getStatesCasesHistory,
   getStatesDeathsHistory,
   getStatesRecoveredHistory,
+  getStatesIncidenceHistory,
   getStatesNewCases,
   getStatesNewDeaths,
   getStatesNewRecovered,
@@ -19,9 +20,6 @@ import {
   getStateIdByName,
   getStateNameByAbbreviation,
   getDateBefore,
-  fill0CasesDays,
-  RegionType,
-  RequestType,
   limit,
   getMetaData,
   MetaData,
@@ -177,8 +175,7 @@ export interface StatesCasesHistory {
 
 export async function StatesCasesHistoryResponse(
   days?: number,
-  abbreviation?: string,
-  metaData?: MetaData
+  abbreviation?: string
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -191,29 +188,29 @@ export async function StatesCasesHistoryResponse(
   }
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
-  if (metaData == null) {
-    metaData = await getMetaData();
+  const metaData = await getMetaData();
+  const sHData = await getStatesCasesHistory(metaData, days, id);
+
+  const data: StatesCasesHistory = {};
+
+  for (const history of sHData.data) {
+    const idKey = getStateAbbreviationById(history.id);
+    if (!data[history[idKey]]) {
+      data[history[idKey]] = {
+        id: history.id,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history[idKey]].history.push({
+      cases: history.cases,
+      date: history.date,
+    });
   }
-  const statesHistoryData = await getStatesCasesHistory(metaData, days, id);
-
-  const highDate = new Date(
-    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  ); //highest date, witch is "datenstand" -1
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
-
-  const data: StatesCasesHistory = fill0CasesDays(
-    statesHistoryData,
-    lowDate,
-    highDate,
-    RegionType.states,
-    RequestType.cases
-  );
 
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(sHData.lastUpdate),
   };
 }
 
@@ -231,57 +228,32 @@ export async function StatesWeekIncidenceHistoryResponse(
       );
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
-    } else {
-      days += 6;
     }
   }
   const metaData = await getMetaData();
+  const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
+  const sHData = await getStatesIncidenceHistory(metaData, days, id);
 
-  const statesHistoryCasesData = await StatesCasesHistoryResponse(
-    days,
-    abbreviation,
-    metaData
-  );
-  const statesData = await getStatesData(metaData);
+  const data: StatesWeekIncidenceHistory = {};
 
-  function getStateById(
-    data: ResponseData<IStateData[]>,
-    id: number
-  ): IStateData | null {
-    for (const state of data.data) {
-      if (state.id == id) return state;
+  for (const history of sHData.data) {
+    const idKey = getStateAbbreviationById(history.id);
+    if (!data[history[idKey]]) {
+      data[history[idKey]] = {
+        id: history.id,
+        name: history.name,
+        history: [],
+      };
     }
-    return null;
-  }
-
-  const incidenceData: StatesWeekIncidenceHistory = {};
-
-  for (const abbr of Object.keys(statesHistoryCasesData.data)) {
-    const stateHistory = statesHistoryCasesData.data[abbr].history;
-    const state = getStateById(statesData, getStateIdByAbbreviation(abbr));
-
-    incidenceData[abbr] = {
-      id: state.id,
-      name: state.name,
-      history: [],
-    };
-
-    for (let i = 6; i < stateHistory.length; i++) {
-      const date = stateHistory[i].date;
-      let sum = 0;
-      for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-        sum += stateHistory[dayOffset].cases;
-      }
-      incidenceData[abbr].history.push({
-        weekIncidence: (sum / state.population) * 100000,
-        date: date,
-      });
-    }
+    data[history[idKey]].history.push({
+      weekIncidence: history.incidence,
+      date: history.date,
+    });
   }
 
   return {
-    data: incidenceData,
-    meta: statesHistoryCasesData.meta,
+    data,
+    meta: new ResponseMeta(sHData.lastUpdate),
   };
 }
 
@@ -304,25 +276,27 @@ export async function StatesDeathsHistoryResponse(
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
   const metaData = await getMetaData();
-  const statesHistoryData = await getStatesDeathsHistory(metaData, days, id);
-  const highDate = new Date(
-    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  ); //highest date, witch is "datenstand" -1
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const sHData = await getStatesDeathsHistory(metaData, days, id);
 
-  const data: StatesDeathsHistory = fill0CasesDays(
-    statesHistoryData,
-    lowDate,
-    highDate,
-    RegionType.states,
-    RequestType.deaths
-  );
+  const data: StatesDeathsHistory = {};
+  for (const history of sHData.data) {
+    const idKey = getStateAbbreviationById(history.id);
+    if (!data[history[idKey]]) {
+      data[history[idKey]] = {
+        id: history.id,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history[idKey]].history.push({
+      deaths: history.deaths,
+      date: history.date,
+    });
+  }
 
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(sHData.lastUpdate),
   };
 }
 
@@ -345,25 +319,26 @@ export async function StatesRecoveredHistoryResponse(
 
   const id = abbreviation ? getStateIdByAbbreviation(abbreviation) : null;
   const metaData = await getMetaData();
-  const statesHistoryData = await getStatesRecoveredHistory(metaData, days, id);
-  const highDate = new Date(
-    AddDaysToDate(statesHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  ); //highest date, witch is "datenstand" -1
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const sHData = await getStatesRecoveredHistory(metaData, days, id);
 
-  const data: StatesRecoveredHistory = fill0CasesDays(
-    statesHistoryData,
-    lowDate,
-    highDate,
-    RegionType.states,
-    RequestType.recovered
-  );
-
+  const data: StatesRecoveredHistory = {};
+  for (const history of sHData.data) {
+    const idKey = getStateAbbreviationById(history.id);
+    if (!data[history[idKey]]) {
+      data[history[idKey]] = {
+        id: history.id,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history[idKey]].history.push({
+      recovered: history.recovered,
+      date: history.date,
+    });
+  }
   return {
     data,
-    meta: new ResponseMeta(statesHistoryData.lastUpdate),
+    meta: new ResponseMeta(sHData.lastUpdate),
   };
 }
 

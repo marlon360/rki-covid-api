@@ -9,17 +9,14 @@ import {
   getDistrictsCasesHistory,
   getDistrictsDeathsHistory,
   getDistrictsRecoveredHistory,
+  getDistrictsIncidenceHistory,
   getDistrictsAgeGroups,
 } from "../data-requests/districts";
 import {
   AddDaysToDate,
   getStateAbbreviationByName,
-  fill0CasesDays,
-  RequestType,
-  RegionType,
   limit,
   getMetaData,
-  MetaData,
 } from "../utils";
 import {
   FrozenIncidenceData,
@@ -125,6 +122,7 @@ interface DistrictHistory<T> {
   name: string;
   history: T[];
 }
+
 export interface DistrictsHistoryData<T> extends IResponseMeta {
   data: T;
 }
@@ -132,10 +130,10 @@ export interface DistrictsHistoryData<T> extends IResponseMeta {
 export interface DistrictsCasesHistory {
   [key: string]: DistrictHistory<{ cases: number; date: Date }>;
 }
+
 export async function DistrictsCasesHistoryResponse(
   days?: number,
-  ags?: string,
-  metaData?: MetaData
+  ags?: string
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
@@ -146,36 +144,33 @@ export async function DistrictsCasesHistoryResponse(
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
-  if (metaData == null) {
-    metaData = await getMetaData();
+
+  const metaData = await getMetaData();
+  const historyData = await getDistrictsCasesHistory(metaData, days, ags);
+  const data: DistrictsCasesHistory = {};
+  for (const history of historyData.data) {
+    if (!data[history.ags]) {
+      data[history.ags] = {
+        ags: history.ags,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history.ags].history.push({
+      cases: history.cases,
+      date: history.date,
+    });
   }
-  const districtsHistoryData = await getDistrictsCasesHistory(
-    metaData,
-    days,
-    ags
-  );
-  const highDate = new Date(
-    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set
-  const data: DistrictsCasesHistory = fill0CasesDays(
-    districtsHistoryData,
-    lowDate,
-    highDate,
-    RegionType.districts,
-    RequestType.cases
-  );
   return {
     data,
-    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
+    meta: new ResponseMeta(historyData.lastUpdate),
   };
 }
 
 interface DistrictsWeekIncidenceHistory {
   [key: string]: DistrictHistory<{ weekIncidence: number; date: Date }>;
 }
+
 export async function DistrictsWeekIncidenceHistoryResponse(
   days?: number,
   ags?: string
@@ -187,47 +182,30 @@ export async function DistrictsWeekIncidenceHistoryResponse(
       );
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
-    } else {
-      // add 6 days to calculate week incidence
-      days += 6;
     }
   }
   const metaData = await getMetaData();
-  const districtsHistoryData = await DistrictsCasesHistoryResponse(
-    days,
-    ags,
-    metaData
-  );
-  const districtsData = await getDistrictsData(metaData);
+  const historyData = await getDistrictsIncidenceHistory(metaData, days, ags);
 
-  const incidenceData: DistrictsWeekIncidenceHistory = {};
+  const data: DistrictsWeekIncidenceHistory = {};
 
-  for (const ags of Object.keys(districtsHistoryData.data)) {
-    const districtHistory = districtsHistoryData.data[ags].history;
-    const district = getDistrictByAGS(districtsData, ags);
-
-    incidenceData[ags] = {
-      ags: district.ags,
-      name: district.name,
-      history: [],
-    };
-
-    for (let i = 6; i < districtHistory.length; i++) {
-      const date = districtHistory[i].date;
-      let sum = 0;
-      for (let dayOffset = i; dayOffset > i - 7; dayOffset--) {
-        sum += districtHistory[dayOffset].cases;
-      }
-      incidenceData[ags].history.push({
-        weekIncidence: (sum / district.population) * 100000,
-        date: date,
-      });
+  for (const history of historyData.data) {
+    if (!data[history.ags]) {
+      data[history.ags] = {
+        ags: history.ags,
+        name: history.name,
+        history: [],
+      };
     }
+    data[history.ags].history.push({
+      weekIncidence: history.incidence,
+      date: history.date,
+    });
   }
 
   return {
-    data: incidenceData,
-    meta: districtsHistoryData.meta,
+    data,
+    meta: new ResponseMeta(historyData.lastUpdate),
   };
 }
 
@@ -249,29 +227,27 @@ export async function DistrictsDeathsHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const districtsHistoryData = await getDistrictsDeathsHistory(
-    metaData,
-    days,
-    ags
-  );
-  const highDate = new Date(
-    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set
+  const historyData = await getDistrictsDeathsHistory(metaData, days, ags);
 
-  const data: DistrictsDeathsHistory = fill0CasesDays(
-    districtsHistoryData,
-    lowDate,
-    highDate,
-    RegionType.districts,
-    RequestType.deaths
-  );
+  const data: DistrictsDeathsHistory = {};
+
+  for (const history of historyData.data) {
+    if (!data[history.ags]) {
+      data[history.ags] = {
+        ags: history.ags,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history.ags].history.push({
+      deaths: history.deaths,
+      date: history.date,
+    });
+  }
 
   return {
     data,
-    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
+    meta: new ResponseMeta(historyData.lastUpdate),
   };
 }
 
@@ -292,29 +268,27 @@ export async function DistrictsRecoveredHistoryResponse(
     }
   }
   const metaData = await getMetaData();
-  const districtsHistoryData = await getDistrictsRecoveredHistory(
-    metaData,
-    days,
-    ags
-  );
-  const highDate = new Date(
-    AddDaysToDate(districtsHistoryData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  ); //highest date, witch is "datenstand" -1
-  const lowDate = days
-    ? AddDaysToDate(highDate, (days - 1) * -1)
-    : new Date("2020-01-01"); // lowest date if days is set, else set lowdate to 2020-01-01
+  const historyData = await getDistrictsRecoveredHistory(metaData, days, ags);
 
-  const data: DistrictsRecoveredHistory = fill0CasesDays(
-    districtsHistoryData,
-    lowDate,
-    highDate,
-    RegionType.districts,
-    RequestType.recovered
-  );
+  const data: DistrictsRecoveredHistory = {};
+
+  for (const history of historyData.data) {
+    if (!data[history.ags]) {
+      data[history.ags] = {
+        ags: history.ags,
+        name: history.name,
+        history: [],
+      };
+    }
+    data[history.ags].history.push({
+      recovered: history.recovered,
+      date: history.date,
+    });
+  }
 
   return {
     data,
-    meta: new ResponseMeta(districtsHistoryData.lastUpdate),
+    meta: new ResponseMeta(historyData.lastUpdate),
   };
 }
 
