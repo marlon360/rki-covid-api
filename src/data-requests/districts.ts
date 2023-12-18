@@ -153,7 +153,7 @@ export async function getDistrictsCasesHistory(
       ags: dist.i,
       name: dist.t,
       cases: dist.c,
-      date: dist.m,
+      date: new Date(dist.m),
     };
   });
   if (days) {
@@ -201,7 +201,7 @@ export async function getDistrictsDeathsHistory(
       ags: dist.i,
       name: dist.t,
       deaths: dist.d,
-      date: dist.m,
+      date: new Date(dist.m),
     };
   });
   if (days) {
@@ -249,7 +249,7 @@ export async function getDistrictsRecoveredHistory(
       ags: dist.i,
       name: dist.t,
       recovered: dist.r,
-      date: dist.m,
+      date: new Date(dist.m),
     };
   });
   if (days) {
@@ -298,7 +298,7 @@ export async function getDistrictsIncidenceHistory(
       ags: dist.i,
       name: dist.t,
       incidence: dist.i7,
-      date: dist.m,
+      date: new Date(dist.m),
     };
   });
   if (days) {

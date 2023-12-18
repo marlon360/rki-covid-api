@@ -48,7 +48,7 @@ export async function getGermanyCasesHistory(
     .map((state) => {
       return {
         cases: state.c,
-        date: state.m,
+        date: new Date(state.m),
       };
     });
   if (days) {
@@ -79,7 +79,7 @@ export async function getGermanyDeathsHistory(
     .map((state) => {
       return {
         deaths: state.d,
-        date: state.m,
+        date: new Date(state.m),
       };
     });
   if (days) {
@@ -110,7 +110,7 @@ export async function getGermanyRecoveredHistory(
     .map((state) => {
       return {
         recovered: state.r,
-        date: state.m,
+        date: new Date(state.m),
       };
     });
   if (days) {
@@ -141,7 +141,7 @@ export async function getGermanyIncidenceHistory(
     .map((state) => {
       return {
         weekIncidence: state.i7,
-        date: state.m,
+        date: new Date(state.m),
       };
     });
   if (days) {

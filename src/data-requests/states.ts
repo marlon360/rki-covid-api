@@ -155,7 +155,7 @@ export async function getStatesCasesHistory(
       id: parseInt(state.i),
       name: state.t,
       cases: state.c,
-      date: state.m,
+      date: new Date(state.m),
     };
   });
   if (id) {
@@ -204,7 +204,7 @@ export async function getStatesDeathsHistory(
       id: parseInt(state.i),
       name: state.t,
       deaths: state.d,
-      date: state.m,
+      date: new Date(state.m),
     };
   });
   if (id) {
@@ -253,7 +253,7 @@ export async function getStatesRecoveredHistory(
       id: parseInt(state.i),
       name: state.t,
       recovered: state.r,
-      date: state.m,
+      date: new Date(state.m),
     };
   });
   if (id) {
@@ -303,7 +303,7 @@ export async function getStatesIncidenceHistory(
       id: parseInt(state.i),
       name: state.t,
       incidence: state.i7,
-      date: state.m,
+      date: new Date(state.m),
     };
   });
   if (id) {
