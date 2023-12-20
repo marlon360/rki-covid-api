@@ -64,9 +64,7 @@ export enum Region {
 
 interface CperDay {
   [date: string]: {
-    [idkey: string]: {
-      cInd: number;
-    };
+    [idkey: string]: number;
   };
 }
 
@@ -106,10 +104,10 @@ export async function ColorsPerDay(
         let sum: number;
         let count: number;
         if (newObj[dateStr]) {
-          min = Math.min(newObj[dateStr].min.cInd, cInd);
-          max = Math.max(newObj[dateStr].max.cInd, cInd);
-          sum = newObj[dateStr].sum.cInd + entry.i7;
-          count = newObj[dateStr].count.cInd + 1;
+          min = Math.min(newObj[dateStr].min, cInd);
+          max = Math.max(newObj[dateStr].max, cInd);
+          sum = newObj[dateStr].sum + entry.i7;
+          count = newObj[dateStr].count + 1;
         } else {
           min = cInd;
           max = cInd;
@@ -125,18 +123,18 @@ export async function ColorsPerDay(
           }
         });
         if (newObj[dateStr]) {
-          newObj[dateStr][entry.i] = { cInd: cInd };
+          newObj[dateStr][entry.i] = cInd;
         } else {
           newObj[dateStr] = {
             ...(newObj[dateStr] || {}),
-            [entry.i]: { cInd: cInd },
+            [entry.i]: cInd,
           };
         }
-        newObj[dateStr].min = { cInd: min };
-        newObj[dateStr].max = { cInd: max };
-        newObj[dateStr].avg = { cInd: avgInd };
-        newObj[dateStr].sum = { cInd: sum };
-        newObj[dateStr].count = { cInd: count };
+        newObj[dateStr].min = min;
+        newObj[dateStr].max = max;
+        newObj[dateStr].avg = avgInd;
+        newObj[dateStr].sum = sum;
+        newObj[dateStr].count = count;
         return newObj;
       },
       {}
@@ -158,10 +156,10 @@ export async function ColorsPerDay(
         let sum: number;
         let count: number;
         if (newObj[dateStr]) {
-          min = Math.min(newObj[dateStr].min.cInd, cInd);
-          max = Math.max(newObj[dateStr].max.cInd, cInd);
-          sum = newObj[dateStr].sum.cInd + entry.i7;
-          count = newObj[dateStr].count.cInd + 1;
+          min = Math.min(newObj[dateStr].min, cInd);
+          max = Math.max(newObj[dateStr].max, cInd);
+          sum = newObj[dateStr].sum + entry.i7;
+          count = newObj[dateStr].count + 1;
         } else {
           min = cInd;
           max = cInd;
@@ -178,18 +176,18 @@ export async function ColorsPerDay(
         });
         const id = parseInt(entry.i).toString();
         if (newObj[dateStr]) {
-          newObj[dateStr][id] = { cInd: cInd };
+          newObj[dateStr][id] = cInd;
         } else {
           newObj[dateStr] = {
             ...(newObj[dateStr] || {}),
-            [id]: { cInd: cInd },
+            [id]: cInd,
           };
         }
-        newObj[dateStr].min = { cInd: min };
-        newObj[dateStr].max = { cInd: max };
-        newObj[dateStr].avg = { cInd: avgInd };
-        newObj[dateStr].sum = { cInd: sum };
-        newObj[dateStr].count = { cInd: count };
+        newObj[dateStr].min = min;
+        newObj[dateStr].max = max;
+        newObj[dateStr].avg = avgInd;
+        newObj[dateStr].sum = sum;
+        newObj[dateStr].count = count;
         return newObj;
       }, {});
   }
@@ -243,7 +241,7 @@ export async function VideoResponse(
   //check if incidencesPerDay_date.json exists
   const cPerDayStart = new Date().getTime();
   let cPerDay: CperDay = {};
-  const jsonFileName = `${incidenceDataPath}${region}-incidenceColorsPerDay_${refDate}.json`;
+  const jsonFileName = `${incidenceDataPath}${region}-cPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
     cPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
     const cPerDayEnd = new Date().getTime();
@@ -440,11 +438,7 @@ export async function VideoResponse(
       });
       cPerDayKeys.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
-    // function to compare two Objects
-    function isDiffernd(obj1, obj2) {
-      return JSON.stringify(obj1) !== JSON.stringify(obj2);
-    }
-
+    
     // find all days that changed one or more colors, and store this key to allDiffs
     const findDiffsStart = new Date().getTime();
     let allDiffs = [];
@@ -459,7 +453,7 @@ export async function VideoResponse(
           if (rgnKy != "count" && rgnKy != "sum") {
             const newdata = cPerDay[date][rgnKy];
             const olddata = oldCPerDay[date][rgnKy];
-            if (isDiffernd(newdata, olddata)) {
+            if (newdata != olddata) {
               // push datekey to allDiffs[] if one color is differend,
               allDiffs.push(date);
               // and break this "for loop"
@@ -497,7 +491,7 @@ export async function VideoResponse(
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
           regionPathElement.attributes["fill"] =
-            IColorRanges[cPerDay[date][id].cInd].color;
+            IColorRanges[cPerDay[date][id]].color;
           if (region == Region.states) {
             regionPathElement.attributes["stroke"] = "#DBDBDB";
             regionPathElement.attributes["stroke-width"] = "0.9";
@@ -514,30 +508,30 @@ export async function VideoResponse(
 
         // define mAMG (MinAvgMaxGrouped)
         let mAMG: MAMGrouped = {
-          [cPerDay[date]["min"].cInd]: [
-            { name: "min", nCol: "green", rInd: cPerDay[date]["min"].cInd },
+          [cPerDay[date]["min"]]: [
+            { name: "min", nCol: "green", rInd: cPerDay[date]["min"] },
           ],
         };
-        if (mAMG[cPerDay[date]["avg"].cInd]) {
-          mAMG[cPerDay[date]["avg"].cInd].push({
+        if (mAMG[cPerDay[date]["avg"]]) {
+          mAMG[cPerDay[date]["avg"]].push({
             name: "avg",
             nCol: "orange",
-            rInd: cPerDay[date]["avg"].cInd,
+            rInd: cPerDay[date]["avg"],
           });
         } else {
-          mAMG[cPerDay[date]["avg"].cInd] = [
-            { name: "avg", nCol: "orange", rInd: cPerDay[date]["avg"].cInd },
+          mAMG[cPerDay[date]["avg"]] = [
+            { name: "avg", nCol: "orange", rInd: cPerDay[date]["avg"] },
           ];
         }
-        if (mAMG[cPerDay[date]["max"].cInd]) {
-          mAMG[cPerDay[date]["max"].cInd].push({
+        if (mAMG[cPerDay[date]["max"]]) {
+          mAMG[cPerDay[date]["max"]].push({
             name: "max",
             nCol: "red",
-            rInd: cPerDay[date]["max"].cInd,
+            rInd: cPerDay[date]["max"],
           });
         } else {
-          mAMG[cPerDay[date]["max"].cInd] = [
-            { name: "max", nCol: "red", rInd: cPerDay[date]["max"].cInd },
+          mAMG[cPerDay[date]["max"]] = [
+            { name: "max", nCol: "red", rInd: cPerDay[date]["max"] },
           ];
         }
 
