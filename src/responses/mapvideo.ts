@@ -191,7 +191,7 @@ export async function ColorsPerDay(
         return newObj;
       }, {});
   }
-  for (const dateKey of Object.keys(cPerDay)){
+  for (const dateKey of Object.keys(cPerDay)) {
     delete cPerDay[dateKey].sum;
     delete cPerDay[dateKey].count;
   }
@@ -441,7 +441,7 @@ export async function VideoResponse(
       });
       cPerDayKeys.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
-    
+
     // find all days that changed one or more colors, and store this key to allDiffs
     const findDiffsStart = new Date().getTime();
     let allDiffs = [];

@@ -6,6 +6,4 @@ src/maps/districts.json
 src/maps/states.json
 
 # payPics json files
-dayPics/districts-incidenceColorsPerDay*.json
-dayPics/states-incidenceColorsPerDay*.json
-dayPics/status.json
+dayPics/*.json
