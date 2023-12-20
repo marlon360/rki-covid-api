@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { getMapBackground } from "./map";
 import ffmpegStatic from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import fs from "fs";
+import fs, { cp } from "fs";
 import {
   getMetaData,
   getDateBeforeDate,
@@ -191,7 +191,10 @@ export async function ColorsPerDay(
         return newObj;
       }, {});
   }
-
+  for (const dateKey of Object.keys(cPerDay)){
+    delete cPerDay[dateKey].sum;
+    delete cPerDay[dateKey].count;
+  }
   return cPerDay;
 }
 
@@ -447,18 +450,15 @@ export async function VideoResponse(
       if (!oldCPerDay[date]) {
         allDiffs.push(date);
       } else {
-        // else test every regionKey for changed colors,
+        // else test every regionKey for changed color indexes,
         for (const rgnKy of Object.keys(cPerDay[date])) {
-          // dont compare count and sum (that are only helpers to calculate cPerDay)
-          if (rgnKy != "count" && rgnKy != "sum") {
-            const newdata = cPerDay[date][rgnKy];
-            const olddata = oldCPerDay[date][rgnKy];
-            if (newdata != olddata) {
-              // push datekey to allDiffs[] if one color is differend,
-              allDiffs.push(date);
-              // and break this "for loop"
-              break;
-            }
+          const newCindex = cPerDay[date][rgnKy];
+          const oldCindex = oldCPerDay[date][rgnKy];
+          if (newCindex != oldCindex) {
+            // push datekey to allDiffs[] if one color is differend,
+            allDiffs.push(date);
+            // and break this "for loop"
+            break;
           }
         }
       }
