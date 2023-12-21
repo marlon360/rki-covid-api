@@ -396,7 +396,7 @@ export async function VideoResponse(
     // find the last stored incidencePerDay file witch is the basis of the stored pict files
     let allRegionsColorsPerDayFiles = fs.readdirSync(incidenceDataPath);
     allRegionsColorsPerDayFiles = allRegionsColorsPerDayFiles
-      .filter((file) => file.includes(`${region}-incidenceColorsPerDay_`))
+      .filter((file) => file.includes(`${region}-cPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
     const oldRegionsColorsPerDayFile =
       allRegionsColorsPerDayFiles.length > 1
