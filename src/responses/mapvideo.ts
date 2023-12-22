@@ -644,7 +644,7 @@ export async function VideoResponse(
   // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
   allJsonFiles = allJsonFiles.filter((file) =>
-    file.includes(`${region}-incidence`)
+    file.includes(`${region}-cPerDay`)
   );
   // keep the last 2 files only
   if (allJsonFiles.length > 2) {
