@@ -6,7 +6,7 @@ import sharp from "sharp";
 import { getMapBackground } from "./map";
 import ffmpegStatic from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
-import fs, { cp } from "fs";
+import fs from "fs";
 import {
   getMetaData,
   getDateBeforeDate,
@@ -257,8 +257,7 @@ export async function VideoResponse(
     // if region incidence per day data file not exists requst the data
     cPerDay = await ColorsPerDay(metaData, region);
     // store to disc
-    const jsonData = JSON.stringify(cPerDay);
-    fs.writeFileSync(jsonFileName, jsonData);
+    fs.writeFileSync(jsonFileName, JSON.stringify(cPerDay));
     const cPerDayEnd = new Date().getTime();
     console.log(
       `${region}: get cPerDay calculated from incidenceFile: ${
