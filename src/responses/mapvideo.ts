@@ -90,7 +90,7 @@ export async function ColorsPerDay(
   // request the data depending on region
   if (region == Region.districts) {
     cPerDay = (await getData(metaData, Files.D_IncidenceHistory)).data.reduce(
-      (newObj, entry) => {
+      (temp, entry) => {
         const dateStr = new Date(entry.m).toISOString().split("T").shift();
         const cInd = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
@@ -103,11 +103,11 @@ export async function ColorsPerDay(
         let max: number;
         let sum: number;
         let count: number;
-        if (newObj[dateStr]) {
-          min = Math.min(newObj[dateStr].min, cInd);
-          max = Math.max(newObj[dateStr].max, cInd);
-          sum = newObj[dateStr].sum + entry.i7;
-          count = newObj[dateStr].count + 1;
+        if (temp[dateStr]) {
+          min = Math.min(temp[dateStr].min, cInd);
+          max = Math.max(temp[dateStr].max, cInd);
+          sum = temp[dateStr].sum + entry.i7;
+          count = temp[dateStr].count + 1;
         } else {
           min = cInd;
           max = cInd;
@@ -122,27 +122,27 @@ export async function ColorsPerDay(
             return avg > range.min && avg <= range.max;
           }
         });
-        if (newObj[dateStr]) {
-          newObj[dateStr][entry.i] = cInd;
+        if (temp[dateStr]) {
+          temp[dateStr][entry.i] = cInd;
         } else {
-          newObj[dateStr] = {
-            ...(newObj[dateStr] || {}),
+          temp[dateStr] = {
+            ...(temp[dateStr] || {}),
             [entry.i]: cInd,
           };
         }
-        newObj[dateStr].min = min;
-        newObj[dateStr].max = max;
-        newObj[dateStr].avg = avgInd;
-        newObj[dateStr].sum = sum;
-        newObj[dateStr].count = count;
-        return newObj;
+        temp[dateStr].min = min;
+        temp[dateStr].max = max;
+        temp[dateStr].avg = avgInd;
+        temp[dateStr].sum = sum;
+        temp[dateStr].count = count;
+        return temp;
       },
       {}
     );
   } else if (region == Region.states) {
     cPerDay = (await getData(metaData, Files.S_IncidenceHistory)).data
       .filter((entry) => entry.i != "00")
-      .reduce((newObj, entry) => {
+      .reduce((temp, entry) => {
         const dateStr = new Date(entry.m).toISOString().split("T").shift();
         const cInd = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
@@ -155,11 +155,11 @@ export async function ColorsPerDay(
         let max: number;
         let sum: number;
         let count: number;
-        if (newObj[dateStr]) {
-          min = Math.min(newObj[dateStr].min, cInd);
-          max = Math.max(newObj[dateStr].max, cInd);
-          sum = newObj[dateStr].sum + entry.i7;
-          count = newObj[dateStr].count + 1;
+        if (temp[dateStr]) {
+          min = Math.min(temp[dateStr].min, cInd);
+          max = Math.max(temp[dateStr].max, cInd);
+          sum = temp[dateStr].sum + entry.i7;
+          count = temp[dateStr].count + 1;
         } else {
           min = cInd;
           max = cInd;
@@ -175,20 +175,20 @@ export async function ColorsPerDay(
           }
         });
         const id = parseInt(entry.i).toString();
-        if (newObj[dateStr]) {
-          newObj[dateStr][id] = cInd;
+        if (temp[dateStr]) {
+          temp[dateStr][id] = cInd;
         } else {
-          newObj[dateStr] = {
-            ...(newObj[dateStr] || {}),
+          temp[dateStr] = {
+            ...(temp[dateStr] || {}),
             [id]: cInd,
           };
         }
-        newObj[dateStr].min = min;
-        newObj[dateStr].max = max;
-        newObj[dateStr].avg = avgInd;
-        newObj[dateStr].sum = sum;
-        newObj[dateStr].count = count;
-        return newObj;
+        temp[dateStr].min = min;
+        temp[dateStr].max = max;
+        temp[dateStr].avg = avgInd;
+        temp[dateStr].sum = sum;
+        temp[dateStr].count = count;
+        return temp;
       }, {});
   }
   for (const dateKey of Object.keys(cPerDay)) {
