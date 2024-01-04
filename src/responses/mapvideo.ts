@@ -447,7 +447,12 @@ export async function VideoResponse(
     for (const date of cPerDayKeys) {
       // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
       if (!oldCPerDay[date]) {
-        allDiffs.push(date);
+        allDiffs.push({
+          date: date,
+          key: "new date",
+          oldColor: 99,
+          newColor: 99,
+        });
       } else {
         // else test every regionKey for changed color indexes,
         for (const rgnKy of Object.keys(cPerDay[date])) {
@@ -455,7 +460,12 @@ export async function VideoResponse(
           const oldCindex = oldCPerDay[date][rgnKy];
           if (newCindex != oldCindex) {
             // push datekey to allDiffs[] if one color is differend,
-            allDiffs.push(date);
+            allDiffs.push({
+              date: date,
+              key: rgnKy,
+              oldColor: oldCindex,
+              newColor: newCindex,
+            });
             // and break this "for loop"
             break;
           }
@@ -468,16 +478,21 @@ export async function VideoResponse(
         (findDiffsEnd - findDiffsStart) / 1000
       } seconds. ${allDiffs.length} changes.`
     );
+    allDiffs.forEach((entry) => {
+      console.log(
+        `${region}: date: ${entry.date}; key: ${entry.key}; oldColor: ${entry.oldColor}; newColor: ${entry.newColor}`
+      );
+    });
     const createPromisesStart = new Date().getTime();
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises
     if (allDiffs.length > 0) {
       const firstDate = new Date(cPerDayKeys[0]).getTime();
       const promises = [];
-      allDiffs.forEach((date) => {
+      allDiffs.forEach((entry) => {
         // calculate the frameNumber
         const frmNmbrStr = (
-          (new Date(date).getTime() - firstDate) / 86400000 +
+          (new Date(entry.date).getTime() - firstDate) / 86400000 +
           1
         )
           .toString()
@@ -490,7 +505,7 @@ export async function VideoResponse(
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
           regionPathElement.attributes["fill"] =
-            IColorRanges[cPerDay[date][id]].color;
+            IColorRanges[cPerDay[entry.date][id]].color;
           if (region == Region.states) {
             regionPathElement.attributes["stroke"] = "#DBDBDB";
             regionPathElement.attributes["stroke-width"] = "0.9";
@@ -507,36 +522,36 @@ export async function VideoResponse(
 
         // define mAMG (MinAvgMaxGrouped)
         let mAMG: MAMGrouped = {
-          [cPerDay[date]["min"]]: [
-            { name: "min", nCol: "green", rInd: cPerDay[date]["min"] },
+          [cPerDay[entry.date]["min"]]: [
+            { name: "min", nCol: "green", rInd: cPerDay[entry.date]["min"] },
           ],
         };
-        if (mAMG[cPerDay[date]["avg"]]) {
-          mAMG[cPerDay[date]["avg"]].push({
+        if (mAMG[cPerDay[entry.date]["avg"]]) {
+          mAMG[cPerDay[entry.date]["avg"]].push({
             name: "avg",
             nCol: "orange",
-            rInd: cPerDay[date]["avg"],
+            rInd: cPerDay[entry.date]["avg"],
           });
         } else {
-          mAMG[cPerDay[date]["avg"]] = [
-            { name: "avg", nCol: "orange", rInd: cPerDay[date]["avg"] },
+          mAMG[cPerDay[entry.date]["avg"]] = [
+            { name: "avg", nCol: "orange", rInd: cPerDay[entry.date]["avg"] },
           ];
         }
-        if (mAMG[cPerDay[date]["max"]]) {
-          mAMG[cPerDay[date]["max"]].push({
+        if (mAMG[cPerDay[entry.date]["max"]]) {
+          mAMG[cPerDay[entry.date]["max"]].push({
             name: "max",
             nCol: "red",
-            rInd: cPerDay[date]["max"],
+            rInd: cPerDay[entry.date]["max"],
           });
         } else {
-          mAMG[cPerDay[date]["max"]] = [
-            { name: "max", nCol: "red", rInd: cPerDay[date]["max"] },
+          mAMG[cPerDay[entry.date]["max"]] = [
+            { name: "max", nCol: "red", rInd: cPerDay[entry.date]["max"] },
           ];
         }
 
         // push new promise for frames with legend
         promises.push(
-          sharp(getMapBackground(hdl, new Date(date), IColorRanges, mAMG))
+          sharp(getMapBackground(hdl, new Date(entry.date), IColorRanges, mAMG))
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
             .png({ quality: 100 })
             .toFile(frameName)
