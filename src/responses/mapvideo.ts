@@ -99,42 +99,30 @@ export async function ColorsPerDay(
             return entry.i7 > range.min && entry.i7 <= range.max;
           }
         });
-        let min: number;
-        let max: number;
-        let sum: number;
-        let count: number;
-        if (temp[dateStr]) {
-          min = Math.min(temp[dateStr].min, cInd);
-          max = Math.max(temp[dateStr].max, cInd);
-          sum = temp[dateStr].sum + entry.i7;
-          count = temp[dateStr].count + 1;
-        } else {
-          min = cInd;
-          max = cInd;
-          sum = entry.i7;
-          count = 1;
-        }
-        const avg = sum / count;
-        const avgInd = IColorRanges.findIndex((range) => {
-          if (range.compareFn) {
-            return range.compareFn(avg, range);
-          } else {
-            return avg > range.min && avg <= range.max;
-          }
-        });
         if (temp[dateStr]) {
           temp[dateStr][entry.i] = cInd;
+          temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
+          temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
+          temp[dateStr].sum = temp[dateStr].sum + entry.i7;
+          temp[dateStr].count = temp[dateStr].count + 1;
+          const avg = temp[dateStr].sum / temp[dateStr].count;
+          temp[dateStr].avg = IColorRanges.findIndex((range) => {
+            if (range.compareFn) {
+              return range.compareFn(avg, range);
+            } else {
+              return avg > range.min && avg <= range.max;
+            }
+          });
         } else {
           temp[dateStr] = {
-            ...(temp[dateStr] || {}),
             [entry.i]: cInd,
+            min: cInd,
+            max: cInd,
+            avg: cInd,
+            sum: entry.i7,
+            count: 1,
           };
         }
-        temp[dateStr].min = min;
-        temp[dateStr].max = max;
-        temp[dateStr].avg = avgInd;
-        temp[dateStr].sum = sum;
-        temp[dateStr].count = count;
         return temp;
       },
       {}
@@ -151,43 +139,32 @@ export async function ColorsPerDay(
             return entry.i7 > range.min && entry.i7 <= range.max;
           }
         });
-        let min: number;
-        let max: number;
-        let sum: number;
-        let count: number;
-        if (temp[dateStr]) {
-          min = Math.min(temp[dateStr].min, cInd);
-          max = Math.max(temp[dateStr].max, cInd);
-          sum = temp[dateStr].sum + entry.i7;
-          count = temp[dateStr].count + 1;
-        } else {
-          min = cInd;
-          max = cInd;
-          sum = entry.i7;
-          count = 1;
-        }
-        const avg = sum / count;
-        const avgInd = IColorRanges.findIndex((range) => {
-          if (range.compareFn) {
-            return range.compareFn(avg, range);
-          } else {
-            return avg > range.min && avg <= range.max;
-          }
-        });
+        let avg = entry.i7;
         const id = parseInt(entry.i).toString();
         if (temp[dateStr]) {
           temp[dateStr][id] = cInd;
+          temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
+          temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
+          temp[dateStr].sum = temp[dateStr].sum + entry.i7;
+          temp[dateStr].count = temp[dateStr].count + 1;
+          avg = temp[dateStr].sum / temp[dateStr].count;
+          temp[dateStr].avg = IColorRanges.findIndex((range) => {
+            if (range.compareFn) {
+              return range.compareFn(avg, range);
+            } else {
+              return avg > range.min && avg <= range.max;
+            }
+          });
         } else {
           temp[dateStr] = {
-            ...(temp[dateStr] || {}),
             [id]: cInd,
+            min: cInd,
+            max: cInd,
+            avg: cInd,
+            sum: entry.i7,
+            count: 1,
           };
         }
-        temp[dateStr].min = min;
-        temp[dateStr].max = max;
-        temp[dateStr].avg = avgInd;
-        temp[dateStr].sum = sum;
-        temp[dateStr].count = count;
         return temp;
       }, {});
   }
@@ -450,8 +427,8 @@ export async function VideoResponse(
         allDiffs.push({
           date: date,
           key: "new date",
-          oldColor: 99,
-          newColor: 99,
+          oldColor: null,
+          newColor: null,
         });
       } else {
         // else test every regionKey for changed color indexes,
@@ -476,11 +453,11 @@ export async function VideoResponse(
     console.log(
       `${region}: find all diffs: ${
         (findDiffsEnd - findDiffsStart) / 1000
-      } seconds. ${allDiffs.length} changes.`
+      } seconds. ${allDiffs.length} changed dates.`
     );
-    allDiffs.forEach((entry) => {
+    allDiffs.forEach((day) => {
       console.log(
-        `${region}: date: ${entry.date}; key: ${entry.key}; oldColor: ${entry.oldColor}; newColor: ${entry.newColor}`
+        `${region}: date: ${day.date}; key: ${day.key}; oldColor: ${day.oldColor}; newColor: ${day.newColor}`
       );
     });
     const createPromisesStart = new Date().getTime();
@@ -489,10 +466,10 @@ export async function VideoResponse(
     if (allDiffs.length > 0) {
       const firstDate = new Date(cPerDayKeys[0]).getTime();
       const promises = [];
-      allDiffs.forEach((entry) => {
+      allDiffs.forEach((day) => {
         // calculate the frameNumber
         const frmNmbrStr = (
-          (new Date(entry.date).getTime() - firstDate) / 86400000 +
+          (new Date(day.date).getTime() - firstDate) / 86400000 +
           1
         )
           .toString()
@@ -505,7 +482,7 @@ export async function VideoResponse(
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
           regionPathElement.attributes["fill"] =
-            IColorRanges[cPerDay[entry.date][id]].color;
+            IColorRanges[cPerDay[day.date][id]].color;
           if (region == Region.states) {
             regionPathElement.attributes["stroke"] = "#DBDBDB";
             regionPathElement.attributes["stroke-width"] = "0.9";
@@ -522,36 +499,36 @@ export async function VideoResponse(
 
         // define mAMG (MinAvgMaxGrouped)
         let mAMG: MAMGrouped = {
-          [cPerDay[entry.date]["min"]]: [
-            { name: "min", nCol: "green", rInd: cPerDay[entry.date]["min"] },
+          [cPerDay[day.date].min]: [
+            { name: "min", nCol: "green", rInd: cPerDay[day.date].min },
           ],
         };
-        if (mAMG[cPerDay[entry.date]["avg"]]) {
-          mAMG[cPerDay[entry.date]["avg"]].push({
+        if (mAMG[cPerDay[day.date].avg]) {
+          mAMG[cPerDay[day.date].avg].push({
             name: "avg",
             nCol: "orange",
-            rInd: cPerDay[entry.date]["avg"],
+            rInd: cPerDay[day.date].avg,
           });
         } else {
-          mAMG[cPerDay[entry.date]["avg"]] = [
-            { name: "avg", nCol: "orange", rInd: cPerDay[entry.date]["avg"] },
+          mAMG[cPerDay[day.date].avg] = [
+            { name: "avg", nCol: "orange", rInd: cPerDay[day.date].avg },
           ];
         }
-        if (mAMG[cPerDay[entry.date]["max"]]) {
-          mAMG[cPerDay[entry.date]["max"]].push({
+        if (mAMG[cPerDay[day.date].max]) {
+          mAMG[cPerDay[day.date].max].push({
             name: "max",
             nCol: "red",
-            rInd: cPerDay[entry.date]["max"],
+            rInd: cPerDay[day.date].max,
           });
         } else {
-          mAMG[cPerDay[entry.date]["max"]] = [
-            { name: "max", nCol: "red", rInd: cPerDay[entry.date]["max"] },
+          mAMG[cPerDay[day.date].max] = [
+            { name: "max", nCol: "red", rInd: cPerDay[day.date].max },
           ];
         }
 
         // push new promise for frames with legend
         promises.push(
-          sharp(getMapBackground(hdl, new Date(entry.date), IColorRanges, mAMG))
+          sharp(getMapBackground(hdl, new Date(day.date), IColorRanges, mAMG))
             .composite([{ input: svgBuffer, top: 100, left: 180 }])
             .png({ quality: 100 })
             .toFile(frameName)
