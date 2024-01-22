@@ -24,22 +24,24 @@
     "express": "^4.18.2",
     "express-async-errors": "^3.1.1",
     "express-redis-cache-next": "^1.2.1",
-    "lzma-native": "^8.0.6",
     "ffmpeg-static": "^5.2.0",
     "fluent-ffmpeg": "^2.1.2",
+    "lodash.isequal": "^4.5.0",
+    "lzma-native": "^8.0.6",
     "pm2": "^5.3.0",
     "sharp": "^0.32.6",
     "svgson": "^5.3.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@types/lodash.isequal": "^4.5.8",
     "@types/express": "^4.17.19",
     "@types/fluent-ffmpeg": "^2.1.22",
+    "@types/lzma-native": "^4.0.4",
     "@types/node": "^16.18.57",
     "prettier": "2.4.1",
     "typescript": "^5.2.2",
-    "vuepress": "^1.9.10",
-    "@types/lzma-native": "^4.0.4"
+    "vuepress": "^1.9.10"
   },
   "engines": {
     "node": ">=16.0.0 <17"
