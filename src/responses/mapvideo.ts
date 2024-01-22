@@ -15,7 +15,6 @@ import {
   Files,
 } from "../utils";
 import isEqual from "lodash.isequal";
-import { all } from "axios";
 
 interface Status {
   districts: boolean;
@@ -503,7 +502,7 @@ export async function VideoResponse(
       console.log(
         `${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
-        } seconds. Ranges have chenged! Must recalculate all ${allDiffs.length} frames.`
+        } seconds. Color ranges have chenged! Must recalculate all ${allDiffs.length} frames!`
       )
     }
     
