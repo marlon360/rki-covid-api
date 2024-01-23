@@ -428,22 +428,25 @@ export async function VideoResponse(
       });
       cPerDayKeys.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
+    
+    interface Changes {
+      key: string,
+      oldColor: number,
+      newColor: number
+    }
+
     interface AllDiffs {
       date: string,
-      changes: {
-        key: string,
-        oldColor: number,
-        newColor: number
-      }[]
+      changes: Changes[],
     }
 
     // find all days that changed one or more colors, and store this key to allDiffs
     const findDiffsStart = new Date().getTime();
     let allDiffs: AllDiffs[] = [] ;
-    let changes = [];
     if (isEqual(oldCPerDay.usedColorRanges, cPerDay.usedColorRanges)){
       for (const date of cPerDayKeys) {
         // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
+        let changes: Changes[] = [];
         if (!oldCPerDay.data[date]) {
           allDiffs.push({
             date: date,
