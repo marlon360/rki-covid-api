@@ -397,10 +397,15 @@ export async function VideoResponse(
         oldCPerDay.data = oldCPerDayFile
       }
     }
-    // get a sorted list of old incidencePerDay keys
-    const oldCPerDayKeys = Object.keys(oldCPerDay.data).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime()
-    );
+    let oldCPerDayKeys = []
+    if (oldCPerDay.data) {
+      // get a sorted list of old incidencePerDay keys
+      oldCPerDayKeys = Object.keys(oldCPerDay.data).sort(
+        (a, b) => new Date(a).getTime() - new Date(b).getTime()
+      );
+    } else {
+      oldCPerDayKeys[0] = "dummy"
+    }
     
     let fileNames: FileNames = {};
     if (oldCPerDayKeys[0] != cPerDayKeys[0]) {
@@ -505,7 +510,7 @@ export async function VideoResponse(
       console.log(
         `${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
-        } seconds. Color ranges have chenged! Must recalculate all ${allDiffs.length} frames!`
+        } seconds. Color ranges have changed! Must recalculate all ${allDiffs.length} frames!`
       )
     }
     
