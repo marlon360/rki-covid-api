@@ -37,6 +37,7 @@ import {
   DistrictsWeekIncidenceHistoryResponse,
   FrozenIncidenceHistoryResponse,
   DistrictsAgeGroupsResponse,
+  DistrictsIncidenceHistoryByDate
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -733,6 +734,16 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await DistrictsWeekIncidenceHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/historybydate/incidence",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsIncidenceHistoryByDate();
     res.json(response);
   }
 );

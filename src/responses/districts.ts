@@ -123,6 +123,10 @@ interface DistrictHistory<T> {
   history: T[];
 }
 
+interface DistrictHistoryByDate<T> {
+  [date: string]: T[];
+}
+
 export interface DistrictsHistoryData<T> extends IResponseMeta {
   data: T;
 }
@@ -201,6 +205,46 @@ export async function DistrictsWeekIncidenceHistoryResponse(
       weekIncidence: history.incidence,
       date: history.date,
     });
+  }
+
+  return {
+    data,
+    meta: new ResponseMeta(historyData.lastUpdate),
+  };
+}
+
+interface DistrictsIncidenceHistoryByDate {
+  [dateKey: string]: {
+    ags: string;
+    name: string;
+    weekIncidence: number;
+  }[];
+}
+
+export async function DistrictsIncidenceHistoryByDate(
+  days?: number,
+  ags?: string
+): Promise<DistrictsHistoryData<DistrictsIncidenceHistoryByDate>> {
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
+  }
+  const metaData = await getMetaData();
+  const historyData = await getDistrictsIncidenceHistory(metaData, days, ags);
+
+  const data: DistrictsIncidenceHistoryByDate = {};
+
+  for (const history of historyData.data) {
+    const dateKey = history.date.toISOString()
+    if (!data[dateKey]) {
+      data[dateKey] = [];
+    }
+    data[dateKey].push({ags: history.ags, name: history.name, weekIncidence: history.incidence});
   }
 
   return {
