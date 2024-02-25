@@ -63,7 +63,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     getNewDistrictCases(metaData),
     getNewDistrictDeaths(metaData),
     getNewDistrictRecovered(metaData),
-    getDistrictsFrozenIncidenceHistory(metaData, 3),
+    getDistrictsFrozenIncidenceHistory(metaData, 7),
   ]);
 
   function getDistrictByAgs(
