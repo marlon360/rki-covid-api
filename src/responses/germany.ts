@@ -80,7 +80,7 @@ export async function GermanyResponse(): Promise<GermanyData> {
     getStatesData(metaData),
     getRValue(),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(metaData, 3, "Bund"),
+    getStatesFrozenIncidenceHistory(metaData, 7, "Bund"),
   ]);
 
   // calculate week incidence

@@ -67,7 +67,7 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     getDistrictsNewCases(metaData),
     getDistrictsNewDeaths(metaData),
     getDistrictsNewRecovered(metaData),
-    getDistrictsFrozenIncidenceHistory(metaData, 3),
+    getDistrictsFrozenIncidenceHistory(metaData, 7),
   ]);
 
   const yesterdayDate = new Date(

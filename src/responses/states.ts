@@ -88,7 +88,7 @@ export async function StatesResponse(
     getStatesNewDeaths(metaData),
     getStatesNewRecovered(metaData),
     getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(metaData, 3),
+    getStatesFrozenIncidenceHistory(metaData, 7),
   ]);
 
   // remove the first element from statesData.data (=Bundesgebiet)
