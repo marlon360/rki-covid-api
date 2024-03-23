@@ -371,6 +371,10 @@ export enum Files {
   D_RecoveredHistory = "history/d_recovered_short.json.xz",
   D_IncidenceHistory = "history/d_incidence_short.json.xz",
   D_AgeGroups = "agegroup/districts.json.xz",
+  D_CasesHistoryLastChangesFile = "historychanges/cases/districts_Diff.json.xz",
+  D_DeathsHistoryLastChangesFile = "historychanges/deaths/districts_Diff.json.xz",
+  D_RevoveredHistoryLastChangesFile = "historychanges/recovered/districts_Diff.json.xz",
+  D_IncidenceHistoryLastChangesFile = "historychanges/incidence/districts_Diff.json.xz",
   S_Data = "cases/states.json.xz",
   S_NewCases = "cases/states.json.xz",
   S_NewDeaths = "cases/states.json.xz",
@@ -380,6 +384,10 @@ export enum Files {
   S_RecoveredHistory = "history/s_recovered_short.json.xz",
   S_IncidenceHistory = "history/s_incidence_short.json.xz",
   S_AgeGroups = "agegroup/states.json.xz",
+  S_CasesHistoryLastChangesFile = "historychanges/cases/states_Diff.json.xz",
+  S_DeathsHistoryLastChangesFile = "historychanges/deaths/states_Diff.json.xz",
+  S_RevoveredHistoryLastChangesFile = "historychanges/recovered/states_Diff.json.xz",
+  S_IncidenceHistoryLastChangesFile = "historychanges/incidence/states_Diff.json.xz",
 }
 
 export interface MetaData {
@@ -391,8 +399,11 @@ export interface MetaData {
   modified: number;
 }
 
-const baseUrl =
+export const baseUrl =
   "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/";
+
+export const baseUrlRD5 =
+  "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA5/master/dataStore/";
 
 export async function getMetaData(): Promise<MetaData> {
   let metaData: MetaData;
@@ -457,7 +468,78 @@ export async function getMetaData(): Promise<MetaData> {
   return metaData;
 }
 
-export async function getData(metaData: MetaData, whatToLoad: Files) {
+export async function getMetaDataRD5(): Promise<MetaData> {
+  let metaDataRD5: MetaData;
+  // check if redis entry for meta data exists, if yes use it
+  const redisEntryMeta = await GetRedisEntry(redisClientBas, "metaRD5");
+  // check if redisEmtry is older than 1 day
+  let olderThenOneDay = false;
+  if (redisEntryMeta.length == 1) {
+    const now = new Date().getTime();
+    metaDataRD5 = JSON.parse(redisEntryMeta[0].body);
+    const redisEntryAge = now - metaDataRD5.modified;
+    olderThenOneDay = redisEntryAge > 24 * 60 * 60 * 1000;
+  }
+  // if redisEntry for metadata not exists get data from github and store data to redis
+  if (redisEntryMeta.length == 0 || olderThenOneDay) {
+    const metaUrl = `${baseUrlRD5}meta/meta.json`;
+    const metaResponse = await axios.get(metaUrl);
+    const rMetaData = metaResponse.data;
+    if (rMetaData.error) {
+      throw new RKIError(rMetaData.error, metaResponse.config.url);
+    }
+    metaDataRD5 = rMetaData;
+    // prepare for redis
+    const metaRedis = JSON.stringify(metaDataRD5);
+    let validForSec = 0;
+    if (olderThenOneDay) {
+      const oldMetaData: MetaData = JSON.parse(redisEntryMeta[0].body);
+      const oldModified = oldMetaData.modified;
+      const newModified = metaDataRD5.modified;
+      newModified > oldModified;
+      if (newModified > oldModified) {
+        const validToMs = AddDaysToDate(
+          new Date(metaDataRD5.modified),
+          1
+        ).setHours(3, 0, 0, 0);
+        // calculate the seconds from now to validTo
+        // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
+        validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
+      } else {
+        validForSec = 3600;
+      }
+    } else {
+      // metaData redisEntry is valid to next day 3 o`clock GMT
+      const validToMs = AddDaysToDate(
+        new Date(metaDataRD5.modified),
+        1
+      ).setHours(3, 0, 0, 0);
+      // calculate the seconds from now to validTo
+      // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
+      validForSec =
+        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
+          ? Math.ceil((validToMs - new Date().getTime()) / 1000)
+          : 3600;
+    }
+    // create redis Entry for metaData
+    await AddRedisEntry(
+      redisClientBas,
+      "metaRD5",
+      metaRedis,
+      validForSec,
+      "json"
+    );
+  } else {
+    metaDataRD5 = JSON.parse(redisEntryMeta[0].body);
+  }
+  return metaDataRD5;
+}
+
+export async function getData(
+  metaData: MetaData,
+  whatToLoad: Files,
+  base = baseUrl
+) {
   let result;
   let newerDataAvail = false;
 
@@ -481,7 +563,7 @@ export async function getData(metaData: MetaData, whatToLoad: Files) {
 
   // if redisEntry not exists or new data is avail get data from github und store data to redis
   if (redisEntry.length == 0 || newerDataAvail) {
-    const url = `${baseUrl}${whatToLoad}`;
+    const url = `${base}${whatToLoad}`;
 
     // request data
     const response = await axios.get(url, { responseType: "arraybuffer" });

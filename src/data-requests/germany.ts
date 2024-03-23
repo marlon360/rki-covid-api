@@ -1,5 +1,12 @@
 import { ResponseData } from "./response-data";
-import { getDateBefore, getData, Files, MetaData } from "../utils";
+import {
+  getDateBefore,
+  getData,
+  Files,
+  MetaData,
+  baseUrl,
+  baseUrlRD5,
+} from "../utils";
 import {
   AgeGroupData,
   IStateDataFile,
@@ -8,6 +15,7 @@ import {
   S_RecoveredHistoryFile,
   S_IncidenceHistoryFile,
   S_AgeGrpFile,
+  S_CasesHistoryChangesFile,
 } from "./states";
 
 export async function getGermanyCases(
@@ -58,6 +66,50 @@ export async function getGermanyCasesHistory(
   return {
     data: history,
     lastUpdate: new Date(json.metaData.modified),
+  };
+}
+
+export interface G_CasesChangesHistory {
+  [date: string]: {
+    cases: number;
+    changeDate: Date;
+  }[];
+}
+
+export async function getGermanyCasesChangesHistory(
+  metaDataRD5: MetaData
+): Promise<ResponseData<G_CasesChangesHistory>> {
+  const json: S_CasesHistoryChangesFile = await getData(
+    metaDataRD5,
+    Files.S_CasesHistoryLastChangesFile,
+    baseUrlRD5
+  );
+  const casesChangesHistory: G_CasesChangesHistory = json.data
+    .filter((state) => state.i == "00")
+    .reduce((changes, entry) => {
+      const dateStr = new Date(entry.m).toISOString().split("T").shift();
+      if (changes[dateStr]) {
+        changes[dateStr].push({
+          cases: entry.c,
+          changeDate: new Date(entry.cD),
+        });
+      } else {
+        changes[dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD) }];
+      }
+      return changes;
+    }, {});
+
+  Object.keys(casesChangesHistory).forEach((date) => {
+    casesChangesHistory[date].sort((a, b) => {
+      const dateA = new Date(a.changeDate);
+      const dateB = new Date(b.changeDate);
+      return dateA.getTime() - dateB.getTime();
+    });
+  });
+
+  return {
+    lastUpdate: new Date(json.metaData.modified),
+    data: casesChangesHistory,
   };
 }
 

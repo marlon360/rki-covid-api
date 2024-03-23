@@ -1,7 +1,10 @@
 import { stringify } from "svgson";
 import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
-import { ColorRange, weekIncidenceColorRanges as IColorRanges } from "../configuration/colors";
+import {
+  ColorRange,
+  weekIncidenceColorRanges as IColorRanges,
+} from "../configuration/colors";
 import sharp from "sharp";
 import { getMapBackground } from "./map";
 import ffmpegStatic from "ffmpeg-static";
@@ -69,7 +72,7 @@ interface CperDay {
     [date: string]: {
       [idkey: string]: number;
     };
-  }
+  };
 }
 
 export interface MAMGrouped {
@@ -90,47 +93,49 @@ export async function ColorsPerDay(
   metaData: MetaData,
   region: Region
 ): Promise<CperDay> {
-  let cPerDay: CperDay = {usedColorRanges: JSON.parse(JSON.stringify(IColorRanges)), data: {}};
+  let cPerDay: CperDay = {
+    usedColorRanges: JSON.parse(JSON.stringify(IColorRanges)),
+    data: {},
+  };
   // request the data depending on region
   if (region == Region.districts) {
-    cPerDay.data = (await getData(metaData, Files.D_IncidenceHistory)).data.reduce(
-      (temp, entry) => {
-        const dateStr = new Date(entry.m).toISOString().split("T").shift();
-        const cInd = IColorRanges.findIndex((range) => {
+    cPerDay.data = (
+      await getData(metaData, Files.D_IncidenceHistory)
+    ).data.reduce((temp, entry) => {
+      const dateStr = new Date(entry.m).toISOString().split("T").shift();
+      const cInd = IColorRanges.findIndex((range) => {
+        if (range.compareFn) {
+          return range.compareFn(entry.i7, range);
+        } else {
+          return entry.i7 > range.min && entry.i7 <= range.max;
+        }
+      });
+      if (temp[dateStr]) {
+        temp[dateStr][entry.i] = cInd;
+        temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
+        temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
+        temp[dateStr].sum = temp[dateStr].sum + entry.i7;
+        temp[dateStr].count = temp[dateStr].count + 1;
+        const avg = temp[dateStr].sum / temp[dateStr].count;
+        temp[dateStr].avg = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
-            return range.compareFn(entry.i7, range);
+            return range.compareFn(avg, range);
           } else {
-            return entry.i7 > range.min && entry.i7 <= range.max;
+            return avg > range.min && avg <= range.max;
           }
         });
-        if (temp[dateStr]) {
-          temp[dateStr][entry.i] = cInd;
-          temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
-          temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
-          temp[dateStr].sum = temp[dateStr].sum + entry.i7;
-          temp[dateStr].count = temp[dateStr].count + 1;
-          const avg = temp[dateStr].sum / temp[dateStr].count;
-          temp[dateStr].avg = IColorRanges.findIndex((range) => {
-            if (range.compareFn) {
-              return range.compareFn(avg, range);
-            } else {
-              return avg > range.min && avg <= range.max;
-            }
-          });
-        } else {
-          temp[dateStr] = {
-            [entry.i]: cInd,
-            min: cInd,
-            max: cInd,
-            avg: cInd,
-            sum: entry.i7,
-            count: 1,
-          };
-        }
-        return temp;
-      },
-      {}
-    );
+      } else {
+        temp[dateStr] = {
+          [entry.i]: cInd,
+          min: cInd,
+          max: cInd,
+          avg: cInd,
+          sum: entry.i7,
+          count: 1,
+        };
+      }
+      return temp;
+    }, {});
   } else if (region == Region.states) {
     cPerDay.data = (await getData(metaData, Files.S_IncidenceHistory)).data
       .filter((entry) => entry.i != "00")
@@ -224,7 +229,7 @@ export async function VideoResponse(
   }
   //check if incidencesPerDay_date.json exists
   const cPerDayStart = new Date().getTime();
-  let cPerDay: CperDay = {usedColorRanges: undefined, data: undefined};
+  let cPerDay: CperDay = { usedColorRanges: undefined, data: undefined };
   const jsonFileName = `${incidenceDataPath}${region}-cPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
     cPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
@@ -383,30 +388,30 @@ export async function VideoResponse(
         ? `${incidenceDataPath}${allRegionsColorsPerDayFiles[1]}`
         : "dummy";
     // load the old incidences (if exists)
-    let oldCPerDay: CperDay = {usedColorRanges: undefined, data: undefined};
+    let oldCPerDay: CperDay = { usedColorRanges: undefined, data: undefined };
     if (fs.existsSync(oldRegionsColorsPerDayFile)) {
       const oldCPerDayFile = JSON.parse(
         fs.readFileSync(oldRegionsColorsPerDayFile).toString()
       );
       if (oldCPerDayFile.usedColorRanges) {
-        oldCPerDay.usedColorRanges = oldCPerDayFile.usedColorRanges
+        oldCPerDay.usedColorRanges = oldCPerDayFile.usedColorRanges;
       }
       if (oldCPerDayFile.data) {
-        oldCPerDay.data = oldCPerDayFile.data
+        oldCPerDay.data = oldCPerDayFile.data;
       } else {
-        oldCPerDay.data = oldCPerDayFile
+        oldCPerDay.data = oldCPerDayFile;
       }
     }
-    let oldCPerDayKeys = []
+    let oldCPerDayKeys = [];
     if (oldCPerDay.data) {
       // get a sorted list of old incidencePerDay keys
       oldCPerDayKeys = Object.keys(oldCPerDay.data).sort(
         (a, b) => new Date(a).getTime() - new Date(b).getTime()
       );
     } else {
-      oldCPerDayKeys[0] = "dummy"
+      oldCPerDayKeys[0] = "dummy";
     }
-    
+
     let fileNames: FileNames = {};
     if (oldCPerDayKeys[0] != cPerDayKeys[0]) {
       cPerDayKeys.forEach((date, index) => {
@@ -433,36 +438,38 @@ export async function VideoResponse(
       });
       cPerDayKeys.sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
-    
+
     interface Changes {
-      key: string,
-      oldColor: number,
-      newColor: number
+      key: string;
+      oldColor: number;
+      newColor: number;
     }
 
     interface AllDiffs {
-      date: string,
-      changes: Changes[],
+      date: string;
+      changes: Changes[];
     }
 
     // find all days that changed one or more colors, and store this key to allDiffs
     const findDiffsStart = new Date().getTime();
-    let allDiffs: AllDiffs[] = [] ;
-    if (isEqual(oldCPerDay.usedColorRanges, cPerDay.usedColorRanges)){
+    let allDiffs: AllDiffs[] = [];
+    if (isEqual(oldCPerDay.usedColorRanges, cPerDay.usedColorRanges)) {
       for (const date of cPerDayKeys) {
         // if datekey is not present in old incidences file always calculate this date, push key to allDiffs[]
         let changes: Changes[] = [];
         if (!oldCPerDay.data[date]) {
           allDiffs.push({
             date: date,
-            changes: [{
-              key: "new date",
-              oldColor: null,
-              newColor: null,
-            }]
+            changes: [
+              {
+                key: "new date",
+                oldColor: null,
+                newColor: null,
+              },
+            ],
           });
         } else {
-          if (!isEqual(oldCPerDay.data[date], cPerDay.data[date])){
+          if (!isEqual(oldCPerDay.data[date], cPerDay.data[date])) {
             // else test every regionKey for changed color indexes,
             for (const rgnKy of Object.keys(cPerDay.data[date])) {
               const newCindex = cPerDay.data[date][rgnKy];
@@ -479,7 +486,7 @@ export async function VideoResponse(
             allDiffs.push({
               date: date,
               changes: changes,
-            })
+            });
           }
         }
       }
@@ -500,20 +507,25 @@ export async function VideoResponse(
               `${region}: date: ${day.date}; change => key: ${change.key} oldColor: ${change.oldColor} newColor: ${change.newColor}`
             );
           }
-        })
+        });
       });
     } else {
       for (const date of cPerDayKeys) {
-        allDiffs.push({date: date, changes: [{key: "new ranges", oldColor: null, newColor: null}]});
-      };
+        allDiffs.push({
+          date: date,
+          changes: [{ key: "new ranges", oldColor: null, newColor: null }],
+        });
+      }
       const findDiffsEnd = new Date().getTime();
       console.log(
         `${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
-        } seconds. Color ranges have changed! Must recalculate all ${allDiffs.length} frames!`
-      )
+        } seconds. Color ranges have changed! Must recalculate all ${
+          allDiffs.length
+        } frames!`
+      );
     }
-    
+
     const createPromisesStart = new Date().getTime();
     // if length allDiffs[] > 0
     // re-/calculate all new or changed days as promises

@@ -11,6 +11,8 @@ import {
   getGermanyRecoveredHistory,
   getGermanyIncidenceHistory,
   getGermanyAgeGroups,
+  getGermanyCasesChangesHistory,
+  G_CasesChangesHistory,
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData, AgeGroupData } from "../data-requests/states";
@@ -19,7 +21,14 @@ import {
   getLatestHospitalizationDataKey,
 } from "../data-requests/hospitalization";
 import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
-import { getDateBefore, AddDaysToDate, limit, getMetaData } from "../utils";
+import {
+  getDateBefore,
+  AddDaysToDate,
+  limit,
+  getMetaData,
+  getMetaDataRD5,
+} from "../utils";
+import { ResponseData } from "../data-requests/response-data";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -156,6 +165,74 @@ export async function GermanyCasesHistoryResponse(
 
   return {
     data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
+  };
+}
+
+interface GermanyHistoryDataObj<T> extends IResponseMeta {
+  data: T;
+  meta: ResponseMeta;
+}
+
+export async function GermanyCasesChangesHistoryResponse(
+  days?: number
+): Promise<GermanyHistoryDataObj<G_CasesChangesHistory>> {
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
+  }
+
+  const metaData = await getMetaDataRD5();
+  const data = await getGermanyCasesChangesHistory(metaData);
+
+  return {
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
+  };
+}
+
+export async function GermanyCasesLastChangeHistoryResponse(
+  days?: number
+): Promise<
+  GermanyHistoryData<{
+    cases: number;
+    date: Date;
+    lastChangeDate: Date;
+    changes: number;
+  }>
+> {
+  if (days != null) {
+    if (isNaN(days)) {
+      throw new TypeError(
+        "Wrong format for ':days' parameter! This is not a number."
+      );
+    } else if (days <= 0) {
+      throw new TypeError("':days' parameter must be > '0'");
+    }
+  }
+
+  const metaData = await getMetaDataRD5();
+  const data = await getGermanyCasesChangesHistory(metaData);
+  const lastChange = [];
+  Object.keys(data.data).forEach((date) => {
+    const changes = data.data[date].length;
+    const cases = data.data[date][changes - 1].cases;
+    const lastDate = data.data[date][changes - 1].changeDate;
+    lastChange.push({
+      cases: cases,
+      lastChangeDate: lastDate,
+      date: new Date(date),
+      changes: changes,
+    });
+  });
+
+  return {
+    data: lastChange,
     meta: new ResponseMeta(data.lastUpdate),
   };
 }
