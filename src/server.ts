@@ -27,6 +27,8 @@ import {
   GermanyWeekIncidenceHistoryResponse,
   GermanyFrozenIncidenceHistoryResponse,
   GermanyHospitalizationHistoryResponse,
+  GermanyCasesChangesHistoryResponse,
+  GermanyCasesLastChangeHistoryResponse,
 } from "./responses/germany";
 import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import {
@@ -37,7 +39,7 @@ import {
   DistrictsWeekIncidenceHistoryResponse,
   FrozenIncidenceHistoryResponse,
   DistrictsAgeGroupsResponse,
-  DistrictsIncidenceHistoryByDate
+  DistrictsIncidenceHistoryByDate,
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -214,6 +216,26 @@ app.get(
   cache.route(),
   async function (req, res) {
     const response = await GermanyCasesHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/changes/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyCasesChangesHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/lastchange/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await GermanyCasesLastChangeHistoryResponse();
     res.json(response);
   }
 );

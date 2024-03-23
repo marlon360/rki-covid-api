@@ -240,11 +240,15 @@ export async function DistrictsIncidenceHistoryByDate(
   const data: DistrictsIncidenceHistoryByDate = {};
 
   for (const history of historyData.data) {
-    const dateKey = history.date.toISOString()
+    const dateKey = history.date.toISOString();
     if (!data[dateKey]) {
       data[dateKey] = [];
     }
-    data[dateKey].push({ags: history.ags, name: history.name, weekIncidence: history.incidence});
+    data[dateKey].push({
+      ags: history.ags,
+      name: history.name,
+      weekIncidence: history.incidence,
+    });
   }
 
   return {
