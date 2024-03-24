@@ -606,7 +606,7 @@ export async function StatesCasesChangesHistoryResponse(
     tillReportDate,
     oneReportDate,
     changeDate,
-    stateId,
+    stateId
   );
 
   return {
@@ -618,16 +618,31 @@ export async function StatesCasesChangesHistoryResponse(
 export async function StatesCasesLastChangeHistoryResponse(
   stateId?: string,
   tillReportDate?: Date
-): Promise<StatesHistoryData<{[id: string]: {cases: number; date: Date; lastChanged: Date; totalNumberOfChanges: number;}[];}>> {
+): Promise<
+  StatesHistoryData<{
+    [id: string]: {
+      cases: number;
+      date: Date;
+      lastChanged: Date;
+      totalNumberOfChanges: number;
+    }[];
+  }>
+> {
   const metaData = await getMetaDataRD5();
-  const data = await getStatesCasesChangesHistory(metaData, tillReportDate, null, null, stateId);
+  const data = await getStatesCasesChangesHistory(
+    metaData,
+    tillReportDate,
+    null,
+    null,
+    stateId
+  );
   const lastChange = {};
   Object.keys(data.data).forEach((state) => {
     Object.keys(data.data[state]).forEach((date) => {
       const changes = data.data[state][date].length;
       const cases = data.data[state][date][changes - 1].cases;
       const lastDate = data.data[state][date][changes - 1].changeDate;
-      if (lastChange[state]){
+      if (lastChange[state]) {
         lastChange[state].push({
           cases: cases,
           lastChanged: lastDate,
@@ -635,12 +650,14 @@ export async function StatesCasesLastChangeHistoryResponse(
           totalNumberOfChanges: changes,
         });
       } else {
-        lastChange[state] = [{
-          cases: cases,
-          lastChanged: lastDate,
-          date: new Date(date),
-          totalNumberOfChanges: changes,
-        }]
+        lastChange[state] = [
+          {
+            cases: cases,
+            lastChanged: lastDate,
+            date: new Date(date),
+            totalNumberOfChanges: changes,
+          },
+        ];
       }
     });
   });

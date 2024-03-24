@@ -60,7 +60,13 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import { RKIError, checkDateParameter, CreateRedisClient, getStateAbbreviationById, getStateIdByAbbreviation } from "./utils";
+import {
+  RKIError,
+  checkDateParameter,
+  CreateRedisClient,
+  getStateAbbreviationById,
+  getStateIdByAbbreviation,
+} from "./utils";
 
 const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
@@ -603,9 +609,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`
@@ -635,9 +644,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`
@@ -672,9 +684,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`
@@ -711,9 +726,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`
@@ -745,9 +763,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`
@@ -777,9 +798,12 @@ app.get(
   queuedCache(),
   cache.route(),
   async function (req, res) {
-    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
-      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
-      : null;
+    const stateId =
+      getStateIdByAbbreviation(req.params.abbreviation) != null
+        ? getStateIdByAbbreviation(req.params.abbreviation)
+            .toString()
+            .padStart(2, "0")
+        : null;
     if (stateId == null) {
       throw new TypeError(
         `${req.params.abbreviation} is not a valid abbreviation for a state`

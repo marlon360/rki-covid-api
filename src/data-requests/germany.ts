@@ -103,7 +103,9 @@ export async function getGermanyCasesChangesHistory(
   }
   // if a changeDate is given filter changeDate
   if (changeDate) {
-    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
+    json.data = json.data.filter(
+      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
+    );
   }
   const casesChangesHistory: G_CasesChangesHistory = json.data.reduce(
     (changes, entry) => {

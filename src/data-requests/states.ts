@@ -4,7 +4,7 @@ import {
   getData,
   MetaData,
   Files,
-  baseUrlRD5
+  baseUrlRD5,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -400,7 +400,7 @@ export interface S_CasesChangesHistory {
       cases: number;
       changeDate: Date;
     }[];
-  }
+  };
 }
 
 export async function getStatesCasesChangesHistory(
@@ -413,11 +413,11 @@ export async function getStatesCasesChangesHistory(
   const json: S_CasesHistoryChangesFile = await getData(
     metaDataRD5,
     Files.S_CasesHistoryLastChangesFile,
-    baseUrlRD5,
+    baseUrlRD5
   );
   // filter id
   if (stateId) {
-    json.data = json.data.filter((state) => state.i == stateId)
+    json.data = json.data.filter((state) => state.i == stateId);
   } else {
     json.data = json.data.filter((state) => state.i != "00");
   }
@@ -435,12 +435,14 @@ export async function getStatesCasesChangesHistory(
   }
   // if a changeDate is given filter changeDate
   if (changeDate) {
-    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
+    json.data = json.data.filter(
+      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
+    );
   }
   const casesChangesHistory: S_CasesChangesHistory = json.data.reduce(
     (state, entry) => {
       const dateStr = new Date(entry.m).toISOString().split("T").shift();
-      const abbreviation = getStateAbbreviationById(parseInt(entry.i))
+      const abbreviation = getStateAbbreviationById(parseInt(entry.i));
       if (state[abbreviation]) {
         if (state[abbreviation][dateStr]) {
           state[abbreviation][dateStr].push({
@@ -448,10 +450,14 @@ export async function getStatesCasesChangesHistory(
             changeDate: new Date(entry.cD),
           });
         } else {
-          state[abbreviation][dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD) }];
+          state[abbreviation][dateStr] = [
+            { cases: entry.c, changeDate: new Date(entry.cD) },
+          ];
         }
       } else {
-        state[abbreviation] = {[dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }]};
+        state[abbreviation] = {
+          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }],
+        };
       }
       return state;
     },
@@ -459,7 +465,7 @@ export async function getStatesCasesChangesHistory(
   );
 
   Object.keys(casesChangesHistory).forEach((state) => {
-    Object.keys(casesChangesHistory[state]).forEach((date) =>{
+    Object.keys(casesChangesHistory[state]).forEach((date) => {
       casesChangesHistory[state][date].sort((a, b) => {
         const dateA = new Date(a.changeDate);
         const dateB = new Date(b.changeDate);
