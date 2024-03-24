@@ -11,6 +11,8 @@ import {
   IStateData,
   getStatesAgeGroups,
   AgeGroupsData,
+  S_CasesChangesHistory,
+  getStatesCasesChangesHistory,
 } from "../data-requests/states";
 import {
   AddDaysToDate,
@@ -22,7 +24,7 @@ import {
   getDateBefore,
   limit,
   getMetaData,
-  MetaData,
+  getMetaDataRD5,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
 import {
@@ -584,5 +586,84 @@ export async function StatesFrozenIncidenceHistoryResponse(
   return {
     data: data,
     meta: new ResponseMeta(frozenIncidenceHistoryData.lastUpdate),
+  };
+}
+
+interface StatesHistoryDataObj<T> extends IResponseMeta {
+  data: T;
+  meta: ResponseMeta;
+}
+
+export async function StatesCasesChangesHistoryResponse(
+  stateId?: string,
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date
+): Promise<StatesHistoryDataObj<S_CasesChangesHistory>> {
+  const metaData = await getMetaDataRD5();
+  const data = await getStatesCasesChangesHistory(
+    metaData,
+    tillReportDate,
+    oneReportDate,
+    changeDate,
+    stateId
+  );
+
+  return {
+    data: data.data,
+    meta: new ResponseMeta(data.lastUpdate),
+  };
+}
+
+export async function StatesCasesLastChangeHistoryResponse(
+  stateId?: string,
+  tillReportDate?: Date
+): Promise<
+  StatesHistoryData<{
+    [id: string]: {
+      cases: number;
+      date: Date;
+      lastChanged: Date;
+      totalNumberOfChanges: number;
+    }[];
+  }>
+> {
+  const metaData = await getMetaDataRD5();
+  const data = await getStatesCasesChangesHistory(
+    metaData,
+    tillReportDate,
+    null,
+    null,
+    stateId
+  );
+  const lastChange = {};
+  Object.keys(data.data).forEach((state) => {
+    Object.keys(data.data[state]).forEach((date) => {
+      const changes = data.data[state][date].length;
+      const cases = data.data[state][date][changes - 1].cases;
+      const lastDate = data.data[state][date][changes - 1].changeDate;
+      if (lastChange[state]) {
+        lastChange[state].push({
+          cases: cases,
+          lastChanged: lastDate,
+          date: new Date(date),
+          totalNumberOfChanges: changes,
+        });
+      } else {
+        lastChange[state] = [
+          {
+            cases: cases,
+            lastChanged: lastDate,
+            date: new Date(date),
+            totalNumberOfChanges: changes,
+          },
+        ];
+      }
+    });
+  });
+
+  return {
+    data: lastChange,
+    meta: new ResponseMeta(data.lastUpdate),
   };
 }
