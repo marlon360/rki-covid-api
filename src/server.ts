@@ -17,6 +17,8 @@ import {
   StatesAgeGroupsResponse,
   StatesFrozenIncidenceHistoryResponse,
   StatesHospitalizationHistoryResponse,
+  StatesCasesChangesHistoryResponse,
+  StatesCasesLastChangeHistoryResponse,
 } from "./responses/states";
 import {
   GermanyAgeGroupsResponse,
@@ -58,7 +60,7 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import { RKIError, checkDateParameter, CreateRedisClient } from "./utils";
+import { RKIError, checkDateParameter, CreateRedisClient, getStateAbbreviationById, getStateIdByAbbreviation } from "./utils";
 
 const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
@@ -581,6 +583,212 @@ app.get(
   async function (req, res) {
     const response = await StatesHospitalizationHistoryResponse(
       parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/changes/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesCasesChangesHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/changes/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    const response = await StatesCasesChangesHistoryResponse(stateId);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/changes/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/changes/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      stateId,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/changesofreportday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/changesofreportday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      stateId,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/changesofchangeday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      null,
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/changesofchangeday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesChangesHistoryResponse(
+      stateId,
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/lastchange/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await StatesCasesLastChangeHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/lastchange/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    const response = await StatesCasesLastChangeHistoryResponse(stateId);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/history/lastchange/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesLastChangeHistoryResponse(
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/states/:abbreviation/history/lastchange/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const stateId = getStateIdByAbbreviation(req.params.abbreviation) != null 
+      ? getStateIdByAbbreviation(req.params.abbreviation).toString().padStart(2, "0")
+      : null;
+    if (stateId == null) {
+      throw new TypeError(
+        `${req.params.abbreviation} is not a valid abbreviation for a state`
+      );
+    }
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await StatesCasesLastChangeHistoryResponse(
+      stateId,
+      new Date(checkedDateString)
     );
     res.json(response);
   }

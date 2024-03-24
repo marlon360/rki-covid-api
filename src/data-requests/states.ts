@@ -4,6 +4,7 @@ import {
   getData,
   MetaData,
   Files,
+  baseUrlRD5
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -390,5 +391,85 @@ export async function getStatesAgeGroups(
   return {
     data: states,
     lastUpdate: new Date(json.metaData.modified),
+  };
+}
+
+export interface S_CasesChangesHistory {
+  [id: string]: {
+    [date: string]: {
+      cases: number;
+      changeDate: Date;
+    }[];
+  }
+}
+
+export async function getStatesCasesChangesHistory(
+  metaDataRD5: MetaData,
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date,
+  stateId?: string
+): Promise<ResponseData<S_CasesChangesHistory>> {
+  const json: S_CasesHistoryChangesFile = await getData(
+    metaDataRD5,
+    Files.S_CasesHistoryLastChangesFile,
+    baseUrlRD5,
+  );
+  // filter id
+  if (stateId) {
+    json.data = json.data.filter((state) => state.i == stateId)
+  } else {
+    json.data = json.data.filter((state) => state.i != "00");
+  }
+  // if till date is given filter meldedatum
+  if (tillReportDate) {
+    json.data = json.data.filter(
+      (dates) => dates.m.getTime() >= tillReportDate.getTime()
+    );
+  }
+  // if oneReportDate is given filter to this date
+  if (oneReportDate) {
+    json.data = json.data.filter(
+      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
+    );
+  }
+  // if a changeDate is given filter changeDate
+  if (changeDate) {
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
+  }
+  const casesChangesHistory: S_CasesChangesHistory = json.data.reduce(
+    (state, entry) => {
+      const dateStr = new Date(entry.m).toISOString().split("T").shift();
+      const abbreviation = getStateAbbreviationById(parseInt(entry.i))
+      if (state[abbreviation]) {
+        if (state[abbreviation][dateStr]) {
+          state[abbreviation][dateStr].push({
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+          });
+        } else {
+          state[abbreviation][dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD) }];
+        }
+      } else {
+        state[abbreviation] = {[dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }]};
+      }
+      return state;
+    },
+    {}
+  );
+
+  Object.keys(casesChangesHistory).forEach((state) => {
+    Object.keys(casesChangesHistory[state]).forEach((date) =>{
+      casesChangesHistory[state][date].sort((a, b) => {
+        const dateA = new Date(a.changeDate);
+        const dateB = new Date(b.changeDate);
+        return dateA.getTime() - dateB.getTime();
+      });
+    });
+  });
+
+  return {
+    lastUpdate: new Date(json.metaData.modified),
+    data: casesChangesHistory,
   };
 }
