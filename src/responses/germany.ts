@@ -175,20 +175,17 @@ interface GermanyHistoryDataObj<T> extends IResponseMeta {
 }
 
 export async function GermanyCasesChangesHistoryResponse(
-  days?: number
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date
 ): Promise<GermanyHistoryDataObj<G_CasesChangesHistory>> {
-  if (days != null) {
-    if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
-    } else if (days <= 0) {
-      throw new TypeError("':days' parameter must be > '0'");
-    }
-  }
-
   const metaData = await getMetaDataRD5();
-  const data = await getGermanyCasesChangesHistory(metaData);
+  const data = await getGermanyCasesChangesHistory(
+    metaData,
+    tillReportDate,
+    oneReportDate,
+    changeDate
+  );
 
   return {
     data: data.data,
@@ -197,27 +194,17 @@ export async function GermanyCasesChangesHistoryResponse(
 }
 
 export async function GermanyCasesLastChangeHistoryResponse(
-  days?: number
+  tillReportDate?: Date
 ): Promise<
   GermanyHistoryData<{
     cases: number;
     date: Date;
-    lastChangeDate: Date;
-    changes: number;
+    lastChanged: Date;
+    totalNumberOfChanges: number;
   }>
 > {
-  if (days != null) {
-    if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
-    } else if (days <= 0) {
-      throw new TypeError("':days' parameter must be > '0'");
-    }
-  }
-
   const metaData = await getMetaDataRD5();
-  const data = await getGermanyCasesChangesHistory(metaData);
+  const data = await getGermanyCasesChangesHistory(metaData, tillReportDate);
   const lastChange = [];
   Object.keys(data.data).forEach((date) => {
     const changes = data.data[date].length;
@@ -225,9 +212,9 @@ export async function GermanyCasesLastChangeHistoryResponse(
     const lastDate = data.data[date][changes - 1].changeDate;
     lastChange.push({
       cases: cases,
-      lastChangeDate: lastDate,
+      lastChanged: lastDate,
       date: new Date(date),
-      changes: changes,
+      totalNumberOfChanges: changes,
     });
   });
 

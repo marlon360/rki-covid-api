@@ -77,16 +77,36 @@ export interface G_CasesChangesHistory {
 }
 
 export async function getGermanyCasesChangesHistory(
-  metaDataRD5: MetaData
+  metaDataRD5: MetaData,
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date
 ): Promise<ResponseData<G_CasesChangesHistory>> {
   const json: S_CasesHistoryChangesFile = await getData(
     metaDataRD5,
     Files.S_CasesHistoryLastChangesFile,
     baseUrlRD5
   );
-  const casesChangesHistory: G_CasesChangesHistory = json.data
-    .filter((state) => state.i == "00")
-    .reduce((changes, entry) => {
+  // filter to only germany data
+  json.data = json.data.filter((state) => state.i == "00");
+  // if till date is given filter meldedatum
+  if (tillReportDate) {
+    json.data = json.data.filter(
+      (dates) => dates.m.getTime() >= tillReportDate.getTime()
+    );
+  }
+  // if oneReportDate is given filter to this date
+  if (oneReportDate) {
+    json.data = json.data.filter(
+      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
+    );
+  }
+  // if a changeDate is given filter changeDate
+  if (changeDate) {
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
+  }
+  const casesChangesHistory: G_CasesChangesHistory = json.data.reduce(
+    (changes, entry) => {
       const dateStr = new Date(entry.m).toISOString().split("T").shift();
       if (changes[dateStr]) {
         changes[dateStr].push({
@@ -97,7 +117,9 @@ export async function getGermanyCasesChangesHistory(
         changes[dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD) }];
       }
       return changes;
-    }, {});
+    },
+    {}
+  );
 
   Object.keys(casesChangesHistory).forEach((date) => {
     casesChangesHistory[date].sort((a, b) => {

@@ -58,11 +58,7 @@ import {
   StatesHistoryMapResponse,
   mapTypes,
 } from "./responses/map";
-import {
-  RKIError,
-  checkDateParameterForMaps,
-  CreateRedisClient,
-} from "./utils";
+import { RKIError, checkDateParameter, CreateRedisClient } from "./utils";
 
 const cache = require("express-redis-cache-next")({
   expire: { 200: 1800, 400: 180, 503: 180, xxx: 180 },
@@ -231,11 +227,66 @@ app.get(
 );
 
 app.get(
+  "/germany/history/changes/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await GermanyCasesChangesHistoryResponse(
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/changesofreportday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await GermanyCasesChangesHistoryResponse(
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/changesofchangeday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await GermanyCasesChangesHistoryResponse(
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
   "/germany/history/lastchange/cases",
   queuedCache(),
   cache.route(),
   async function (req, res) {
     const response = await GermanyCasesLastChangeHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/germany/history/lastchange/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await GermanyCasesLastChangeHistoryResponse(
+      new Date(checkedDateString)
+    );
     res.json(response);
   }
 );
@@ -1087,7 +1138,7 @@ app.get(
   "/map/districts/history/:date",
   queuedCache(),
   async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    let checkedDateString: string = checkDateParameter(req.params.date);
     const response = await DistrictsHistoryMapResponse(
       mapTypes.map,
       checkedDateString
@@ -1105,7 +1156,7 @@ app.get(
   "/map/districts-legend/history/:date",
   queuedCache(),
   async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    let checkedDateString: string = checkDateParameter(req.params.date);
     const response = await DistrictsHistoryMapResponse(
       mapTypes.legendMap,
       checkedDateString
@@ -1124,7 +1175,7 @@ app.get("/map/states", queuedCache(), async function (req, res) {
 });
 
 app.get("/map/states/history/:date", queuedCache(), async function (req, res) {
-  let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+  let checkedDateString: string = checkDateParameter(req.params.date);
   const response = await StatesHistoryMapResponse(
     mapTypes.map,
     checkedDateString
@@ -1141,7 +1192,7 @@ app.get(
   "/map/states-legend/history/:date",
   queuedCache(),
   async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    let checkedDateString: string = checkDateParameter(req.params.date);
     const response = await StatesHistoryMapResponse(
       mapTypes.legendMap,
       checkedDateString
@@ -1176,7 +1227,7 @@ app.get(
   "/map/states-legend/hospitalization/history/:date",
   queuedCache(),
   async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    let checkedDateString: string = checkDateParameter(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
       mapTypes.legendMap,
       checkedDateString
@@ -1189,7 +1240,7 @@ app.get(
   "/map/states/hospitalization/history/:date",
   queuedCache(),
   async function (req, res) {
-    let checkedDateString: string = checkDateParameterForMaps(req.params.date);
+    let checkedDateString: string = checkDateParameter(req.params.date);
     const response = await StatesHospitalizationHistoryMapResponse(
       mapTypes.map,
       checkedDateString

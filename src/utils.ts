@@ -258,7 +258,7 @@ export class RKIError extends Error {
   }
 }
 
-export function checkDateParameterForMaps(parmsDate: string) {
+export function checkDateParameter(parmsDate: string) {
   let dateString: string;
   // Parametercheck
   if (
@@ -354,7 +354,9 @@ export function dateReviver(objKey: string, objValue: string | number | Date) {
     objKey.includes("date") ||
     objKey.includes("datum") ||
     objKey.includes("Datum") ||
-    objKey == "Datenstand"
+    objKey == "Datenstand" ||
+    objKey == "m" ||
+    objKey == "cD"
   ) {
     return new Date(objValue);
   }
