@@ -393,10 +393,8 @@ export async function getDistrictsCasesChangesHistory(
   // filter id
   if (districtId) {
     json.data = json.data.filter((district) => district.i == districtId);
-    if (json.data.length == 0){
-      throw new TypeError(
-        `${districtId} is not a valid ags for a district`
-      );
+    if (json.data.length == 0) {
+      throw new TypeError(`${districtId} is not a valid ags for a district`);
     }
   }
   // if till date is given filter meldedatum
