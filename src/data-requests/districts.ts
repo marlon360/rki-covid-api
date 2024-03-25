@@ -1,4 +1,4 @@
-import { getDateBefore, getData, MetaData, Files } from "../utils";
+import { getDateBefore, getData, MetaData, Files, baseUrlRD5 } from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
 import LK_Names from "../configuration/LK_Names.json";
@@ -356,5 +356,103 @@ export async function getDistrictsAgeGroups(
   return {
     data: districts,
     lastUpdate: new Date(json.metaData.modified),
+  };
+}
+
+export interface D_CasesChangesHistory {
+  [id: string]: {
+    [date: string]: {
+      cases: number;
+      changeDate: Date;
+    }[];
+  };
+}
+
+export interface D_CasesHistoryChangesFile {
+  data: {
+    m: Date; // Meldedatum
+    i: string; // id Bundesland
+    c: number; // Fälle
+    cD: Date; // ÄnderungsDatum
+  }[];
+  metaData: MetaData;
+}
+
+export async function getDistrictsCasesChangesHistory(
+  metaDataRD5: MetaData,
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date,
+  districtId?: string
+): Promise<ResponseData<D_CasesChangesHistory>> {
+  const json: D_CasesHistoryChangesFile = await getData(
+    metaDataRD5,
+    Files.D_CasesHistoryLastChangesFile,
+    baseUrlRD5
+  );
+  // filter id
+  if (districtId) {
+    json.data = json.data.filter((district) => district.i == districtId);
+    if (json.data.length == 0){
+      throw new TypeError(
+        `${districtId} is not a valid ags for a district`
+      );
+    }
+  }
+  // if till date is given filter meldedatum
+  if (tillReportDate) {
+    json.data = json.data.filter(
+      (dates) => dates.m.getTime() >= tillReportDate.getTime()
+    );
+  }
+  // if oneReportDate is given filter to this date
+  if (oneReportDate) {
+    json.data = json.data.filter(
+      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
+    );
+  }
+  // if a changeDate is given filter changeDate
+  if (changeDate) {
+    json.data = json.data.filter(
+      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
+    );
+  }
+  const casesChangesHistory: D_CasesChangesHistory = json.data.reduce(
+    (district, entry) => {
+      const dateStr = new Date(entry.m).toISOString().split("T").shift();
+      if (district[entry.i]) {
+        if (district[entry.i][dateStr]) {
+          district[entry.i][dateStr].push({
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+          });
+        } else {
+          district[entry.i][dateStr] = [
+            { cases: entry.c, changeDate: new Date(entry.cD) },
+          ];
+        }
+      } else {
+        district[entry.i] = {
+          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }],
+        };
+      }
+      return district;
+    },
+    {}
+  );
+
+  Object.keys(casesChangesHistory).forEach((district) => {
+    Object.keys(casesChangesHistory[district]).forEach((date) => {
+      casesChangesHistory[district][date].sort((a, b) => {
+        const dateA = new Date(a.changeDate);
+        const dateB = new Date(b.changeDate);
+        return dateA.getTime() - dateB.getTime();
+      });
+    });
+  });
+
+  return {
+    lastUpdate: new Date(json.metaData.modified),
+    data: casesChangesHistory,
   };
 }
