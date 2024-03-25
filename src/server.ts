@@ -42,6 +42,8 @@ import {
   FrozenIncidenceHistoryResponse,
   DistrictsAgeGroupsResponse,
   DistrictsIncidenceHistoryByDate,
+  DistrictsCasesChangesHistoryResponse,
+  DistrictsCasesLastChangeHistoryResponse,
 } from "./responses/districts";
 import {
   VaccinationResponse,
@@ -1126,6 +1128,206 @@ app.get(
   async function (req, res) {
     const response = await DistrictsRecoveredHistoryResponse(
       parseInt(req.params.days)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/changes/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsCasesChangesHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/changes/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    const response = await DistrictsCasesChangesHistoryResponse(districtId);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/changes/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/changes/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      districtId,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/changesofreportday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/changesofreportday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      districtId,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/changesofchangeday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      null,
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/changesofchangeday/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesChangesHistoryResponse(
+      districtId,
+      null,
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/lastchange/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    const response = await DistrictsCasesLastChangeHistoryResponse();
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/lastchange/cases",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    const response = await DistrictsCasesLastChangeHistoryResponse(districtId);
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/history/lastchange/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesLastChangeHistoryResponse(
+      null,
+      new Date(checkedDateString)
+    );
+    res.json(response);
+  }
+);
+
+app.get(
+  "/districts/:ags/history/lastchange/cases/:filter",
+  queuedCache(),
+  cache.route(),
+  async function (req, res) {
+    let districtId = req.params.ags.toString();
+    if (districtId.length != 4 && districtId.length != 5) {
+      throw new TypeError(
+        `${req.params.ags} is not a valid ags for a district`
+      );
+    }
+    districtId = districtId.padStart(5, "0");
+    let checkedDateString: string = checkDateParameter(req.params.filter);
+    const response = await DistrictsCasesLastChangeHistoryResponse(
+      districtId,
+      new Date(checkedDateString)
     );
     res.json(response);
   }
