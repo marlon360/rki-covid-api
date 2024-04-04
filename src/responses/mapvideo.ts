@@ -494,7 +494,7 @@ export async function VideoResponse(
         }
       }
       const findDiffsEnd = new Date().getTime();
-      logDate = new Date(findDiffsEnd).toISOString()
+      logDate = new Date(findDiffsEnd).toISOString();
       console.log(
         `${logDate}: ${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
@@ -503,12 +503,12 @@ export async function VideoResponse(
       allDiffs.forEach((day) => {
         day.changes.forEach((change) => {
           if (change.key == "new date") {
-            logDate = new Date().toISOString()
+            logDate = new Date().toISOString();
             console.log(
               `${logDate}: ${region}: date: ${day.date}; change => ${change.key}`
             );
           } else {
-            logDate = new Date().toISOString()
+            logDate = new Date().toISOString();
             console.log(
               `${logDate}: ${region}: date: ${day.date}; change => key: ${change.key} oldColor: ${change.oldColor} newColor: ${change.newColor}`
             );
@@ -523,7 +523,7 @@ export async function VideoResponse(
         });
       }
       const findDiffsEnd = new Date().getTime();
-      logDate = new Date(findDiffsEnd).toISOString()
+      logDate = new Date(findDiffsEnd).toISOString();
       console.log(
         `${logDate}: ${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
