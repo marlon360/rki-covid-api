@@ -228,14 +228,16 @@ export async function VideoResponse(
     fs.writeFileSync(statusFileName, JSON.stringify(initialStatus));
   }
   //check if incidencesPerDay_date.json exists
+  let logDate: string;
   const cPerDayStart = new Date().getTime();
   let cPerDay: CperDay = { usedColorRanges: undefined, data: undefined };
   const jsonFileName = `${incidenceDataPath}${region}-cPerDay_${refDate}.json`;
   if (fs.existsSync(jsonFileName)) {
     cPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
     const cPerDayEnd = new Date().getTime();
+    logDate = new Date(cPerDayEnd).toISOString();
     console.log(
-      `${region}: get cPerDay from cPerDay file: ${
+      `${logDate}: ${region}: get cPerDay from cPerDay file: ${
         (cPerDayEnd - cPerDayStart) / 1000
       } seconds`
     );
@@ -245,8 +247,9 @@ export async function VideoResponse(
     // store to disc
     fs.writeFileSync(jsonFileName, JSON.stringify(cPerDay));
     const cPerDayEnd = new Date().getTime();
+    logDate = new Date(cPerDayEnd).toISOString();
     console.log(
-      `${region}: get cPerDay calculated from incidenceFile: ${
+      `${logDate}: ${region}: get cPerDay calculated from incidenceFile: ${
         (cPerDayEnd - cPerDayStart) / 1000
       } seconds`
     );
@@ -491,20 +494,23 @@ export async function VideoResponse(
         }
       }
       const findDiffsEnd = new Date().getTime();
+      logDate = new Date(findDiffsEnd).toISOString();
       console.log(
-        `${region}: find all diffs: ${
+        `${logDate}: ${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
         } seconds. ${allDiffs.length} changed dates.`
       );
       allDiffs.forEach((day) => {
         day.changes.forEach((change) => {
           if (change.key == "new date") {
+            logDate = new Date().toISOString();
             console.log(
-              `${region}: date: ${day.date}; change => ${change.key}`
+              `${logDate}: ${region}: date: ${day.date}; change => ${change.key}`
             );
           } else {
+            logDate = new Date().toISOString();
             console.log(
-              `${region}: date: ${day.date}; change => key: ${change.key} oldColor: ${change.oldColor} newColor: ${change.newColor}`
+              `${logDate}: ${region}: date: ${day.date}; change => key: ${change.key} oldColor: ${change.oldColor} newColor: ${change.newColor}`
             );
           }
         });
@@ -517,8 +523,9 @@ export async function VideoResponse(
         });
       }
       const findDiffsEnd = new Date().getTime();
+      logDate = new Date(findDiffsEnd).toISOString();
       console.log(
-        `${region}: find all diffs: ${
+        `${logDate}: ${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
         } seconds. Color ranges have changed! Must recalculate all ${
           allDiffs.length
@@ -601,16 +608,18 @@ export async function VideoResponse(
         );
       });
       const createPromisesEnd = new Date().getTime();
+      logDate = new Date(createPromisesEnd).toISOString();
       console.log(
-        `${region}: create Promises ${
+        `${logDate}: ${region}: create Promises ${
           (createPromisesEnd - createPromisesStart) / 1000
         } seconds`
       );
       // await all frames promises
       await Promise.all(promises);
       const executePromisesEnd = new Date().getTime();
+      logDate = new Date(executePromisesEnd).toISOString();
       console.log(
-        `${region}: execute Promises ${
+        `${logDate}: ${region}: execute Promises ${
           (executePromisesEnd - createPromisesEnd) / 1000
         } seconds`
       );
@@ -657,8 +666,9 @@ export async function VideoResponse(
     lockFile
   );
   const createVideoEnd = new Date().getTime();
+  logDate = new Date(createVideoEnd).toISOString();
   console.log(
-    `${region}: video rendering time ${
+    `${logDate}: ${region}: video rendering time ${
       (createVideoEnd - createVideoStart) / 1000
     } seconds`
   );
