@@ -364,6 +364,7 @@ export interface D_CasesChangesHistory {
     [date: string]: {
       cases: number;
       changeDate: Date;
+      deltaCases: number;
     }[];
   };
 }
@@ -374,6 +375,7 @@ export interface D_CasesHistoryChangesFile {
     i: string; // id Bundesland
     c: number; // Fälle
     cD: Date; // ÄnderungsDatum
+    dc: number; // delta cases
   }[];
   metaData: MetaData;
 }
@@ -423,15 +425,26 @@ export async function getDistrictsCasesChangesHistory(
           district[entry.i][dateStr].push({
             cases: entry.c,
             changeDate: new Date(entry.cD),
+            deltaCases: entry.dc,
           });
         } else {
           district[entry.i][dateStr] = [
-            { cases: entry.c, changeDate: new Date(entry.cD) },
+            {
+              cases: entry.c,
+              changeDate: new Date(entry.cD),
+              deltaCases: entry.dc,
+            },
           ];
         }
       } else {
         district[entry.i] = {
-          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }],
+          [dateStr]: [
+            {
+              cases: entry.c,
+              changeDate: new Date(entry.cD),
+              deltaCases: entry.dc,
+            },
+          ],
         };
       }
       return district;

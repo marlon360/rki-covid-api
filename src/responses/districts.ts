@@ -441,6 +441,7 @@ export async function DistrictsCasesLastChangeHistoryResponse(
       date: Date;
       lastChanged: Date;
       totalNumberOfChanges: number;
+      deltaCases: number;
     }[];
   }>
 > {
@@ -458,12 +459,14 @@ export async function DistrictsCasesLastChangeHistoryResponse(
       const changes = data.data[state][date].length;
       const cases = data.data[state][date][changes - 1].cases;
       const lastDate = data.data[state][date][changes - 1].changeDate;
+      const deltaCases = data.data[state][date][changes - 1].deltaCases;
       if (lastChange[state]) {
         lastChange[state].push({
           cases: cases,
           lastChanged: lastDate,
           date: new Date(date),
           totalNumberOfChanges: changes,
+          deltaCases: deltaCases,
         });
       } else {
         lastChange[state] = [
@@ -472,6 +475,7 @@ export async function DistrictsCasesLastChangeHistoryResponse(
             lastChanged: lastDate,
             date: new Date(date),
             totalNumberOfChanges: changes,
+            deltaCases: deltaCases,
           },
         ];
       }

@@ -73,6 +73,7 @@ export interface G_CasesChangesHistory {
   [date: string]: {
     cases: number;
     changeDate: Date;
+    deltaCases: number;
   }[];
 }
 
@@ -114,9 +115,16 @@ export async function getGermanyCasesChangesHistory(
         changes[dateStr].push({
           cases: entry.c,
           changeDate: new Date(entry.cD),
+          deltaCases: entry.dc,
         });
       } else {
-        changes[dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD) }];
+        changes[dateStr] = [
+          {
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+            deltaCases: entry.dc,
+          },
+        ];
       }
       return changes;
     },
