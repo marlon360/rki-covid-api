@@ -148,6 +148,7 @@ export interface S_CasesHistoryChangesFile {
     i: string; // id Bundesland
     c: number; // Fälle
     cD: Date; // ÄnderungsDatum
+    dc: number; // delta cases
   }[];
   metaData: MetaData;
 }
@@ -399,6 +400,7 @@ export interface S_CasesChangesHistory {
     [date: string]: {
       cases: number;
       changeDate: Date;
+      deltaCases: number;
     }[];
   };
 }
@@ -448,15 +450,16 @@ export async function getStatesCasesChangesHistory(
           state[abbreviation][dateStr].push({
             cases: entry.c,
             changeDate: new Date(entry.cD),
+            deltaCases: entry.dc
           });
         } else {
           state[abbreviation][dateStr] = [
-            { cases: entry.c, changeDate: new Date(entry.cD) },
+            { cases: entry.c, changeDate: new Date(entry.cD), deltaCases: entry.dc },
           ];
         }
       } else {
         state[abbreviation] = {
-          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD) }],
+          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD), deltaCases: entry.dc }],
         };
       }
       return state;
