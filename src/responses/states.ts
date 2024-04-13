@@ -643,7 +643,7 @@ export async function StatesCasesLastChangeHistoryResponse(
       const changes = data.data[state][date].length;
       const cases = data.data[state][date][changes - 1].cases;
       const lastDate = data.data[state][date][changes - 1].changeDate;
-      const deltaCases = data.data[state][date][changes -1].deltaCases;
+      const deltaCases = data.data[state][date][changes - 1].deltaCases;
       if (lastChange[state]) {
         lastChange[state].push({
           cases: cases,

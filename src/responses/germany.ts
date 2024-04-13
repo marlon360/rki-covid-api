@@ -211,7 +211,7 @@ export async function GermanyCasesLastChangeHistoryResponse(
     const changes = data.data[date].length;
     const cases = data.data[date][changes - 1].cases;
     const lastDate = data.data[date][changes - 1].changeDate;
-    const deltaCases = data.data[date][changes - 1].deltaCases
+    const deltaCases = data.data[date][changes - 1].deltaCases;
     lastChange.push({
       cases: cases,
       lastChanged: lastDate,

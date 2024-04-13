@@ -425,16 +425,26 @@ export async function getDistrictsCasesChangesHistory(
           district[entry.i][dateStr].push({
             cases: entry.c,
             changeDate: new Date(entry.cD),
-            deltaCases: entry.dc
+            deltaCases: entry.dc,
           });
         } else {
           district[entry.i][dateStr] = [
-            { cases: entry.c, changeDate: new Date(entry.cD), deltaCases: entry.dc },
+            {
+              cases: entry.c,
+              changeDate: new Date(entry.cD),
+              deltaCases: entry.dc,
+            },
           ];
         }
       } else {
         district[entry.i] = {
-          [dateStr]: [{ cases: entry.c, changeDate: new Date(entry.cD), deltaCases: entry.dc}],
+          [dateStr]: [
+            {
+              cases: entry.c,
+              changeDate: new Date(entry.cD),
+              deltaCases: entry.dc,
+            },
+          ],
         };
       }
       return district;

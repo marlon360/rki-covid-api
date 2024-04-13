@@ -115,10 +115,16 @@ export async function getGermanyCasesChangesHistory(
         changes[dateStr].push({
           cases: entry.c,
           changeDate: new Date(entry.cD),
-          deltaCases: entry.dc
+          deltaCases: entry.dc,
         });
       } else {
-        changes[dateStr] = [{ cases: entry.c, changeDate: new Date(entry.cD), deltaCases: entry.dc }];
+        changes[dateStr] = [
+          {
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+            deltaCases: entry.dc,
+          },
+        ];
       }
       return changes;
     },
