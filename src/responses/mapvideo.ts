@@ -556,10 +556,6 @@ export async function VideoResponse(
           const id = idAttribute.split("-")[1];
           regionPathElement.attributes["fill"] =
             IColorRanges[cPerDay.data[day.date][id]].color;
-          if (region == Region.states) {
-            regionPathElement.attributes["stroke"] = "#DBDBDB";
-            regionPathElement.attributes["stroke-width"] = "0.9";
-          }
         }
         const svgBuffer = Buffer.from(stringify(mapData));
 

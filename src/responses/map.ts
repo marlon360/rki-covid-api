@@ -94,8 +94,6 @@ export async function StatesMapResponse(mapType: mapTypes = mapTypes.map) {
       weekIncidence,
       weekIncidenceColorRanges
     );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -226,8 +224,6 @@ export async function StatesHistoryMapResponse(
       weekIncidence,
       weekIncidenceColorRanges
     );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -273,8 +269,6 @@ export async function StatesHospitalizationMapResponse(
       state.incidence7Days,
       hospitalizationIncidenceColorRanges
     );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
@@ -326,8 +320,6 @@ export async function StatesHospitalizationHistoryMapResponse(
       state.incidence7Days,
       hospitalizationIncidenceColorRanges
     );
-    statePathElement.attributes["stroke"] = "#DBDBDB";
-    statePathElement.attributes["stroke-width"] = "0.9";
   }
 
   const svgBuffer = Buffer.from(stringify(mapData));
