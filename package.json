@@ -21,7 +21,7 @@
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "csv-parse": "^4.16.3",
-    "express": "^4.18.2",
+    "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "express-redis-cache-next": "^1.2.1",
     "lzma-native": "^8.0.6",
