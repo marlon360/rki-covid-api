@@ -308,13 +308,17 @@ export async function VideoResponse(
     Math.floor(numberOfFrames / videoduration) < 5 ||
     Math.floor(numberOfFrames / videoduration) > 25
   ) {
-    throw new RangeError(
-      `':duration' parameter must be between '${
-        Math.floor(numberOfFrames / 25) + 1
-      }' and '${Math.floor(numberOfFrames / 5)}' seconds if 'days:' is '${
-        oldDays ? oldDays.toString() : "unlimited"
-      }'`
-    );
+    if (oldDays == null && videoduration == 60){
+      videoduration = Math.floor(numberOfFrames / 15);
+    } else {
+      throw new RangeError(
+        `':duration' parameter must be between '${
+          Math.floor(numberOfFrames / 25) + 1
+        }' and '${Math.floor(numberOfFrames / 5)}' seconds if 'days:' is '${
+          oldDays ? oldDays.toString() : "unlimited"
+        }'`
+      );
+    }
   }
 
   // calculate the frame rate
