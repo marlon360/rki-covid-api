@@ -197,14 +197,14 @@ export async function StatesCasesHistoryResponse(
 
   for (const history of sHData.data) {
     const idKey = getStateAbbreviationById(history.id);
-    if (!data[history[idKey]]) {
-      data[history[idKey]] = {
+    if (!data[idKey]) {
+      data[idKey] = {
         id: history.id,
         name: history.name,
         history: [],
       };
     }
-    data[history[idKey]].history.push({
+    data[idKey].history.push({
       cases: history.cases,
       date: history.date,
     });
@@ -240,14 +240,14 @@ export async function StatesWeekIncidenceHistoryResponse(
 
   for (const history of sHData.data) {
     const idKey = getStateAbbreviationById(history.id);
-    if (!data[history[idKey]]) {
-      data[history[idKey]] = {
+    if (!data[idKey]) {
+      data[idKey] = {
         id: history.id,
         name: history.name,
         history: [],
       };
     }
-    data[history[idKey]].history.push({
+    data[idKey].history.push({
       weekIncidence: history.incidence,
       date: history.date,
     });
@@ -283,14 +283,14 @@ export async function StatesDeathsHistoryResponse(
   const data: StatesDeathsHistory = {};
   for (const history of sHData.data) {
     const idKey = getStateAbbreviationById(history.id);
-    if (!data[history[idKey]]) {
-      data[history[idKey]] = {
+    if (!data[idKey]) {
+      data[idKey] = {
         id: history.id,
         name: history.name,
         history: [],
       };
     }
-    data[history[idKey]].history.push({
+    data[idKey].history.push({
       deaths: history.deaths,
       date: history.date,
     });
@@ -326,14 +326,14 @@ export async function StatesRecoveredHistoryResponse(
   const data: StatesRecoveredHistory = {};
   for (const history of sHData.data) {
     const idKey = getStateAbbreviationById(history.id);
-    if (!data[history[idKey]]) {
-      data[history[idKey]] = {
+    if (!data[idKey]) {
+      data[idKey] = {
         id: history.id,
         name: history.name,
         history: [],
       };
     }
-    data[history[idKey]].history.push({
+    data[idKey].history.push({
       recovered: history.recovered,
       date: history.date,
     });

@@ -5,6 +5,7 @@ import {
   MetaData,
   Files,
   baseUrlRD5,
+  getStateNameByAbbreviation,
 } from "../utils";
 import { ResponseData } from "./response-data";
 
@@ -397,6 +398,8 @@ export async function getStatesAgeGroups(
 
 export interface S_CasesChangesHistory {
   [id: string]: {
+    id: any;
+    name: any;
     [date: string]: {
       cases: number;
       changeDate: Date;
@@ -445,6 +448,7 @@ export async function getStatesCasesChangesHistory(
     (state, entry) => {
       const dateStr = new Date(entry.m).toISOString().split("T").shift();
       const abbreviation = getStateAbbreviationById(parseInt(entry.i));
+      const name = getStateNameByAbbreviation(abbreviation);
       if (state[abbreviation]) {
         if (state[abbreviation][dateStr]) {
           state[abbreviation][dateStr].push({
@@ -463,6 +467,8 @@ export async function getStatesCasesChangesHistory(
         }
       } else {
         state[abbreviation] = {
+          id: entry.i,
+          name: name,
           [dateStr]: [
             {
               cases: entry.c,
@@ -478,13 +484,15 @@ export async function getStatesCasesChangesHistory(
   );
 
   Object.keys(casesChangesHistory).forEach((state) => {
-    Object.keys(casesChangesHistory[state]).forEach((date) => {
-      casesChangesHistory[state][date].sort((a, b) => {
-        const dateA = new Date(a.changeDate);
-        const dateB = new Date(b.changeDate);
-        return dateA.getTime() - dateB.getTime();
-      });
-    });
+    for (const entry of Object.keys(casesChangesHistory[state])){
+      if (entry != "id" && entry != "name"){
+        casesChangesHistory[state][entry].sort((a, b) => {
+          const dateA = new Date(a.changeDate);
+          const dateB = new Date(b.changeDate);
+          return dateA.getTime() - dateB.getTime();
+        });
+      }
+    };
   });
 
   return {

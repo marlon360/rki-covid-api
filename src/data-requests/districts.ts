@@ -1,4 +1,4 @@
-import { getDateBefore, getData, MetaData, Files, baseUrlRD5 } from "../utils";
+import { getDateBefore, getData, MetaData, Files, baseUrlRD5, getMetaData } from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
 import LK_Names from "../configuration/LK_Names.json";
@@ -361,6 +361,8 @@ export async function getDistrictsAgeGroups(
 
 export interface D_CasesChangesHistory {
   [id: string]: {
+    id: any;
+    name: any;
     [date: string]: {
       cases: number;
       changeDate: Date;
@@ -392,6 +394,10 @@ export async function getDistrictsCasesChangesHistory(
     Files.D_CasesHistoryLastChangesFile,
     baseUrlRD5
   );
+  // for the name of the district we need the districtsData
+  const metaData = await getMetaData();
+  const districtsData = await getDistrictsData(metaData)
+
   // filter id
   if (districtId) {
     json.data = json.data.filter((district) => district.i == districtId);
@@ -437,7 +443,12 @@ export async function getDistrictsCasesChangesHistory(
           ];
         }
       } else {
+        const name = districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i) ? 
+          districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i).county :
+          entry.i
         district[entry.i] = {
+          id: entry.i,
+          name: name,
           [dateStr]: [
             {
               cases: entry.c,
@@ -453,13 +464,15 @@ export async function getDistrictsCasesChangesHistory(
   );
 
   Object.keys(casesChangesHistory).forEach((district) => {
-    Object.keys(casesChangesHistory[district]).forEach((date) => {
-      casesChangesHistory[district][date].sort((a, b) => {
-        const dateA = new Date(a.changeDate);
-        const dateB = new Date(b.changeDate);
-        return dateA.getTime() - dateB.getTime();
-      });
-    });
+    for (const entry of Object.keys(casesChangesHistory[district])){
+      if (entry != "id" && entry != "name") {
+        casesChangesHistory[district][entry].sort((a, b) => {
+          const dateA = new Date(a.changeDate);
+          const dateB = new Date(b.changeDate);
+          return dateA.getTime() - dateB.getTime();
+        });
+      }
+    };
   });
 
   return {
