@@ -454,30 +454,32 @@ export async function DistrictsCasesLastChangeHistoryResponse(
     stateId
   );
   const lastChange = {};
-  Object.keys(data.data).forEach((state) => {
-    Object.keys(data.data[state]).forEach((date) => {
-      const changes = data.data[state][date].length;
-      const cases = data.data[state][date][changes - 1].cases;
-      const lastDate = data.data[state][date][changes - 1].changeDate;
-      const deltaCases = data.data[state][date][changes - 1].deltaCases;
-      if (lastChange[state]) {
-        lastChange[state].push({
-          cases: cases,
-          lastChanged: lastDate,
-          date: new Date(date),
-          totalNumberOfChanges: changes,
-          deltaCases: deltaCases,
-        });
-      } else {
-        lastChange[state] = [
-          {
+  Object.keys(data.data).forEach((district) => {
+    Object.keys(data.data[district]).forEach((date) => {
+      if (date != "id" && date != "name") {
+        const changes = data.data[district][date].length;
+        const cases = data.data[district][date][changes - 1].cases;
+        const lastDate = data.data[district][date][changes - 1].changeDate;
+        const deltaCases = data.data[district][date][changes - 1].deltaCases;
+        if (lastChange[district]) {
+          lastChange[district].push({
             cases: cases,
             lastChanged: lastDate,
             date: new Date(date),
             totalNumberOfChanges: changes,
             deltaCases: deltaCases,
-          },
-        ];
+          });
+        } else {
+          lastChange[district] = [
+            {
+              cases: cases,
+              lastChanged: lastDate,
+              date: new Date(date),
+              totalNumberOfChanges: changes,
+              deltaCases: deltaCases,
+            },
+          ];
+        }
       }
     });
   });

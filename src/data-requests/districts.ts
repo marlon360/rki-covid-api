@@ -1,4 +1,11 @@
-import { getDateBefore, getData, MetaData, Files, baseUrlRD5, getMetaData } from "../utils";
+import {
+  getDateBefore,
+  getData,
+  MetaData,
+  Files,
+  baseUrlRD5,
+  getMetaData,
+} from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
 import LK_Names from "../configuration/LK_Names.json";
@@ -396,7 +403,7 @@ export async function getDistrictsCasesChangesHistory(
   );
   // for the name of the district we need the districtsData
   const metaData = await getMetaData();
-  const districtsData = await getDistrictsData(metaData)
+  const districtsData = await getDistrictsData(metaData);
 
   // filter id
   if (districtId) {
@@ -443,9 +450,13 @@ export async function getDistrictsCasesChangesHistory(
           ];
         }
       } else {
-        const name = districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i) ? 
-          districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i).county :
-          entry.i
+        const name = districtsData.data.find(
+          (districtsDataEntry) => districtsDataEntry.ags == entry.i
+        )
+          ? districtsData.data.find(
+              (districtsDataEntry) => districtsDataEntry.ags == entry.i
+            ).county
+          : entry.i;
         district[entry.i] = {
           id: entry.i,
           name: name,
@@ -464,7 +475,7 @@ export async function getDistrictsCasesChangesHistory(
   );
 
   Object.keys(casesChangesHistory).forEach((district) => {
-    for (const entry of Object.keys(casesChangesHistory[district])){
+    for (const entry of Object.keys(casesChangesHistory[district])) {
       if (entry != "id" && entry != "name") {
         casesChangesHistory[district][entry].sort((a, b) => {
           const dateA = new Date(a.changeDate);
@@ -472,7 +483,7 @@ export async function getDistrictsCasesChangesHistory(
           return dateA.getTime() - dateB.getTime();
         });
       }
-    };
+    }
   });
 
   return {

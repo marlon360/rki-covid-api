@@ -484,15 +484,15 @@ export async function getStatesCasesChangesHistory(
   );
 
   Object.keys(casesChangesHistory).forEach((state) => {
-    for (const entry of Object.keys(casesChangesHistory[state])){
-      if (entry != "id" && entry != "name"){
+    for (const entry of Object.keys(casesChangesHistory[state])) {
+      if (entry != "id" && entry != "name") {
         casesChangesHistory[state][entry].sort((a, b) => {
           const dateA = new Date(a.changeDate);
           const dateB = new Date(b.changeDate);
           return dateA.getTime() - dateB.getTime();
         });
       }
-    };
+    }
   });
 
   return {

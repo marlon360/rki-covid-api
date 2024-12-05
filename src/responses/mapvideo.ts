@@ -308,7 +308,7 @@ export async function VideoResponse(
     Math.floor(numberOfFrames / videoduration) < 5 ||
     Math.floor(numberOfFrames / videoduration) > 25
   ) {
-    if (oldDays == null && videoduration == 60){
+    if (oldDays == null && videoduration == 60) {
       videoduration = Math.floor(numberOfFrames / 15);
     } else {
       throw new RangeError(

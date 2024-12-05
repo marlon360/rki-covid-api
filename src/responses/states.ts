@@ -640,28 +640,30 @@ export async function StatesCasesLastChangeHistoryResponse(
   const lastChange = {};
   Object.keys(data.data).forEach((state) => {
     Object.keys(data.data[state]).forEach((date) => {
-      const changes = data.data[state][date].length;
-      const cases = data.data[state][date][changes - 1].cases;
-      const lastDate = data.data[state][date][changes - 1].changeDate;
-      const deltaCases = data.data[state][date][changes - 1].deltaCases;
-      if (lastChange[state]) {
-        lastChange[state].push({
-          cases: cases,
-          lastChanged: lastDate,
-          date: new Date(date),
-          totalNumberOfChanges: changes,
-          deltaCases: deltaCases,
-        });
-      } else {
-        lastChange[state] = [
-          {
+      if (date != "id" && date != "name") {
+        const changes = data.data[state][date].length;
+        const cases = data.data[state][date][changes - 1].cases;
+        const lastDate = data.data[state][date][changes - 1].changeDate;
+        const deltaCases = data.data[state][date][changes - 1].deltaCases;
+        if (lastChange[state]) {
+          lastChange[state].push({
             cases: cases,
             lastChanged: lastDate,
             date: new Date(date),
             totalNumberOfChanges: changes,
             deltaCases: deltaCases,
-          },
-        ];
+          });
+        } else {
+          lastChange[state] = [
+            {
+              cases: cases,
+              lastChanged: lastDate,
+              date: new Date(date),
+              totalNumberOfChanges: changes,
+              deltaCases: deltaCases,
+            },
+          ];
+        }
       }
     });
   });
