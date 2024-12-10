@@ -1,11 +1,4 @@
-import {
-  getDateBefore,
-  getData,
-  MetaData,
-  Files,
-  baseUrlRD5,
-  getMetaData,
-} from "../utils";
+import { getDateBefore, getData, MetaData, Files, baseUrlRD5, getMetaData } from "../utils";
 import { ResponseData } from "./response-data";
 import { AgeGroupsData } from "./states";
 import LK_Names from "../configuration/LK_Names.json";
@@ -45,9 +38,7 @@ interface IDistrictDataFile {
   metaData: MetaData;
 }
 
-export async function getDistrictsData(
-  metaData: MetaData
-): Promise<ResponseData<IDistrictData[]>> {
+export async function getDistrictsData(metaData: MetaData): Promise<ResponseData<IDistrictData[]>> {
   const json: IDistrictDataFile = await getData(metaData, Files.D_Data);
   const districts = json.data.map((dist) => {
     return {
@@ -74,9 +65,7 @@ interface D_NewCases {
   cases: number;
 }
 
-export async function getDistrictsNewCases(
-  metaData: MetaData
-): Promise<ResponseData<D_NewCases[]>> {
+export async function getDistrictsNewCases(metaData: MetaData): Promise<ResponseData<D_NewCases[]>> {
   let json: IDistrictDataFile = await getData(metaData, Files.D_NewCases);
   const districts = json.data.map((dist) => {
     return {
@@ -95,9 +84,7 @@ interface D_NewDeaths {
   deaths: number;
 }
 
-export async function getDistrictsNewDeaths(
-  metaData: MetaData
-): Promise<ResponseData<D_NewDeaths[]>> {
+export async function getDistrictsNewDeaths(metaData: MetaData): Promise<ResponseData<D_NewDeaths[]>> {
   let json: IDistrictDataFile = await getData(metaData, Files.D_NewDeaths);
   const districts = json.data.map((dist) => {
     return {
@@ -116,9 +103,7 @@ interface D_NewRecovered {
   recovered: number;
 }
 
-export async function getDistrictsNewRecovered(
-  metaData: MetaData
-): Promise<ResponseData<D_NewRecovered[]>> {
+export async function getDistrictsNewRecovered(metaData: MetaData): Promise<ResponseData<D_NewRecovered[]>> {
   let json: IDistrictDataFile = await getData(metaData, Files.D_NewRecovered);
   const districts = json.data.map((dist) => {
     return {
@@ -199,10 +184,7 @@ export async function getDistrictsDeathsHistory(
   days?: number,
   ags?: string
 ): Promise<ResponseData<D_DeathsHistory[]>> {
-  let json: D_DeathsHistoryFile = await getData(
-    metaData,
-    Files.D_DeathsHistory
-  );
+  let json: D_DeathsHistoryFile = await getData(metaData, Files.D_DeathsHistory);
   let history: D_DeathsHistory[] = json.data.map((dist) => {
     return {
       ags: dist.i,
@@ -247,10 +229,7 @@ export async function getDistrictsRecoveredHistory(
   days?: number,
   ags?: string
 ): Promise<ResponseData<D_RecoveredHistory[]>> {
-  let json: D_RecoveredHistoryFile = await getData(
-    metaData,
-    Files.D_RecoveredHistory
-  );
+  let json: D_RecoveredHistoryFile = await getData(metaData, Files.D_RecoveredHistory);
   let history: D_RecoveredHistory[] = json.data.map((dist) => {
     return {
       ags: dist.i,
@@ -296,10 +275,7 @@ export async function getDistrictsIncidenceHistory(
   days?: number,
   ags?: string
 ): Promise<ResponseData<D_IncidenceHistory[]>> {
-  let json: D_IncidenceHistoryFile = await getData(
-    metaData,
-    Files.D_IncidenceHistory
-  );
+  let json: D_IncidenceHistoryFile = await getData(metaData, Files.D_IncidenceHistory);
   let history: D_IncidenceHistory[] = json.data.map((dist) => {
     return {
       ags: dist.i,
@@ -338,10 +314,7 @@ interface D_AgeGrpFile {
   metaData: MetaData;
 }
 
-export async function getDistrictsAgeGroups(
-  metaData: MetaData,
-  paramAgs?: string
-): Promise<ResponseData<AgeGroupsData>> {
+export async function getDistrictsAgeGroups(metaData: MetaData, paramAgs?: string): Promise<ResponseData<AgeGroupsData>> {
   let json: D_AgeGrpFile = await getData(metaData, Files.D_AgeGroups);
   if (paramAgs) paramAgs = paramAgs.padStart(5, "0");
   const districts: AgeGroupsData = {};
@@ -396,11 +369,7 @@ export async function getDistrictsCasesChangesHistory(
   changeDate?: Date,
   districtId?: string
 ): Promise<ResponseData<D_CasesChangesHistory>> {
-  const json: D_CasesHistoryChangesFile = await getData(
-    metaDataRD5,
-    Files.D_CasesHistoryLastChangesFile,
-    baseUrlRD5
-  );
+  const json: D_CasesHistoryChangesFile = await getData(metaDataRD5, Files.D_CasesHistoryLastChangesFile, baseUrlRD5);
   // for the name of the district we need the districtsData
   const metaData = await getMetaData();
   const districtsData = await getDistrictsData(metaData);
@@ -414,65 +383,52 @@ export async function getDistrictsCasesChangesHistory(
   }
   // if till date is given filter meldedatum
   if (tillReportDate) {
-    json.data = json.data.filter(
-      (dates) => dates.m.getTime() >= tillReportDate.getTime()
-    );
+    json.data = json.data.filter((dates) => dates.m.getTime() >= tillReportDate.getTime());
   }
   // if oneReportDate is given filter to this date
   if (oneReportDate) {
-    json.data = json.data.filter(
-      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
-    );
+    json.data = json.data.filter((reportDates) => reportDates.m.getTime() == oneReportDate.getTime());
   }
   // if a changeDate is given filter changeDate
   if (changeDate) {
-    json.data = json.data.filter(
-      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
-    );
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
   }
-  const casesChangesHistory: D_CasesChangesHistory = json.data.reduce(
-    (district, entry) => {
-      const dateStr = new Date(entry.m).toISOString().split("T").shift();
-      if (district[entry.i]) {
-        if (district[entry.i][dateStr]) {
-          district[entry.i][dateStr].push({
+  const casesChangesHistory: D_CasesChangesHistory = json.data.reduce((district, entry) => {
+    const dateStr = new Date(entry.m).toISOString().split("T").shift();
+    if (district[entry.i]) {
+      if (district[entry.i][dateStr]) {
+        district[entry.i][dateStr].push({
+          cases: entry.c,
+          changeDate: new Date(entry.cD),
+          deltaCases: entry.dc,
+        });
+      } else {
+        district[entry.i][dateStr] = [
+          {
             cases: entry.c,
             changeDate: new Date(entry.cD),
             deltaCases: entry.dc,
-          });
-        } else {
-          district[entry.i][dateStr] = [
-            {
-              cases: entry.c,
-              changeDate: new Date(entry.cD),
-              deltaCases: entry.dc,
-            },
-          ];
-        }
-      } else {
-        const name = districtsData.data.find(
-          (districtsDataEntry) => districtsDataEntry.ags == entry.i
-        )
-          ? districtsData.data.find(
-              (districtsDataEntry) => districtsDataEntry.ags == entry.i
-            ).county
-          : entry.i;
-        district[entry.i] = {
-          id: entry.i,
-          name: name,
-          [dateStr]: [
-            {
-              cases: entry.c,
-              changeDate: new Date(entry.cD),
-              deltaCases: entry.dc,
-            },
-          ],
-        };
+          },
+        ];
       }
-      return district;
-    },
-    {}
-  );
+    } else {
+      const name = districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i)
+        ? districtsData.data.find((districtsDataEntry) => districtsDataEntry.ags == entry.i).county
+        : entry.i;
+      district[entry.i] = {
+        id: entry.i,
+        name: name,
+        [dateStr]: [
+          {
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+            deltaCases: entry.dc,
+          },
+        ],
+      };
+    }
+    return district;
+  }, {});
 
   Object.keys(casesChangesHistory).forEach((district) => {
     for (const entry of Object.keys(casesChangesHistory[district])) {

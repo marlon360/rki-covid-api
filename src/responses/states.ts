@@ -27,15 +27,8 @@ import {
   getMetaDataRD5,
 } from "../utils";
 import { ResponseData } from "../data-requests/response-data";
-import {
-  AgeGroups,
-  getHospitalizationData,
-  getLatestHospitalizationDataKey,
-} from "../data-requests/hospitalization";
-import {
-  FrozenIncidenceData,
-  getStatesFrozenIncidenceHistory,
-} from "../data-requests/frozen-incidence";
+import { AgeGroups, getHospitalizationData, getLatestHospitalizationDataKey } from "../data-requests/hospitalization";
+import { FrozenIncidenceData, getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 
 interface StateData extends IStateData {
   abbreviation: string;
@@ -62,56 +55,37 @@ interface StatesData extends IResponseMeta {
   };
 }
 
-export function getStateById(
-  data: ResponseData<any[]>,
-  id: number
-): any | null {
+export function getStateById(data: ResponseData<any[]>, id: number): any | null {
   for (const state of data.data) {
     if (state.id == id) return state;
   }
   return null;
 }
 
-export async function StatesResponse(
-  abbreviation?: string
-): Promise<StatesData> {
+export async function StatesResponse(abbreviation?: string): Promise<StatesData> {
   const metaData = await getMetaData();
   // make all requests
-  const [
-    statesData,
-    statesNewCasesData,
-    statesNewDeathsData,
-    statesNewRecoveredData,
-    hospitalizationData,
-    statesFixIncidence,
-  ] = await Promise.all([
-    getStatesData(metaData),
-    getStatesNewCases(metaData),
-    getStatesNewDeaths(metaData),
-    getStatesNewRecovered(metaData),
-    getHospitalizationData(),
-    getStatesFrozenIncidenceHistory(metaData, 7),
-  ]);
+  const [statesData, statesNewCasesData, statesNewDeathsData, statesNewRecoveredData, hospitalizationData, statesFixIncidence] =
+    await Promise.all([
+      getStatesData(metaData),
+      getStatesNewCases(metaData),
+      getStatesNewDeaths(metaData),
+      getStatesNewRecovered(metaData),
+      getHospitalizationData(),
+      getStatesFrozenIncidenceHistory(metaData, 7),
+    ]);
 
   // remove the first element from statesData.data (=Bundesgebiet)
   statesData.data.shift();
 
-  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
-    hospitalizationData.data
-  );
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(hospitalizationData.data);
 
-  const yesterdayDate = new Date(
-    AddDaysToDate(statesData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
+  const yesterdayDate = new Date(AddDaysToDate(statesData.lastUpdate, -1).setHours(0, 0, 0, 0));
 
   let states = statesData.data.map((state) => {
     const stateAbbreviation = getStateAbbreviationById(state.id);
-    const stateFixHistory = statesFixIncidence.data.find(
-      (fixEntry) => fixEntry.abbreviation == stateAbbreviation
-    ).history;
-    const yesterdayIncidence = stateFixHistory.find(
-      (entry) => entry.date.getTime() == yesterdayDate.getTime()
-    ).weekIncidence;
+    const stateFixHistory = statesFixIncidence.data.find((fixEntry) => fixEntry.abbreviation == stateAbbreviation).history;
+    const yesterdayIncidence = stateFixHistory.find((entry) => entry.date.getTime() == yesterdayDate.getTime()).weekIncidence;
     return {
       ...state,
       abbreviation: getStateAbbreviationById(state.id),
@@ -120,22 +94,12 @@ export async function StatesResponse(
       delta: {
         cases: getStateById(statesNewCasesData, state.id)?.cases ?? 0,
         deaths: getStateById(statesNewDeathsData, state.id)?.deaths ?? 0,
-        recovered:
-          getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
-        weekIncidence: limit(
-          (state.casesPerWeek / state.population) * 100000 - yesterdayIncidence,
-          12
-        ),
+        recovered: getStateById(statesNewRecoveredData, state.id)?.recovered ?? 0,
+        weekIncidence: limit((state.casesPerWeek / state.population) * 100000 - yesterdayIncidence, 12),
       },
       hospitalization: {
-        cases7Days:
-          hospitalizationData.data[latestHospitalizationDataKey].states[
-            state.name
-          ].cases7Days,
-        incidence7Days:
-          hospitalizationData.data[latestHospitalizationDataKey].states[
-            state.name
-          ].incidence7Days,
+        cases7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].cases7Days,
+        incidence7Days: hospitalizationData.data[latestHospitalizationDataKey].states[state.name].incidence7Days,
         date: new Date(latestHospitalizationDataKey),
         lastUpdate: hospitalizationData.lastUpdate,
       },
@@ -181,9 +145,7 @@ export async function StatesCasesHistoryResponse(
 ): Promise<StatesHistoryData<StatesCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -225,9 +187,7 @@ export async function StatesWeekIncidenceHistoryResponse(
 ): Promise<StatesHistoryData<StatesWeekIncidenceHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -268,9 +228,7 @@ export async function StatesDeathsHistoryResponse(
 ): Promise<StatesHistoryData<StatesDeathsHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -311,9 +269,7 @@ export async function StatesRecoveredHistoryResponse(
 ): Promise<StatesHistoryData<StatesRecoveredHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -377,9 +333,7 @@ export async function StatesHospitalizationHistoryResponse(
 ): Promise<StatesHospitalizationHistory> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -414,40 +368,19 @@ export async function StatesHospitalizationHistoryResponse(
           };
         }
         historyData[abbreviation].history.push({
-          cases7Days:
-            hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
-          incidence7Days:
-            hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
+          cases7Days: hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
+          incidence7Days: hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
           date: new Date(dateKey),
-          fixedCases7Days:
-            hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
-          updatedCases7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .updatedCases7Days,
-          adjustedLowerCases7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedLowerCases7Days,
-          adjustedCases7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedCases7Days,
-          adjustedUpperCases7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedUpperCases7Days,
-          fixedIncidence7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .fixedIncidence7Days,
-          updatedIncidence7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .updatedIncidence7Days,
-          adjustedLowerIncidence7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedLowerIncidence7Days,
-          adjustedIncidence7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedIncidence7Days,
-          adjustedUpperIncidence7Days:
-            hospitalizationData.data[dateKey].states[stateName]
-              .adjustedUpperIncidence7Days,
+          fixedCases7Days: hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
+          updatedCases7Days: hospitalizationData.data[dateKey].states[stateName].updatedCases7Days,
+          adjustedLowerCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedLowerCases7Days,
+          adjustedCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedCases7Days,
+          adjustedUpperCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedUpperCases7Days,
+          fixedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].fixedIncidence7Days,
+          updatedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].updatedIncidence7Days,
+          adjustedLowerIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedLowerIncidence7Days,
+          adjustedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedIncidence7Days,
+          adjustedUpperIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedUpperIncidence7Days,
         });
       });
     } else if (abbreviationList.includes(p_abbreviation)) {
@@ -461,44 +394,22 @@ export async function StatesHospitalizationHistoryResponse(
         };
       }
       historyData[p_abbreviation].history.push({
-        cases7Days:
-          hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
-        incidence7Days:
-          hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
+        cases7Days: hospitalizationData.data[dateKey].states[stateName].cases7Days, //legacy
+        incidence7Days: hospitalizationData.data[dateKey].states[stateName].incidence7Days, //legacy
         date: new Date(dateKey),
-        fixedCases7Days:
-          hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
-        updatedCases7Days:
-          hospitalizationData.data[dateKey].states[stateName].updatedCases7Days,
-        adjustedLowerCases7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedLowerCases7Days,
-        adjustedCases7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedCases7Days,
-        adjustedUpperCases7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedUpperCases7Days,
-        fixedIncidence7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .fixedIncidence7Days,
-        updatedIncidence7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .updatedIncidence7Days,
-        adjustedLowerIncidence7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedLowerIncidence7Days,
-        adjustedIncidence7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedIncidence7Days,
-        adjustedUpperIncidence7Days:
-          hospitalizationData.data[dateKey].states[stateName]
-            .adjustedUpperIncidence7Days,
+        fixedCases7Days: hospitalizationData.data[dateKey].states[stateName].fixedCases7Days,
+        updatedCases7Days: hospitalizationData.data[dateKey].states[stateName].updatedCases7Days,
+        adjustedLowerCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedLowerCases7Days,
+        adjustedCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedCases7Days,
+        adjustedUpperCases7Days: hospitalizationData.data[dateKey].states[stateName].adjustedUpperCases7Days,
+        fixedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].fixedIncidence7Days,
+        updatedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].updatedIncidence7Days,
+        adjustedLowerIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedLowerIncidence7Days,
+        adjustedIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedIncidence7Days,
+        adjustedUpperIncidence7Days: hospitalizationData.data[dateKey].states[stateName].adjustedUpperIncidence7Days,
       });
     } else {
-      throw new Error(
-        `Abbreviation ${p_abbreviation} is not allowed. Please choose one of: ${abbreviationList}`
-      );
+      throw new Error(`Abbreviation ${p_abbreviation} is not allowed. Please choose one of: ${abbreviationList}`);
     }
   });
 
@@ -517,9 +428,7 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
   const AgeGroupsData = await getStatesAgeGroups(metaData, id);
   const hospitalizationData = await getHospitalizationData();
 
-  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(
-    hospitalizationData.data
-  );
+  const latestHospitalizationDataKey = getLatestHospitalizationDataKey(hospitalizationData.data);
 
   const data = {};
   Object.keys(AgeGroupsData.data).forEach((stateAbbreviation) => {
@@ -531,13 +440,11 @@ export async function StatesAgeGroupsResponse(abbreviation?: string): Promise<{
         ...AgeGroupsData.data[stateAbbreviation][ageGroup],
         hospitalization: {
           cases7Days:
-            hospitalizationData.data[latestHospitalizationDataKey].states[
-              getStateNameByAbbreviation(stateAbbreviation)
-            ].ageGroups[ageGroup].cases7Days,
+            hospitalizationData.data[latestHospitalizationDataKey].states[getStateNameByAbbreviation(stateAbbreviation)]
+              .ageGroups[ageGroup].cases7Days,
           incidence7Days:
-            hospitalizationData.data[latestHospitalizationDataKey].states[
-              getStateNameByAbbreviation(stateAbbreviation)
-            ].ageGroups[ageGroup].incidence7Days,
+            hospitalizationData.data[latestHospitalizationDataKey].states[getStateNameByAbbreviation(stateAbbreviation)]
+              .ageGroups[ageGroup].incidence7Days,
           date: new Date(latestHospitalizationDataKey),
         },
       };
@@ -562,19 +469,13 @@ export async function StatesFrozenIncidenceHistoryResponse(
 ): Promise<StatesFrozenIncidenceHistoryData> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
   const metaData = await getMetaData();
-  const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(
-    metaData,
-    days,
-    abbreviation
-  );
+  const frozenIncidenceHistoryData = await getStatesFrozenIncidenceHistory(metaData, days, abbreviation);
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
@@ -601,13 +502,7 @@ export async function StatesCasesChangesHistoryResponse(
   changeDate?: Date
 ): Promise<StatesHistoryDataObj<S_CasesChangesHistory>> {
   const metaData = await getMetaDataRD5();
-  const data = await getStatesCasesChangesHistory(
-    metaData,
-    tillReportDate,
-    oneReportDate,
-    changeDate,
-    stateId
-  );
+  const data = await getStatesCasesChangesHistory(metaData, tillReportDate, oneReportDate, changeDate, stateId);
 
   return {
     data: data.data,
@@ -630,13 +525,7 @@ export async function StatesCasesLastChangeHistoryResponse(
   }>
 > {
   const metaData = await getMetaDataRD5();
-  const data = await getStatesCasesChangesHistory(
-    metaData,
-    tillReportDate,
-    null,
-    null,
-    stateId
-  );
+  const data = await getStatesCasesChangesHistory(metaData, tillReportDate, null, null, stateId);
   const lastChange = {};
   Object.keys(data.data).forEach((state) => {
     Object.keys(data.data[state]).forEach((date) => {

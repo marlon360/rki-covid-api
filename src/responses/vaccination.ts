@@ -36,9 +36,7 @@ function isAbbreviationValid(abbreviation: string) {
   return abbreviationList.includes(abbreviation);
 }
 
-export async function VaccinationStatesResponse(
-  abbreviation?: string
-): Promise<VaccinationData> {
+export async function VaccinationStatesResponse(abbreviation?: string): Promise<VaccinationData> {
   const vaccinationData = await getVaccinationCoverage();
   const vaccinationDataOut = { data: undefined };
   if (abbreviation && isAbbreviationValid(abbreviation)) {
@@ -51,8 +49,7 @@ export async function VaccinationStatesResponse(
     for (let id = 1; id <= 16; id++) {
       const tempData = { data: undefined };
       tempData.data = {
-        [getStateAbbreviationById(id)]:
-          vaccinationData.data.states[getStateAbbreviationById(id)],
+        [getStateAbbreviationById(id)]: vaccinationData.data.states[getStateAbbreviationById(id)],
       };
       vaccinationDataOut.data = {
         ...vaccinationDataOut.data,
@@ -72,14 +69,10 @@ interface VaccinationHistoryData extends IResponseMeta {
   };
 }
 
-export async function VaccinationHistoryResponse(
-  days?: number
-): Promise<VaccinationHistoryData> {
+export async function VaccinationHistoryResponse(days?: number): Promise<VaccinationHistoryData> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }

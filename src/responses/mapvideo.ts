@@ -1,22 +1,13 @@
 import { stringify } from "svgson";
 import DistrictsMap from "../maps/districts.json";
 import StatesMap from "../maps/states.json";
-import {
-  ColorRange,
-  weekIncidenceColorRanges as IColorRanges,
-} from "../configuration/colors";
+import { ColorRange, weekIncidenceColorRanges as IColorRanges } from "../configuration/colors";
 import sharp from "sharp";
 import { getMapBackground } from "./map";
 import ffmpegStatic from "ffmpeg-static";
 import ffmpeg from "fluent-ffmpeg";
 import fs from "fs";
-import {
-  getMetaData,
-  getDateBeforeDate,
-  MetaData,
-  getData,
-  Files,
-} from "../utils";
+import { getMetaData, getDateBeforeDate, MetaData, getData, Files } from "../utils";
 import isEqual from "lodash.isequal";
 
 interface Status {
@@ -34,13 +25,7 @@ interface Status {
   };
 }
 
-function ffmpegSync(
-  framesNameSearch: string,
-  mp4FileName: string,
-  frameRate: string,
-  startFrame: string,
-  lockFileName: string
-) {
+function ffmpegSync(framesNameSearch: string, mp4FileName: string, frameRate: string, startFrame: string, lockFileName: string) {
   return new Promise<{ filename: string }>((resolve, reject) => {
     ffmpeg()
       .input(framesNameSearch)
@@ -89,19 +74,14 @@ interface FileNames {
     newFileName: string;
   };
 }
-export async function ColorsPerDay(
-  metaData: MetaData,
-  region: Region
-): Promise<CperDay> {
+export async function ColorsPerDay(metaData: MetaData, region: Region): Promise<CperDay> {
   let cPerDay: CperDay = {
     usedColorRanges: JSON.parse(JSON.stringify(IColorRanges)),
     data: {},
   };
   // request the data depending on region
   if (region == Region.districts) {
-    cPerDay.data = (
-      await getData(metaData, Files.D_IncidenceHistory)
-    ).data.reduce((temp, entry) => {
+    cPerDay.data = (await getData(metaData, Files.D_IncidenceHistory)).data.reduce((temp, entry) => {
       const dateStr = new Date(entry.m).toISOString().split("T").shift();
       const cInd = IColorRanges.findIndex((range) => {
         if (range.compareFn) {
@@ -185,11 +165,7 @@ export async function ColorsPerDay(
 }
 
 // ################################################################
-export async function VideoResponse(
-  region: Region,
-  videoduration: number,
-  days?: number
-): Promise<{ filename: string }> {
+export async function VideoResponse(region: Region, videoduration: number, days?: number): Promise<{ filename: string }> {
   // get the actual meta data
   const metaData = await getMetaData();
   // set the reference date
@@ -236,11 +212,7 @@ export async function VideoResponse(
     cPerDay = JSON.parse(fs.readFileSync(jsonFileName).toString());
     const cPerDayEnd = new Date().getTime();
     logDate = new Date(cPerDayEnd).toISOString();
-    console.log(
-      `${logDate}: ${region}: get cPerDay from cPerDay file: ${
-        (cPerDayEnd - cPerDayStart) / 1000
-      } seconds`
-    );
+    console.log(`${logDate}: ${region}: get cPerDay from cPerDay file: ${(cPerDayEnd - cPerDayStart) / 1000} seconds`);
   } else {
     // if region incidence per day data file not exists requst the data
     cPerDay = await ColorsPerDay(metaData, region);
@@ -249,9 +221,7 @@ export async function VideoResponse(
     const cPerDayEnd = new Date().getTime();
     logDate = new Date(cPerDayEnd).toISOString();
     console.log(
-      `${logDate}: ${region}: get cPerDay calculated from incidenceFile: ${
-        (cPerDayEnd - cPerDayStart) / 1000
-      } seconds`
+      `${logDate}: ${region}: get cPerDay calculated from incidenceFile: ${(cPerDayEnd - cPerDayStart) / 1000} seconds`
     );
     // new incidencesPerDay , change status
     // wait for ulocked status.json file
@@ -276,9 +246,7 @@ export async function VideoResponse(
   }
 
   // get a sorted list of incidencePerDay keys
-  const cPerDayKeys = Object.keys(cPerDay.data).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
+  const cPerDayKeys = Object.keys(cPerDay.data).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
   // save days to oldDays
   let oldDays = days;
@@ -286,13 +254,9 @@ export async function VideoResponse(
   // some checks for :days
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days > cPerDayKeys.length || days < 100) {
-      throw new RangeError(
-        `':days' parameter must be between '100' and '${cPerDayKeys.length}'`
-      );
+      throw new RangeError(`':days' parameter must be between '100' and '${cPerDayKeys.length}'`);
     }
   } else {
     days = cPerDayKeys.length;
@@ -301,22 +265,15 @@ export async function VideoResponse(
 
   // some checks for :duration
   if (isNaN(videoduration)) {
-    throw new TypeError(
-      "Wrong format for ':duration' parameter! This is not a number."
-    );
-  } else if (
-    Math.floor(numberOfFrames / videoduration) < 5 ||
-    Math.floor(numberOfFrames / videoduration) > 25
-  ) {
+    throw new TypeError("Wrong format for ':duration' parameter! This is not a number.");
+  } else if (Math.floor(numberOfFrames / videoduration) < 5 || Math.floor(numberOfFrames / videoduration) > 25) {
     if (oldDays == null && videoduration == 60) {
       videoduration = Math.floor(numberOfFrames / 15);
     } else {
       throw new RangeError(
-        `':duration' parameter must be between '${
-          Math.floor(numberOfFrames / 25) + 1
-        }' and '${Math.floor(numberOfFrames / 5)}' seconds if 'days:' is '${
-          oldDays ? oldDays.toString() : "unlimited"
-        }'`
+        `':duration' parameter must be between '${Math.floor(numberOfFrames / 25) + 1}' and '${Math.floor(
+          numberOfFrames / 5
+        )}' seconds if 'days:' is '${oldDays ? oldDays.toString() : "unlimited"}'`
       );
     }
   }
@@ -378,9 +335,7 @@ export async function VideoResponse(
   // no other region thread is running, because of region lockfile! locking status file is not nesessary!
 
   // read status
-  status = JSON.parse(
-    fs.readFileSync(`${incidenceDataPath}status.json`).toString()
-  );
+  status = JSON.parse(fs.readFileSync(`${incidenceDataPath}status.json`).toString());
 
   if (!status[region]) {
     //load the region mapfile
@@ -391,15 +346,11 @@ export async function VideoResponse(
       .filter((file) => file.includes(`${region}-cPerDay_`))
       .sort((a, b) => (a > b ? -1 : 1));
     const oldRegionsColorsPerDayFile =
-      allRegionsColorsPerDayFiles.length > 1
-        ? `${incidenceDataPath}${allRegionsColorsPerDayFiles[1]}`
-        : "dummy";
+      allRegionsColorsPerDayFiles.length > 1 ? `${incidenceDataPath}${allRegionsColorsPerDayFiles[1]}` : "dummy";
     // load the old incidences (if exists)
     let oldCPerDay: CperDay = { usedColorRanges: undefined, data: undefined };
     if (fs.existsSync(oldRegionsColorsPerDayFile)) {
-      const oldCPerDayFile = JSON.parse(
-        fs.readFileSync(oldRegionsColorsPerDayFile).toString()
-      );
+      const oldCPerDayFile = JSON.parse(fs.readFileSync(oldRegionsColorsPerDayFile).toString());
       if (oldCPerDayFile.usedColorRanges) {
         oldCPerDay.usedColorRanges = oldCPerDayFile.usedColorRanges;
       }
@@ -412,9 +363,7 @@ export async function VideoResponse(
     let oldCPerDayKeys = [];
     if (oldCPerDay.data) {
       // get a sorted list of old incidencePerDay keys
-      oldCPerDayKeys = Object.keys(oldCPerDay.data).sort(
-        (a, b) => new Date(a).getTime() - new Date(b).getTime()
-      );
+      oldCPerDayKeys = Object.keys(oldCPerDay.data).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     } else {
       oldCPerDayKeys[0] = "dummy";
     }
@@ -423,16 +372,10 @@ export async function VideoResponse(
     if (oldCPerDayKeys[0] != cPerDayKeys[0]) {
       cPerDayKeys.forEach((date, index) => {
         const newFrmNmbrStr = (index + 1).toString().padStart(4, "0");
-        const newFileName = framesFullPath.replace(
-          "F-0000",
-          `F-${newFrmNmbrStr}`
-        );
+        const newFileName = framesFullPath.replace("F-0000", `F-${newFrmNmbrStr}`);
         const oldIndex = oldCPerDayKeys.indexOf(date);
         const oldFrmNmbrStr = (oldIndex + 1).toString().padStart(4, "0");
-        const oldFileName =
-          oldIndex == -1
-            ? null
-            : framesFullPath.replace("F-0000", `F-${oldFrmNmbrStr}`);
+        const oldFileName = oldIndex == -1 ? null : framesFullPath.replace("F-0000", `F-${oldFrmNmbrStr}`);
         fileNames[date] = { oldFileName, newFileName };
       });
       cPerDayKeys.sort((a, b) => new Date(b).getTime() - new Date(a).getTime());
@@ -500,17 +443,15 @@ export async function VideoResponse(
       const findDiffsEnd = new Date().getTime();
       logDate = new Date(findDiffsEnd).toISOString();
       console.log(
-        `${logDate}: ${region}: find all diffs: ${
-          (findDiffsEnd - findDiffsStart) / 1000
-        } seconds. ${allDiffs.length} changed dates.`
+        `${logDate}: ${region}: find all diffs: ${(findDiffsEnd - findDiffsStart) / 1000} seconds. ${
+          allDiffs.length
+        } changed dates.`
       );
       allDiffs.forEach((day) => {
         day.changes.forEach((change) => {
           if (change.key == "new date") {
             logDate = new Date().toISOString();
-            console.log(
-              `${logDate}: ${region}: date: ${day.date}; change => ${change.key}`
-            );
+            console.log(`${logDate}: ${region}: date: ${day.date}; change => ${change.key}`);
           } else {
             logDate = new Date().toISOString();
             console.log(
@@ -531,9 +472,7 @@ export async function VideoResponse(
       console.log(
         `${logDate}: ${region}: find all diffs: ${
           (findDiffsEnd - findDiffsStart) / 1000
-        } seconds. Color ranges have changed! Must recalculate all ${
-          allDiffs.length
-        } frames!`
+        } seconds. Color ranges have changed! Must recalculate all ${allDiffs.length} frames!`
       );
     }
 
@@ -545,12 +484,7 @@ export async function VideoResponse(
       const promises = [];
       allDiffs.forEach((day) => {
         // calculate the frameNumber
-        const frmNmbrStr = (
-          (new Date(day.date).getTime() - firstDate) / 86400000 +
-          1
-        )
-          .toString()
-          .padStart(4, "0");
+        const frmNmbrStr = ((new Date(day.date).getTime() - firstDate) / 86400000 + 1).toString().padStart(4, "0");
         // frameName
         const frameName = framesFullPath.replace("F-0000", `F-${frmNmbrStr}`);
 
@@ -558,8 +492,7 @@ export async function VideoResponse(
         for (const regionPathElement of mapData.children) {
           const idAttribute = regionPathElement.attributes.id;
           const id = idAttribute.split("-")[1];
-          regionPathElement.attributes["fill"] =
-            IColorRanges[cPerDay.data[day.date][id]].color;
+          regionPathElement.attributes["fill"] = IColorRanges[cPerDay.data[day.date][id]].color;
         }
         const svgBuffer = Buffer.from(stringify(mapData));
 
@@ -572,9 +505,7 @@ export async function VideoResponse(
 
         // define mAMG (MinAvgMaxGrouped)
         let mAMG: MAMGrouped = {
-          [cPerDay.data[day.date].min]: [
-            { name: "min", nCol: "green", rInd: cPerDay.data[day.date].min },
-          ],
+          [cPerDay.data[day.date].min]: [{ name: "min", nCol: "green", rInd: cPerDay.data[day.date].min }],
         };
         if (mAMG[cPerDay.data[day.date].avg]) {
           mAMG[cPerDay.data[day.date].avg].push({
@@ -583,9 +514,7 @@ export async function VideoResponse(
             rInd: cPerDay.data[day.date].avg,
           });
         } else {
-          mAMG[cPerDay.data[day.date].avg] = [
-            { name: "avg", nCol: "orange", rInd: cPerDay.data[day.date].avg },
-          ];
+          mAMG[cPerDay.data[day.date].avg] = [{ name: "avg", nCol: "orange", rInd: cPerDay.data[day.date].avg }];
         }
         if (mAMG[cPerDay.data[day.date].max]) {
           mAMG[cPerDay.data[day.date].max].push({
@@ -594,9 +523,7 @@ export async function VideoResponse(
             rInd: cPerDay.data[day.date].max,
           });
         } else {
-          mAMG[cPerDay.data[day.date].max] = [
-            { name: "max", nCol: "red", rInd: cPerDay.data[day.date].max },
-          ];
+          mAMG[cPerDay.data[day.date].max] = [{ name: "max", nCol: "red", rInd: cPerDay.data[day.date].max }];
         }
 
         // push new promise for frames with legend
@@ -609,20 +536,12 @@ export async function VideoResponse(
       });
       const createPromisesEnd = new Date().getTime();
       logDate = new Date(createPromisesEnd).toISOString();
-      console.log(
-        `${logDate}: ${region}: create Promises ${
-          (createPromisesEnd - createPromisesStart) / 1000
-        } seconds`
-      );
+      console.log(`${logDate}: ${region}: create Promises ${(createPromisesEnd - createPromisesStart) / 1000} seconds`);
       // await all frames promises
       await Promise.all(promises);
       const executePromisesEnd = new Date().getTime();
       logDate = new Date(executePromisesEnd).toISOString();
-      console.log(
-        `${logDate}: ${region}: execute Promises ${
-          (executePromisesEnd - createPromisesEnd) / 1000
-        } seconds`
-      );
+      console.log(`${logDate}: ${region}: execute Promises ${(executePromisesEnd - createPromisesEnd) / 1000} seconds`);
     }
     // wait for unlocked status.json
     if (fs.existsSync(statusLockFile)) {
@@ -649,29 +568,17 @@ export async function VideoResponse(
   const framesNameVideo = `${dayPicsPath}${region}_F-%04d.png`;
 
   // set first frame number for video as a four digit string if :days is set, otherwise it is 0001
-  const firstFrameNumber = (cPerDayKeys.length - days + 1)
-    .toString()
-    .padStart(4, "0");
+  const firstFrameNumber = (cPerDayKeys.length - days + 1).toString().padStart(4, "0");
 
   // Tell fluent-ffmpeg where it can find FFmpeg
   ffmpeg.setFfmpegPath(ffmpegStatic);
 
   // calculate the requested video
   const createVideoStart = new Date().getTime();
-  const mp4out = await ffmpegSync(
-    framesNameVideo,
-    mp4FileName,
-    frameRate.toString(),
-    firstFrameNumber,
-    lockFile
-  );
+  const mp4out = await ffmpegSync(framesNameVideo, mp4FileName, frameRate.toString(), firstFrameNumber, lockFile);
   const createVideoEnd = new Date().getTime();
   logDate = new Date(createVideoEnd).toISOString();
-  console.log(
-    `${logDate}: ${region}: video rendering time ${
-      (createVideoEnd - createVideoStart) / 1000
-    } seconds`
-  );
+  console.log(`${logDate}: ${region}: video rendering time ${(createVideoEnd - createVideoStart) / 1000} seconds`);
   // wait for unlocked status.json
   if (fs.existsSync(statusLockFile)) {
     while (fs.existsSync(statusLockFile)) {
@@ -688,13 +595,9 @@ export async function VideoResponse(
   // push video data filename and crationtime to status
   status.videos[region].push({ filename: mp4FileName, created: created });
   // find region video files not from refData
-  const oldVideoFiles = status.videos[region].filter(
-    (video) => !video.filename.includes(refDate)
-  );
+  const oldVideoFiles = status.videos[region].filter((video) => !video.filename.includes(refDate));
   // clean region video files in status.videos[region]
-  status.videos[region] = status.videos[region].filter((video) =>
-    video.filename.includes(refDate)
-  );
+  status.videos[region] = status.videos[region].filter((video) => video.filename.includes(refDate));
   // delete old region video files
   oldVideoFiles.forEach((video) => fs.rmSync(video.filename));
   // cleanup region videofiles, store only the 5 last created entrys, delete the oldest entry(s)
@@ -710,9 +613,7 @@ export async function VideoResponse(
 
   // cleanup region incidences .json files
   let allJsonFiles = fs.readdirSync(incidenceDataPath);
-  allJsonFiles = allJsonFiles.filter((file) =>
-    file.includes(`${region}-cPerDay`)
-  );
+  allJsonFiles = allJsonFiles.filter((file) => file.includes(`${region}-cPerDay`));
   // keep the last 2 files only
   if (allJsonFiles.length > 2) {
     allJsonFiles.sort((a, b) => (a > b ? -1 : 1));

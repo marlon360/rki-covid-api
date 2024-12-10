@@ -41,9 +41,7 @@ export interface IStateDataFile {
   metaData: MetaData;
 }
 
-export async function getStatesData(
-  metaData: MetaData
-): Promise<ResponseData<IStateData[]>> {
+export async function getStatesData(metaData: MetaData): Promise<ResponseData<IStateData[]>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   const states: IStateData[] = json.data.map((state) => {
     return {
@@ -68,9 +66,7 @@ interface S_NewRecovered {
   recovered: number;
 }
 
-export async function getStatesNewRecovered(
-  metaData: MetaData
-): Promise<ResponseData<S_NewRecovered[]>> {
+export async function getStatesNewRecovered(metaData: MetaData): Promise<ResponseData<S_NewRecovered[]>> {
   const json: IStateDataFile = await getData(metaData, Files.S_NewRecovered);
   const states: S_NewRecovered[] = json.data.map((state) => {
     return {
@@ -89,9 +85,7 @@ interface S_NewCases {
   cases: number;
 }
 
-export async function getStatesNewCases(
-  metaData: MetaData
-): Promise<ResponseData<S_NewCases[]>> {
+export async function getStatesNewCases(metaData: MetaData): Promise<ResponseData<S_NewCases[]>> {
   const json: IStateDataFile = await getData(metaData, Files.S_NewCases);
   const states: S_NewCases[] = json.data.map((state) => {
     return {
@@ -110,9 +104,7 @@ interface S_NewDeaths {
   deaths: number;
 }
 
-export async function getStatesNewDeaths(
-  metaData: MetaData
-): Promise<ResponseData<S_NewDeaths[]>> {
+export async function getStatesNewDeaths(metaData: MetaData): Promise<ResponseData<S_NewDeaths[]>> {
   const json: IStateDataFile = await getData(metaData, Files.S_NewDeaths);
   const states: S_NewDeaths[] = json.data.map((state) => {
     return {
@@ -159,10 +151,7 @@ export async function getStatesCasesHistory(
   days?: number,
   id?: number
 ): Promise<ResponseData<S_CasesHistory[]>> {
-  const json: S_CasesHistoryFile = await getData(
-    metaData,
-    Files.S_CasesHistory
-  );
+  const json: S_CasesHistoryFile = await getData(metaData, Files.S_CasesHistory);
   let history: S_CasesHistory[] = json.data.map((state) => {
     return {
       id: parseInt(state.i),
@@ -208,10 +197,7 @@ export async function getStatesDeathsHistory(
   days?: number,
   id?: number
 ): Promise<ResponseData<S_DeathsHistory[]>> {
-  const json: S_DeathsHistoryFile = await getData(
-    metaData,
-    Files.S_DeathsHistory
-  );
+  const json: S_DeathsHistoryFile = await getData(metaData, Files.S_DeathsHistory);
   let history: S_DeathsHistory[] = json.data.map((state) => {
     return {
       id: parseInt(state.i),
@@ -257,10 +243,7 @@ export async function getStatesRecoveredHistory(
   days?: number,
   id?: number
 ): Promise<ResponseData<S_RecoveredHistory[]>> {
-  let json: S_RecoveredHistoryFile = await getData(
-    metaData,
-    Files.S_RecoveredHistory
-  );
+  let json: S_RecoveredHistoryFile = await getData(metaData, Files.S_RecoveredHistory);
   let history: S_RecoveredHistory[] = json.data.map((state) => {
     return {
       id: parseInt(state.i),
@@ -307,10 +290,7 @@ export async function getStatesIncidenceHistory(
   days?: number,
   id?: number
 ): Promise<ResponseData<S_IncidenceHistory[]>> {
-  let json: S_IncidenceHistoryFile = await getData(
-    metaData,
-    Files.S_IncidenceHistory
-  );
+  let json: S_IncidenceHistoryFile = await getData(metaData, Files.S_IncidenceHistory);
   let history: S_IncidenceHistory[] = json.data.map((state) => {
     return {
       id: parseInt(state.i),
@@ -367,10 +347,7 @@ export interface S_AgeGrpFile {
   metaData: MetaData;
 }
 
-export async function getStatesAgeGroups(
-  metaData: MetaData,
-  id?: number
-): Promise<ResponseData<AgeGroupsData>> {
+export async function getStatesAgeGroups(metaData: MetaData, id?: number): Promise<ResponseData<AgeGroupsData>> {
   const json: S_AgeGrpFile = await getData(metaData, Files.S_AgeGroups);
   const states: AgeGroupsData = {};
   json.data.forEach((entry) => {
@@ -415,11 +392,7 @@ export async function getStatesCasesChangesHistory(
   changeDate?: Date,
   stateId?: string
 ): Promise<ResponseData<S_CasesChangesHistory>> {
-  const json: S_CasesHistoryChangesFile = await getData(
-    metaDataRD5,
-    Files.S_CasesHistoryLastChangesFile,
-    baseUrlRD5
-  );
+  const json: S_CasesHistoryChangesFile = await getData(metaDataRD5, Files.S_CasesHistoryLastChangesFile, baseUrlRD5);
   // filter id
   if (stateId) {
     json.data = json.data.filter((state) => state.i == stateId);
@@ -428,60 +401,51 @@ export async function getStatesCasesChangesHistory(
   }
   // if till date is given filter meldedatum
   if (tillReportDate) {
-    json.data = json.data.filter(
-      (dates) => dates.m.getTime() >= tillReportDate.getTime()
-    );
+    json.data = json.data.filter((dates) => dates.m.getTime() >= tillReportDate.getTime());
   }
   // if oneReportDate is given filter to this date
   if (oneReportDate) {
-    json.data = json.data.filter(
-      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
-    );
+    json.data = json.data.filter((reportDates) => reportDates.m.getTime() == oneReportDate.getTime());
   }
   // if a changeDate is given filter changeDate
   if (changeDate) {
-    json.data = json.data.filter(
-      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
-    );
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
   }
-  const casesChangesHistory: S_CasesChangesHistory = json.data.reduce(
-    (state, entry) => {
-      const dateStr = new Date(entry.m).toISOString().split("T").shift();
-      const abbreviation = getStateAbbreviationById(parseInt(entry.i));
-      const name = getStateNameByAbbreviation(abbreviation);
-      if (state[abbreviation]) {
-        if (state[abbreviation][dateStr]) {
-          state[abbreviation][dateStr].push({
+  const casesChangesHistory: S_CasesChangesHistory = json.data.reduce((state, entry) => {
+    const dateStr = new Date(entry.m).toISOString().split("T").shift();
+    const abbreviation = getStateAbbreviationById(parseInt(entry.i));
+    const name = getStateNameByAbbreviation(abbreviation);
+    if (state[abbreviation]) {
+      if (state[abbreviation][dateStr]) {
+        state[abbreviation][dateStr].push({
+          cases: entry.c,
+          changeDate: new Date(entry.cD),
+          deltaCases: entry.dc,
+        });
+      } else {
+        state[abbreviation][dateStr] = [
+          {
             cases: entry.c,
             changeDate: new Date(entry.cD),
             deltaCases: entry.dc,
-          });
-        } else {
-          state[abbreviation][dateStr] = [
-            {
-              cases: entry.c,
-              changeDate: new Date(entry.cD),
-              deltaCases: entry.dc,
-            },
-          ];
-        }
-      } else {
-        state[abbreviation] = {
-          id: entry.i,
-          name: name,
-          [dateStr]: [
-            {
-              cases: entry.c,
-              changeDate: new Date(entry.cD),
-              deltaCases: entry.dc,
-            },
-          ],
-        };
+          },
+        ];
       }
-      return state;
-    },
-    {}
-  );
+    } else {
+      state[abbreviation] = {
+        id: entry.i,
+        name: name,
+        [dateStr]: [
+          {
+            cases: entry.c,
+            changeDate: new Date(entry.cD),
+            deltaCases: entry.dc,
+          },
+        ],
+      };
+    }
+    return state;
+  }, {});
 
   Object.keys(casesChangesHistory).forEach((state) => {
     for (const entry of Object.keys(casesChangesHistory[state])) {

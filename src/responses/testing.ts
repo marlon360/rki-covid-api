@@ -1,8 +1,5 @@
 import { IResponseMeta, ResponseMeta } from "./meta";
-import {
-  getTestingHistory,
-  testingHistoryEntry,
-} from "../data-requests/testing";
+import { getTestingHistory, testingHistoryEntry } from "../data-requests/testing";
 
 interface TestingHistoryData extends IResponseMeta {
   data: {
@@ -10,14 +7,10 @@ interface TestingHistoryData extends IResponseMeta {
   };
 }
 
-export async function TestingHistoryResponse(
-  weeks?: number
-): Promise<TestingHistoryData> {
+export async function TestingHistoryResponse(weeks?: number): Promise<TestingHistoryData> {
   if (weeks != null) {
     if (isNaN(weeks)) {
-      throw new TypeError(
-        "Wrong format for ':weeks' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':weeks' parameter! This is not a number.");
     } else if (weeks <= 0) {
       throw new TypeError("':weeks' parameter must be > '0'");
     }

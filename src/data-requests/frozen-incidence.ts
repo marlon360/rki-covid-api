@@ -18,9 +18,7 @@ function getDateFromString(dateString: string): Date {
   if (dateString.indexOf("/") > -1) {
     // probably this format: 8/25/21: m/d/y
     const parts = dateString.split("/");
-    return new Date(
-      `20${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`
-    );
+    return new Date(`20${parts[2]}-${parts[0].padStart(2, "0")}-${parts[1].padStart(2, "0")}`);
   } else {
     // probably this format: 01.12.2020: dd.mm.yyyy
     const date_pattern = /(\d{2})\.(\d{2})\.(\d{4})/;
@@ -141,14 +139,10 @@ const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
   const redisEntry = await GetRedisEntry(redisClientFix, parameter.redisKey);
 
   // if there is no redis entry, set localdata.lastUpdate to 1970-01-01 to initiate recalculation
-  const redisData = redisEntry.length
-    ? JSON.parse(redisEntry[0].body, dateReviver)
-    : { lastUpdate: new Date(1970, 0, 1), data };
+  const redisData = redisEntry.length ? JSON.parse(redisEntry[0].body, dateReviver) : { lastUpdate: new Date(1970, 0, 1), data };
 
   // build data from excel and store to redis
-  if (
-    new Date(redisData.lastUpdate).getTime() == new Date(1970, 0, 1).getTime()
-  ) {
+  if (new Date(redisData.lastUpdate).getTime() == new Date(1970, 0, 1).getTime()) {
     const response = await axios.get(parameter.url, {
       responseType: "arraybuffer",
     });
@@ -163,9 +157,7 @@ const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     // if type == Districts.Archive.type filter out rows with "NR"
     let json = [];
     if (parameter.type == Districts.Archive.type) {
-      json = XLSX.utils
-        .sheet_to_json(sheet, { range: parameter.startRow })
-        .filter((entry) => !!entry["NR"]);
+      json = XLSX.utils.sheet_to_json(sheet, { range: parameter.startRow }).filter((entry) => !!entry["NR"]);
     } else {
       json = XLSX.utils.sheet_to_json(sheet, { range: parameter.startRow });
     }
@@ -209,13 +201,7 @@ const RKIFrozenIncidenceHistoryPromise = async function (resolve, reject) {
     const JsonData = JSON.stringify({ lastUpdate, data });
 
     // add to redis
-    await AddRedisEntry(
-      redisClientFix,
-      parameter.redisKey,
-      JsonData,
-      neverExpire,
-      "json"
-    );
+    await AddRedisEntry(redisClientFix, parameter.redisKey, JsonData, neverExpire, "json");
   } else {
     data = redisData.data;
     lastUpdate = new Date(redisData.lastUpdate);
@@ -234,10 +220,7 @@ export interface UnofficialData {
   };
 }
 // this reloads the unofficial data from LK.json.gz or BL.json.gz and store this to redis
-async function reloadUnofficial(
-  requestType: UnofficialParameter,
-  lastUpdate: Date
-): Promise<UnofficialData> {
+async function reloadUnofficial(requestType: UnofficialParameter, lastUpdate: Date): Promise<UnofficialData> {
   const response = await axios.get(requestType.githubUrlUnofficial, {
     responseType: "arraybuffer",
   });
@@ -246,22 +229,14 @@ async function reloadUnofficial(
     throw new RKIError(rdata.error, response.config.url);
   }
   //decompress lzma compressed data (xz)
-  const decompressed = await new Promise((resolve) =>
-    lzma.decompress(rdata, undefined, (result) => resolve(result))
-  );
+  const decompressed = await new Promise((resolve) => lzma.decompress(rdata, undefined, (result) => resolve(result)));
   // parse Json
   const jsonData = JSON.parse(decompressed.toString(), dateReviver);
   // build unofficial data
   let unofficial: UnofficialData = {};
   jsonData.forEach((entry) => {
-    const name =
-      requestType.key == "abbreviation"
-        ? entry["Bundesland"]
-        : entry["Landkreis"];
-    let regionKey =
-      requestType.key == "abbreviation"
-        ? getStateAbbreviationByName(name)
-        : entry["IdLandkreis"].padStart(5, "0");
+    const name = requestType.key == "abbreviation" ? entry["Bundesland"] : entry["Landkreis"];
+    let regionKey = requestType.key == "abbreviation" ? getStateAbbreviationByName(name) : entry["IdLandkreis"].padStart(5, "0");
     let keyEntry = unofficial[regionKey];
     if (!keyEntry) {
       const history = [];
@@ -275,13 +250,7 @@ async function reloadUnofficial(
   });
   const redisData = JSON.stringify({ lastUpdate, unofficial });
   // add to redis
-  await AddRedisEntry(
-    redisClientFix,
-    requestType.redisKeyUnofficial,
-    redisData,
-    neverExpire,
-    "json"
-  );
+  await AddRedisEntry(redisClientFix, requestType.redisKeyUnofficial, redisData, neverExpire, "json");
   return unofficial;
 }
 // this is the Promise to get BL.json.gz or LK.json.gz from redis for all dates after 2023-04-17
@@ -294,16 +263,10 @@ const UnofficialDataPromise = async function (resolve, reject) {
 
   const lastUpdateMeta = new Date(metaData.publication_date);
   let unofficialData: UnofficialData = {};
-  const redisEntry = await GetRedisEntry(
-    redisClientFix,
-    requestType.redisKeyUnofficial
-  );
+  const redisEntry = await GetRedisEntry(redisClientFix, requestType.redisKeyUnofficial);
   if (redisEntry.length == 1) {
     const unofficialRedis = JSON.parse(redisEntry[0].body, dateReviver);
-    if (
-      new Date(lastUpdateMeta).getTime() <=
-      new Date(unofficialRedis.lastUpdate).getTime()
-    ) {
+    if (new Date(lastUpdateMeta).getTime() <= new Date(unofficialRedis.lastUpdate).getTime()) {
       unofficialData = unofficialRedis.unofficial;
     } else {
       unofficialData = await reloadUnofficial(requestType, lastUpdateMeta);
@@ -329,20 +292,14 @@ async function finalizeData(
 ): Promise<{ data: FrozenIncidenceData[]; lastUpdate: Date }> {
   // merge archive data with current data
   actualData.data = actualData.data.map((entry) => {
-    entry.history.unshift(
-      ...archiveData.data.find(
-        (element) => element[region.Actual.key] === entry[region.Actual.key]
-      ).history
-    );
+    entry.history.unshift(...archiveData.data.find((element) => element[region.Actual.key] === entry[region.Actual.key]).history);
     return entry;
   });
 
   // merge unofficial data with current data
   actualData.data.forEach((entry) => {
     if (unofficialData[entry[region.Unofficial.key]] != null) {
-      entry.history.unshift(
-        ...unofficialData[entry[region.Unofficial.key]].history
-      );
+      entry.history.unshift(...unofficialData[entry[region.Unofficial.key]].history);
     }
     entry.history.sort((a, b) => {
       const dateA = new Date(a.date);
@@ -353,26 +310,17 @@ async function finalizeData(
 
   // filter by requestType.key (ags or abbreviation)
   if (paramKey) {
-    actualData.data = actualData.data.filter(
-      (entry) => entry[region.Actual.key] === paramKey
-    );
+    actualData.data = actualData.data.filter((entry) => entry[region.Actual.key] === paramKey);
   }
 
   // filter by days || date
   if (paramDays || paramDate) {
-    const reference_date = paramDays
-      ? new Date(getDateBefore(paramDays))
-      : new Date(paramDate);
+    const reference_date = paramDays ? new Date(getDateBefore(paramDays)) : new Date(paramDate);
     actualData.data = actualData.data.map((entry) => {
       if (paramDays) {
-        entry.history = entry.history.filter(
-          (element) => new Date(element.date) > reference_date
-        );
+        entry.history = entry.history.filter((element) => new Date(element.date) > reference_date);
       } else {
-        entry.history = entry.history.filter(
-          (element) =>
-            new Date(element.date).getTime() == reference_date.getTime()
-        );
+        entry.history = entry.history.filter((element) => new Date(element.date).getTime() == reference_date.getTime());
       }
       return entry;
     });
@@ -406,25 +354,14 @@ export async function getDistrictsFrozenIncidenceHistory(
     actualDataPromise,
     archiveDataPromise,
     axios
-      .get(
-        "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/meta/meta.json"
-      )
+      .get("https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/meta/meta.json")
       .then((response) => {
         return new Date(response.data.modified);
       }),
     GitUnofficialDataPromise,
   ]);
 
-  const districtsFinal = await finalizeData(
-    actual,
-    archive,
-    unofficialData,
-    metaLastFileDate,
-    Districts,
-    ags,
-    days,
-    date
-  );
+  const districtsFinal = await finalizeData(actual, archive, unofficialData, metaLastFileDate, Districts, ags, days, date);
 
   return {
     data: districtsFinal.data,
@@ -458,25 +395,14 @@ export async function getStatesFrozenIncidenceHistory(
     actualDataPromise,
     archiveDataPromise,
     axios
-      .get(
-        "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/meta/meta.json"
-      )
+      .get("https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/meta/meta.json")
       .then((response) => {
         return new Date(response.data.modified);
       }),
     GitUnofficialDataPromise,
   ]);
 
-  const statesFinal = await finalizeData(
-    actual,
-    archive,
-    unofficialData,
-    metaLastFileDate,
-    States,
-    abbreviation,
-    days,
-    date
-  );
+  const statesFinal = await finalizeData(actual, archive, unofficialData, metaLastFileDate, States, abbreviation, days, date);
 
   return {
     data: statesFinal.data,

@@ -14,17 +14,8 @@ import {
   D_CasesChangesHistory,
   getDistrictsCasesChangesHistory,
 } from "../data-requests/districts";
-import {
-  AddDaysToDate,
-  getStateAbbreviationByName,
-  limit,
-  getMetaData,
-  getMetaDataRD5,
-} from "../utils";
-import {
-  FrozenIncidenceData,
-  getDistrictsFrozenIncidenceHistory,
-} from "../data-requests/frozen-incidence";
+import { AddDaysToDate, getStateAbbreviationByName, limit, getMetaData, getMetaDataRD5 } from "../utils";
+import { FrozenIncidenceData, getDistrictsFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 import { AgeGroupsData } from "../data-requests/states";
 
 interface DistrictData extends IDistrictData {
@@ -46,10 +37,7 @@ interface DistrictsData extends IResponseMeta {
   };
 }
 
-export function getDistrictByAGS(
-  data: ResponseData<any[]>,
-  ags: string
-): any | null {
+export function getDistrictByAGS(data: ResponseData<any[]>, ags: string): any | null {
   for (const district of data.data) {
     if (district.ags == ags) return district;
   }
@@ -59,13 +47,7 @@ export function getDistrictByAGS(
 export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
   const metaData = await getMetaData();
   // make all requests
-  const [
-    districtsData,
-    districtsNewCases,
-    districtsNewDeaths,
-    districtsNewRecovered,
-    districtsFixIncidence,
-  ] = await Promise.all([
+  const [districtsData, districtsNewCases, districtsNewDeaths, districtsNewRecovered, districtsFixIncidence] = await Promise.all([
     getDistrictsData(metaData),
     getDistrictsNewCases(metaData),
     getDistrictsNewDeaths(metaData),
@@ -73,17 +55,11 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
     getDistrictsFrozenIncidenceHistory(metaData, 7),
   ]);
 
-  const yesterdayDate = new Date(
-    AddDaysToDate(districtsData.lastUpdate, -1).setHours(0, 0, 0, 0)
-  );
+  const yesterdayDate = new Date(AddDaysToDate(districtsData.lastUpdate, -1).setHours(0, 0, 0, 0));
 
   let districts = districtsData.data.map((district) => {
-    const districtFixHistory = districtsFixIncidence.data.find(
-      (fixEntry) => fixEntry.ags == district.ags
-    ).history;
-    const yesterdayIncidence = districtFixHistory.find(
-      (entry) => entry.date.getTime() == yesterdayDate.getTime()
-    ).weekIncidence;
+    const districtFixHistory = districtsFixIncidence.data.find((fixEntry) => fixEntry.ags == district.ags).history;
+    const yesterdayIncidence = districtFixHistory.find((entry) => entry.date.getTime() == yesterdayDate.getTime()).weekIncidence;
     return {
       ...district,
       stateAbbreviation: getStateAbbreviationByName(district.state),
@@ -92,13 +68,8 @@ export async function DistrictsResponse(ags?: string): Promise<DistrictsData> {
       delta: {
         cases: getDistrictByAGS(districtsNewCases, district.ags)?.cases ?? 0,
         deaths: getDistrictByAGS(districtsNewDeaths, district.ags)?.deaths ?? 0,
-        recovered:
-          getDistrictByAGS(districtsNewRecovered, district.ags)?.recovered ?? 0,
-        weekIncidence: limit(
-          (district.casesPerWeek / district.population) * 100000 -
-            yesterdayIncidence,
-          12
-        ),
+        recovered: getDistrictByAGS(districtsNewRecovered, district.ags)?.recovered ?? 0,
+        weekIncidence: limit((district.casesPerWeek / district.population) * 100000 - yesterdayIncidence, 12),
       },
     };
   });
@@ -126,10 +97,6 @@ interface DistrictHistory<T> {
   history: T[];
 }
 
-interface DistrictHistoryByDate<T> {
-  [date: string]: T[];
-}
-
 export interface DistrictsHistoryData<T> extends IResponseMeta {
   data: T;
 }
@@ -144,9 +111,7 @@ export async function DistrictsCasesHistoryResponse(
 ): Promise<DistrictsHistoryData<DistrictsCasesHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -184,9 +149,7 @@ export async function DistrictsWeekIncidenceHistoryResponse(
 ): Promise<DistrictsHistoryData<DistrictsWeekIncidenceHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -230,9 +193,7 @@ export async function DistrictsIncidenceHistoryByDate(
 ): Promise<DistrictsHistoryData<DistrictsIncidenceHistoryByDate>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -270,9 +231,7 @@ export async function DistrictsDeathsHistoryResponse(
 ): Promise<DistrictsHistoryData<DistrictsDeathsHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -311,9 +270,7 @@ export async function DistrictsRecoveredHistoryResponse(
 ): Promise<DistrictsHistoryData<DistrictsRecoveredHistory>> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
@@ -349,25 +306,16 @@ interface FrozenIncidenceHistoryData extends IResponseMeta {
   };
 }
 
-export async function FrozenIncidenceHistoryResponse(
-  days?: number,
-  ags?: string
-): Promise<FrozenIncidenceHistoryData> {
+export async function FrozenIncidenceHistoryResponse(days?: number, ags?: string): Promise<FrozenIncidenceHistoryData> {
   if (days != null) {
     if (isNaN(days)) {
-      throw new TypeError(
-        "Wrong format for ':days' parameter! This is not a number."
-      );
+      throw new TypeError("Wrong format for ':days' parameter! This is not a number.");
     } else if (days <= 0) {
       throw new TypeError("':days' parameter must be > '0'");
     }
   }
   const metaData = await getMetaData();
-  const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(
-    metaData,
-    days,
-    ags
-  );
+  const frozenIncidenceHistoryData = await getDistrictsFrozenIncidenceHistory(metaData, days, ags);
 
   let data = {};
   frozenIncidenceHistoryData.data.forEach((historyData) => {
@@ -417,13 +365,7 @@ export async function DistrictsCasesChangesHistoryResponse(
   changeDate?: Date
 ): Promise<DistrictsHistoryDataObj<D_CasesChangesHistory>> {
   const metaData = await getMetaDataRD5();
-  const data = await getDistrictsCasesChangesHistory(
-    metaData,
-    tillReportDate,
-    oneReportDate,
-    changeDate,
-    districtId
-  );
+  const data = await getDistrictsCasesChangesHistory(metaData, tillReportDate, oneReportDate, changeDate, districtId);
 
   return {
     data: data.data,
@@ -446,13 +388,7 @@ export async function DistrictsCasesLastChangeHistoryResponse(
   }>
 > {
   const metaData = await getMetaDataRD5();
-  const data = await getDistrictsCasesChangesHistory(
-    metaData,
-    tillReportDate,
-    null,
-    null,
-    stateId
-  );
+  const data = await getDistrictsCasesChangesHistory(metaData, tillReportDate, null, null, stateId);
   const lastChange = {};
   Object.keys(data.data).forEach((district) => {
     Object.keys(data.data[district]).forEach((date) => {

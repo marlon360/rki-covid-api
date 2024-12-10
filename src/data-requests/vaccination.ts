@@ -1,14 +1,7 @@
 import axios from "axios";
 import { ResponseData } from "./response-data";
 import parse from "csv-parse";
-import {
-  cleanupString,
-  getStateAbbreviationByName,
-  getDateBefore,
-  limit,
-  GetApiCommit,
-  GetApiTrees,
-} from "../utils";
+import { cleanupString, getStateAbbreviationByName, getDateBefore, limit, GetApiCommit, GetApiTrees } from "../utils";
 import { ApiData } from "./r-value";
 
 function clearEntry(entry: any) {
@@ -448,128 +441,123 @@ const DataPromise = async function (resolve, reject) {
   });
 };
 
-export async function getVaccinationCoverage(): Promise<
-  ResponseData<VaccinationCoverage>
-> {
+export async function getVaccinationCoverage(): Promise<ResponseData<VaccinationCoverage>> {
   const url =
     "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Bundeslaender_COVID-19-Impfungen.csv";
-  const actualDataPromise = new Promise<VaccineVaccinationData>(
-    DataPromise.bind({ url: url })
-  );
+  const actualDataPromise = new Promise<VaccineVaccinationData>(DataPromise.bind({ url: url }));
 
-  const quoteDataPromise = new Promise<QuoteVaccinationData>(
-    async (resolve, reject) => {
-      // Create the parser
-      const parser = parse({
-        delimiter: ",",
-        from: 2,
-        cast: true,
-        cast_date: true,
-      });
+  const quoteDataPromise = new Promise<QuoteVaccinationData>(async (resolve, reject) => {
+    // Create the parser
+    const parser = parse({
+      delimiter: ",",
+      from: 2,
+      cast: true,
+      cast_date: true,
+    });
 
-      // get csv as stream
-      const response = await axios({
-        method: "get",
-        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Impfquoten_COVID-19.csv",
-        responseType: "stream",
-      });
+    // get csv as stream
+    const response = await axios({
+      method: "get",
+      url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Impfquoten_COVID-19.csv",
+      responseType: "stream",
+    });
 
-      // pipe csv stream to csv parser
-      response.data.pipe(parser);
+    // pipe csv stream to csv parser
+    response.data.pipe(parser);
 
-      // empty object, that gets filled
-      const quoteVaccinationDataObject: QuoteVaccinationData = {};
+    // empty object, that gets filled
+    const quoteVaccinationDataObject: QuoteVaccinationData = {};
 
-      // read the parser stream and add record to hospitalizationDataObject
-      parser.on("readable", function () {
-        let record;
-        while ((record = parser.read())) {
-          let [
-            // VariableName       csv header name (2022-12-03)
-            date, // Datum,
-            name, // Bundesland,
-            id, // BundeslandId_Impfort,
-            total, // Impfungen_gesamt,
-            first, // Impfungen_gesamt_min1,
-            firstInfant, // Impfungen_gesamt_00bis04_min1,
-            full, // Impfungen_gesamt_gi,
-            fullInfant, // Impfungen_gesamt_00bis04_gi,
-            firstBooster, // Impfungen_gesamt_boost1,
-            secondBooster, // Impfungen_gesamt_boost2,
-            thirdBooster, // Impfungen_gesamt_boost3,
-            fourthBooster, // Impfungen_gesamt_boost4,
-            qFirstTotal, // Impfquote_gesamt_min1,
-            qFirst05bis17, // Impfquote_05bis17_min1,
-            qFirst05bis11, // Impfquote_05bis11_min1,
-            qFirst12bis17, // Impfquote_12bis17_min1,
-            qFirst18plus, // Impfquote_18plus_min1,
-            qFirst18bis59, // Impfquote_18bis59_min1,
-            qFirst60plus, // Impfquote_60plus_min1,
-            qFullTotal, // Impfquote_gesamt_gi,
-            qFull05bis17, // Impfquote_05bis17_gi,
-            qFull05bis11, // Impfquote_05bis11_gi,
-            qFull12bis17, // Impfquote_12bis17_gi,
-            qFull18plus, // Impfquote_18plus_gi,
-            qFull18bis59, // Impfquote_18bis59_gi,
-            qFull60plus, // Impfquote_60plus_gi,
-            q1BoostTotal, // Impfquote_gesamt_boost1,
-            q1Boost12bis17, // Impfquote_12bis17_boost1,
-            q1Boost18plus, // Impfquote_18plus_boost1,
-            q1Boost18bis59, // Impfquote_18bis59_boost1,
-            q1Boost60plus, // Impfquote_60plus_boost1,
-            q2BoostTotal, // Impfquote_gesamt_boost2,
-            q2Boost12bis17, // Impfquote_12bis17_boost2,
-            q2Boost18plus, // Impfquote_18plus_boost2,
-            q2Boost18bis59, // Impfquote_18bis59_boost2,
-            q2Boost60plus, // Impfquote_60plus_boost2,
-            // no quotes for third and fourth booster are privided !
-          ] = record;
-          quoteVaccinationDataObject[id] = {
-            name: name,
-            vaccination: {
-              total: total,
-              [US.S1]: first,
-              [US.S1I]: firstInfant,
-              [US.S2]: full,
-              [US.S2I]: fullInfant,
-              [US.S3]: firstBooster,
-              [US.S4]: secondBooster,
-              [US.S5]: thirdBooster,
-              [US.S6]: fourthBooster,
-            },
-            [US.S1]: {
-              total: qFirstTotal,
-              [UAG.G0517]: qFirst05bis17,
-              [UAG.G0511]: qFirst05bis11,
-              [UAG.G1217]: qFirst12bis17,
-              [UAG.G18pl]: qFirst18plus,
-              [UAG.G1859]: qFirst18bis59,
-              [UAG.G60pl]: qFirst60plus,
-            },
-            [US.S2]: {
-              total: qFullTotal,
-              [UAG.G0517]: qFull05bis17,
-              [UAG.G0511]: qFull05bis11,
-              [UAG.G1217]: qFull12bis17,
-              [UAG.G18pl]: qFull18plus,
-              [UAG.G1859]: qFull18bis59,
-              [UAG.G60pl]: qFull60plus,
-            },
-            [US.S3]: {
-              total: q1BoostTotal,
-              [UAG.G1217]: q1Boost12bis17,
-              [UAG.G18pl]: q1Boost18plus,
-              [UAG.G1859]: q1Boost18bis59,
-              [UAG.G60pl]: q1Boost60plus,
-            },
-            [US.S4]: {
-              total: q2BoostTotal,
-              [UAG.G1217]: q2Boost12bis17,
-              [UAG.G18pl]: q2Boost18plus,
-              [UAG.G1859]: q2Boost18bis59,
-              [UAG.G60pl]: q2Boost60plus,
-            },
-            /* The RKI does not provide quotes for the third and fourth booster
+    // read the parser stream and add record to hospitalizationDataObject
+    parser.on("readable", function () {
+      let record;
+      while ((record = parser.read())) {
+        let [
+          // VariableName       csv header name (2022-12-03)
+          date, // Datum,
+          name, // Bundesland,
+          id, // BundeslandId_Impfort,
+          total, // Impfungen_gesamt,
+          first, // Impfungen_gesamt_min1,
+          firstInfant, // Impfungen_gesamt_00bis04_min1,
+          full, // Impfungen_gesamt_gi,
+          fullInfant, // Impfungen_gesamt_00bis04_gi,
+          firstBooster, // Impfungen_gesamt_boost1,
+          secondBooster, // Impfungen_gesamt_boost2,
+          thirdBooster, // Impfungen_gesamt_boost3,
+          fourthBooster, // Impfungen_gesamt_boost4,
+          qFirstTotal, // Impfquote_gesamt_min1,
+          qFirst05bis17, // Impfquote_05bis17_min1,
+          qFirst05bis11, // Impfquote_05bis11_min1,
+          qFirst12bis17, // Impfquote_12bis17_min1,
+          qFirst18plus, // Impfquote_18plus_min1,
+          qFirst18bis59, // Impfquote_18bis59_min1,
+          qFirst60plus, // Impfquote_60plus_min1,
+          qFullTotal, // Impfquote_gesamt_gi,
+          qFull05bis17, // Impfquote_05bis17_gi,
+          qFull05bis11, // Impfquote_05bis11_gi,
+          qFull12bis17, // Impfquote_12bis17_gi,
+          qFull18plus, // Impfquote_18plus_gi,
+          qFull18bis59, // Impfquote_18bis59_gi,
+          qFull60plus, // Impfquote_60plus_gi,
+          q1BoostTotal, // Impfquote_gesamt_boost1,
+          q1Boost12bis17, // Impfquote_12bis17_boost1,
+          q1Boost18plus, // Impfquote_18plus_boost1,
+          q1Boost18bis59, // Impfquote_18bis59_boost1,
+          q1Boost60plus, // Impfquote_60plus_boost1,
+          q2BoostTotal, // Impfquote_gesamt_boost2,
+          q2Boost12bis17, // Impfquote_12bis17_boost2,
+          q2Boost18plus, // Impfquote_18plus_boost2,
+          q2Boost18bis59, // Impfquote_18bis59_boost2,
+          q2Boost60plus, // Impfquote_60plus_boost2,
+          // no quotes for third and fourth booster are privided !
+        ] = record;
+        quoteVaccinationDataObject[id] = {
+          name: name,
+          vaccination: {
+            total: total,
+            [US.S1]: first,
+            [US.S1I]: firstInfant,
+            [US.S2]: full,
+            [US.S2I]: fullInfant,
+            [US.S3]: firstBooster,
+            [US.S4]: secondBooster,
+            [US.S5]: thirdBooster,
+            [US.S6]: fourthBooster,
+          },
+          [US.S1]: {
+            total: qFirstTotal,
+            [UAG.G0517]: qFirst05bis17,
+            [UAG.G0511]: qFirst05bis11,
+            [UAG.G1217]: qFirst12bis17,
+            [UAG.G18pl]: qFirst18plus,
+            [UAG.G1859]: qFirst18bis59,
+            [UAG.G60pl]: qFirst60plus,
+          },
+          [US.S2]: {
+            total: qFullTotal,
+            [UAG.G0517]: qFull05bis17,
+            [UAG.G0511]: qFull05bis11,
+            [UAG.G1217]: qFull12bis17,
+            [UAG.G18pl]: qFull18plus,
+            [UAG.G1859]: qFull18bis59,
+            [UAG.G60pl]: qFull60plus,
+          },
+          [US.S3]: {
+            total: q1BoostTotal,
+            [UAG.G1217]: q1Boost12bis17,
+            [UAG.G18pl]: q1Boost18plus,
+            [UAG.G1859]: q1Boost18bis59,
+            [UAG.G60pl]: q1Boost60plus,
+          },
+          [US.S4]: {
+            total: q2BoostTotal,
+            [UAG.G1217]: q2Boost12bis17,
+            [UAG.G18pl]: q2Boost18plus,
+            [UAG.G1859]: q2Boost18bis59,
+            [UAG.G60pl]: q2Boost60plus,
+          },
+          /* The RKI does not provide quotes for the third and fourth booster
             [US.S5]: {
               total: q2BoostTotal,
               [UAG.G1217]: q2Boost12bis17,
@@ -585,22 +573,21 @@ export async function getVaccinationCoverage(): Promise<
               [UAG.G60pl]: q2Boost60plus,
             },
             */
-          };
-        }
-      });
+        };
+      }
+    });
 
-      // Catch any error
-      parser.on("error", function (err) {
-        console.error(err.message);
-        reject(err.message);
-      });
+    // Catch any error
+    parser.on("error", function (err) {
+      console.error(err.message);
+      reject(err.message);
+    });
 
-      // When we are done, test that the parsed output matched what expected
-      parser.on("end", function () {
-        resolve(quoteVaccinationDataObject);
-      });
-    }
-  );
+    // When we are done, test that the parsed output matched what expected
+    parser.on("end", function () {
+      resolve(quoteVaccinationDataObject);
+    });
+  });
   // get last commit of Deutschland_Bundeslaender_COVID-19-Impfungen.csv
   const apiDBUrl = new URL(
     "https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits?path=Deutschland_Bundeslaender_COVID-19-Impfungen.csv"
@@ -619,19 +606,13 @@ export async function getVaccinationCoverage(): Promise<
   const apiUrlTreesSha = new URL(
     `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${lastCommitData.sha}`
   );
-  const filesResponse = await GetApiTrees(
-    apiUrlTreesSha.href,
-    apiUrlTreesSha.pathname
-  );
+  const filesResponse = await GetApiTrees(apiUrlTreesSha.href, apiUrlTreesSha.pathname);
   const baseFiles = filesResponse.tree;
   const archiveSha = baseFiles.find((entry) => entry.path == "Archiv").sha;
   const apiUrlTreesArchivSha = new URL(
     `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/git/trees/${archiveSha}`
   );
-  const archiveResponse = await GetApiTrees(
-    apiUrlTreesArchivSha.href,
-    apiUrlTreesArchivSha.pathname
-  );
+  const archiveResponse = await GetApiTrees(apiUrlTreesArchivSha.href, apiUrlTreesArchivSha.pathname);
   const archiveFile = archiveResponse.tree
     .filter((entry) => entry.path.includes("Bundeslaender"))
     .sort((a, b) => {
@@ -640,16 +621,10 @@ export async function getVaccinationCoverage(): Promise<
       return dateB.getTime() - dateA.getTime();
     })[1].path;
   const archiveUrl = `https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Archiv/${archiveFile}`;
-  const archiveDataPromise = new Promise<VaccineVaccinationData>(
-    DataPromise.bind({ url: archiveUrl })
-  );
+  const archiveDataPromise = new Promise<VaccineVaccinationData>(DataPromise.bind({ url: archiveUrl }));
 
   // request all data
-  const [actualData, archiveData, quoteData] = await Promise.all([
-    actualDataPromise,
-    archiveDataPromise,
-    quoteDataPromise,
-  ]);
+  const [actualData, archiveData, quoteData] = await Promise.all([actualDataPromise, archiveDataPromise, quoteDataPromise]);
 
   // now we have all the stuff we need to fill the coverage
   // init
@@ -1196,83 +1171,77 @@ export interface VaccinationHistoryEntry {
 }
 [];
 
-export async function getVaccinationHistory(
-  days?: number
-): Promise<ResponseData<VaccinationHistoryEntry[]>> {
-  const vaccinationHistoryPromise = new Promise<VacciantionHistoryDataObject>(
-    async (resolve, reject) => {
-      // Create the parser
-      const parser = parse({
-        delimiter: ",",
-        from: 2,
-        cast: true,
-        cast_date: true,
-      });
+export async function getVaccinationHistory(days?: number): Promise<ResponseData<VaccinationHistoryEntry[]>> {
+  const vaccinationHistoryPromise = new Promise<VacciantionHistoryDataObject>(async (resolve, reject) => {
+    // Create the parser
+    const parser = parse({
+      delimiter: ",",
+      from: 2,
+      cast: true,
+      cast_date: true,
+    });
 
-      // get csv as stream
-      const response = await axios({
-        method: "get",
-        url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Bundeslaender_COVID-19-Impfungen.csv",
-        responseType: "stream",
-      });
+    // get csv as stream
+    const response = await axios({
+      method: "get",
+      url: "https://github.com/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/raw/main/Deutschland_Bundeslaender_COVID-19-Impfungen.csv",
+      responseType: "stream",
+    });
 
-      // pipe csv stream to csv parser
-      response.data.pipe(parser);
+    // pipe csv stream to csv parser
+    response.data.pipe(parser);
 
-      // empty object, that gets filled
-      const vaccinationHistoryDataObject: VacciantionHistoryDataObject = {};
+    // empty object, that gets filled
+    const vaccinationHistoryDataObject: VacciantionHistoryDataObject = {};
 
-      // read the parser stream and add record to hospitalizationDataObject
-      parser.on("readable", function () {
-        let record;
-        while ((record = parser.read())) {
-          let [date, stateId, vaccine, series, count] = record;
-          const seriesKey = "S" + series.toString();
-          // read entry for the date
-          let dateEntry = vaccinationHistoryDataObject[date.toISOString()];
+    // read the parser stream and add record to hospitalizationDataObject
+    parser.on("readable", function () {
+      let record;
+      while ((record = parser.read())) {
+        let [date, stateId, vaccine, series, count] = record;
+        const seriesKey = "S" + series.toString();
+        // read entry for the date
+        let dateEntry = vaccinationHistoryDataObject[date.toISOString()];
 
-          // create new object if the entry does not exist
-          if (!dateEntry) {
-            dateEntry = {
-              date: date,
-              vaccinated: null,
-              firstVaccination: null,
-              secondVaccination: null,
-              firstBoosterVaccination: null,
-              secondBoosterVaccination: null,
-              thirdBoosterVaccination: null,
-              fourthBoosterVaccination: null,
-              totalVacciantionOfTheDay: null,
-            };
-          }
-
-          dateEntry.totalVacciantionOfTheDay += count;
-          dateEntry[SeriesHistory[seriesKey]] += count;
-          if (series == 1) dateEntry.vaccinated += count; // legacy Entry
-
-          // write data to object
-          vaccinationHistoryDataObject[date.toISOString()] = dateEntry;
+        // create new object if the entry does not exist
+        if (!dateEntry) {
+          dateEntry = {
+            date: date,
+            vaccinated: null,
+            firstVaccination: null,
+            secondVaccination: null,
+            firstBoosterVaccination: null,
+            secondBoosterVaccination: null,
+            thirdBoosterVaccination: null,
+            fourthBoosterVaccination: null,
+            totalVacciantionOfTheDay: null,
+          };
         }
-      });
-      // Catch any error
-      parser.on("error", function (err) {
-        console.error(err.message);
-        reject(err.message);
-      });
 
-      // When we are done, test that the parsed output matched what expected
-      parser.on("end", function () {
-        resolve(vaccinationHistoryDataObject);
-      });
-    }
-  );
+        dateEntry.totalVacciantionOfTheDay += count;
+        dateEntry[SeriesHistory[seriesKey]] += count;
+        if (series == 1) dateEntry.vaccinated += count; // legacy Entry
+
+        // write data to object
+        vaccinationHistoryDataObject[date.toISOString()] = dateEntry;
+      }
+    });
+    // Catch any error
+    parser.on("error", function (err) {
+      console.error(err.message);
+      reject(err.message);
+    });
+
+    // When we are done, test that the parsed output matched what expected
+    parser.on("end", function () {
+      resolve(vaccinationHistoryDataObject);
+    });
+  });
 
   const [vaccinationHistoryObject, lastUpdate] = await Promise.all([
     vaccinationHistoryPromise,
     axios
-      .get(
-        `https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`
-      )
+      .get(`https://api.github.com/repos/robert-koch-institut/COVID-19-Impfungen_in_Deutschland/commits/main`)
       .then((response) => {
         const apiData: ApiData = response.data;
         return new Date(apiData.commit.author.date);
@@ -1284,9 +1253,7 @@ export async function getVaccinationHistory(
   }
   if (days) {
     const reference_date = new Date(getDateBefore(days + 1));
-    vaccinationHistory = vaccinationHistory.filter(
-      (element) => element.date > reference_date
-    );
+    vaccinationHistory = vaccinationHistory.filter((element) => element.date > reference_date);
   }
   return {
     data: vaccinationHistory,

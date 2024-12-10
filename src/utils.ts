@@ -126,9 +126,7 @@ export function getStateAbbreviationByName(name: string): string | null {
   }
 }
 
-export function getStateNameByAbbreviation(
-  abbreviation: string
-): string | null {
+export function getStateNameByAbbreviation(abbreviation: string): string | null {
   switch (abbreviation) {
     case "BW":
       return "Baden-Württemberg";
@@ -305,26 +303,15 @@ export function CreateRedisClient(prefix: string) {
 }
 
 // function to add entry to redis
-export async function AddRedisEntry(
-  redisClient: any,
-  redisKey: string,
-  JsonData: string,
-  validFor: number,
-  mime: string
-) {
+export async function AddRedisEntry(redisClient: any, redisKey: string, JsonData: string, validFor: number, mime: string) {
   return new Promise((resolve, reject) => {
-    redisClient.add(
-      redisKey,
-      JsonData,
-      { expire: validFor, type: mime },
-      (err, reply) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(reply);
-        }
+    redisClient.add(redisKey, JsonData, { expire: validFor, type: mime }, (err, reply) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(reply);
       }
-    );
+    });
   });
 }
 
@@ -401,11 +388,9 @@ export interface MetaData {
   modified: number;
 }
 
-export const baseUrl =
-  "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/";
+export const baseUrl = "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA/master/dataStore/";
 
-export const baseUrlRD5 =
-  "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA5/master/dataStore/";
+export const baseUrlRD5 = "https://raw.githubusercontent.com/Rubber1Duck/RD_RKI_COVID19_DATA5/master/dataStore/";
 
 export async function getMetaData(): Promise<MetaData> {
   let metaData: MetaData;
@@ -437,10 +422,7 @@ export async function getMetaData(): Promise<MetaData> {
       const newModified = metaData.modified;
       newModified > oldModified;
       if (newModified > oldModified) {
-        const validToMs = AddDaysToDate(
-          new Date(metaData.modified),
-          1
-        ).setHours(3, 0, 0, 0);
+        const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(3, 0, 0, 0);
         // calculate the seconds from now to validTo
         // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
         validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
@@ -449,18 +431,11 @@ export async function getMetaData(): Promise<MetaData> {
       }
     } else {
       // metaData redisEntry is valid to next day 3 o`clock GMT
-      const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(
-        3,
-        0,
-        0,
-        0
-      );
+      const validToMs = AddDaysToDate(new Date(metaData.modified), 1).setHours(3, 0, 0, 0);
       // calculate the seconds from now to validTo
       // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
       validForSec =
-        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
-          ? Math.ceil((validToMs - new Date().getTime()) / 1000)
-          : 3600;
+        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0 ? Math.ceil((validToMs - new Date().getTime()) / 1000) : 3600;
     }
     // create redis Entry for metaData
     await AddRedisEntry(redisClientBas, "meta", metaRedis, validForSec, "json");
@@ -500,10 +475,7 @@ export async function getMetaDataRD5(): Promise<MetaData> {
       const newModified = metaDataRD5.modified;
       newModified > oldModified;
       if (newModified > oldModified) {
-        const validToMs = AddDaysToDate(
-          new Date(metaDataRD5.modified),
-          1
-        ).setHours(3, 0, 0, 0);
+        const validToMs = AddDaysToDate(new Date(metaDataRD5.modified), 1).setHours(3, 0, 0, 0);
         // calculate the seconds from now to validTo
         // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
         validForSec = Math.ceil((validToMs - new Date().getTime()) / 1000);
@@ -512,36 +484,21 @@ export async function getMetaDataRD5(): Promise<MetaData> {
       }
     } else {
       // metaData redisEntry is valid to next day 3 o`clock GMT
-      const validToMs = AddDaysToDate(
-        new Date(metaDataRD5.modified),
-        1
-      ).setHours(3, 0, 0, 0);
+      const validToMs = AddDaysToDate(new Date(metaDataRD5.modified), 1).setHours(3, 0, 0, 0);
       // calculate the seconds from now to validTo
       // if Math.ceil((validToMs - new Date().getTime()) / 1000) < 0 then set validForSec to 3600 () (one more hour to wait for Updates)
       validForSec =
-        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0
-          ? Math.ceil((validToMs - new Date().getTime()) / 1000)
-          : 3600;
+        Math.ceil((validToMs - new Date().getTime()) / 1000) > 0 ? Math.ceil((validToMs - new Date().getTime()) / 1000) : 3600;
     }
     // create redis Entry for metaData
-    await AddRedisEntry(
-      redisClientBas,
-      "metaRD5",
-      metaRedis,
-      validForSec,
-      "json"
-    );
+    await AddRedisEntry(redisClientBas, "metaRD5", metaRedis, validForSec, "json");
   } else {
     metaDataRD5 = JSON.parse(redisEntryMeta[0].body);
   }
   return metaDataRD5;
 }
 
-export async function getData(
-  metaData: MetaData,
-  whatToLoad: Files,
-  base = baseUrl
-) {
+export async function getData(metaData: MetaData, whatToLoad: Files, base = baseUrl) {
   let result;
   let newerDataAvail = false;
 
@@ -577,9 +534,7 @@ export async function getData(
     }
 
     // decompress lzma compressed data (files are xz compressed)
-    const decomp = await new Promise((resolve) =>
-      lzma.decompress(rdata, undefined, (result) => resolve(result))
-    );
+    const decomp = await new Promise((resolve) => lzma.decompress(rdata, undefined, (result) => resolve(result)));
 
     // parse json data
     result = {
@@ -591,13 +546,7 @@ export async function getData(
     const redisResult = JSON.stringify(result);
 
     // create redis Entry
-    await AddRedisEntry(
-      redisClientBas,
-      redisKey,
-      redisResult,
-      neverExpire,
-      "json"
-    );
+    await AddRedisEntry(redisClientBas, redisKey, redisResult, neverExpire, "json");
   }
 
   // return requested data
@@ -639,10 +588,7 @@ export interface ApiTreesSha {
   }[];
 }
 
-export async function GetApiTrees(
-  url: string,
-  key: string
-): Promise<ApiTreesSha> {
+export async function GetApiTrees(url: string, key: string): Promise<ApiTreesSha> {
   let apiData: ApiTreesSha;
   const apiDataRedis = await GetRedisEntry(redisClientBas, key);
   if (apiDataRedis.length == 1) {

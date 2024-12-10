@@ -104,13 +104,7 @@ export interface ApiData {
   }[];
 }
 
-function sumInterval(
-  data: unknown[],
-  startRow: number,
-  intervalStart: number,
-  intervalEnd: number,
-  fieldName: string
-): number {
+function sumInterval(data: unknown[], startRow: number, intervalStart: number, intervalEnd: number, fieldName: string): number {
   let sum = 0;
   for (let offset = intervalStart; offset <= intervalEnd; offset++) {
     sum += data[startRow - offset][fieldName];
@@ -180,9 +174,7 @@ export async function getRValue() {
   };
 }
 
-export async function getRValueHistory(
-  days?: number
-): Promise<ResponseData<RValueHistoryEntry[]>> {
+export async function getRValueHistory(days?: number): Promise<ResponseData<RValueHistoryEntry[]>> {
   const response = await axios.get(rValueDataUrl.href, {
     responseType: "arraybuffer",
   });
@@ -206,8 +198,7 @@ export async function getRValueHistory(
     const numerator = sumInterval(json, index, 0, 3, "PS_COVID_Faelle");
     // sum of four daily cases 4 days ago
     const denominator = sumInterval(json, index, 4, 7, "PS_COVID_Faelle");
-    json[index]["rValue4Days"] =
-      Math.round((numerator / denominator) * 100) / 100;
+    json[index]["rValue4Days"] = Math.round((numerator / denominator) * 100) / 100;
   }
   let history: RValueHistoryEntry[] = json.map((row) => {
     return {

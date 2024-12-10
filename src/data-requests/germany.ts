@@ -1,12 +1,5 @@
 import { ResponseData } from "./response-data";
-import {
-  getDateBefore,
-  getData,
-  Files,
-  MetaData,
-  baseUrl,
-  baseUrlRD5,
-} from "../utils";
+import { getDateBefore, getData, Files, MetaData, baseUrl, baseUrlRD5 } from "../utils";
 import {
   AgeGroupData,
   IStateDataFile,
@@ -18,9 +11,7 @@ import {
   S_CasesHistoryChangesFile,
 } from "./states";
 
-export async function getGermanyCases(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyCases(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].accuCases,
@@ -28,9 +19,7 @@ export async function getGermanyCases(
   };
 }
 
-export async function getGermanyNewCases(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyNewCases(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].newCases,
@@ -43,14 +32,8 @@ interface G_CasesHistory {
   date: Date;
 }
 
-export async function getGermanyCasesHistory(
-  metaData: MetaData,
-  days?: number
-): Promise<ResponseData<G_CasesHistory[]>> {
-  const json: S_CasesHistoryFile = await getData(
-    metaData,
-    Files.S_CasesHistory
-  );
+export async function getGermanyCasesHistory(metaData: MetaData, days?: number): Promise<ResponseData<G_CasesHistory[]>> {
+  const json: S_CasesHistoryFile = await getData(metaData, Files.S_CasesHistory);
   let history: G_CasesHistory[] = json.data
     .filter((state) => state.i == "00")
     .map((state) => {
@@ -83,53 +66,40 @@ export async function getGermanyCasesChangesHistory(
   oneReportDate?: Date,
   changeDate?: Date
 ): Promise<ResponseData<G_CasesChangesHistory>> {
-  const json: S_CasesHistoryChangesFile = await getData(
-    metaDataRD5,
-    Files.S_CasesHistoryLastChangesFile,
-    baseUrlRD5
-  );
+  const json: S_CasesHistoryChangesFile = await getData(metaDataRD5, Files.S_CasesHistoryLastChangesFile, baseUrlRD5);
   // filter to only germany data
   json.data = json.data.filter((state) => state.i == "00");
   // if till date is given filter meldedatum
   if (tillReportDate) {
-    json.data = json.data.filter(
-      (dates) => dates.m.getTime() >= tillReportDate.getTime()
-    );
+    json.data = json.data.filter((dates) => dates.m.getTime() >= tillReportDate.getTime());
   }
   // if oneReportDate is given filter to this date
   if (oneReportDate) {
-    json.data = json.data.filter(
-      (reportDates) => reportDates.m.getTime() == oneReportDate.getTime()
-    );
+    json.data = json.data.filter((reportDates) => reportDates.m.getTime() == oneReportDate.getTime());
   }
   // if a changeDate is given filter changeDate
   if (changeDate) {
-    json.data = json.data.filter(
-      (changeDates) => changeDates.cD.getTime() == changeDate.getTime()
-    );
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
   }
-  const casesChangesHistory: G_CasesChangesHistory = json.data.reduce(
-    (changes, entry) => {
-      const dateStr = new Date(entry.m).toISOString().split("T").shift();
-      if (changes[dateStr]) {
-        changes[dateStr].push({
+  const casesChangesHistory: G_CasesChangesHistory = json.data.reduce((changes, entry) => {
+    const dateStr = new Date(entry.m).toISOString().split("T").shift();
+    if (changes[dateStr]) {
+      changes[dateStr].push({
+        cases: entry.c,
+        changeDate: new Date(entry.cD),
+        deltaCases: entry.dc,
+      });
+    } else {
+      changes[dateStr] = [
+        {
           cases: entry.c,
           changeDate: new Date(entry.cD),
           deltaCases: entry.dc,
-        });
-      } else {
-        changes[dateStr] = [
-          {
-            cases: entry.c,
-            changeDate: new Date(entry.cD),
-            deltaCases: entry.dc,
-          },
-        ];
-      }
-      return changes;
-    },
-    {}
-  );
+        },
+      ];
+    }
+    return changes;
+  }, {});
 
   Object.keys(casesChangesHistory).forEach((date) => {
     casesChangesHistory[date].sort((a, b) => {
@@ -150,14 +120,8 @@ interface G_DeathsHistory {
   date: Date;
 }
 
-export async function getGermanyDeathsHistory(
-  metaData: MetaData,
-  days?: number
-): Promise<ResponseData<G_DeathsHistory[]>> {
-  const json: S_DeathsHistoryFile = await getData(
-    metaData,
-    Files.S_DeathsHistory
-  );
+export async function getGermanyDeathsHistory(metaData: MetaData, days?: number): Promise<ResponseData<G_DeathsHistory[]>> {
+  const json: S_DeathsHistoryFile = await getData(metaData, Files.S_DeathsHistory);
   let history: G_DeathsHistory[] = json.data
     .filter((state) => state.i == "00")
     .map((state) => {
@@ -181,14 +145,8 @@ interface G_RecoveredHistory {
   date: Date;
 }
 
-export async function getGermanyRecoveredHistory(
-  metaData: MetaData,
-  days?: number
-): Promise<ResponseData<G_RecoveredHistory[]>> {
-  const json: S_RecoveredHistoryFile = await getData(
-    metaData,
-    Files.S_RecoveredHistory
-  );
+export async function getGermanyRecoveredHistory(metaData: MetaData, days?: number): Promise<ResponseData<G_RecoveredHistory[]>> {
+  const json: S_RecoveredHistoryFile = await getData(metaData, Files.S_RecoveredHistory);
   let history: G_RecoveredHistory[] = json.data
     .filter((state) => state.i == "00")
     .map((state) => {
@@ -212,14 +170,8 @@ interface G_IncidenceHistory {
   date: Date;
 }
 
-export async function getGermanyIncidenceHistory(
-  metaData: MetaData,
-  days?: number
-): Promise<ResponseData<G_IncidenceHistory[]>> {
-  const json: S_IncidenceHistoryFile = await getData(
-    metaData,
-    Files.S_IncidenceHistory
-  );
+export async function getGermanyIncidenceHistory(metaData: MetaData, days?: number): Promise<ResponseData<G_IncidenceHistory[]>> {
+  const json: S_IncidenceHistoryFile = await getData(metaData, Files.S_IncidenceHistory);
   let history: G_IncidenceHistory[] = json.data
     .filter((state) => state.i == "00")
     .map((state) => {
@@ -238,9 +190,7 @@ export async function getGermanyIncidenceHistory(
   };
 }
 
-export async function getGermanyDeaths(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyDeaths(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].accuDeaths,
@@ -248,9 +198,7 @@ export async function getGermanyDeaths(
   };
 }
 
-export async function getGermanyNewDeaths(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyNewDeaths(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].newDeaths,
@@ -258,9 +206,7 @@ export async function getGermanyNewDeaths(
   };
 }
 
-export async function getGermanyRecovered(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyRecovered(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].accuRecovered,
@@ -268,9 +214,7 @@ export async function getGermanyRecovered(
   };
 }
 
-export async function getGermanyNewRecovered(
-  metaData: MetaData
-): Promise<ResponseData<number>> {
+export async function getGermanyNewRecovered(metaData: MetaData): Promise<ResponseData<number>> {
   const json: IStateDataFile = await getData(metaData, Files.S_Data);
   return {
     data: json.data[0].newRecovered,
@@ -282,9 +226,7 @@ interface G_AgeGrpData {
   [ageGrp: string]: AgeGroupData;
 }
 
-export async function getGermanyAgeGroups(
-  metaData: MetaData
-): Promise<ResponseData<G_AgeGrpData>> {
+export async function getGermanyAgeGroups(metaData: MetaData): Promise<ResponseData<G_AgeGrpData>> {
   const json: S_AgeGrpFile = await getData(metaData, Files.S_AgeGroups);
   let data: G_AgeGrpData = {};
   json.data.forEach((entry) => {

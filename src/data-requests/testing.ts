@@ -11,9 +11,7 @@ export interface testingHistoryEntry {
   laboratoryCount: number;
 }
 
-export async function getTestingHistory(
-  weeks?: number
-): Promise<ResponseData<testingHistoryEntry[]>> {
+export async function getTestingHistory(weeks?: number): Promise<ResponseData<testingHistoryEntry[]>> {
   const testingDataUrl =
     "https://github.com/robert-koch-institut/SARS-CoV-2-PCR-Testungen_in_Deutschland/raw/main/SARS-CoV-2-PCR-Testungen_in_Deutschland.xlsx";
 
@@ -49,15 +47,12 @@ export async function getTestingHistory(
 
   for (const entry of json) {
     const dateSplit = entry.date.split("-");
-    const dateStr = `${dateSplit[1].substring(1).padStart(2, "0")}/${
-      dateSplit[0]
-    }`;
+    const dateStr = `${dateSplit[1].substring(1).padStart(2, "0")}/${dateSplit[0]}`;
     testingHistory.push({
       calendarWeek: dateStr,
       performedTests: entry.tests_total ?? null,
       positiveTests: entry.tests_positive ?? null,
-      positivityRate:
-        limit(entry.tests_positive / entry.tests_total, 4) ?? null,
+      positivityRate: limit(entry.tests_positive / entry.tests_total, 4) ?? null,
       laboratoryCount: entry.laboratories_tests ?? null,
     });
   }
