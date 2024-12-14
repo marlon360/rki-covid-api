@@ -25,8 +25,9 @@ interface GermanyData extends IResponseMeta {
   cases: number;
   deaths: number;
   recovered: number;
-  weekIncidence: number;
+  population: number;
   casesPerWeek: number;
+  weekIncidence: number;
   deathsPerWeek: number;
   casesPer100k: number;
   r: {
@@ -99,10 +100,11 @@ export async function GermanyResponse(): Promise<GermanyData> {
     cases: casesData.data,
     deaths: deathsData.data,
     recovered: recoveredData.data,
-    weekIncidence,
-    casesPer100k,
-    casesPerWeek,
-    deathsPerWeek,
+    population: population,
+    casesPerWeek: casesPerWeek,
+    weekIncidence: weekIncidence,
+    deathsPerWeek: deathsPerWeek,
+    casesPer100k: casesPer100k,
     delta: {
       cases: newCasesData.data,
       deaths: newDeathsData.data,
