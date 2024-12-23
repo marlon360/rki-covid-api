@@ -94,8 +94,8 @@ export async function ColorsPerDay(metaData: MetaData, region: Region): Promise<
         temp[dateStr][entry.i] = cInd;
         temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
         temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
-        temp[dateStr].sum = temp[dateStr].sum + entry.i7;
-        temp[dateStr].count = temp[dateStr].count + 1;
+        temp[dateStr].sum += entry.i7;
+        temp[dateStr].count +=1;
         const avg = temp[dateStr].sum / temp[dateStr].count;
         temp[dateStr].avg = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
@@ -128,15 +128,14 @@ export async function ColorsPerDay(metaData: MetaData, region: Region): Promise<
             return entry.i7 > range.min && entry.i7 <= range.max;
           }
         });
-        let avg = entry.i7;
         const id = parseInt(entry.i).toString();
         if (temp[dateStr]) {
           temp[dateStr][id] = cInd;
           temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
           temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
-          temp[dateStr].sum = temp[dateStr].sum + entry.i7;
-          temp[dateStr].count = temp[dateStr].count + 1;
-          avg = temp[dateStr].sum / temp[dateStr].count;
+          temp[dateStr].sum += entry.i7;
+          temp[dateStr].count += 1;
+          const avg = temp[dateStr].sum / temp[dateStr].count;
           temp[dateStr].avg = IColorRanges.findIndex((range) => {
             if (range.compareFn) {
               return range.compareFn(avg, range);
