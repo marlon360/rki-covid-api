@@ -447,17 +447,8 @@ export async function VideoResponse(region: Region, videoduration: number, days?
         } changed dates.`
       );
       allDiffs.forEach((day) => {
-        day.changes.forEach((change) => {
-          if (change.key == "new date") {
-            logDate = new Date().toISOString();
-            console.log(`${logDate}: ${region}: date: ${day.date}; change => ${change.key}`);
-          } else {
-            logDate = new Date().toISOString();
-            console.log(
-              `${logDate}: ${region}: date: ${day.date}; change => key: ${change.key} oldColor: ${change.oldColor} newColor: ${change.newColor}`
-            );
-          }
-        });
+        logDate = new Date().toISOString();
+        console.log(`${logDate}: ${region}: date: ${day.date}; changed regions: ${day.changes.length}`);
       });
     } else {
       for (const date of cPerDayKeys) {
