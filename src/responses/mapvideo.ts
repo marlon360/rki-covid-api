@@ -95,7 +95,7 @@ export async function ColorsPerDay(metaData: MetaData, region: Region): Promise<
         temp[dateStr].min = Math.min(temp[dateStr].min, cInd);
         temp[dateStr].max = Math.max(temp[dateStr].max, cInd);
         temp[dateStr].sum += entry.i7;
-        temp[dateStr].count +=1;
+        temp[dateStr].count += 1;
         const avg = temp[dateStr].sum / temp[dateStr].count;
         temp[dateStr].avg = IColorRanges.findIndex((range) => {
           if (range.compareFn) {
