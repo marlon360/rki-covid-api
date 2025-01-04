@@ -9,6 +9,7 @@ import {
   GermanyRecoveredHistoryResponse,
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
+  GermanyDeathsLastChangeHistoryResponse,
 } from "./responses/germany";
 import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import { app, queuedCache, cache } from "./server";
@@ -64,6 +65,40 @@ app.get("/germany/history/lastchange/cases/:days", queuedCache(), cache.route(),
 
 app.get("/germany/history/cases/:days", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
+  res.json(response);
+});
+/*
+app.get("/germany/history/changes/deaths", queuedCache(), cache.route(), async function (req, res) {
+  const response = await GermanyCasesChangesHistoryResponse();
+  res.json(response);
+});
+
+app.get("/germany/history/changes/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(new Date(checkedDateString));
+  res.json(response);
+});
+
+app.get("/germany/history/changesofreportday/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(null, new Date(checkedDateString));
+  res.json(response);
+});
+
+app.get("/germany/history/changesofchangeday/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(null, null, new Date(checkedDateString));
+  res.json(response);
+});
+*/
+app.get("/germany/history/lastchange/deaths", queuedCache(), cache.route(), async function (req, res) {
+  const response = await GermanyDeathsLastChangeHistoryResponse();
+  res.json(response);
+});
+
+app.get("/germany/history/lastchange/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesLastChangeHistoryResponse(new Date(checkedDateString));
   res.json(response);
 });
 

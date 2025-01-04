@@ -13,13 +13,13 @@ import {
   getGermanyAgeGroups,
   getGermanyCasesChangesHistory,
   G_CasesChangesHistory,
+  getGermanyDeathsChangesHistory,
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData, AgeGroupData } from "../data-requests/states";
 import { getHospitalizationData, getLatestHospitalizationDataKey } from "../data-requests/hospitalization";
 import { getStatesFrozenIncidenceHistory } from "../data-requests/frozen-incidence";
 import { getDateBefore, AddDaysToDate, limit, getMetaData, getMetaDataRD5 } from "../utils";
-import { ResponseData } from "../data-requests/response-data";
 
 interface GermanyData extends IResponseMeta {
   cases: number;
@@ -192,6 +192,35 @@ export async function GermanyCasesLastChangeHistoryResponse(tillReportDate?: Dat
       date: new Date(date),
       totalNumberOfChanges: changes,
       deltaCases: deltaCases,
+    });
+  });
+
+  return {
+    data: lastChange,
+    meta: new ResponseMeta(data.lastUpdate),
+  };
+}
+
+export async function GermanyDeathsLastChangeHistoryResponse(tillReportDate?: Date): Promise<
+  GermanyHistoryData<{
+    deaths: number;
+    date: Date;
+    lastChanged: Date;
+    totalNumberOfChanges: number;
+  }>
+> {
+  const metaData = await getMetaDataRD5();
+  const data = await getGermanyDeathsChangesHistory(metaData, tillReportDate);
+  const lastChange = [];
+  Object.keys(data.data).forEach((date) => {
+    const changes = data.data[date].length;
+    const deaths = data.data[date][changes - 1].deaths;
+    const lastDate = data.data[date][changes - 1].changeDate;
+    lastChange.push({
+      deaths: deaths,
+      lastChanged: lastDate,
+      date: new Date(date),
+      totalNumberOfChanges: changes,
     });
   });
 
