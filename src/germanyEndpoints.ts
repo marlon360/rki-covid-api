@@ -10,6 +10,7 @@ import {
   GermanyResponse,
   GermanyWeekIncidenceHistoryResponse,
   GermanyDeathsLastChangeHistoryResponse,
+  GermanyRecoveredLastChangeHistoryResponse,
 } from "./responses/germany";
 import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import { app, queuedCache, cache } from "./server";
@@ -99,6 +100,40 @@ app.get("/germany/history/lastchange/deaths", queuedCache(), cache.route(), asyn
 app.get("/germany/history/lastchange/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
   const response = await GermanyCasesLastChangeHistoryResponse(new Date(checkedDateString));
+  res.json(response);
+});
+/*
+app.get("/germany/history/changes/recovered", queuedCache(), cache.route(), async function (req, res) {
+  const response = await GermanyCasesChangesHistoryResponse();
+  res.json(response);
+});
+
+app.get("/germany/history/changes/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(new Date(checkedDateString));
+  res.json(response);
+});
+
+app.get("/germany/history/changesofreportday/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(null, new Date(checkedDateString));
+  res.json(response);
+});
+
+app.get("/germany/history/changesofchangeday/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyCasesChangesHistoryResponse(null, null, new Date(checkedDateString));
+  res.json(response);
+});
+*/
+app.get("/germany/history/lastchange/recovered", queuedCache(), cache.route(), async function (req, res) {
+  const response = await GermanyRecoveredLastChangeHistoryResponse();
+  res.json(response);
+});
+
+app.get("/germany/history/lastchange/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
+  let checkedDateString: string = checkDateParameter(req.params.days);
+  const response = await GermanyRecoveredLastChangeHistoryResponse(new Date(checkedDateString));
   res.json(response);
 });
 

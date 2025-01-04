@@ -9,7 +9,8 @@ import {
   S_IncidenceHistoryFile,
   S_AgeGrpFile,
   S_CasesHistoryChangesFile,
-  S_DeathsHistoryChangesFile
+  S_DeathsHistoryChangesFile,
+  S_RecoveredHistoryChangesFile,
 } from "./states";
 
 export async function getGermanyCases(metaData: MetaData): Promise<ResponseData<number>> {
@@ -155,6 +156,66 @@ export async function getGermanyDeathsChangesHistory(
       changes[dateStr] = [
         {
           deaths: entry.d,
+          changeDate: new Date(entry.cD),
+        },
+      ];
+    }
+    return changes;
+  }, {});
+
+  Object.keys(casesChangesHistory).forEach((date) => {
+    casesChangesHistory[date].sort((a, b) => {
+      const dateA = new Date(a.changeDate);
+      const dateB = new Date(b.changeDate);
+      return dateA.getTime() - dateB.getTime();
+    });
+  });
+
+  return {
+    lastUpdate: new Date(json.metaData.modified),
+    data: casesChangesHistory,
+  };
+}
+
+export interface G_RecoveredChangesHistory {
+  [date: string]: {
+    recovered: number;
+    changeDate: Date;
+  }[];
+}
+
+export async function getGermanyRecoveredChangesHistory(
+  metaDataRD5: MetaData,
+  tillReportDate?: Date,
+  oneReportDate?: Date,
+  changeDate?: Date
+): Promise<ResponseData<G_RecoveredChangesHistory>> {
+  const json: S_RecoveredHistoryChangesFile = await getData(metaDataRD5, Files.S_RevoveredHistoryLastChangesFile, baseUrlRD5);
+  // filter to only germany data
+  json.data = json.data.filter((state) => state.i == "00");
+  // if till date is given filter meldedatum
+  if (tillReportDate) {
+    json.data = json.data.filter((dates) => dates.m.getTime() >= tillReportDate.getTime());
+  }
+  // if oneReportDate is given filter to this date
+  if (oneReportDate) {
+    json.data = json.data.filter((reportDates) => reportDates.m.getTime() == oneReportDate.getTime());
+  }
+  // if a changeDate is given filter changeDate
+  if (changeDate) {
+    json.data = json.data.filter((changeDates) => changeDates.cD.getTime() == changeDate.getTime());
+  }
+  const casesChangesHistory: G_RecoveredChangesHistory = json.data.reduce((changes, entry) => {
+    const dateStr = new Date(entry.m).toISOString().split("T").shift();
+    if (changes[dateStr]) {
+      changes[dateStr].push({
+        recovered: entry.r,
+        changeDate: new Date(entry.cD),
+      });
+    } else {
+      changes[dateStr] = [
+        {
+          recovered: entry.r,
           changeDate: new Date(entry.cD),
         },
       ];

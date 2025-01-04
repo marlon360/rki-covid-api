@@ -14,6 +14,7 @@ import {
   getGermanyCasesChangesHistory,
   G_CasesChangesHistory,
   getGermanyDeathsChangesHistory,
+  getGermanyRecoveredChangesHistory
 } from "../data-requests/germany";
 import { getRValue } from "../data-requests/r-value";
 import { getStatesData, AgeGroupData } from "../data-requests/states";
@@ -218,6 +219,35 @@ export async function GermanyDeathsLastChangeHistoryResponse(tillReportDate?: Da
     const lastDate = data.data[date][changes - 1].changeDate;
     lastChange.push({
       deaths: deaths,
+      lastChanged: lastDate,
+      date: new Date(date),
+      totalNumberOfChanges: changes,
+    });
+  });
+
+  return {
+    data: lastChange,
+    meta: new ResponseMeta(data.lastUpdate),
+  };
+}
+
+export async function GermanyRecoveredLastChangeHistoryResponse(tillReportDate?: Date): Promise<
+  GermanyHistoryData<{
+    recovered: number;
+    date: Date;
+    lastChanged: Date;
+    totalNumberOfChanges: number;
+  }>
+> {
+  const metaData = await getMetaDataRD5();
+  const data = await getGermanyRecoveredChangesHistory(metaData, tillReportDate);
+  const lastChange = [];
+  Object.keys(data.data).forEach((date) => {
+    const changes = data.data[date].length;
+    const recovered = data.data[date][changes - 1].recovered;
+    const lastDate = data.data[date][changes - 1].changeDate;
+    lastChange.push({
+      recovered: recovered,
       lastChanged: lastDate,
       date: new Date(date),
       totalNumberOfChanges: changes,

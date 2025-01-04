@@ -156,6 +156,16 @@ export interface S_DeathsHistoryChangesFile {
   metaData: MetaData;
 }
 
+export interface S_RecoveredHistoryChangesFile {
+  data: {
+    m: Date; // Meldedatum
+    i: string; // id Bundesland
+    r: number; // Genesen
+    cD: Date; // ÄnderungsDatum
+  }[];
+  metaData: MetaData;
+}
+
 export async function getStatesCasesHistory(
   metaData: MetaData,
   days?: number,
