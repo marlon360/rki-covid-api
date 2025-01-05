@@ -11,6 +11,8 @@ import {
   GermanyWeekIncidenceHistoryResponse,
   GermanyDeathsLastChangeHistoryResponse,
   GermanyRecoveredLastChangeHistoryResponse,
+  GermanyDeathsChangesHistoryResponse,
+  GermanyRecoveredChangesHistoryResponse
 } from "./responses/germany";
 import { RValueHistoryHistoryResponse } from "./responses/r-value";
 import { app, queuedCache, cache } from "./server";
@@ -27,6 +29,11 @@ app.get("/germany/history", queuedCache(), cache.route(), async function (req, r
 
 app.get("/germany/history/cases", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyCasesHistoryResponse();
+  res.json(response);
+});
+
+app.get("/germany/history/cases/:days", queuedCache(), cache.route(), async function (req, res) {
+  const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
   res.json(response);
 });
 
@@ -64,34 +71,29 @@ app.get("/germany/history/lastchange/cases/:days", queuedCache(), cache.route(),
   res.json(response);
 });
 
-app.get("/germany/history/cases/:days", queuedCache(), cache.route(), async function (req, res) {
-  const response = await GermanyCasesHistoryResponse(parseInt(req.params.days));
-  res.json(response);
-});
-/*
 app.get("/germany/history/changes/deaths", queuedCache(), cache.route(), async function (req, res) {
-  const response = await GermanyCasesChangesHistoryResponse();
+  const response = await GermanyDeathsChangesHistoryResponse();
   res.json(response);
 });
 
 app.get("/germany/history/changes/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(new Date(checkedDateString));
+  const response = await GermanyDeathsChangesHistoryResponse(new Date(checkedDateString));
   res.json(response);
 });
 
 app.get("/germany/history/changesofreportday/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(null, new Date(checkedDateString));
+  const response = await GermanyDeathsChangesHistoryResponse(null, new Date(checkedDateString));
   res.json(response);
 });
 
 app.get("/germany/history/changesofchangeday/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(null, null, new Date(checkedDateString));
+  const response = await GermanyDeathsChangesHistoryResponse(null, null, new Date(checkedDateString));
   res.json(response);
 });
-*/
+
 app.get("/germany/history/lastchange/deaths", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyDeathsLastChangeHistoryResponse();
   res.json(response);
@@ -99,33 +101,33 @@ app.get("/germany/history/lastchange/deaths", queuedCache(), cache.route(), asyn
 
 app.get("/germany/history/lastchange/deaths/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesLastChangeHistoryResponse(new Date(checkedDateString));
+  const response = await GermanyDeathsLastChangeHistoryResponse(new Date(checkedDateString));
   res.json(response);
 });
-/*
+
 app.get("/germany/history/changes/recovered", queuedCache(), cache.route(), async function (req, res) {
-  const response = await GermanyCasesChangesHistoryResponse();
+  const response = await GermanyRecoveredChangesHistoryResponse();
   res.json(response);
 });
 
 app.get("/germany/history/changes/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(new Date(checkedDateString));
+  const response = await GermanyRecoveredChangesHistoryResponse(new Date(checkedDateString));
   res.json(response);
 });
 
 app.get("/germany/history/changesofreportday/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(null, new Date(checkedDateString));
+  const response = await GermanyRecoveredChangesHistoryResponse(null, new Date(checkedDateString));
   res.json(response);
 });
 
 app.get("/germany/history/changesofchangeday/recovered/:days", queuedCache(), cache.route(), async function (req, res) {
   let checkedDateString: string = checkDateParameter(req.params.days);
-  const response = await GermanyCasesChangesHistoryResponse(null, null, new Date(checkedDateString));
+  const response = await GermanyRecoveredChangesHistoryResponse(null, null, new Date(checkedDateString));
   res.json(response);
 });
-*/
+
 app.get("/germany/history/lastchange/recovered", queuedCache(), cache.route(), async function (req, res) {
   const response = await GermanyRecoveredLastChangeHistoryResponse();
   res.json(response);
