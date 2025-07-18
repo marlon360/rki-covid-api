@@ -18,7 +18,7 @@
   "dependencies": {
     "@marlon360/express-queue": "^1.0.3",
     "axios": "^1.7.7",
-    "compression": "^1.7.4",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
     "csv-parse": "^4.16.3",
     "express": "^4.21.0",
